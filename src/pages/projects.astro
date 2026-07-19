@@ -5,8 +5,8 @@ import { wixResize, landLabel } from '../lib/wix.js';
 import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
 
-const [{ projects_page: page, home_stats: stats, films }, all] = await Promise.all([
-  getContent('projects_page', 'home_stats', 'films'),
+const [{ projects_page: page, home_stats: stats }, all] = await Promise.all([
+  getContent('projects_page', 'home_stats'),
   getProperties(),
 ]);
 const forSale = all.filter((p) => p.data.status === 'for-sale');
@@ -35,17 +35,15 @@ const journeyStage = (slug, gi, w = 1600, h = 1000) => {
 const journeys = [
   {
     // FOR-SALE example — full journey ending in the listing finale.
-    // `video` switches on scrub mode: dragging the timeline scrubs this film
-    // so the build assembles under the visitor's finger. Currently wired to
-    // the QASR property film as a stand-in — REPLACE with a true build
-    // time-lapse / Instagram journey reel (upload to Supabase media/films/)
-    // for the real "watch it rise" effect.
+    // `video` switches on scrub mode: dragging the timeline scrubs this
+    // AI-generated build time-lapse (Seedance via Higgsfield, end frame
+    // anchored to the real QASR facade photo) hosted in Supabase storage.
     name: 'QASR',
     suburb: 'Coorparoo',
     forSale: true,
     listingHref: '/properties/qasr/',
-    video: films?.byProperty?.qasr?.video,
-    poster: films?.byProperty?.qasr?.poster,
+    video: 'https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/qasr-journey.mp4',
+    poster: 'https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/qasr-journey-poster.jpg',
     gallery: bySlug.qasr?.data.gallery ?? [],
     stages: [
       { label: 'Site & Foundation', caption: 'Every build begins with the land — engineered footings anchor QASR to its Coorparoo ridge.', image: journeyStage('qasr', 3) },
