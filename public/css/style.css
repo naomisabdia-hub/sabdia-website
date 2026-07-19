@@ -120,6 +120,11 @@ html.js .reveal-x{opacity:0;transform:translateX(-28px);transition:opacity .9s v
 html.js .reveal-x.vis{opacity:1;transform:translateX(0)}
 html.js .reveal-r{opacity:0;transform:translateX(28px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 html.js .reveal-r.vis{opacity:1;transform:translateX(0)}
+/* Curtain reveals — imagery unveils with a soft clip wipe */
+html.js .reveal-wipe{clip-path:inset(0 0 100% 0);transition:clip-path 1.15s var(--ease)}
+html.js .reveal-wipe.vis{clip-path:inset(0 0 0 0)}
+html.js .reveal-wipe-x{clip-path:inset(0 100% 0 0);transition:clip-path 1.15s var(--ease)}
+html.js .reveal-wipe-x.vis{clip-path:inset(0 0 0 0)}
 .d1{transition-delay:.1s!important}.d2{transition-delay:.2s!important}.d3{transition-delay:.3s!important}.d4{transition-delay:.4s!important}.d5{transition-delay:.5s!important}
 
 /* Section labels */
@@ -238,7 +243,7 @@ html.js .slabel.reveal.vis::before{width:24px}
 .pc-sm-a{grid-column:9/13;grid-row:1;aspect-ratio:unset}
 .pc-sm-b{grid-column:9/13;grid-row:2;aspect-ratio:unset}
 
-.pc{position:relative;overflow:hidden;cursor:none;display:block}
+.pc{position:relative;overflow:hidden;cursor:none;display:block;transition:transform .55s var(--ease)}
 .pc img{width:100%;height:100%;object-fit:cover;filter:brightness(.9) saturate(.88);transition:filter .7s var(--ease),transform .7s var(--ease)}
 .pc:hover img{filter:brightness(.55) saturate(.72);transform:scale(1.035)}
 .pc-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(14,13,11,.85) 0%,rgba(14,13,11,.12) 55%,transparent 100%);transition:opacity .4s}
@@ -262,7 +267,7 @@ html.js .slabel.reveal.vis::before{width:24px}
 .proj-grid-sold{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:64px}
 .sold-label{font-size:9px;font-weight:300;letter-spacing:.36em;text-transform:uppercase;color:var(--taupe-d);padding-bottom:20px;display:flex;align-items:center;gap:12px;margin-bottom:0}
 .sold-label::before{content:'';width:20px;height:1px;background:var(--taupe);flex-shrink:0}
-.sc-card{position:relative;overflow:hidden;cursor:none;display:block;aspect-ratio:16/10}
+.sc-card{position:relative;overflow:hidden;cursor:none;display:block;aspect-ratio:16/10;transition:transform .55s var(--ease)}
 .sc-card img{width:100%;height:100%;object-fit:cover;filter:brightness(.75) saturate(.65);transition:filter .6s,transform .8s var(--ease)}
 .sc-card:hover img{filter:brightness(.5) saturate(.55);transform:scale(1.035)}
 .sc-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(14,13,11,.8) 0%,transparent 55%)}
@@ -290,6 +295,15 @@ html.js .slabel.reveal.vis::before{width:24px}
 /* ── PROCESS ── */
 .proc-track{display:grid;grid-template-columns:repeat(4,1fr);position:relative}
 .proc-track::before{content:'';position:absolute;top:24px;left:calc(12.5%);right:calc(12.5%);height:1px;background:linear-gradient(90deg,var(--gold) 0%,var(--gold2) 100%);opacity:.35}
+/* line draws + numbers pop in sequence once the track scrolls in */
+html.js .proc-track::before{transform:scaleX(0);transform-origin:left;transition:transform 1.8s var(--ease) .2s}
+html.js .proc-track.fill::before{transform:scaleX(1)}
+html.js .proc-track .proc-n{transform:scale(.55);opacity:0;transition:transform .7s var(--ease),opacity .5s ease}
+html.js .proc-track.fill .proc-n{transform:scale(1);opacity:1}
+html.js .proc-track.fill .proc-step:nth-child(1) .proc-n{transition-delay:.2s}
+html.js .proc-track.fill .proc-step:nth-child(2) .proc-n{transition-delay:.55s}
+html.js .proc-track.fill .proc-step:nth-child(3) .proc-n{transition-delay:.9s}
+html.js .proc-track.fill .proc-step:nth-child(4) .proc-n{transition-delay:1.25s}
 .proc-step{padding:56px 28px 0;position:relative;text-align:center}
 .proc-n{width:48px;height:48px;border-radius:50%;background:var(--bg);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:19px;font-weight:300;font-style:italic;color:var(--gold);margin:0 auto 24px;position:relative;z-index:1}
 .proc-t{font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--ink);margin-bottom:12px}
@@ -676,6 +690,13 @@ p,.svc-d,.proc-d,.about-val-d,.tl-desc,.agent-ben-d{font-family:'EB Garamond',Ge
 .film-caption b{font-weight:300;color:var(--gold2)}
 @media(max-width:900px){.film-grid{grid-template-columns:1fr;gap:44px}.film-copy{text-align:center}.film-p{margin-left:auto;margin-right:auto}.film-copy .slabel{justify-content:center}}
 
+/* ── KINETIC TYPE BAND ── */
+.kin-band{background:var(--dark);border-top:1px solid rgba(255,255,255,.05);overflow:hidden;padding:clamp(26px,4vw,54px) 0}
+.kin-track{display:flex;width:max-content;animation:mq 46s linear infinite}
+.kin-group{display:flex;gap:clamp(44px,6vw,104px);padding-right:clamp(44px,6vw,104px);align-items:baseline}
+.kin-item{font-family:var(--font-d);font-style:italic;font-weight:300;font-size:clamp(54px,9vw,138px);line-height:1.08;white-space:nowrap;color:transparent;-webkit-text-stroke:1px rgba(196,172,135,.42);letter-spacing:.01em}
+.kin-item-fill{color:rgba(196,172,135,.15);-webkit-text-stroke:0}
+
 /* ── LIGHTBOX ── */
 .lb{position:fixed;inset:0;z-index:8000;background:rgba(10,9,8,.96);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s var(--ease)}
 .lb.open{opacity:1;pointer-events:all}
@@ -763,4 +784,10 @@ p,.svc-d,.proc-d,.about-val-d,.tl-desc,.agent-ben-d{font-family:'EB Garamond',Ge
   html.js .slabel.reveal::before{width:24px;transition:none}
   .testi-text .tw{color:var(--ink);transition:none}
   .nav-progress{display:none}
+  html.js .reveal-wipe,html.js .reveal-wipe-x{clip-path:inset(0);transition:none}
+  html.js .proc-track::before{transform:scaleX(1);transition:none}
+  html.js .proc-track .proc-n{transform:none;opacity:1;transition:none}
+  .kin-track{animation:none}
+  .kin-group[aria-hidden="true"]{display:none}
+  .pc,.sc-card{transition:none}
 }

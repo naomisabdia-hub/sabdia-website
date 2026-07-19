@@ -170,7 +170,7 @@ const jsonLd = JSON.stringify({
     <div class="slabel reveal" style="margin-bottom:28px">Gallery</div>
     <div class="prop-gallery-grid" id="galleryGrid">
       {d.gallery.map((g, i) => (
-        <div class={`gallery-item gallery-${'abcdef'[i] ?? 'f'} reveal ${['', 'd1', 'd2', 'd1', 'd2', 'd3'][i] ?? 'd3'}`} data-lb-item data-src={g.src} data-alt={g.alt} role="button" tabindex="0" aria-label={`View photo: ${g.alt}`}>
+        <div class={`gallery-item gallery-${'abcdef'[i] ?? 'f'} reveal-wipe ${['', 'd1', 'd2', 'd1', 'd2', 'd3'][i] ?? 'd3'}`} data-lb-item data-src={g.src} data-alt={g.alt} role="button" tabindex="0" aria-label={`View photo: ${g.alt}`}>
           <img class="gallery-img" src={g.src} alt={g.alt} loading="lazy">
         </div>
       ))}

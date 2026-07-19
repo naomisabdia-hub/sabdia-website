@@ -176,7 +176,7 @@ const jsonLd = JSON.stringify({
       <div class="about-sticky">
         <div class="slabel reveal">{about.label}</div>
         <h2 class="about-h reveal d1" set:html={about.headingHtml} />
-        <div class="about-img-strip reveal d2">
+        <div class="about-img-strip reveal-wipe d2">
           {about.images.map((img) => (
             <img src={img.image} alt={img.alt} loading="lazy" decoding="async">
           ))}
@@ -221,6 +221,18 @@ const jsonLd = JSON.stringify({
     </FilmBand>
   )}
 
+  <!-- KINETIC TYPE BAND -->
+  <div class="kin-band" aria-hidden="true">
+    <div class="kin-track">
+      {[false, true].map((dup) => (
+        <div class="kin-group" aria-hidden={dup ? 'true' : undefined}>
+          <span class="kin-item">{heroC.words.join(' · ')}</span>
+          <span class="kin-item kin-item-fill">Brisbane, Queensland</span>
+        </div>
+      ))}
+    </div>
+  </div>
+
   <!-- PROPERTIES -->
   <section id="properties" style="padding:0 0 clamp(80px,12vw,160px)">
     <div class="inner" style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px) clamp(44px,5vw,60px)">
@@ -234,11 +246,11 @@ const jsonLd = JSON.stringify({
     </div>
 
     <div class="inner" style="padding:0 clamp(22px,5vw,80px)">
-      <div class="proj-grid proj-grid-main reveal">
+      <div class="proj-grid proj-grid-main">
         {hero && (
           <PropertyCard
             entry={hero}
-            class="pc-hero"
+            class="pc-hero reveal-wipe"
             imgW={1400}
             imgH={900}
             specs={[`${hero.data.beds} Bed`, `${hero.data.baths} Bath`, `${hero.data.cars} Garage`, landLabel(hero.data.land, hero.data.landOver)]}
@@ -248,7 +260,7 @@ const jsonLd = JSON.stringify({
         {smallA && (
           <PropertyCard
             entry={smallA}
-            class="pc-sm-a"
+            class="pc-sm-a reveal-wipe d1"
             style="aspect-ratio:4/3"
             imgW={900}
             imgH={680}
@@ -259,7 +271,7 @@ const jsonLd = JSON.stringify({
         {smallB && (
           <PropertyCard
             entry={smallB}
-            class="pc-sm-b"
+            class="pc-sm-b reveal-wipe d2"
             style="aspect-ratio:4/3"
             imgW={900}
             imgH={680}
@@ -274,7 +286,7 @@ const jsonLd = JSON.stringify({
           {restRow.map((p) => (
             <PropertyCard
               entry={p}
-              class="reveal"
+              class="reveal-wipe"
               style="aspect-ratio:16/10"
               imgW={900}
               imgH={560}
@@ -283,7 +295,7 @@ const jsonLd = JSON.stringify({
             />
           ))}
           {sold.map((p, i) => (
-            <SoldCard entry={p} class={`reveal ${['d1', 'd2'][i % 2]}`} imgW={800} imgH={500} showSuburb={false} />
+            <SoldCard entry={p} class={`reveal-wipe ${['d1', 'd2'][i % 2]}`} imgW={800} imgH={500} showSuburb={false} />
           ))}
         </div>
       )}
@@ -356,7 +368,7 @@ const jsonLd = JSON.stringify({
 
   <!-- AGENT ACCESS -->
   <div class="agent-grid" id="agents">
-    <div class="agent-vis reveal-x">
+    <div class="agent-vis reveal-wipe-x">
       <img src={agent.image.image} alt={agent.image.alt} loading="lazy" decoding="async">
       <div class="agent-frame"></div>
       <div class="agent-badge">{agent.badge}</div>

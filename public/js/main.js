@@ -131,9 +131,9 @@ if (!reduceMotion && 'IntersectionObserver' in window) {
   const revealObs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); revealObs.unobserve(e.target); } });
   }, { threshold: 0.08, rootMargin: '0px 0px -52px 0px' });
-  document.querySelectorAll('.reveal,.reveal-x,.reveal-r').forEach(el => revealObs.observe(el));
+  document.querySelectorAll('.reveal,.reveal-x,.reveal-r,.reveal-wipe,.reveal-wipe-x').forEach(el => revealObs.observe(el));
 } else {
-  document.querySelectorAll('.reveal,.reveal-x,.reveal-r').forEach(el => el.classList.add('vis'));
+  document.querySelectorAll('.reveal,.reveal-x,.reveal-r,.reveal-wipe,.reveal-wipe-x').forEach(el => el.classList.add('vis'));
 }
 
 // ── COUNTER ANIMATION ───────────────────────────────────────
@@ -168,6 +168,8 @@ if (procTrack && !reduceMotion && 'IntersectionObserver' in window) {
     entries.forEach(e => { if (e.isIntersecting) { procTrack.classList.add('fill'); procObs.unobserve(procTrack); } });
   }, { threshold: 0.3 });
   procObs.observe(procTrack);
+} else if (procTrack) {
+  procTrack.classList.add('fill');
 }
 
 // ── PARALLAX HERO CONTENT ───────────────────────────────────
@@ -214,6 +216,22 @@ if (window.matchMedia('(pointer: fine)').matches && !reduceMotion) {
       btn.style.transform = `translate(${x * 0.12}px, ${y * 0.18}px)`;
     });
     btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  });
+}
+
+// ── 3D CARD TILT ────────────────────────────────────────────
+// Property cards lean gently toward the cursor. The .55s transform
+// transition on the card doubles as damping, so the tilt feels
+// weighted rather than twitchy.
+if (window.matchMedia('(pointer: fine)').matches && !reduceMotion && window.innerWidth > 768) {
+  document.querySelectorAll('.pc, .sc-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      card.style.transform = `perspective(1100px) rotateX(${(-y * 3).toFixed(2)}deg) rotateY(${(x * 3).toFixed(2)}deg)`;
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
   });
 }
 
