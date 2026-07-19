@@ -1,0 +1,114 @@
+---
+/**
+ * "The Series" — a horizontally scrolling strip of every Instagram post
+ * documenting a project, from first render to final reveal. Video posts
+ * open in a full-screen vertical player; arrow buttons + drag to scroll.
+ *
+ * Props: items (from site_content `series`), name, label, handle,
+ *        instagramUrl, dark (render on dark background)
+ */
+const { items = [], name, label = 'The Series', handle = '@_sabdia', instagramUrl = 'https://www.instagram.com/_sabdia/', dark = false } = Astro.props;
+const fmt = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-AU', { month: 'short', year: 'numeric' });
+---
+{items.length > 0 && (
+  <section class={`series-band${dark ? ' on-dark' : ''}`} data-series>
+    <div class="series-hdr">
+      <div>
+        <div class={`slabel ${dark ? 'slabel-dark' : ''} reveal`}>{label}</div>
+        <h2 class="series-h reveal d1">The story of <em>{name}</em>.</h2>
+        <a href={instagramUrl} target="_blank" rel="noopener" class="series-handle reveal d2">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+          As documented on {handle}
+        </a>
+      </div>
+      <p class="series-sub reveal d2">From first render to final reveal — swipe through the journey as it was shared.</p>
+    </div>
+    <div class="series-track-wrap">
+      <button class="series-nav series-prev" type="button" aria-label="Scroll back" data-series-prev>&larr;</button>
+      <button class="series-nav series-next" type="button" aria-label="Scroll forward" data-series-next>&rarr;</button>
+      <div class="series-track" data-series-track>
+        {items.map((item) => (
+          <div
+            class="series-card"
+            data-series-card
+            data-video={item.video || undefined}
+            data-caption={item.caption}
+            role={item.video ? 'button' : undefined}
+            tabindex={item.video ? 0 : undefined}
+            aria-label={item.video ? `Play film: ${item.caption}` : undefined}
+          >
+            <img src={item.thumb} alt={item.caption || `${name} — ${fmt(item.date)}`} loading="lazy">
+            <div class="series-card-ov"></div>
+            {item.video && (
+              <div class="series-play" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+              </div>
+            )}
+            <div class="series-card-meta">
+              <div class="series-card-date">{fmt(item.date)}</div>
+              {item.caption && <div class="series-card-cap">{item.caption}</div>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+{items.length > 0 && (
+  <div class="lbv" id="lbv" role="dialog" aria-modal="true" aria-label="Film player">
+    <video id="lbvVideo" controls playsinline preload="none"></video>
+    <button class="lb-close" id="lbvClose" aria-label="Close">&#10005;</button>
+    <div class="lbv-cap" id="lbvCap"></div>
+  </div>
+)}
+
+<script is:inline>
+(function () {
+  document.querySelectorAll('[data-series]').forEach(function (band) {
+    if (band.dataset.init) return;
+    band.dataset.init = '1';
+    var track = band.querySelector('[data-series-track]');
+    var prev = band.querySelector('[data-series-prev]');
+    var next = band.querySelector('[data-series-next]');
+
+    function step() { return Math.min(track.clientWidth * 0.7, 560); }
+    function update() {
+      prev.disabled = track.scrollLeft < 40;
+      next.disabled = track.scrollLeft > track.scrollWidth - track.clientWidth - 40;
+    }
+    prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+    next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+    track.addEventListener('scroll', update, { passive: true });
+    update();
+  });
+
+  var lbv = document.getElementById('lbv');
+  if (lbv && !lbv.dataset.init) {
+    lbv.dataset.init = '1';
+    var video = document.getElementById('lbvVideo');
+    var cap = document.getElementById('lbvCap');
+    function openV(src, caption) {
+      video.src = src;
+      cap.textContent = caption || '';
+      lbv.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      video.play().catch(function () {});
+    }
+    function closeV() {
+      lbv.classList.remove('open');
+      document.body.style.overflow = '';
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
+    }
+    document.querySelectorAll('[data-series-card][data-video]').forEach(function (card) {
+      card.addEventListener('click', function () { openV(card.dataset.video, card.dataset.caption); });
+      card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openV(card.dataset.video, card.dataset.caption); } });
+    });
+    document.getElementById('lbvClose').addEventListener('click', closeV);
+    lbv.addEventListener('click', function (e) { if (e.target === lbv) closeV(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && lbv.classList.contains('open')) closeV(); });
+  }
+})();
+</script>

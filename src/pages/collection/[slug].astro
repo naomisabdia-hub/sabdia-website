@@ -1,0 +1,96 @@
+---
+import Base from '../../layouts/Base.astro';
+import FilmBand from '../../components/FilmBand.astro';
+import SeriesStrip from '../../components/SeriesStrip.astro';
+import { getContent } from '../../lib/content.js';
+
+const { collection_page: page, series, films, settings } = await getContent('collection_page', 'series', 'films', 'settings');
+
+const slugify = (n) => n.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const item = (page.items || []).find((i) => slugify(i.name) === Astro.params.slug);
+if (!item) {
+  return new Response('Not found', { status: 404 });
+}
+const slug = slugify(item.name);
+const posts = series?.byProject?.[slug] ?? [];
+// Editorial story: stitch the strongest captions into prose.
+const story = [...new Set(posts.map((p) => p.caption).filter((c) => c && c.length > 60))].slice(0, 3);
+const others = (page.items || []).filter((i) => i.name !== item.name).slice(0, 3);
+---
+<Base
+  title={`${item.name} | The Sabdia Collection`}
+  description={`${item.name} — ${item.loc}. A completed Sabdia residence: ${story[0] ?? 'designed, developed, and constructed entirely in-house.'}`}
+  ogTitle={`${item.name} — The Sabdia Collection`}
+  ogDescription={story[0] ?? `${item.name}, ${item.loc}`}
+  ogImage={item.image}
+>
+  <!-- HERO -->
+  <section class="cd-hero">
+    <img src={item.image} alt={item.name} loading="eager" fetchpriority="high">
+    <div class="cd-hero-ov"></div>
+    <div class="cd-hero-content">
+      <div class="cd-badge reveal">The Sabdia Collection</div>
+      <h1 class="cd-name reveal d1">{item.name}</h1>
+      <div class="cd-loc reveal d2">{item.loc}</div>
+    </div>
+  </section>
+
+  <!-- STORY -->
+  {story.length > 0 && (
+    <div class="cd-story">
+      {story.map((p) => (
+        <p class="reveal">{p}{/[.!?]$/.test(p) ? '' : '.'}</p>
+      ))}
+    </div>
+  )}
+
+  <!-- FILM -->
+  {item.video && (
+    <FilmBand
+      id="film"
+      label="The Film"
+      headingHtml={`Experience <em>${item.name}</em>.`}
+      text={`A cinematic walkthrough of ${item.name} — its materials, its light, and the craft within.`}
+      video={item.video}
+      poster={item.image}
+      captionLeft={`${item.name} — On Film`}
+      captionRight={item.loc}
+    />
+  )}
+
+  <!-- SERIES -->
+  <SeriesStrip items={posts} name={item.name} label={series?.label} handle={series?.handle} instagramUrl={settings.socials.instagram.url} />
+
+  <!-- MORE FROM THE COLLECTION -->
+  {others.length > 0 && (
+    <section class="sp" style="border-top:1px solid var(--border)">
+      <div class="inner">
+        <div class="slabel reveal" style="margin-bottom:32px">More from the Collection</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,2.5vw,36px)">
+          {others.map((o) => (
+            <a href={`/collection/${slugify(o.name)}/`} class="port-card reveal">
+              <div class="port-img-wrap">
+                <img src={o.image} alt={o.name} loading="lazy">
+              </div>
+              <div class="port-name">{o.name}</div>
+              <div class="port-loc">{o.loc}</div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- CTA -->
+  <section class="sp" style="background:var(--dark);text-align:center">
+    <div class="inner-sm">
+      <div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">Commission Your Own</div>
+      <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(34px,5vw,64px);font-weight:300;color:var(--white);letter-spacing:-.02em;margin-bottom:22px">Inspired by <em style="font-style:italic;color:var(--gold2)">{item.name}</em>?</h2>
+      <p class="reveal d2" style="font-size:13px;font-weight:300;color:rgba(253,252,248,.45);max-width:440px;margin:0 auto 38px;line-height:1.85">Every Sabdia residence begins as a conversation. Tell us about your site, your vision, or simply the way you want to live.</p>
+      <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="/contact/" class="btn-p">Begin a Conversation</a>
+        <a href="/properties/" class="btn-g btn-g-light">View Current Properties</a>
+      </div>
+    </div>
+  </section>
+</Base>

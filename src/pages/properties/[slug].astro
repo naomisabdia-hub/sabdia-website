@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import PropertyCard from '../../components/PropertyCard.astro';
 import PropertyViewer from '../../components/PropertyViewer.astro';
 import FilmBand from '../../components/FilmBand.astro';
+import SeriesStrip from '../../components/SeriesStrip.astro';
 import { wixResize, landLabel } from '../../lib/wix.js';
 import { getProperties, getProperty } from '../../lib/db.js';
 import { getContent } from '../../lib/content.js';
@@ -17,8 +18,12 @@ const statusLabel = sold ? 'Sold Prior to Completion' : 'For Sale';
 
 const paragraphs = entry.body.trim().split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 
-const [allProps, { films }] = await Promise.all([getProperties(), getContent('films')]);
+const [allProps, { films, series, settings }] = await Promise.all([
+  getProperties(),
+  getContent('films', 'series', 'settings'),
+]);
 const film = films?.byProperty?.[entry.id];
+const seriesPosts = series?.byProject?.[entry.id] ?? [];
 const related = allProps
   .filter((p) => p.data.status === 'for-sale' && p.id !== entry.id)
   .sort((a, b) => a.data.order - b.data.order)
@@ -196,6 +201,9 @@ const jsonLd = JSON.stringify({
 
   <!-- 3D VIEWER -->
   <PropertyViewer property={entry} />
+
+  <!-- THE SERIES -->
+  <SeriesStrip items={seriesPosts} name={d.name} label={series?.label} handle={series?.handle} instagramUrl={settings.socials.instagram.url} />
 
   <script is:inline>
   (function () {
