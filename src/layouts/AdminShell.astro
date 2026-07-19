@@ -1,0 +1,47 @@
+---
+// Shared frame for all /admin pages: sidebar, auth-guarded content area.
+interface Props { title: string; active: string }
+const { title, active } = Astro.props;
+const nav = [
+  ['dashboard', '/admin/', 'Dashboard'],
+  ['properties', '/admin/properties/', 'Properties'],
+  ['content', '/admin/content/', 'Site Content'],
+  ['lists', '/admin/lists/', 'Services & More'],
+  ['leads', '/admin/leads/', 'Leads Inbox'],
+  ['settings', '/admin/settings/', 'Settings'],
+];
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>{title} · Sabdia Admin</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin">
+<div class="ad-app">
+  <aside class="ad-side">
+    <div class="ad-side-logo">
+      <img src="https://static.wixstatic.com/media/1cc2db_f012027bbf0c45ebb4ae6d847309d59f~mv2.png/v1/fill/w_211,h_35,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/DESIGN%20%C2%B7%20DEVELOP%20%C2%B7%20CONSTRUCT.png" alt="Sabdia">
+      <span>Admin Portal</span>
+    </div>
+    <nav class="ad-nav">
+      {nav.map(([key, href, label]) => (
+        <a href={href} class={active === key ? 'on' : ''}>{label}</a>
+      ))}
+      <a href="/" target="_blank">View Website ↗</a>
+    </nav>
+    <div class="ad-side-foot">
+      <div class="ad-side-user" id="adUser"></div>
+      <button class="ad-logout" id="adLogout" type="button">Sign out</button>
+    </div>
+  </aside>
+  <main class="ad-main">
+    <slot />
+  </main>
+</div>
+</body>
+</html>

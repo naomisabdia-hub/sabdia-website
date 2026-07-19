@@ -1,0 +1,119 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Properties" active="properties">
+  <!-- LIST VIEW -->
+  <div id="listView">
+    <div class="ad-hdr">
+      <div>
+        <h1 class="ad-h1">Properties</h1>
+        <p class="ad-sub">Add, edit, publish, and retire listings. Unpublished properties are hidden from the public website until you're ready.</p>
+      </div>
+      <button class="ad-btn ad-btn-gold" id="newBtn">+ New Property</button>
+    </div>
+    <table class="ad-table" id="propTable">
+      <thead><tr><th></th><th>Name</th><th>Suburb</th><th>Status</th><th>Visibility</th><th>Order</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="ad-empty" id="propEmpty" style="display:none">No properties yet.</div>
+  </div>
+
+  <!-- EDITOR VIEW -->
+  <div id="editView" style="display:none">
+    <div class="ad-hdr">
+      <div>
+        <h1 class="ad-h1" id="editTitle">Edit property</h1>
+        <p class="ad-sub">Changes go live when you press Save. Use Preview to check the page first — even for unpublished drafts.</p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <a class="ad-btn ad-btn-ghost" id="previewBtn" target="_blank">Preview ↗</a>
+        <button class="ad-btn ad-btn-ghost" id="backBtn">← All properties</button>
+      </div>
+    </div>
+    <div class="ad-form" id="propForm"></div>
+    <div class="ad-savebar" id="saveBar">
+      <button class="ad-btn ad-btn-gold" data-save>Save</button>
+      <span class="ad-dirty">Unsaved changes</span>
+      <span class="spacer"></span>
+      <button class="ad-btn ad-btn-danger" id="deleteBtn">Delete property</button>
+    </div>
+  </div>
+</AdminShell>
+
+<script>
+  import { supabase, requireAuth, el, toast } from '../../lib/admin/client.js';
+  import { buildForm, readForm, saveBar } from '../../lib/admin/forms.js';
+  import { propertySchema } from '../../lib/admin/schemas.js';
+
+  await requireAuth();
+
+  const listView = document.getElementById('listView');
+  const editView = document.getElementById('editView');
+  let current = null;
+
+  async function loadList() {
+    listView.style.display = '';
+    editView.style.display = 'none';
+    const { data, error } = await supabase.from('properties').select('*').order('display_order');
+    if (error) return toast(error.message, true);
+    const tbody = document.querySelector('#propTable tbody');
+    tbody.innerHTML = '';
+    document.getElementById('propEmpty').style.display = data.length ? 'none' : '';
+    document.getElementById('propTable').style.display = data.length ? '' : 'none';
+    for (const p of data) {
+      tbody.appendChild(el('tr', { class: 'clickable', onclick: () => openEditor(p) }, [
+        el('td', {}, [el('img', { src: p.image, alt: '', style: 'width:64px;height:42px;object-fit:cover;display:block' })]),
+        el('td', { text: p.name, style: 'font-weight:400' }),
+        el('td', { text: p.suburb }),
+        el('td', {}, [el('span', { class: `ad-badge ${p.status === 'sold' ? 'sold' : 'live'}`, text: p.status === 'sold' ? 'Sold' : 'For Sale' })]),
+        el('td', {}, [el('span', { class: `ad-badge ${p.published ? 'live' : 'draft'}`, text: p.published ? 'Published' : 'Draft' })]),
+        el('td', { text: p.display_order }),
+      ]));
+    }
+  }
+
+  function openEditor(p) {
+    current = p;
+    listView.style.display = 'none';
+    editView.style.display = '';
+    document.getElementById('editTitle').textContent = p.id ? `Edit — ${p.name}` : 'New property';
+    document.getElementById('previewBtn').href = `/properties/${p.slug || ''}/`;
+    document.getElementById('deleteBtn').style.display = p.id ? '' : 'none';
+    buildForm(document.getElementById('propForm'), propertySchema, p);
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById('newBtn').addEventListener('click', () =>
+    openEditor({ status: 'for-sale', published: false, state: 'Queensland', display_order: 100, features: [], gallery: [], hotspots: [], enquiry_button: 'Submit Enquiry', viewer_type: 'none' }),
+  );
+  document.getElementById('backBtn').addEventListener('click', loadList);
+
+  saveBar(document.getElementById('propForm'), document.getElementById('saveBar'), async () => {
+    const row = readForm(document.getElementById('propForm'), propertySchema, current);
+    if (!row.name || !row.slug) throw new Error('Name and web address are both required.');
+    row.slug = row.slug.toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '');
+    delete row.created_at;
+    delete row.updated_at;
+    const { data, error } = current?.id
+      ? await supabase.from('properties').update(row).eq('id', current.id).select().single()
+      : await supabase.from('properties').insert(row).select().single();
+    if (error) throw error;
+    current = data;
+    document.getElementById('previewBtn').href = `/properties/${data.slug}/`;
+    document.getElementById('editTitle').textContent = `Edit — ${data.name}`;
+  });
+
+  document.getElementById('deleteBtn').addEventListener('click', async () => {
+    if (!current?.id) return;
+    if (!confirm(`Delete ${current.name}? This cannot be undone from the portal — consider unticking "Published" instead if you just want it off the website.`)) return;
+    if (!confirm('Really delete permanently?')) return;
+    const { error } = await supabase.from('properties').delete().eq('id', current.id);
+    if (error) return toast(error.message, true);
+    toast('Property deleted');
+    loadList();
+  });
+
+  await loadList();
+  if (new URLSearchParams(location.search).get('new')) document.getElementById('newBtn').click();
+</script>

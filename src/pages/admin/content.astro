@@ -1,0 +1,95 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Site Content" active="content">
+  <!-- INDEX -->
+  <div id="indexView">
+    <div class="ad-hdr">
+      <div>
+        <h1 class="ad-h1">Site Content</h1>
+        <p class="ad-sub">Every section of every page, editable. Pick a section below — changes go live when you save.</p>
+      </div>
+    </div>
+    <div id="groups"></div>
+  </div>
+
+  <!-- EDITOR -->
+  <div id="editView" style="display:none">
+    <div class="ad-hdr">
+      <div>
+        <h1 class="ad-h1" id="editTitle"></h1>
+        <p class="ad-sub" id="editDesc"></p>
+      </div>
+      <button class="ad-btn ad-btn-ghost" id="backBtn">← All content</button>
+    </div>
+    <div class="ad-form" id="contentForm"></div>
+    <div class="ad-savebar" id="saveBar">
+      <button class="ad-btn ad-btn-gold" data-save>Save &amp; publish</button>
+      <span class="ad-dirty">Unsaved changes</span>
+    </div>
+  </div>
+</AdminShell>
+
+<script>
+  import { supabase, requireAuth, el } from '../../lib/admin/client.js';
+  import { buildForm, readForm, saveBar } from '../../lib/admin/forms.js';
+  import { contentSchemas, contentGroups } from '../../lib/admin/schemas.js';
+  import seed from '../../lib/seed-content.json';
+
+  await requireAuth();
+
+  const indexView = document.getElementById('indexView');
+  const editView = document.getElementById('editView');
+  let currentKey = null;
+  let currentData = null;
+
+  const groupsBox = document.getElementById('groups');
+  for (const group of contentGroups) {
+    const card = el('div', { class: 'ad-card' }, [el('div', { class: 'ad-card-h', text: group.name })]);
+    const table = el('table', { class: 'ad-table' });
+    const tbody = el('tbody');
+    for (const key of group.keys) {
+      const meta = contentSchemas[key];
+      if (!meta) continue;
+      tbody.appendChild(el('tr', { class: 'clickable', onclick: () => openEditor(key) }, [
+        el('td', { text: meta.title, style: 'font-weight:400' }),
+        el('td', { text: meta.description || '', style: 'color:var(--taupe)' }),
+      ]));
+    }
+    table.appendChild(tbody);
+    card.appendChild(table);
+    groupsBox.appendChild(card);
+  }
+
+  async function openEditor(key) {
+    const meta = contentSchemas[key];
+    const { data, error } = await supabase.from('site_content').select('data').eq('key', key).maybeSingle();
+    currentKey = key;
+    currentData = data?.data ?? seed[key] ?? {};
+    if (error) console.error(error);
+    document.getElementById('editTitle').textContent = meta.title;
+    document.getElementById('editDesc').textContent = meta.description || '';
+    buildForm(document.getElementById('contentForm'), meta.schema, currentData);
+    indexView.style.display = 'none';
+    editView.style.display = '';
+    window.scrollTo(0, 0);
+    history.replaceState(null, '', '?key=' + key);
+  }
+
+  document.getElementById('backBtn').addEventListener('click', () => {
+    editView.style.display = 'none';
+    indexView.style.display = '';
+    history.replaceState(null, '', location.pathname);
+  });
+
+  saveBar(document.getElementById('contentForm'), document.getElementById('saveBar'), async () => {
+    const data = readForm(document.getElementById('contentForm'), contentSchemas[currentKey].schema, currentData);
+    const { error } = await supabase.from('site_content').upsert({ key: currentKey, data });
+    if (error) throw error;
+    currentData = data;
+  });
+
+  const startKey = new URLSearchParams(location.search).get('key');
+  if (startKey && contentSchemas[startKey]) openEditor(startKey);
+</script>

@@ -158,6 +158,23 @@
     ],
     "note": "We typically respond within one business day."
   },
+  "films": {
+    "brand": {
+      "label": "The Sabdia Story",
+      "headingHtml": "Crafted moments,<br><em>captured on film</em>.",
+      "text": "A look at the residences, the craftsmanship, and the people behind every Sabdia home.",
+      "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand.mp4",
+      "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand-poster.jpg"
+    },
+    "sectionLabel": "The Film",
+    "byProperty": {
+      "qasr": { "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/qasr.mp4", "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/qasr-poster.jpg" },
+      "solace": { "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/solace.mp4", "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/solace-poster.jpg" },
+      "sierra": { "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/sierra.mp4", "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/sierra-poster.jpg" },
+      "capri": { "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/capri.mp4", "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/capri-poster.jpg" },
+      "aether": { "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/aether.mp4", "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/aether-poster.jpg" }
+    }
+  },
   "properties_page": {
     "label": "For Sale",
     "headingHtml": "<em style=\"color:var(--gold)\">Current</em><br>Properties.",
@@ -275,11 +292,15 @@
     "titleHtml": "The Sabdia<br><em style=\"color:var(--gold)\">Collection</em>.",
     "text": "A portfolio of completed luxury residences across inner Brisbane — each one designed, developed, and constructed entirely in-house by Sabdia.",
     "items": [
+      { "name": "MILOS", "loc": "Camp Hill QLD, Australia", "image": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos-poster.jpg", "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos.mp4" },
+      { "name": "AMMOS", "loc": "Taringa QLD, Australia", "image": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos-poster.jpg", "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos.mp4" },
+      { "name": "CALLE", "loc": "Camp Hill QLD, Australia", "image": "https://static.wixstatic.com/media/1cc2db_a11d808ebc4648de9b8a25918f19e192~mv2.png/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_a11d808ebc4648de9b8a25918f19e192~mv2.png", "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/calle.mp4" },
+      { "name": "ELYSIUM", "loc": "Holland Park QLD, Australia", "image": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium-poster.jpg", "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium.mp4" },
+      { "name": "ALHAMBRA", "loc": "Brisbane QLD, Australia", "image": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra-poster.jpg", "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra.mp4" },
       { "name": "ENCANTO", "loc": "Camp Hill QLD, Australia", "image": "https://static.wixstatic.com/media/1cc2db_4d7d30024fef47ba8f5f9859e08bb47b~mv2.jpeg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_4d7d30024fef47ba8f5f9859e08bb47b~mv2.jpeg" },
       { "name": "NERO", "loc": "Rochedale QLD, Australia", "image": "https://static.wixstatic.com/media/1cc2db_9ed4e50eba3b453885aa6a4917ba5607~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_9ed4e50eba3b453885aa6a4917ba5607~mv2.jpg" },
       { "name": "HERMOSA", "loc": "Camp Hill QLD, Australia", "image": "https://static.wixstatic.com/media/1cc2db_9cbfa41ef2dd4ed3b14b5277765cc446~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_9cbfa41ef2dd4ed3b14b5277765cc446~mv2.jpg" },
       { "name": "FRASER", "loc": "Graceville QLD, Australia", "image": "https://static.wixstatic.com/media/1cc2db_fb04f5dbe53b4d34ab710537a2e24b40~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_fb04f5dbe53b4d34ab710537a2e24b40~mv2.jpg" },
-      { "name": "CALLE", "loc": "Camp Hill QLD, Australia", "image": "https://static.wixstatic.com/media/1cc2db_a11d808ebc4648de9b8a25918f19e192~mv2.png/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_a11d808ebc4648de9b8a25918f19e192~mv2.png" },
       { "name": "PETRA", "loc": "Taringa QLD, Australia", "image": "https://static.wixstatic.com/media/1cc2db_64f35b15dd914a189eee2aeb79b86284~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_64f35b15dd914a189eee2aeb79b86284~mv2.jpg" },
       { "name": "KIRRA", "loc": "Brisbane QLD, Australia", "image": "https://static.wixstatic.com/media/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png/v1/fill/w_800,h_600,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png" }
     ]

@@ -1,0 +1,76 @@
+---
+/**
+ * Cinematic film section — a vertical reel in a framed player beside
+ * editorial copy. Autoplays muted when scrolled into view (unless the
+ * visitor prefers reduced motion); tap the control for sound.
+ *
+ * Props: label, headingHtml, text, video, poster, captionLeft, captionRight, id
+ */
+const { label, headingHtml, text, video, poster, captionLeft = '', captionRight = '', id = 'film' } = Astro.props;
+---
+{video && (
+  <section class="film-band" id={id}>
+    <div class="film-grid">
+      <div class="film-copy">
+        <div class="slabel slabel-dark reveal">{label}</div>
+        <h2 class="film-h reveal d1" set:html={headingHtml} />
+        {text && <p class="film-p reveal d2">{text}</p>}
+        <slot />
+      </div>
+      <div class="reveal d2">
+        <div class="film-frame" data-film>
+          <video
+            src={video}
+            poster={poster || undefined}
+            muted
+            loop
+            playsinline
+            preload="none"
+          ></video>
+          <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            <span data-sound-label>Sound On</span>
+          </button>
+        </div>
+        {(captionLeft || captionRight) && (
+          <div class="film-caption">
+            <span><b>{captionLeft}</b></span>
+            <span>{captionRight}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+)}
+
+<script is:inline>
+(function () {
+  document.querySelectorAll('[data-film]').forEach(function (frame) {
+    if (frame.dataset.filmInit) return;
+    frame.dataset.filmInit = '1';
+    var video = frame.querySelector('video');
+    var btn = frame.querySelector('[data-sound]');
+    var label = frame.querySelector('[data-sound-label]');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if ('IntersectionObserver' in window && !reduced) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) {
+            video.play().catch(function () {});
+          } else {
+            video.pause();
+          }
+        });
+      }, { threshold: 0.35 });
+      io.observe(frame);
+    }
+
+    btn.addEventListener('click', function () {
+      video.muted = !video.muted;
+      if (!video.muted && video.paused) video.play().catch(function () {});
+      label.textContent = video.muted ? 'Sound On' : 'Mute';
+    });
+  });
+})();
+</script>

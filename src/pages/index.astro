@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import PropertyCard from '../components/PropertyCard.astro';
 import SoldCard from '../components/SoldCard.astro';
 import ServiceIcon from '../components/ServiceIcon.astro';
+import FilmBand from '../components/FilmBand.astro';
 import { landLabel } from '../lib/wix.js';
 import { getProperties } from '../lib/db.js';
 import { getContent, getServices, getProcessSteps, getTestimonials } from '../lib/content.js';
@@ -20,6 +21,7 @@ const [all, content, services, processSteps, testimonials] = await Promise.all([
     'home_process',
     'home_agent',
     'home_contact',
+    'films',
   ),
   getServices(),
   getProcessSteps(),
@@ -36,6 +38,7 @@ const {
   home_process: processC,
   home_agent: agent,
   home_contact: contactC,
+  films,
 } = content;
 const testimonial = testimonials[0];
 
@@ -194,6 +197,22 @@ const jsonLd = JSON.stringify({
       </div>
     </div>
   </section>
+
+  <!-- BRAND FILM -->
+  {films?.brand?.video && (
+    <FilmBand
+      id="story"
+      label={films.brand.label}
+      headingHtml={films.brand.headingHtml}
+      text={films.brand.text}
+      video={films.brand.video}
+      poster={films.brand.poster}
+      captionLeft="Sabdia — On Film"
+      captionRight="Brisbane, QLD"
+    >
+      <a href="/collection/" class="btn-g btn-g-light reveal d3">Explore the Collection &rarr;</a>
+    </FilmBand>
+  )}
 
   <!-- PROPERTIES -->
   <section id="properties" style="padding:0 0 clamp(80px,12vw,160px)">

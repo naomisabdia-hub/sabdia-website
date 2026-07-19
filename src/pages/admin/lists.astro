@@ -1,0 +1,116 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Services & More" active="lists">
+  <div class="ad-hdr">
+    <div>
+      <h1 class="ad-h1">Services, Process &amp; Testimonials</h1>
+      <p class="ad-sub">These lists appear on the homepage and the Services page. Reorder with the arrows; changes go live on save.</p>
+    </div>
+  </div>
+  <div id="sections"></div>
+</AdminShell>
+
+<script>
+  import { supabase, requireAuth, el, toast } from '../../lib/admin/client.js';
+  import { buildForm, readForm } from '../../lib/admin/forms.js';
+
+  await requireAuth();
+
+  const tables = [
+    {
+      table: 'services', title: 'Services', itemLabel: 'service',
+      schema: [
+        { key: 'number', label: 'Number', type: 'text', help: 'e.g. 01' },
+        { key: 'label', label: 'Small label (services page)', type: 'text', help: 'e.g. Service One' },
+        { key: 'title', label: 'Title', type: 'text' },
+        { key: 'description', label: 'Short description (homepage)', type: 'textarea' },
+        { key: 'icon', label: 'Icon', type: 'select', options: ['home', 'case', 'clock', 'grid'] },
+        {
+          key: 'detail', label: 'Services page detail', type: 'object',
+          fields: [
+            { key: 'headingHtml', label: 'Heading', type: 'html' },
+            { key: 'image', label: 'Image', type: 'image', folder: 'services' },
+            { key: 'alt', label: 'Image alt text', type: 'text' },
+            { key: 'paragraphs', label: 'Paragraphs', type: 'list', itemType: 'textarea', itemLabel: 'paragraph' },
+            { key: 'bullets', label: 'Bullet list', type: 'list', itemLabel: 'bullet' },
+          ],
+        },
+      ],
+    },
+    {
+      table: 'process_steps', title: 'Process steps', itemLabel: 'step',
+      schema: [
+        { key: 'title', label: 'Title', type: 'text' },
+        { key: 'description', label: 'Description', type: 'textarea' },
+      ],
+    },
+    {
+      table: 'testimonials', title: 'Testimonials', itemLabel: 'testimonial',
+      schema: [
+        { key: 'quote', label: 'Quote', type: 'textarea' },
+        { key: 'attribution', label: 'Attribution', type: 'text', help: 'e.g. Satisfied Client — Inner Brisbane Residence' },
+      ],
+    },
+  ];
+
+  const box = document.getElementById('sections');
+
+  for (const cfg of tables) {
+    const card = el('div', { class: 'ad-card' }, [el('div', { class: 'ad-card-h', text: cfg.title })]);
+    const itemsBox = el('div', { style: 'display:flex;flex-direction:column;gap:12px;margin-top:14px' });
+    card.appendChild(itemsBox);
+    box.appendChild(card);
+
+    const { data, error } = await supabase.from(cfg.table).select('*').order('sort');
+    if (error) { toast(error.message, true); continue; }
+
+    const addRow = (row) => {
+      const item = el('div', { class: 'ad-item' });
+      const form = el('div', { class: 'ad-form' });
+      buildForm(form, cfg.schema, row);
+      const bar = el('div', { class: 'ad-item-bar' }, [
+        el('button', { type: 'button', text: '↑ Move up', onclick: async () => { const p = item.previousElementSibling; if (p) { itemsBox.insertBefore(item, p); await resort(); } } }),
+        el('button', { type: 'button', text: '↓ Move down', onclick: async () => { const n = item.nextElementSibling; if (n) { itemsBox.insertBefore(n, item); await resort(); } } }),
+        el('button', { type: 'button', text: 'Save', style: 'border-color:var(--gold);color:var(--gold)', onclick: async () => {
+          const values = readForm(form, cfg.schema, row.id ? {} : { sort: itemsBox.children.length * 10 });
+          const { data: saved, error: err } = row.id
+            ? await supabase.from(cfg.table).update(values).eq('id', row.id).select().single()
+            : await supabase.from(cfg.table).insert(values).select().single();
+          if (err) return toast(err.message, true);
+          Object.assign(row, saved);
+          toast('Saved — live on the website now');
+        } }),
+        el('button', { type: 'button', text: 'Delete', onclick: async () => {
+          if (!confirm(`Delete this ${cfg.itemLabel}?`)) return;
+          if (row.id) {
+            const { error: err } = await supabase.from(cfg.table).delete().eq('id', row.id);
+            if (err) return toast(err.message, true);
+          }
+          item.remove();
+          toast('Deleted');
+        } }),
+      ]);
+      item.appendChild(bar);
+      item.appendChild(form);
+      itemsBox.appendChild(item);
+    };
+
+    const resort = async () => {
+      const updates = [...itemsBox.children].map((node, i) => ({ node, sort: (i + 1) * 10 }));
+      for (const { node, sort } of updates) {
+        const row = rowsByNode.get(node);
+        if (row?.id) await supabase.from(cfg.table).update({ sort }).eq('id', row.id);
+        if (row) row.sort = sort;
+      }
+      toast('Order updated');
+    };
+
+    const rowsByNode = new Map();
+    const origAdd = addRow;
+    const addRowTracked = (row) => { origAdd(row); rowsByNode.set(itemsBox.lastElementChild, row); };
+    for (const row of data ?? []) addRowTracked(row);
+    card.appendChild(el('button', { type: 'button', class: 'ad-add', text: `+ Add ${cfg.itemLabel}`, onclick: () => addRowTracked({}) }));
+  }
+</script>

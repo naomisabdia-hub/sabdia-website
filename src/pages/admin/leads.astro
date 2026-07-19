@@ -1,0 +1,140 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Leads Inbox" active="leads">
+  <div class="ad-hdr">
+    <div>
+      <h1 class="ad-h1">Leads <em>Inbox</em></h1>
+      <p class="ad-sub">Every enquiry from every form on the website. Update the status as you work through them — nothing is ever deleted.</p>
+    </div>
+    <button class="ad-btn ad-btn-ghost" id="csvBtn">Export CSV</button>
+  </div>
+
+  <div class="ad-filters">
+    <select class="ad-fsel" id="fType" style="max-width:220px">
+      <option value="">All types</option>
+      <option value="contact">Contact enquiries</option>
+      <option value="property-enquiry">Property enquiries</option>
+      <option value="agent-application">Agent applications</option>
+    </select>
+    <select class="ad-fsel" id="fStatus" style="max-width:180px">
+      <option value="">All statuses</option>
+      <option value="new">New</option>
+      <option value="contacted">Contacted</option>
+      <option value="closed">Closed</option>
+    </select>
+    <input class="ad-fi ad-search" id="fSearch" placeholder="Search name or email…">
+  </div>
+
+  <div id="leadsBox"></div>
+  <div class="ad-empty" id="leadsEmpty" style="display:none">No leads match.</div>
+</AdminShell>
+
+<script>
+  import { supabase, requireAuth, el, toast, csvExport, fmtDate } from '../../lib/admin/client.js';
+
+  await requireAuth();
+
+  let all = [];
+
+  async function load() {
+    const { data, error } = await supabase.from('enquiries').select('*').order('created_at', { ascending: false });
+    if (error) return toast(error.message, true);
+    all = data;
+    render();
+  }
+
+  function matches(l) {
+    const type = document.getElementById('fType').value;
+    const status = document.getElementById('fStatus').value;
+    const q = document.getElementById('fSearch').value.toLowerCase();
+    if (type && (l.form_name || 'contact') !== type) return false;
+    if (status && l.status !== status) return false;
+    if (q) {
+      const hay = `${l.first_name} ${l.last_name} ${l.email} ${l.agency} ${l.property}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  }
+
+  function render() {
+    const box = document.getElementById('leadsBox');
+    box.innerHTML = '';
+    const rows = all.filter(matches);
+    document.getElementById('leadsEmpty').style.display = rows.length ? 'none' : '';
+    for (const l of rows) {
+      const details = [
+        ['Email', l.email && el('a', { href: 'mailto:' + l.email, text: l.email, style: 'color:var(--gold)' })],
+        ['Phone', l.phone && el('a', { href: 'tel:' + l.phone, text: l.phone, style: 'color:var(--gold)' })],
+        ['Property', l.property],
+        ['Enquiry type', l.enquiry_type],
+        ['Agency', l.agency],
+        ['Licence no.', l.licence_number],
+        ['Suburb markets', l.suburb_markets],
+        ['Message', l.message],
+      ].filter(([, v]) => v);
+
+      const statusSel = el('select', { class: 'ad-fsel', style: 'max-width:160px' });
+      for (const s of ['new', 'contacted', 'closed']) {
+        const o = el('option', { value: s, text: s[0].toUpperCase() + s.slice(1) });
+        if (l.status === s) o.selected = true;
+        statusSel.appendChild(o);
+      }
+      statusSel.addEventListener('change', async () => {
+        const { error } = await supabase.from('enquiries').update({ status: statusSel.value }).eq('id', l.id);
+        if (error) return toast(error.message, true);
+        l.status = statusSel.value;
+        badge.className = 'ad-badge ' + l.status;
+        badge.textContent = l.status;
+        toast('Status updated');
+      });
+
+      const notes = el('textarea', { class: 'ad-fta', placeholder: 'Internal notes…', text: l.notes || '', style: 'min-height:60px' });
+      let notesTimer;
+      notes.addEventListener('input', () => {
+        clearTimeout(notesTimer);
+        notesTimer = setTimeout(async () => {
+          const { error } = await supabase.from('enquiries').update({ notes: notes.value }).eq('id', l.id);
+          if (!error) toast('Notes saved');
+        }, 900);
+      });
+
+      const badge = el('span', { class: 'ad-badge ' + l.status, text: l.status });
+      const typeLabel = { 'contact': 'Contact', 'property-enquiry': 'Property enquiry', 'agent-application': 'Agent application' }[l.form_name || 'contact'] || l.form_name;
+
+      box.appendChild(el('div', { class: 'ad-card' }, [
+        el('div', { style: 'display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px' }, [
+          el('strong', { text: `${l.first_name ?? ''} ${l.last_name ?? ''}`.trim() || 'Anonymous', style: 'font-weight:400;font-size:15px' }),
+          badge,
+          el('span', { text: typeLabel, style: 'font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe)' }),
+          el('span', { text: fmtDate(l.created_at), style: 'margin-left:auto;font-size:11px;color:var(--taupe)' }),
+        ]),
+        el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 20px;margin-bottom:14px' },
+          details.map(([k, v]) => el('div', { style: 'font-size:12.5px' }, [
+            el('span', { text: k + ': ', style: 'color:var(--taupe)' }),
+            typeof v === 'string' ? el('span', { text: v }) : v,
+          ])),
+        ),
+        el('div', { style: 'display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap' }, [statusSel, notes]),
+      ]));
+    }
+  }
+
+  for (const id of ['fType', 'fStatus', 'fSearch']) {
+    document.getElementById(id).addEventListener(id === 'fSearch' ? 'input' : 'change', render);
+  }
+
+  document.getElementById('csvBtn').addEventListener('click', () => {
+    const rows = all.filter(matches).map((l) => ({
+      received: l.created_at, type: l.form_name, status: l.status,
+      first_name: l.first_name, last_name: l.last_name, email: l.email, phone: l.phone,
+      property: l.property, enquiry_type: l.enquiry_type, agency: l.agency,
+      licence_number: l.licence_number, suburb_markets: l.suburb_markets,
+      message: l.message, notes: l.notes,
+    }));
+    csvExport(rows, 'sabdia-leads.csv');
+  });
+
+  await load();
+</script>

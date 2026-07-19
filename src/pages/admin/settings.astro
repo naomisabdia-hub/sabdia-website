@@ -1,0 +1,78 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Settings" active="settings">
+  <div class="ad-hdr">
+    <div>
+      <h1 class="ad-h1">Settings</h1>
+      <p class="ad-sub">Company details, social links, search defaults, and portal users.</p>
+    </div>
+  </div>
+
+  <div class="ad-form" id="settingsForm"></div>
+  <div class="ad-savebar" id="saveBar">
+    <button class="ad-btn ad-btn-gold" data-save>Save settings</button>
+    <span class="ad-dirty">Unsaved changes</span>
+  </div>
+
+  <div class="ad-card" style="margin-top:28px">
+    <div class="ad-card-h">Your password</div>
+    <p class="ad-sub" style="margin-bottom:16px">Set or change the password for your own sign-in. (You can always use the email-link option on the login page instead.)</p>
+    <form class="ad-form" id="pwForm" style="max-width:380px">
+      <div class="ad-fg">
+        <label class="ad-fl" for="newPw">New password</label>
+        <input class="ad-fi" type="password" id="newPw" autocomplete="new-password" minlength="8" required>
+      </div>
+      <button class="ad-btn" type="submit">Update password</button>
+    </form>
+  </div>
+
+  <div class="ad-card" style="margin-top:28px" id="usersCard">
+    <div class="ad-card-h">Portal users</div>
+    <p class="ad-sub" style="margin-bottom:16px">Who can sign in to this portal. Adding someone: they must first create their login via the email sign-in link on the login page, then an admin adds them here.</p>
+    <table class="ad-table" id="usersTable">
+      <thead><tr><th>Email</th><th>Role</th><th>Added</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="ad-sub" style="margin-top:12px">To add or remove users, or reset a password, use the Supabase dashboard (Authentication → Users) — or ask your developer. Password reset: the "Email me a sign-in link" option on the login page always works.</p>
+  </div>
+</AdminShell>
+
+<script>
+  import { supabase, requireAuth, el, fmtDate, toast } from '../../lib/admin/client.js';
+  import { buildForm, readForm, saveBar } from '../../lib/admin/forms.js';
+  import { contentSchemas } from '../../lib/admin/schemas.js';
+  import seed from '../../lib/seed-content.json';
+
+  await requireAuth();
+
+  const schema = contentSchemas.settings.schema;
+  const { data } = await supabase.from('site_content').select('data').eq('key', 'settings').maybeSingle();
+  let current = data?.data ?? seed.settings;
+  buildForm(document.getElementById('settingsForm'), schema, current);
+
+  saveBar(document.getElementById('settingsForm'), document.getElementById('saveBar'), async () => {
+    current = readForm(document.getElementById('settingsForm'), schema, current);
+    const { error } = await supabase.from('site_content').upsert({ key: 'settings', data: current });
+    if (error) throw error;
+  });
+
+  document.getElementById('pwForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const { error } = await supabase.auth.updateUser({ password: document.getElementById('newPw').value });
+    if (error) return toast(error.message, true);
+    document.getElementById('newPw').value = '';
+    toast('Password updated');
+  });
+
+  const { data: users } = await supabase.from('admin_users').select('*').order('created_at');
+  const tbody = document.querySelector('#usersTable tbody');
+  for (const u of users ?? []) {
+    tbody.appendChild(el('tr', {}, [
+      el('td', { text: u.email }),
+      el('td', { text: u.role }),
+      el('td', { text: fmtDate(u.created_at) }),
+    ]));
+  }
+</script>

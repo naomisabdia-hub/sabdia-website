@@ -2,8 +2,10 @@
 import Base from '../../layouts/Base.astro';
 import PropertyCard from '../../components/PropertyCard.astro';
 import PropertyViewer from '../../components/PropertyViewer.astro';
+import FilmBand from '../../components/FilmBand.astro';
 import { wixResize, landLabel } from '../../lib/wix.js';
 import { getProperties, getProperty } from '../../lib/db.js';
+import { getContent } from '../../lib/content.js';
 
 const entry = await getProperty(Astro.params.slug);
 if (!entry) {
@@ -15,7 +17,8 @@ const statusLabel = sold ? 'Sold Prior to Completion' : 'For Sale';
 
 const paragraphs = entry.body.trim().split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 
-const allProps = await getProperties();
+const [allProps, { films }] = await Promise.all([getProperties(), getContent('films')]);
+const film = films?.byProperty?.[entry.id];
 const related = allProps
   .filter((p) => p.data.status === 'for-sale' && p.id !== entry.id)
   .sort((a, b) => a.data.order - b.data.order)
@@ -159,17 +162,77 @@ const jsonLd = JSON.stringify({
   <!-- GALLERY -->
   <div class="prop-gallery inner">
     <div class="slabel reveal" style="margin-bottom:28px">Gallery</div>
-    <div class="prop-gallery-grid">
+    <div class="prop-gallery-grid" id="galleryGrid">
       {d.gallery.map((g, i) => (
-        <div class={`gallery-item gallery-${'abcdef'[i] ?? 'f'} reveal ${['', 'd1', 'd2', 'd1', 'd2', 'd3'][i] ?? 'd3'}`}>
+        <div class={`gallery-item gallery-${'abcdef'[i] ?? 'f'} reveal ${['', 'd1', 'd2', 'd1', 'd2', 'd3'][i] ?? 'd3'}`} data-lb-item data-src={g.src} data-alt={g.alt} role="button" tabindex="0" aria-label={`View photo: ${g.alt}`}>
           <img class="gallery-img" src={g.src} alt={g.alt} loading="lazy">
         </div>
       ))}
     </div>
   </div>
 
+  <!-- LIGHTBOX -->
+  <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer">
+    <img id="lbImg" src="" alt="">
+    <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&larr;</button>
+    <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&rarr;</button>
+    <button class="lb-close" id="lbClose" aria-label="Close">&#10005;</button>
+    <div class="lb-meta"><span class="lb-cap" id="lbCap"></span><span id="lbCount"></span></div>
+  </div>
+
+  <!-- FILM -->
+  {film?.video && (
+    <FilmBand
+      id="film"
+      label={films.sectionLabel || 'The Film'}
+      headingHtml={`Experience <em>${d.name}</em>.`}
+      text={`Step inside ${d.name} — a cinematic walkthrough of the residence, its materials, and its light.`}
+      video={film.video}
+      poster={film.poster}
+      captionLeft={`${d.name} — On Film`}
+      captionRight={`${d.suburb}, ${d.state}`}
+    />
+  )}
+
   <!-- 3D VIEWER -->
   <PropertyViewer property={entry} />
+
+  <script is:inline>
+  (function () {
+    var items = [].slice.call(document.querySelectorAll('[data-lb-item]'));
+    if (!items.length) return;
+    var lb = document.getElementById('lb');
+    var img = document.getElementById('lbImg');
+    var cap = document.getElementById('lbCap');
+    var count = document.getElementById('lbCount');
+    var idx = 0;
+
+    function show(i) {
+      idx = (i + items.length) % items.length;
+      img.src = items[idx].dataset.src;
+      img.alt = items[idx].dataset.alt || '';
+      cap.textContent = items[idx].dataset.alt || '';
+      count.textContent = (idx + 1) + ' / ' + items.length;
+    }
+    function open(i) { show(i); lb.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function close() { lb.classList.remove('open'); document.body.style.overflow = ''; }
+
+    items.forEach(function (el, i) {
+      el.addEventListener('click', function () { open(i); });
+      el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(i); } });
+    });
+    document.getElementById('lbPrev').addEventListener('click', function () { show(idx - 1); });
+    document.getElementById('lbNext').addEventListener('click', function () { show(idx + 1); });
+    document.getElementById('lbClose').addEventListener('click', close);
+    lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+    document.addEventListener('keydown', function (e) {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowLeft') show(idx - 1);
+      if (e.key === 'ArrowRight') show(idx + 1);
+    });
+  })();
+  </script>
 
   <!-- RELATED -->
   <div class="prop-related inner">

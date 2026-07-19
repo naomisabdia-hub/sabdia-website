@@ -80,9 +80,11 @@ const delays = ['', 'd1', 'd2'];
     <div class="inner">
       <div class="portfolio-grid">
         {page.items.map((item, i) => (
-          <div class={`port-card reveal ${delays[i % 3]}`}>
+          <div class={`port-card reveal ${delays[i % 3]}`} data-port-card>
             <div class="port-img-wrap">
               <img src={item.image} alt={item.name} loading="lazy">
+              {item.video && <video src={item.video} muted loop playsinline preload="none" data-port-video></video>}
+              {item.video && <span class="port-film-tag">Film</span>}
             </div>
             <div class="port-name">{item.name}</div>
             <div class="port-loc">{item.loc}</div>
@@ -91,4 +93,21 @@ const delays = ['', 'd1', 'd2'];
       </div>
     </div>
   </section>
+
+  <script is:inline>
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll('[data-port-card]').forEach(function (card) {
+      var video = card.querySelector('[data-port-video]');
+      if (!video) return;
+      card.addEventListener('mouseenter', function () {
+        video.play().then(function () { video.classList.add('playing'); }).catch(function () {});
+      });
+      card.addEventListener('mouseleave', function () {
+        video.pause();
+        video.classList.remove('playing');
+      });
+    });
+  })();
+  </script>
 </Base>

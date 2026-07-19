@@ -2,7 +2,7 @@
 name: CAPRI
 order: 5
 status: sold
-suburb: Inner Brisbane
+suburb: Holland Park West
 state: Queensland
 year: 2024
 beds: 5

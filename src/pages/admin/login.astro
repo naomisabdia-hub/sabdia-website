@@ -1,0 +1,75 @@
+---
+export const prerender = true;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Sign in · Sabdia Admin</title>
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin">
+<div class="ad-login">
+  <div class="ad-login-card">
+    <img src="https://static.wixstatic.com/media/1cc2db_f012027bbf0c45ebb4ae6d847309d59f~mv2.png/v1/fill/w_422,h_70,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/DESIGN%20%C2%B7%20DEVELOP%20%C2%B7%20CONSTRUCT.png" alt="Sabdia Constructions">
+    <div class="ad-login-sub">Admin Portal</div>
+    <form class="ad-form" id="loginForm">
+      <div class="ad-fg">
+        <label class="ad-fl" for="email">Email</label>
+        <input class="ad-fi" type="email" id="email" autocomplete="email" required>
+      </div>
+      <div class="ad-fg">
+        <label class="ad-fl" for="password">Password</label>
+        <input class="ad-fi" type="password" id="password" autocomplete="current-password">
+      </div>
+      <button class="ad-btn ad-btn-gold" type="submit" id="loginBtn" style="justify-content:center">Sign in</button>
+      <button class="ad-btn ad-btn-ghost" type="button" id="magicBtn" style="justify-content:center">Email me a sign-in link instead</button>
+    </form>
+    <p class="ad-login-note" id="loginNote">Trouble signing in? Use the email link option, or ask an administrator to reset your access.</p>
+  </div>
+</div>
+<script>
+  import { supabase, configured } from '../../lib/admin/client.js';
+
+  const note = document.getElementById('loginNote');
+  const params = new URLSearchParams(location.search);
+  if (params.get('denied')) note.textContent = 'That account is signed in but has no admin access. Ask an administrator to add you.';
+  if (!configured) note.textContent = 'Supabase is not configured for this deployment.';
+
+  const next = params.get('next') || '/admin/';
+
+  supabase?.auth.getSession().then(({ data: { session } }) => {
+    if (session && !params.get('denied')) location.href = next;
+  });
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    const { error } = await supabase.auth.signInWithPassword({
+      email: document.getElementById('email').value,
+      password: document.getElementById('password').value,
+    });
+    if (error) {
+      note.textContent = error.message;
+      btn.disabled = false;
+    } else {
+      location.href = next;
+    }
+  });
+
+  document.getElementById('magicBtn').addEventListener('click', async () => {
+    const email = document.getElementById('email').value;
+    if (!email) { note.textContent = 'Enter your email first, then press the link button.'; return; }
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: location.origin + '/admin/' },
+    });
+    note.textContent = error ? error.message : 'Check your email — a sign-in link is on its way.';
+  });
+</script>
+</body>
+</html>

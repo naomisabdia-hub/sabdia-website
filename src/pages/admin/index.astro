@@ -1,0 +1,93 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Dashboard" active="dashboard">
+  <div class="ad-hdr">
+    <div>
+      <h1 class="ad-h1">Good <em id="dayPart">day</em>.</h1>
+      <p class="ad-sub">Everything on the website is editable from here — changes go live the moment you save. No developer required.</p>
+    </div>
+    <a class="ad-btn ad-btn-gold" href="/admin/properties/?new=1">+ New Property</a>
+  </div>
+
+  <div class="ad-stats" id="stats">
+    <div class="ad-stat"><div class="ad-stat-n" id="stLive">–</div><div class="ad-stat-l">Live Listings</div></div>
+    <div class="ad-stat"><div class="ad-stat-n" id="stDraft">–</div><div class="ad-stat-l">Draft Listings</div></div>
+    <div class="ad-stat"><div class="ad-stat-n" id="stNew">–</div><div class="ad-stat-l">New Leads</div></div>
+    <div class="ad-stat"><div class="ad-stat-n" id="stAgents">–</div><div class="ad-stat-l">Agent Applications</div></div>
+  </div>
+
+  <div class="ad-card">
+    <div class="ad-card-h">Latest leads</div>
+    <p class="ad-sub" style="margin-bottom:16px">The five most recent enquiries. <a href="/admin/leads/" style="color:var(--gold)">Open the full inbox →</a></p>
+    <table class="ad-table" id="leadsTable">
+      <thead><tr><th>Received</th><th>Name</th><th>Type</th><th>Property</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="ad-empty" id="leadsEmpty" style="display:none">No leads yet — they'll appear here the moment a form is submitted.</div>
+  </div>
+
+  <div class="ad-card">
+    <div class="ad-card-h">Recent changes</div>
+    <p class="ad-sub" style="margin-bottom:16px">A record of who changed what, and when.</p>
+    <table class="ad-table" id="auditTable">
+      <thead><tr><th>When</th><th>Who</th><th>Action</th><th>What</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="ad-empty" id="auditEmpty" style="display:none">No changes recorded yet.</div>
+  </div>
+</AdminShell>
+
+<script>
+  import { supabase, requireAuth, el, fmtDate } from '../../lib/admin/client.js';
+
+  const hour = new Date().getHours();
+  document.getElementById('dayPart').textContent = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+
+  await requireAuth();
+
+  const [props, leads, audit] = await Promise.all([
+    supabase.from('properties').select('id, published'),
+    supabase.from('enquiries').select('id, form_name, first_name, last_name, property, status, created_at').order('created_at', { ascending: false }),
+    supabase.from('audit_log').select('user_email, action, table_name, record_key, created_at').order('created_at', { ascending: false }).limit(8),
+  ]);
+
+  const rows = props.data ?? [];
+  document.getElementById('stLive').textContent = rows.filter((p) => p.published).length;
+  document.getElementById('stDraft').textContent = rows.filter((p) => !p.published).length;
+  const allLeads = leads.data ?? [];
+  document.getElementById('stNew').textContent = allLeads.filter((l) => l.status === 'new').length;
+  document.getElementById('stAgents').textContent = allLeads.filter((l) => l.form_name === 'agent-application').length;
+
+  const tbody = document.querySelector('#leadsTable tbody');
+  const latest = allLeads.slice(0, 5);
+  if (!latest.length) {
+    document.getElementById('leadsTable').style.display = 'none';
+    document.getElementById('leadsEmpty').style.display = '';
+  }
+  for (const l of latest) {
+    tbody.appendChild(el('tr', { class: 'clickable', onclick: () => (location.href = '/admin/leads/') }, [
+      el('td', { text: fmtDate(l.created_at) }),
+      el('td', { text: `${l.first_name ?? ''} ${l.last_name ?? ''}`.trim() || '—' }),
+      el('td', { text: l.form_name || 'contact' }),
+      el('td', { text: l.property || '—' }),
+      el('td', {}, [el('span', { class: `ad-badge ${l.status}`, text: l.status })]),
+    ]));
+  }
+
+  const atbody = document.querySelector('#auditTable tbody');
+  const audits = audit.data ?? [];
+  if (!audits.length) {
+    document.getElementById('auditTable').style.display = 'none';
+    document.getElementById('auditEmpty').style.display = '';
+  }
+  for (const a of audits) {
+    atbody.appendChild(el('tr', {}, [
+      el('td', { text: fmtDate(a.created_at) }),
+      el('td', { text: a.user_email || '—' }),
+      el('td', { text: a.action.toLowerCase() }),
+      el('td', { text: `${a.table_name} · ${a.record_key ?? ''}` }),
+    ]));
+  }
+</script>

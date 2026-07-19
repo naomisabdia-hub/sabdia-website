@@ -12,7 +12,7 @@ land: 1000
 landOver: true
 image: https://static.wixstatic.com/media/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png/v1/fill/w_1920,h_1080,q_90,enc_avif,quality_auto/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png
 focus: ""
-viewerType: model
+viewerType: none
 modelUrl: /models/placeholder-home.glb
 posterUrl: https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1600,h_900,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg
 headline: A palace for<br><em>the extraordinary life</em>.
