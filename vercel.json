@@ -1,0 +1,13 @@
+{
+  "redirects": [
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/about.html", "destination": "/about/", "permanent": true },
+    { "source": "/services.html", "destination": "/services/", "permanent": true },
+    { "source": "/projects.html", "destination": "/projects/", "permanent": true },
+    { "source": "/collection.html", "destination": "/collection/", "permanent": true },
+    { "source": "/contact.html", "destination": "/contact/", "permanent": true },
+    { "source": "/agent-access.html", "destination": "/agent-access/", "permanent": true },
+    { "source": "/properties/index.html", "destination": "/properties/", "permanent": true },
+    { "source": "/properties/:slug.html", "destination": "/properties/:slug/", "permanent": true }
+  ]
+}

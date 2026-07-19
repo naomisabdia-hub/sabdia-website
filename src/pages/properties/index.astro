@@ -1,0 +1,106 @@
+---
+import Base from '../../layouts/Base.astro';
+import PropertyCard from '../../components/PropertyCard.astro';
+import SoldCard from '../../components/SoldCard.astro';
+import { wixResize, landLabel, countWord } from '../../lib/wix.js';
+import { getProperties } from '../../lib/db.js';
+
+const all = await getProperties();
+const forSale = all.filter((p) => p.data.status === 'for-sale');
+const sold = all.filter((p) => p.data.status === 'sold');
+
+const featured = forSale[0];
+const rest = forSale.slice(1);
+
+const names = forSale.map((p) => p.data.name).join(', ');
+const description = `Luxury properties for sale by Sabdia Constructions — Brisbane's award-winning boutique luxury home builder. Discover ${names}.`;
+---
+<Base title="Properties For Sale | Sabdia Constructions" description={description}>
+
+  <!-- PAGE HEADER -->
+  <section style="padding:clamp(130px,18vw,180px) clamp(22px,5vw,80px) clamp(48px,6vw,72px);background:var(--bg);border-bottom:1px solid var(--border)">
+    <div class="inner" style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap">
+      <div>
+        <div class="slabel reveal" style="margin-bottom:18px">For Sale</div>
+        <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(48px,9vw,120px);font-weight:300;line-height:.88;letter-spacing:-.035em;color:var(--ink)"><em style="color:var(--gold)">Current</em><br>Properties.</h1>
+      </div>
+      <p class="reveal d2" style="font-size:13.5px;font-weight:300;line-height:1.9;color:var(--ink3);max-width:380px;padding-bottom:6px">{countWord(forSale.length)} extraordinary residences across Brisbane's most sought-after inner suburbs — each designed, developed, and built entirely in-house by Sabdia.</p>
+    </div>
+  </section>
+
+  {featured && (
+    <section style="padding:clamp(40px,5vw,64px) clamp(22px,5vw,80px) 0;background:var(--bg)">
+      <div class="inner">
+        <a href={`/properties/${featured.id}/`} class="reveal" style="display:block;position:relative;overflow:hidden;height:clamp(400px,52vw,680px);cursor:none;text-decoration:none">
+          <img src={wixResize(featured.data.image, { w: 1600, h: 900, focus: featured.data.focus })}
+               alt={featured.data.name} loading="eager"
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.82) saturate(.88);transition:filter .7s,transform .7s">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(14,13,11,.88) 0%,rgba(14,13,11,.1) 50%,transparent 100%);transition:opacity .4s"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:clamp(28px,4vw,52px)">
+            <div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
+              <div style="width:5px;height:5px;border-radius:50%;background:var(--gold2);animation:pulse 2s ease-in-out infinite;flex-shrink:0"></div>
+              <span style="font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold2)">For Sale</span>
+            </div>
+            <div style="font-family:var(--font-d);font-size:clamp(44px,8vw,110px);font-weight:300;line-height:.88;letter-spacing:-.04em;color:var(--white);margin-bottom:10px">{featured.data.name}</div>
+            <div style="font-size:11px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:rgba(253,252,248,.5);margin-bottom:18px">{featured.data.suburb}, {featured.data.state}</div>
+            <div style="display:flex;gap:18px;flex-wrap:wrap">
+              {[`${featured.data.beds} Bed`, `${featured.data.baths} Bath`, `${featured.data.cars} Garage`, landLabel(featured.data.land, featured.data.landOver)].map((s, i) => (
+                <>
+                  {i > 0 && <span style="font-size:10px;color:rgba(253,252,248,.25)">&middot;</span>}
+                  <span style="font-size:10px;font-weight:300;letter-spacing:.08em;color:rgba(253,252,248,.6)">{s}</span>
+                </>
+              ))}
+            </div>
+          </div>
+          <div style="position:absolute;top:clamp(18px,3vw,32px);right:clamp(18px,3vw,32px);width:44px;height:44px;border:1px solid rgba(196,172,135,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);font-size:16px">&rarr;</div>
+        </a>
+      </div>
+    </section>
+  )}
+
+  {rest.length > 0 && (
+    <section style="padding:clamp(8px,1vw,10px) clamp(22px,5vw,80px) 0;background:var(--bg)">
+      <div class="inner">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          {rest.map((p, i) => (
+            <PropertyCard
+              entry={p}
+              class={`reveal ${['', 'd1', 'd2'][i % 3]}`}
+              style="aspect-ratio:16/10"
+              imgW={900}
+              imgH={562}
+              specs={[`${p.data.beds} Bed`, `${p.data.baths} Bath`, `${p.data.cars} Garage`, landLabel(p.data.land, p.data.landOver)]}
+              sep="dot"
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {sold.length > 0 && (
+    <section style="padding:clamp(64px,8vw,100px) clamp(22px,5vw,80px) clamp(80px,10vw,120px);background:var(--bg)">
+      <div class="inner">
+        <div class="slabel reveal" style="margin-bottom:32px">Sold Prior to Completion</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          {sold.map((p, i) => (
+            <SoldCard entry={p} class={`reveal ${['', 'd1'][i % 2]}`} imgW={900} imgH={560} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ENQUIRE CTA -->
+  <section class="sp" style="background:var(--bg2);border-top:1px solid var(--border);text-align:center">
+    <div class="inner-sm">
+      <div class="slabel reveal" style="justify-content:center;margin-bottom:20px">Private Enquiry</div>
+      <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(32px,5vw,64px);font-weight:300;color:var(--ink);margin-bottom:20px;letter-spacing:-.02em">Interested in a<br><em style="color:var(--gold)">private viewing</em>?</h2>
+      <p class="reveal d2" style="font-size:13px;font-weight:300;color:var(--ink3);max-width:420px;margin:0 auto 36px;line-height:1.85">We offer private, exclusive viewings for serious buyers. Contact us to arrange an inspection at a time that suits you.</p>
+      <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="/contact/" class="btn-p">Request a Viewing &rarr;</a>
+        <a href="/agent-access/" class="btn-g">Agent Enquiries</a>
+      </div>
+    </div>
+  </section>
+</Base>

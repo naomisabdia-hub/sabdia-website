@@ -1,0 +1,44 @@
+---
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  preloadImage?: string;
+}
+
+const { title, description, ogTitle, ogDescription, ogImage, preloadImage } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0E0D0B">
+<title>{title}</title>
+<meta name="description" content={description}>
+{ogTitle && <meta property="og:title" content={ogTitle}>}
+{(ogDescription || ogTitle) && <meta property="og:description" content={ogDescription ?? description}>}
+{ogTitle && <meta property="og:type" content="website">}
+{ogImage && <meta property="og:image" content={ogImage}>}
+{ogImage && <meta name="twitter:card" content="summary_large_image">}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{preloadImage && <link rel="preload" as="image" href={preloadImage}>}
+<link rel="stylesheet" href="/css/style.css">
+<slot name="head" />
+</head>
+<body>
+
+<Nav />
+
+<slot />
+
+<Footer />
+<script src="/js/main.js" is:inline></script>
+</body>
+</html>

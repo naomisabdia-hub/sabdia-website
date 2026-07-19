@@ -1,0 +1,149 @@
+---
+import Base from '../layouts/Base.astro';
+import { wixResize, landLabel } from '../lib/wix.js';
+import { getProperties } from '../lib/db.js';
+
+const forSale = (await getProperties())
+  .filter((p) => p.data.status === 'for-sale')
+  .slice(0, 2);
+---
+<Base
+  title="Agent Access | Sabdia Constructions"
+  description="Exclusive agent access for real estate professionals. Pre-launch information, priority access, and commission structures for Sabdia Constructions luxury developments."
+>
+  <style is:inline slot="head">
+  .agent-bens{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:64px}
+  .agent-ben{padding:40px 32px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:background .3s,border-color .3s}
+  .agent-ben:hover{background:rgba(158,139,106,.06);border-color:rgba(158,139,106,.2)}
+  .agent-ben-icon{width:44px;height:44px;border:1px solid rgba(196,172,135,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);margin-bottom:20px}
+  .agent-ben-t{font-family:var(--font-d);font-size:20px;font-weight:300;color:var(--white);margin-bottom:10px}
+  .agent-ben-d{font-size:13px;font-weight:300;line-height:1.78;color:rgba(253,252,248,.4)}
+  .agent-apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start}
+  @media(max-width:1024px){.agent-bens{grid-template-columns:repeat(2,1fr)}.agent-apply-grid{grid-template-columns:1fr;gap:52px}}
+  @media(max-width:640px){.agent-bens{grid-template-columns:1fr}}
+  </style>
+
+  <!-- HERO (dark, full) -->
+  <section style="position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;background:var(--dark)">
+    <img src="https://static.wixstatic.com/media/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png/v1/fill/w_1400,h_1800,q_85,enc_avif,quality_auto/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png" alt="Agent Access" loading="eager"
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.28) saturate(.6)">
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(14,13,11,.95) 0%,rgba(14,13,11,.3) 60%,transparent 100%)"></div>
+    <div class="inner" style="position:relative;z-index:2;padding:clamp(22px,5vw,80px);padding-bottom:clamp(72px,12vw,140px)">
+      <div class="slabel slabel-dark reveal" style="margin-bottom:20px">For Real Estate Professionals</div>
+      <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(52px,10vw,140px);font-weight:300;line-height:.88;letter-spacing:-.035em;color:var(--white)">Exclusive<br><em style="color:var(--gold2)">Agent</em><br>Access.</h1>
+      <p class="reveal d2" style="font-size:13px;font-weight:300;color:rgba(253,252,248,.5);max-width:420px;margin-top:28px;line-height:1.85">Join Sabdia's exclusive agent network and be the first to know about our next landmark development before it reaches the market.</p>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section style="background:var(--dark2);padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px)">
+    <div class="inner">
+      <div class="slabel slabel-dark reveal" style="margin-bottom:20px">Why Join</div>
+      <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(36px,5vw,64px);font-weight:300;color:var(--white);letter-spacing:-.02em;max-width:700px">The Sabdia agent program gives you <em style="color:var(--gold2)">a genuine edge</em>.</h2>
+      <div class="agent-bens">
+        <div class="agent-ben reveal">
+          <div class="agent-ben-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="agent-ben-t">Pre-Release Access</div>
+          <div class="agent-ben-d">Be first to know about upcoming developments before they reach the public market. Give your clients a genuine first-mover advantage.</div>
+        </div>
+        <div class="agent-ben reveal d1">
+          <div class="agent-ben-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <div class="agent-ben-t">Floor Plans &amp; Pricing</div>
+          <div class="agent-ben-d">Access pre-launch floor plans and indicative pricing information exclusively — everything you need to prepare your clients before public release.</div>
+        </div>
+        <div class="agent-ben reveal d2">
+          <div class="agent-ben-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.09 9a19.79 19.79 0 0 1-3-8.57A2 2 0 0 1 3 .18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 15l.92 1.92z"/></svg>
+          </div>
+          <div class="agent-ben-t">Priority Communication</div>
+          <div class="agent-ben-d">A dedicated Sabdia liaison to keep you informed, respond to questions, and support you throughout the sales process.</div>
+        </div>
+        <div class="agent-ben reveal d1">
+          <div class="agent-ben-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="agent-ben-t">Exclusive Commissions</div>
+          <div class="agent-ben-d">Competitive and exclusive commission structures for agent network members — recognising the value of your relationships and referrals.</div>
+        </div>
+        <div class="agent-ben reveal d2">
+          <div class="agent-ben-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="agent-ben-t">Private Previews</div>
+          <div class="agent-ben-d">Invitations to exclusive agent-only preview events — an opportunity to walk through completed or near-complete residences before public launch.</div>
+        </div>
+        <div class="agent-ben reveal d3">
+          <div class="agent-ben-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="agent-ben-t">Award-Winning Product</div>
+          <div class="agent-ben-d">Represent Brisbane's most acclaimed boutique luxury developer — a brand that your clients will immediately recognise as a hallmark of quality.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CURRENT LISTINGS PREVIEW -->
+  <section class="sp" style="border-top:1px solid var(--border)">
+    <div class="inner">
+      <div class="slabel reveal" style="margin-bottom:20px">Current Opportunities</div>
+      <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px);margin-bottom:48px">Properties available <em>now</em>.</h2>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+        {forSale.map((p, i) => (
+          <a href={`/properties/${p.id}/`} class={`pc reveal ${i % 2 === 1 ? 'd1' : ''}`} style="aspect-ratio:16/10">
+            <img src={wixResize(p.data.image, { w: 900, h: 560, focus: p.data.focus })} alt={p.data.name} loading="lazy">
+            <div class="pc-ov"></div>
+            <div class="pc-info">
+              <div class="pc-status"><div class="pc-dot"></div>For Sale</div>
+              <div class="pc-name">{p.data.name}</div>
+              <div class="pc-loc">{p.data.suburb}, QLD &middot; {p.data.beds} Bed &middot; {p.data.baths} Bath &middot; {landLabel(p.data.land, p.data.landOver)}</div>
+            </div>
+            <div class="pc-arrow">&rarr;</div>
+          </a>
+        ))}
+      </div>
+      <div style="text-align:center;margin-top:28px">
+        <a href="/properties/" class="btn-g">View All Properties &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPLICATION FORM -->
+  <section class="sp" style="background:var(--bg2);border-top:1px solid var(--border)" id="apply">
+    <div class="inner agent-apply-grid">
+      <div>
+        <div class="slabel reveal">Apply for Access</div>
+        <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px)">Join the <em>network</em>.</h2>
+        <p class="about-p reveal d2">Complete the form and a member of the Sabdia team will be in touch within one business day to discuss your application and confirm your access to our exclusive agent program.</p>
+        <div class="reveal d3" style="margin-top:36px;padding:28px;background:var(--dark);border-left:2px solid var(--gold)">
+          <div style="font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Please note</div>
+          <div style="font-size:13px;font-weight:300;color:rgba(253,252,248,.5);line-height:1.75">The Sabdia agent program is available to licensed real estate professionals only. We may request verification of your licence at the time of application approval.</div>
+        </div>
+      </div>
+      <div>
+        <form class="cform reveal d1" id="cform" name="agent-application" method="POST" action="/api/contact">
+          <input type="hidden" name="form-name" value="agent-application">
+          <p class="hidden" style="display:none"><label>Don't fill this out: <input name="bot-field"></label></p>
+          <div class="frow">
+            <div class="fg"><label class="fl">First Name*</label><input type="text" name="first-name" class="fi" placeholder="First name" required></div>
+            <div class="fg"><label class="fl">Last Name*</label><input type="text" name="last-name" class="fi" placeholder="Last name" required></div>
+          </div>
+          <div class="fg"><label class="fl">Agency / Company*</label><input type="text" name="agency" class="fi" placeholder="Agency or company name" required></div>
+          <div class="fg"><label class="fl">Email Address*</label><input type="email" name="email" class="fi" placeholder="your@email.com" required></div>
+          <div class="fg"><label class="fl">Phone Number*</label><input type="tel" name="phone" class="fi" placeholder="+61 4xx xxx xxx" required></div>
+          <div class="fg"><label class="fl">Real Estate Licence No.*</label><input type="text" name="licence-number" class="fi" placeholder="Your licence number" required></div>
+          <div class="fg">
+            <label class="fl">Primary Suburb Markets</label>
+            <input type="text" name="suburb-markets" class="fi" placeholder="e.g. Coorparoo, Camp Hill, New Farm…">
+          </div>
+          <div class="fg"><label class="fl">Additional Information</label><textarea class="fta" name="message" placeholder="Tell us about your client base, experience with luxury property, or any other relevant information…"></textarea></div>
+          <button type="submit" class="fsub" id="fsub">Submit Application &rarr;</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</Base>

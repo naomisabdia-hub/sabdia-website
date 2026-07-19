@@ -1,0 +1,19 @@
+{
+  "name": "sabdia-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/vercel": "^9.0.5",
+    "@supabase/supabase-js": "^2.108.1",
+    "astro": "^5.8.0"
+  },
+  "devDependencies": {
+    "js-yaml": "^4.2.0"
+  }
+}

@@ -1,0 +1,27 @@
+---
+import { wixResize } from '../lib/wix.js';
+
+const { entry, class: cls = '', style, imgW, imgH, specs = [], sep = 'none' } = Astro.props;
+const d = entry.data;
+---
+<a href={`/properties/${entry.id}/`} class={`pc ${cls}`} style={style}>
+  <img src={wixResize(d.image, { w: imgW, h: imgH, focus: d.focus })} alt={d.name} loading="lazy">
+  <div class="pc-ov"></div>
+  <div class="pc-info">
+    <div class="pc-status"><div class="pc-dot"></div>For Sale</div>
+    <div class="pc-name">{d.name}</div>
+    <div class="pc-loc">{d.suburb}, QLD</div>
+    {specs.length > 0 && (
+      <div class="pc-specs">
+        {specs.map((s, i) => (
+          <>
+            {i > 0 && sep === 'dot' && <span class="pc-spec">&middot;</span>}
+            {i > 0 && sep === 'gap' && <span class="pc-spec-sep"></span>}
+            <span class="pc-spec">{s}</span>
+          </>
+        ))}
+      </div>
+    )}
+  </div>
+  <div class="pc-arrow">&rarr;</div>
+</a>

@@ -1,0 +1,102 @@
+---
+import Base from '../layouts/Base.astro';
+import { wixResize, landLabel } from '../lib/wix.js';
+import { getProperties } from '../lib/db.js';
+
+const all = await getProperties();
+const forSale = all.filter((p) => p.data.status === 'for-sale');
+const sold = all.filter((p) => p.data.status === 'sold');
+
+const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`, landLabel(d.land, d.landOver)].join(' · ');
+---
+<Base
+  title="Projects | Sabdia Constructions"
+  description="Browse Sabdia Constructions' portfolio of completed luxury residential developments across inner Brisbane. 100+ residences since 2013."
+>
+
+  <!-- HERO -->
+  <section class="page-hero">
+    <img src="https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg" alt="Projects" loading="eager">
+    <div class="page-hero-ov"></div>
+    <div class="page-hero-content inner">
+      <div class="slabel slabel-dark">Portfolio</div>
+      <h1 class="page-h">Our<br><em>Projects</em></h1>
+      <p class="page-hero-sub">Over 100 residences delivered across inner Brisbane's most prestigious suburbs since 2013.</p>
+    </div>
+  </section>
+
+  <!-- FILTER BAR -->
+  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px clamp(22px,5vw,80px)">
+    <div class="inner" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--taupe)">Filter:</span>
+      <a href="#" style="font-size:10px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--gold);padding-bottom:1px">All</a>
+      <a href="#" style="font-size:10px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--taupe);transition:color .3s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--taupe)'">Current</a>
+      <a href="#" style="font-size:10px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--taupe);transition:color .3s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--taupe)'">Completed</a>
+      <a href="#" style="font-size:10px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--taupe);transition:color .3s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--taupe)'">Sold</a>
+    </div>
+  </div>
+
+  <!-- CURRENT PROPERTIES -->
+  <section class="sp">
+    <div class="inner">
+      <div class="slabel reveal" style="margin-bottom:32px">For Sale — Current</div>
+      <div class="projects-grid">
+        {forSale.map((p, i) => (
+          <a href={`/properties/${p.id}/`} class={`proj-card reveal ${i % 2 === 1 ? 'd1' : ''}`}>
+            <img src={wixResize(p.data.image, { w: 1200, h: 750, focus: p.data.focus })} alt={p.data.name} loading="lazy">
+            <div class="proj-card-ov"></div>
+            <div class="proj-card-info">
+              <div class="proj-card-year">{p.data.year} · For Sale</div>
+              <div class="proj-card-name">{p.data.name}</div>
+              <div class="proj-card-loc">{p.data.suburb}, QLD — {specsLine(p.data)}</div>
+            </div>
+            <div class="pc-arrow">&rarr;</div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLD PRIOR -->
+  <section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border)">
+    <div class="inner">
+      <div class="slabel reveal" style="margin-bottom:32px">Sold Prior to Completion</div>
+      <div class="projects-grid">
+        {sold.map((p, i) => (
+          <a href={`/properties/${p.id}/`} class={`proj-card reveal ${i % 2 === 1 ? 'd1' : ''}`}>
+            <img src={wixResize(p.data.image, { w: 1200, h: 750, focus: p.data.focus, q: 85 })} alt={p.data.name} loading="lazy">
+            <div class="proj-card-ov"></div>
+            <div class="sc-badge">Sold Prior to Completion</div>
+            <div class="proj-card-info">
+              <div class="proj-card-year">{p.data.year} · Sold</div>
+              <div class="proj-card-name">{p.data.name}</div>
+              <div class="proj-card-loc">{p.data.suburb}, QLD — {specsLine(p.data)}</div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAND -->
+  <div class="stats-band sp-sm">
+    <div class="stats-grid inner">
+      <div class="stat reveal"><span class="stat-n">10<span class="stat-u">+</span></span><div class="stat-l">Years in Brisbane</div></div>
+      <div class="stat reveal d1"><span class="stat-n"><span class="counter" data-target="100">0</span><span class="stat-u">+</span></span><div class="stat-l">Residences Delivered</div></div>
+      <div class="stat reveal d2"><span class="stat-n">5<span class="stat-u">★</span></span><div class="stat-l">Multi-Award Winning</div></div>
+      <div class="stat reveal d3"><span class="stat-n">100<span class="stat-u">%</span></span><div class="stat-l">In-House Delivery</div></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <section class="sp" style="text-align:center">
+    <div class="inner-sm">
+      <div class="slabel reveal" style="justify-content:center;margin-bottom:20px">Interested?</div>
+      <h2 class="about-h reveal d1" style="text-align:center;font-size:clamp(32px,5vw,60px)">Ready to find your<br><em>next home</em>?</h2>
+      <div class="reveal d2" style="display:flex;gap:14px;justify-content:center;margin-top:36px;flex-wrap:wrap">
+        <a href="/properties/" class="btn-p">View For Sale</a>
+        <a href="/contact/" class="btn-g">Enquire Now</a>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,102 @@
+---
+import Base from '../layouts/Base.astro';
+
+const portfolio = [
+  { name: 'ENCANTO', loc: 'Camp Hill QLD, Australia', img: 'https://static.wixstatic.com/media/1cc2db_4d7d30024fef47ba8f5f9859e08bb47b~mv2.jpeg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_4d7d30024fef47ba8f5f9859e08bb47b~mv2.jpeg' },
+  { name: 'NERO', loc: 'Rochedale QLD, Australia', img: 'https://static.wixstatic.com/media/1cc2db_9ed4e50eba3b453885aa6a4917ba5607~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_9ed4e50eba3b453885aa6a4917ba5607~mv2.jpg' },
+  { name: 'HERMOSA', loc: 'Camp Hill QLD, Australia', img: 'https://static.wixstatic.com/media/1cc2db_9cbfa41ef2dd4ed3b14b5277765cc446~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_9cbfa41ef2dd4ed3b14b5277765cc446~mv2.jpg' },
+  { name: 'FRASER', loc: 'Graceville QLD, Australia', img: 'https://static.wixstatic.com/media/1cc2db_fb04f5dbe53b4d34ab710537a2e24b40~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_fb04f5dbe53b4d34ab710537a2e24b40~mv2.jpg' },
+  { name: 'CALLE', loc: 'Camp Hill QLD, Australia', img: 'https://static.wixstatic.com/media/1cc2db_a11d808ebc4648de9b8a25918f19e192~mv2.png/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_a11d808ebc4648de9b8a25918f19e192~mv2.png' },
+  { name: 'PETRA', loc: 'Taringa QLD, Australia', img: 'https://static.wixstatic.com/media/1cc2db_64f35b15dd914a189eee2aeb79b86284~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_64f35b15dd914a189eee2aeb79b86284~mv2.jpg' },
+  { name: 'KIRRA', loc: 'Brisbane QLD, Australia', img: 'https://static.wixstatic.com/media/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png/v1/fill/w_800,h_600,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png' },
+];
+
+const delays = ['', 'd1', 'd2'];
+---
+<Base
+  title="Collection | Sabdia Constructions"
+  description="The Sabdia Collection — a portfolio of completed luxury residences across inner Brisbane. Award-winning homes designed, developed, and constructed by Sabdia."
+>
+  <style is:inline slot="head">
+  /* ── PORTFOLIO GRID ── */
+  .portfolio-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:clamp(28px,3vw,48px) clamp(20px,2.5vw,36px);
+  }
+  .port-card{
+    display:block;
+    cursor:none;
+    text-decoration:none;
+  }
+  .port-img-wrap{
+    position:relative;
+    overflow:hidden;
+    aspect-ratio:4/3;
+    margin-bottom:16px;
+    background:var(--bg3);
+  }
+  .port-img-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    filter:saturate(.88);
+    transition:transform .75s cubic-bezier(0.16,1,0.3,1),filter .5s;
+    display:block;
+  }
+  .port-card:hover .port-img-wrap img{
+    transform:scale(1.04);
+    filter:saturate(1);
+  }
+  .port-name{
+    font-family:var(--font-u);
+    font-size:12px;
+    font-weight:400;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--ink);
+    margin-bottom:5px;
+    transition:color .3s;
+  }
+  .port-card:hover .port-name{color:var(--gold)}
+  .port-loc{
+    font-size:12px;
+    font-weight:300;
+    color:var(--ink3);
+    letter-spacing:.02em;
+  }
+
+  @media(max-width:900px){
+    .portfolio-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(max-width:560px){
+    .portfolio-grid{grid-template-columns:1fr;gap:32px 0}
+  }
+  </style>
+
+  <!-- PAGE HEADER -->
+  <section style="padding:clamp(130px,18vw,180px) clamp(22px,5vw,80px) clamp(48px,6vw,72px);background:var(--bg);border-bottom:1px solid var(--border)">
+    <div class="inner">
+      <div class="slabel reveal" style="margin-bottom:18px">Our Work</div>
+      <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(48px,9vw,120px);font-weight:300;line-height:.88;letter-spacing:-.035em;color:var(--ink)">The Sabdia<br><em style="color:var(--gold)">Collection</em>.</h1>
+      <p class="reveal d2" style="font-size:13.5px;font-weight:300;line-height:1.9;color:var(--ink3);max-width:480px;margin-top:28px">A portfolio of completed luxury residences across inner Brisbane — each one designed, developed, and constructed entirely in-house by Sabdia.</p>
+    </div>
+  </section>
+
+  <!-- PORTFOLIO GRID -->
+  <section style="padding:clamp(52px,7vw,96px) clamp(22px,5vw,80px) clamp(80px,12vw,140px);background:var(--bg)">
+    <div class="inner">
+      <div class="portfolio-grid">
+        {portfolio.map((item, i) => (
+          <div class={`port-card reveal ${delays[i % 3]}`}>
+            <div class="port-img-wrap">
+              <img src={item.img} alt={item.name} loading="lazy">
+            </div>
+            <div class="port-name">{item.name}</div>
+            <div class="port-loc">{item.loc}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>

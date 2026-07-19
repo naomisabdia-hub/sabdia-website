@@ -1,0 +1,187 @@
+---
+import Base from '../../layouts/Base.astro';
+import PropertyCard from '../../components/PropertyCard.astro';
+import { wixResize, landLabel } from '../../lib/wix.js';
+import { getProperties, getProperty } from '../../lib/db.js';
+
+const entry = await getProperty(Astro.params.slug);
+if (!entry) {
+  return new Response('Not found', { status: 404 });
+}
+const d = entry.data;
+const sold = d.status === 'sold';
+const statusLabel = sold ? 'Sold Prior to Completion' : 'For Sale';
+
+const paragraphs = entry.body.trim().split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+
+const allProps = await getProperties();
+const related = allProps
+  .filter((p) => p.data.status === 'for-sale' && p.id !== entry.id)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+
+const heroImg = wixResize(d.image, { w: 1920, h: 1080, focus: d.focus, q: sold ? 85 : 90 });
+const ogImg = wixResize(d.image, { w: 1200, h: 630, focus: d.focus });
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'SingleFamilyResidence',
+  name: d.name,
+  description: d.seoDescription,
+  numberOfRooms: d.beds,
+  numberOfBathroomsTotal: d.baths,
+  numberOfBedrooms: d.beds,
+  floorSize: { '@type': 'QuantitativeValue', value: d.land, unitCode: 'MTK' },
+  address: { '@type': 'PostalAddress', addressLocality: d.suburb, addressRegion: 'QLD', addressCountry: 'AU' },
+  image: ogImg,
+  brand: { '@type': 'Brand', name: 'Sabdia Constructions' },
+});
+---
+<Base
+  title={`${d.name} | Sabdia Constructions`}
+  description={d.seoDescription}
+  ogTitle={`${d.name} — ${d.suburb} · Sabdia Constructions`}
+  ogDescription={d.seoDescription}
+  ogImage={ogImg}
+>
+  <script type="application/ld+json" slot="head" is:inline set:html={jsonLd} />
+
+  <!-- PROP HERO -->
+  <section class="prop-hero">
+    <img src={heroImg} alt={d.name} loading="eager" style={`position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:${sold ? 'brightness(.4) saturate(.65)' : 'brightness(.48) saturate(.82)'}`}>
+    <div class="prop-hero-ov"></div>
+    <div class="prop-hero-content inner">
+      <div class="prop-status" style={sold ? 'margin-bottom:14px' : undefined}>
+        <div class={`prop-status-dot ${sold ? 'sold' : 'active'}`}></div>
+        <span style="font-size:9.5px;font-weight:300;letter-spacing:.34em;text-transform:uppercase;color:rgba(253,252,248,.6)">{statusLabel}</span>
+      </div>
+      <div class="prop-name">{d.name}</div>
+      <div class="prop-loc">{d.suburb}, {d.state}</div>
+    </div>
+  </section>
+
+  {sold && (
+    <div style="background:var(--dark3);border-bottom:1px solid rgba(255,255,255,.06);padding:22px clamp(22px,5vw,80px)">
+      <div class="inner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="padding:6px 16px;background:rgba(158,139,106,.12);border:1px solid rgba(158,139,106,.25);font-size:8.5px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold2)">Sold Prior to Completion</div>
+        <span style="font-size:12px;font-weight:300;color:rgba(253,252,248,.4)">This residence has been sold. View our current properties for sale below.</span>
+        <a href="/properties/" class="btn-g btn-g-gold" style="margin-left:auto;padding:8px 20px;font-size:9px">View Available &rarr;</a>
+      </div>
+    </div>
+  )}
+
+  <!-- SPECS BAR -->
+  <div class="prop-specs-bar">
+    <div class="prop-specs-inner">
+      <div class="prop-spec-item">
+        <div class="prop-spec-l">Location</div>
+        <div class="prop-spec-v" style="font-size:16px">{d.suburb}</div>
+      </div>
+      <div class="prop-spec-item">
+        <div class="prop-spec-l">Bedrooms</div>
+        <div class="prop-spec-v">{d.beds}</div>
+      </div>
+      <div class="prop-spec-item">
+        <div class="prop-spec-l">Bathrooms</div>
+        <div class="prop-spec-v">{d.baths}</div>
+      </div>
+      <div class="prop-spec-item">
+        <div class="prop-spec-l">Garages</div>
+        <div class="prop-spec-v">{d.cars}</div>
+      </div>
+      <div class="prop-spec-item">
+        <div class="prop-spec-l">Land Size</div>
+        <div class="prop-spec-v">{d.land}<em>m²{d.landOver ? '+' : ''}</em></div>
+      </div>
+      <div class="prop-spec-item">
+        <div class="prop-spec-l">Status</div>
+        <div class="prop-spec-v" style={`font-size:16px;color:${sold ? 'rgba(253,252,248,.5)' : 'var(--gold2)'}`}>{sold ? 'Sold' : 'For Sale'}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="prop-body">
+    <div class="prop-layout inner">
+      <div class="prop-desc">
+        <div class="slabel prop-desc-slabel reveal">About {d.name}</div>
+        <h1 class="prop-body-h reveal d1" set:html={d.headline} />
+        {paragraphs.map((p) => <p class="prop-body-p reveal d2">{p}</p>)}
+
+        <div class="prop-features reveal d3">
+          <div class="prop-features-h">Key Features</div>
+          <div class="prop-feat-grid">
+            {d.features.map((f) => <div class="prop-feat">{f}</div>)}
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal d2">
+        <div class="prop-enquire">
+          <div class="prop-enquire-h">{d.enquiryHeading}</div>
+          <p style="font-size:13px;font-weight:300;color:var(--ink3);line-height:1.75;margin-bottom:24px">{d.enquiryText}</p>
+          <form class="cform" id="cform" name="property-enquiry" method="POST" action="/api/contact">
+            <input type="hidden" name="form-name" value="property-enquiry">
+            <input type="hidden" name="property" value={d.name}>
+            <p class="hidden" style="display:none"><label>Don't fill this out: <input name="bot-field"></label></p>
+            <div class="frow">
+              <div class="fg"><label class="fl">First Name*</label><input type="text" name="first-name" class="fi" placeholder="First name" required></div>
+              <div class="fg"><label class="fl">Last Name*</label><input type="text" name="last-name" class="fi" placeholder="Last name" required></div>
+            </div>
+            <div class="fg"><label class="fl">Email*</label><input type="email" name="email" class="fi" placeholder="Email address" required></div>
+            <div class="fg"><label class="fl">Phone</label><input type="tel" name="phone" class="fi" placeholder="Phone number"></div>
+            {!sold && (
+              <div class="fg">
+                <label class="fl">Enquiry Type</label>
+                <select class="fsel" name="enquiry-type">
+                  <option>Register Interest</option>
+                  <option>Arrange Private Inspection</option>
+                  <option>Request Price Guide</option>
+                  <option>General Enquiry</option>
+                </select>
+              </div>
+            )}
+            <div class="fg"><label class="fl">Message</label><textarea class="fta" name="message" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
+            <p class="form-note">By submitting this form you agree to our privacy policy. Your details will not be shared with third parties.</p>
+            <button type="submit" class="fsub" id="fsub">{d.enquiryButton} &rarr;</button>
+          </form>
+        </div>
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+          {sold && <a href="/properties/" class="btn-p" style="justify-content:center">View Current Properties</a>}
+          <a href="/contact/" class={`btn-g ${sold ? '' : 'btn-g-gold'}`} style="justify-content:center">General Enquiry</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="prop-gallery inner">
+    <div class="slabel reveal" style="margin-bottom:28px">Gallery</div>
+    <div class="prop-gallery-grid">
+      {d.gallery.map((g, i) => (
+        <div class={`gallery-item gallery-${'abcdef'[i] ?? 'f'} reveal ${['', 'd1', 'd2', 'd1', 'd2', 'd3'][i] ?? 'd3'}`}>
+          <img class="gallery-img" src={g.src} alt={g.alt} loading="lazy">
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- RELATED -->
+  <div class="prop-related inner">
+    <h2 class="prop-related-h reveal">
+      {sold ? <Fragment>Properties <em>for sale now</em></Fragment> : <Fragment>Explore more <em>Sabdia residences</em></Fragment>}
+    </h2>
+    <div class="prop-related-grid">
+      {related.map((p, i) => (
+        <PropertyCard
+          entry={p}
+          class={`reveal ${['', 'd1', 'd2'][i] ?? ''}`}
+          style="aspect-ratio:4/3"
+          imgW={600}
+          imgH={400}
+          specs={[`${p.data.beds} Bed`, `${p.data.baths} Bath`, `${p.data.cars} Car`]}
+        />
+      ))}
+    </div>
+  </div>
+</Base>

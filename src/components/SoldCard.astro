@@ -1,0 +1,17 @@
+---
+import { wixResize, landLabel } from '../lib/wix.js';
+
+const { entry, class: cls = '', imgW, imgH, showSuburb = true } = Astro.props;
+const d = entry.data;
+const specs = [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`, landLabel(d.land, d.landOver)];
+const loc = (showSuburb ? [`${d.suburb}, QLD`] : []).concat(specs).join(' · ');
+---
+<a href={`/properties/${entry.id}/`} class={`sc-card ${cls}`}>
+  <img src={wixResize(d.image, { w: imgW, h: imgH, focus: d.focus, q: 85 })} alt={d.name} loading="lazy">
+  <div class="sc-ov"></div>
+  <div class="sc-badge">Sold Prior to Completion</div>
+  <div class="sc-info">
+    <div class="sc-name">{d.name}</div>
+    <div class="sc-loc">{loc}</div>
+  </div>
+</a>

@@ -1,0 +1,197 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base
+  title="About | Sabdia Constructions"
+  description="Boutique luxury home builder and developer in inner Brisbane since 2013. Learn about Sabdia's story, values, and integrated approach to luxury residential development."
+  ogTitle="About — Sabdia Constructions"
+  ogDescription="A decade of redefining luxury residential development in inner Brisbane."
+  ogImage="https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1200,h_630,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg"
+>
+  <style is:inline slot="head">
+  .timeline{position:relative;padding-left:40px;margin-top:0}
+  .timeline::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--gold),transparent)}
+  .tl-item{position:relative;margin-bottom:44px}
+  .tl-item:last-child{margin-bottom:0}
+  .tl-dot{position:absolute;left:-44px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px var(--bg)}
+  .tl-year{font-size:9px;font-weight:300;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+  .tl-title{font-family:var(--font-d);font-size:20px;font-weight:300;color:var(--ink);margin-bottom:6px}
+  .tl-desc{font-size:13px;font-weight:300;line-height:1.75;color:var(--ink3)}
+  .awards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:52px}
+  .award-item{padding:28px 24px;background:var(--bg2);border:1px solid var(--border);border-top:2px solid var(--gold)}
+  .award-year{font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  .award-title{font-family:var(--font-d);font-size:17px;font-weight:300;color:var(--ink);line-height:1.3;margin-bottom:6px}
+  .award-org{font-size:11px;font-weight:300;color:var(--taupe);letter-spacing:.06em}
+  .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:52px}
+  .team-card{text-align:center}
+  .team-img{aspect-ratio:3/4;overflow:hidden;margin-bottom:18px}
+  .team-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.82);transition:filter .4s}
+  .team-card:hover .team-img img{filter:saturate(1)}
+  .team-name{font-family:var(--font-d);font-size:20px;font-weight:300;color:var(--ink);margin-bottom:4px}
+  .team-role{font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+  @media(max-width:1024px){.awards-grid{grid-template-columns:repeat(2,1fr)}.team-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:768px){.awards-grid{grid-template-columns:1fr}.team-grid{grid-template-columns:1fr}}
+  </style>
+
+  <!-- HERO -->
+  <section class="page-hero">
+    <img src="https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg" alt="Sabdia Constructions" loading="eager">
+    <div class="page-hero-ov"></div>
+    <div class="page-hero-content inner">
+      <div class="slabel slabel-dark">Our Story</div>
+      <h1 class="page-h">About<br><em>Sabdia</em></h1>
+      <p class="page-hero-sub">A decade of redefining luxury residential development in inner Brisbane.</p>
+    </div>
+  </section>
+
+  <!-- MISSION -->
+  <section class="sp">
+    <div class="inner about-grid">
+      <div class="about-sticky">
+        <div class="slabel reveal">Mission</div>
+        <h2 class="about-h reveal d1">Built on <em>vision</em>,<br>delivered with<br>precision.</h2>
+      </div>
+      <div>
+        <p class="about-p reveal d2">Founded in 2013, Sabdia Constructions was born from a singular conviction: that the residential development industry in Brisbane deserved a boutique operator who refused to compromise. One that would bring together exceptional design, rigorous development management, and master-level construction under a single, unified vision.</p>
+        <p class="about-p reveal d2">Over a decade later, that conviction has been validated more than 100 times — in every residence we have delivered, in every client who has trusted us with their most significant investment, and in every award that has recognised our commitment to excellence.</p>
+        <p class="about-p reveal d2">We remain boutique by choice. By limiting the number of projects we undertake each year, we ensure that every development receives the full force of our attention, creativity, and craftsmanship. We do not build in volume. We build in detail.</p>
+        <div class="sig reveal d3">
+          <div class="sig-name">Sabdia</div>
+          <div class="sig-title">Founder &amp; Principal</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES -->
+  <section class="sp" style="background:var(--dark);padding-top:0">
+    <div class="mq-band" style="margin:0 0 0">
+    </div>
+    <div style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px)">
+      <div class="inner">
+        <div class="slabel slabel-dark reveal" style="margin-bottom:52px">Our Values</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px">
+          <div class="reveal" style="padding:44px 36px;border-right:1px solid rgba(255,255,255,.07)">
+            <div style="font-family:var(--font-d);font-size:56px;font-weight:300;font-style:italic;color:rgba(158,139,106,.18);line-height:1;margin-bottom:20px">i.</div>
+            <div style="font-family:var(--font-d);font-size:24px;font-weight:300;color:var(--white);margin-bottom:12px">Integrity</div>
+            <div style="font-size:13px;font-weight:300;line-height:1.8;color:rgba(253,252,248,.4)">We say what we do, and we do what we say. Transparency with our clients is non-negotiable at every stage of the journey.</div>
+          </div>
+          <div class="reveal d1" style="padding:44px 36px;border-right:1px solid rgba(255,255,255,.07)">
+            <div style="font-family:var(--font-d);font-size:56px;font-weight:300;font-style:italic;color:rgba(158,139,106,.18);line-height:1;margin-bottom:20px">ii.</div>
+            <div style="font-family:var(--font-d);font-size:24px;font-weight:300;color:var(--white);margin-bottom:12px">Innovation</div>
+            <div style="font-size:13px;font-weight:300;line-height:1.8;color:rgba(253,252,248,.4)">We push the boundaries of design and construction, constantly seeking better ways to create residences that will stand the test of time.</div>
+          </div>
+          <div class="reveal d2" style="padding:44px 36px">
+            <div style="font-family:var(--font-d);font-size:56px;font-weight:300;font-style:italic;color:rgba(158,139,106,.18);line-height:1;margin-bottom:20px">iii.</div>
+            <div style="font-family:var(--font-d);font-size:24px;font-weight:300;color:var(--white);margin-bottom:12px">Excellence</div>
+            <div style="font-size:13px;font-weight:300;line-height:1.8;color:rgba(253,252,248,.4)">We do not accept 'good enough'. Every detail, from the grandest architectural gesture to the smallest finishing touch, must be exceptional.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="sp">
+    <div class="inner">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start">
+        <div>
+          <div class="slabel reveal">Our Journey</div>
+          <h2 class="about-h reveal d1">A decade of<br><em>milestones</em>.</h2>
+          <p class="about-p reveal d2" style="margin-top:0">From a single vision to over 100 delivered residences, each year has brought new achievements and raised the bar for what luxury living in Brisbane can be.</p>
+        </div>
+        <div class="timeline reveal d2">
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2013</div>
+            <div class="tl-title">Founded</div>
+            <div class="tl-desc">Sabdia Constructions established with a vision to redefine boutique luxury residential development in inner Brisbane.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2015</div>
+            <div class="tl-title">First Award</div>
+            <div class="tl-desc">Recognised with our first industry award for design excellence, validating the Sabdia approach to integrated development.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2017</div>
+            <div class="tl-title">50 Residences Delivered</div>
+            <div class="tl-desc">A major milestone — 50 homes delivered to satisfied clients across inner Brisbane's most prestigious suburbs.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2020</div>
+            <div class="tl-title">Interior Architecture Division</div>
+            <div class="tl-desc">Expanded in-house capabilities to include a dedicated interior architecture team, deepening creative integration across all projects.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2023</div>
+            <div class="tl-title">100+ Residences</div>
+            <div class="tl-desc">Surpassed 100 completed residences — a testament to a decade of consistency, quality, and unwavering commitment to excellence.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-year">2025</div>
+            <div class="tl-title">QASR — Flagship Release</div>
+            <div class="tl-desc">The launch of QASR, Coorparoo — Sabdia's most ambitious and extraordinary residence to date, representing a new pinnacle of Brisbane luxury.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AWARDS -->
+  <section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="inner">
+      <div class="slabel reveal">Recognition</div>
+      <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px)">Award-winning<br><em>excellence</em>.</h2>
+      <div class="awards-grid">
+        <div class="award-item reveal">
+          <div class="award-year">2024</div>
+          <div class="award-title">Best Luxury Residential Development</div>
+          <div class="award-org">UDIA Queensland Awards</div>
+        </div>
+        <div class="award-item reveal d1">
+          <div class="award-year">2023</div>
+          <div class="award-title">Excellence in Design</div>
+          <div class="award-org">HIA Australian Housing Awards</div>
+        </div>
+        <div class="award-item reveal d2">
+          <div class="award-year">2022</div>
+          <div class="award-title">Best New Residential Development</div>
+          <div class="award-org">Property Council of Australia</div>
+        </div>
+        <div class="award-item reveal d1">
+          <div class="award-year">2021</div>
+          <div class="award-title">Residential Interior Design — Luxury</div>
+          <div class="award-org">IDEA Awards</div>
+        </div>
+        <div class="award-item reveal d2">
+          <div class="award-year">2020</div>
+          <div class="award-title">Custom Home of the Year — QLD</div>
+          <div class="award-org">Master Builders Queensland</div>
+        </div>
+        <div class="award-item reveal d3">
+          <div class="award-year">2019</div>
+          <div class="award-title">Best Luxury Home Builder — Brisbane</div>
+          <div class="award-org">REIQ Awards for Excellence</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="sp" style="text-align:center">
+    <div class="inner-sm">
+      <div class="slabel reveal" style="justify-content:center;margin-bottom:20px">Begin Your Journey</div>
+      <h2 class="about-h reveal d1" style="text-align:center;font-size:clamp(36px,5vw,68px)">Ready to create something <em>extraordinary</em>?</h2>
+      <p class="about-p reveal d2" style="text-align:center;margin:24px auto 40px;max-width:480px">Whether you're seeking a current property for sale or have a vision for a bespoke home, we'd love to begin a conversation.</p>
+      <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="/properties/" class="btn-p">View Properties</a>
+        <a href="/contact/" class="btn-g">Get In Touch</a>
+      </div>
+    </div>
+  </section>
+</Base>
