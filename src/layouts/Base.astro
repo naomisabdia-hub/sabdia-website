@@ -9,9 +9,11 @@ interface Props {
   ogDescription?: string;
   ogImage?: string;
   preloadImage?: string;
+  preloadImageSet?: string;
+  preloadImageSizes?: string;
 }
 
-const { title, description, ogTitle, ogDescription, ogImage, preloadImage } = Astro.props;
+const { title, description, ogTitle, ogDescription, ogImage, preloadImage, preloadImageSet, preloadImageSizes } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!DOCTYPE html>
@@ -32,7 +34,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 <link rel="preload" as="font" type="font/woff2" href="/fonts/jost-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/cormorant-garamond-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-var-italic.woff2" crossorigin>
-{preloadImage && <link rel="preload" as="image" href={preloadImage}>}
+{preloadImage && <link rel="preload" as="image" href={preloadImage} imagesrcset={preloadImageSet} imagesizes={preloadImageSet ? (preloadImageSizes ?? '100vw') : undefined}>}
 <link rel="stylesheet" href="/css/style.css">
 <slot name="head" />
 </head>

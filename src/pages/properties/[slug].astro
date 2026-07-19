@@ -32,6 +32,16 @@ const related = allProps
 const heroImg = wixResize(d.image, { w: 1920, h: 1080, focus: d.focus, q: sold ? 85 : 90 });
 const ogImg = wixResize(d.image, { w: 1200, h: 630, focus: d.focus });
 
+const base = (Astro.site ?? new URL('https://www.sabdiaconstructions.com.au')).origin;
+const breadcrumbLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+    { '@type': 'ListItem', position: 2, name: 'Properties', item: `${base}/properties/` },
+    { '@type': 'ListItem', position: 3, name: d.name, item: `${base}/properties/${entry.id}/` },
+  ],
+});
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'SingleFamilyResidence',
@@ -54,6 +64,7 @@ const jsonLd = JSON.stringify({
   ogImage={ogImg}
 >
   <script type="application/ld+json" slot="head" is:inline set:html={jsonLd} />
+  <script type="application/ld+json" slot="head" is:inline set:html={breadcrumbLd} />
 
   <!-- PROP HERO -->
   <section class="prop-hero">
@@ -261,4 +272,27 @@ const jsonLd = JSON.stringify({
       ))}
     </div>
   </div>
+
+  {!sold && (
+    <>
+      <!-- STICKY MOBILE ENQUIRE BAR -->
+      <div class="prop-sticky-bar" id="stickyEnquire">
+        <div class="psb-name">{d.name} <span class="psb-loc">— {d.suburb}</span></div>
+        <a href="#cform" class="psb-btn">Enquire &rarr;</a>
+      </div>
+      <script is:inline>
+      (function () {
+        var bar = document.getElementById('stickyEnquire');
+        var form = document.getElementById('cform');
+        if (!bar || !form || !('IntersectionObserver' in window)) return;
+        var obs = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            bar.classList.toggle('psb-hidden', e.isIntersecting);
+          });
+        }, { threshold: 0.15 });
+        obs.observe(form);
+      })();
+      </script>
+    </>
+  )}
 </Base>

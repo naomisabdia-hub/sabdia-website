@@ -769,6 +769,14 @@ p,.svc-d,.proc-d,.about-val-d,.tl-desc,.agent-ben-d{font-family:'EB Garamond',Ge
 .cd-story p{font-family:var(--font-d);font-size:clamp(19px,2.4vw,26px);font-weight:300;line-height:1.75;color:var(--ink2);margin-bottom:1.4em;letter-spacing:.005em}
 .cd-story p:first-child::first-letter{font-size:3.2em;float:left;line-height:.82;padding-right:12px;color:var(--gold);font-style:italic}
 
+/* ── STICKY MOBILE ENQUIRE BAR (property pages) ── */
+.prop-sticky-bar{position:fixed;left:0;right:0;bottom:0;z-index:900;display:none;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px calc(12px + env(safe-area-inset-bottom));background:rgba(14,13,11,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(196,172,135,.3);transform:translateY(0);transition:transform .4s var(--ease)}
+.prop-sticky-bar.psb-hidden{transform:translateY(110%)}
+.psb-name{font-family:var(--font-d);font-size:16px;font-weight:300;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psb-loc{font-family:var(--font-u);font-size:9px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:rgba(253,252,248,.5)}
+.psb-btn{flex-shrink:0;padding:11px 24px;background:var(--gold);color:var(--white);font-size:9.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase}
+@media(max-width:768px){.prop-sticky-bar{display:flex}}
+
 /* ── REDUCED MOTION ── */
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}

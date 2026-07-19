@@ -4,7 +4,7 @@ import PropertyCard from '../components/PropertyCard.astro';
 import SoldCard from '../components/SoldCard.astro';
 import ServiceIcon from '../components/ServiceIcon.astro';
 import FilmBand from '../components/FilmBand.astro';
-import { landLabel } from '../lib/wix.js';
+import { landLabel, wixResize } from '../lib/wix.js';
 import { getProperties } from '../lib/db.js';
 import { getContent, getServices, getProcessSteps, getTestimonials } from '../lib/content.js';
 
@@ -50,7 +50,11 @@ const smallA = forSale[1];
 const smallB = forSale[2];
 const restRow = forSale.slice(3);
 
-const heroPreload = heroC.slides[0]?.image;
+// Responsive AVIF variants for the hero slideshow — the seed URLs are
+// 1920px q85 JPEGs; these cut the LCP asset dramatically on all screens.
+const heroSrc = (img: string, w: number) => wixResize(img, { w, h: Math.round(w * 0.5625), q: 80 });
+const heroSet = (img: string) => [768, 1280, 1920].map((w) => `${heroSrc(img, w)} ${w}w`).join(', ');
+const heroPreload = heroC.slides[0] ? heroSrc(heroC.slides[0].image, 1280) : undefined;
 const delays = ['', 'd1', 'd2', 'd3', 'd4', 'd5'];
 
 const jsonLd = JSON.stringify({
@@ -75,6 +79,7 @@ const jsonLd = JSON.stringify({
   ogDescription={settings.seo.ogDescription}
   ogImage={settings.seo.ogImage}
   preloadImage={heroPreload}
+  preloadImageSet={heroC.slides[0] ? heroSet(heroC.slides[0].image) : undefined}
 >
   <script type="application/ld+json" slot="head" is:inline set:html={jsonLd} />
 
@@ -84,7 +89,9 @@ const jsonLd = JSON.stringify({
       {heroC.slides.map((slide, i) => (
         <div class={`h-slide${i === 0 ? ' active' : ''}`}>
           <img
-            src={slide.image}
+            src={heroSrc(slide.image, 1920)}
+            srcset={heroSet(slide.image)}
+            sizes="100vw"
             alt={slide.alt}
             loading={i === 0 ? 'eager' : 'lazy'}
             fetchpriority={i === 0 ? 'high' : undefined}

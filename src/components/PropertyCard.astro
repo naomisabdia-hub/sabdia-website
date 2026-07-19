@@ -5,7 +5,10 @@ const { entry, class: cls = '', style, imgW, imgH, specs = [], sep = 'none' } = 
 const d = entry.data;
 ---
 <a href={`/properties/${entry.id}/`} class={`pc ${cls}`} style={style}>
-  <img src={wixResize(d.image, { w: imgW, h: imgH, focus: d.focus })} alt={d.name} loading="lazy" decoding="async" width={imgW} height={imgH}>
+  <img
+    src={wixResize(d.image, { w: imgW, h: imgH, focus: d.focus })}
+    srcset={`${wixResize(d.image, { w: imgW, h: imgH, focus: d.focus })} 1x, ${wixResize(d.image, { w: imgW * 2, h: imgH * 2, focus: d.focus, q: 75 })} 2x`}
+    alt={d.name} loading="lazy" decoding="async" width={imgW} height={imgH}>
   <div class="pc-ov"></div>
   <div class="pc-info">
     <div class="pc-status"><div class="pc-dot"></div>For Sale</div>
