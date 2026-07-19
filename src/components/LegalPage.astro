@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+
+// Shared layout for legal pages (privacy, accessibility) driven by a
+// site_content document: { label, titleHtml, updated, intro, sections[] }.
+const { doc, title, description } = Astro.props;
+---
+<Base title={title} description={description}>
+  <section style="padding:clamp(140px,20vw,200px) clamp(22px,5vw,80px) clamp(52px,8vw,96px);background:var(--dark)">
+    <div class="inner-md">
+      <div class="slabel slabel-dark reveal" style="margin-bottom:20px">{doc.label}</div>
+      <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(44px,8vw,100px);font-weight:300;line-height:.92;letter-spacing:-.03em;color:var(--white)" set:html={doc.titleHtml} />
+      <p class="reveal d2" style="font-size:10px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold2);margin-top:28px">Last updated — {doc.updated}</p>
+    </div>
+  </section>
+
+  <section class="sp-sm">
+    <div class="inner-md">
+      <p class="about-p reveal" style="font-size:15px;color:var(--ink2)">{doc.intro}</p>
+      {doc.sections.map((s, i) => (
+        <div class="reveal" style="margin-top:44px;padding-top:36px;border-top:1px solid var(--border)">
+          <div style="display:flex;gap:24px;align-items:baseline">
+            <span style="font-family:var(--font-d);font-size:15px;font-style:italic;color:var(--gold);flex-shrink:0">{String(i + 1).padStart(2, '0')}.</span>
+            <div>
+              <h2 style="font-family:var(--font-d);font-size:clamp(20px,2.5vw,28px);font-weight:300;color:var(--ink);margin-bottom:12px">{s.heading}</h2>
+              <div class="about-p" style="margin-bottom:0" set:html={s.bodyHtml} />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>

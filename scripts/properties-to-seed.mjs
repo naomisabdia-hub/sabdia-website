@@ -37,6 +37,12 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.md')).sort()) {
     enquiry_heading: fm.enquiryHeading,
     enquiry_text: fm.enquiryText,
     enquiry_button: fm.enquiryButton ?? 'Submit Enquiry',
+    viewer_type: fm.viewerType ?? 'none',
+    model_url: fm.modelUrl ?? '',
+    poster_url: fm.posterUrl ?? '',
+    tour_url: fm.tourUrl ?? '',
+    hotspots: fm.hotspots ?? [],
+    brochure_url: fm.brochureUrl ?? '',
     description: m[2].trim(),
   });
 }

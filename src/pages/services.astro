@@ -1,11 +1,18 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getContent, getServices, getProcessSteps } from '../lib/content.js';
+
+const [{ services_page: page }, services, processSteps] = await Promise.all([
+  getContent('services_page'),
+  getServices(),
+  getProcessSteps(),
+]);
 ---
 <Base
   title="Services | Sabdia Constructions"
   description="Full-spectrum luxury residential development services — design, development management, interior architecture, and expert construction by Sabdia Constructions, Brisbane."
   ogTitle="Services — Sabdia Constructions"
-  ogDescription="Full-spectrum residential development expertise delivered entirely in-house."
+  ogDescription={page.hero.sub}
   ogImage="https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1200,h_630,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg"
 >
   <style is:inline slot="head">
@@ -28,12 +35,12 @@ import Base from '../layouts/Base.astro';
 
   <!-- HERO -->
   <section class="page-hero">
-    <img src="https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg" alt="Services" loading="eager">
+    <img src={page.hero.image} alt="Services" loading="eager">
     <div class="page-hero-ov"></div>
     <div class="page-hero-content inner">
-      <div class="slabel slabel-dark">What We Offer</div>
-      <h1 class="page-h">Our<br><em>Services</em></h1>
-      <p class="page-hero-sub">Full-spectrum residential development expertise delivered entirely in-house.</p>
+      <div class="slabel slabel-dark">{page.hero.label}</div>
+      <h1 class="page-h" set:html={page.hero.titleHtml} />
+      <p class="page-hero-sub">{page.hero.sub}</p>
     </div>
   </section>
 
@@ -41,12 +48,13 @@ import Base from '../layouts/Base.astro';
   <section class="sp-sm" style="border-bottom:1px solid var(--border)">
     <div class="inner" style="display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center">
       <div>
-        <div class="slabel reveal">Integrated Approach</div>
-        <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px)">Every element,<br><em>under one roof</em>.</h2>
+        <div class="slabel reveal">{page.intro.label}</div>
+        <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px)" set:html={page.intro.headingHtml} />
       </div>
       <div>
-        <p class="about-p reveal d2">At Sabdia, we believe the best residential developments are those where design, development, and construction work as one seamless system — not as separate, disconnected disciplines. Our fully integrated in-house model is our defining advantage.</p>
-        <p class="about-p reveal d2">From the first sketch to the final handover, every decision is made by the same team, with the same vision, and the same commitment to excellence.</p>
+        {page.intro.paragraphs.map((p) => (
+          <p class="about-p reveal d2">{p}</p>
+        ))}
       </div>
     </div>
   </section>
@@ -54,105 +62,41 @@ import Base from '../layouts/Base.astro';
   <!-- SERVICE DETAILS -->
   <section class="sp">
     <div class="inner">
-      <!-- 01 Design -->
-      <div class="svc-detail-grid">
-        <div class="svc-detail-img reveal-x">
-          <img src="https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_680,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg" alt="Luxury Residential Design" loading="lazy">
+      {services.map((s, i) => (
+        <div class="svc-detail-grid">
+          <div class={`svc-detail-img ${i % 2 === 0 ? 'reveal-x' : 'reveal-r'}`}>
+            <img src={s.detail.image} alt={s.detail.alt || s.title} loading="lazy">
+          </div>
+          <div class="reveal">
+            <span class="svc-num">{s.number}</span>
+            <div class="slabel">{s.label}</div>
+            <h2 class="svc-detail-h" set:html={s.detail.headingHtml} />
+            {(s.detail.paragraphs || []).map((p) => (
+              <p class="svc-detail-p">{p}</p>
+            ))}
+            <ul class="svc-detail-list">
+              {(s.detail.bullets || []).map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <div class="reveal">
-          <span class="svc-num">01</span>
-          <div class="slabel">Service One</div>
-          <h2 class="svc-detail-h">Luxury Residential <em>Design</em></h2>
-          <p class="svc-detail-p">Our in-house architecture and design team creates residences that are as functional as they are breathtaking. We approach each project as a singular creative endeavour — absorbing the site's character, the client's aspirations, and the neighbourhood's context before a single line is drawn.</p>
-          <p class="svc-detail-p">The result is homes that feel inevitable — as though they could not have existed anywhere else, built for anyone else, or been conceived by any other studio.</p>
-          <ul class="svc-detail-list">
-            <li>Architectural concept and schematic design</li>
-            <li>Design development and documentation</li>
-            <li>Planning approvals and DA management</li>
-            <li>Landscape architecture</li>
-            <li>Material and finishes specification</li>
-            <li>3D visualisation and virtual walkthroughs</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- 02 Develop -->
-      <div class="svc-detail-grid">
-        <div class="svc-detail-img reveal-r">
-          <img src="https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_900,h_680,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg" alt="Development Management" loading="lazy">
-        </div>
-        <div class="reveal">
-          <span class="svc-num">02</span>
-          <div class="slabel">Service Two</div>
-          <h2 class="svc-detail-h">Development <em>Management</em></h2>
-          <p class="svc-detail-p">Development management is the complex art of orchestrating every moving part of a residential project — land acquisition, town planning, engineering, approvals, finance, sales, and delivery — into one coherent, high-performing whole.</p>
-          <p class="svc-detail-p">Sabdia handles this process entirely in-house. This means fewer delays, tighter budgets, faster approvals, and a development that performs as well on paper as it does in person.</p>
-          <ul class="svc-detail-list">
-            <li>Site acquisition analysis and due diligence</li>
-            <li>Feasibility modelling and investment structuring</li>
-            <li>Town planning strategy and DA management</li>
-            <li>Engineering and civil coordination</li>
-            <li>Sales and marketing strategy</li>
-            <li>Project reporting and stakeholder management</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- 03 Interior Architecture -->
-      <div class="svc-detail-grid">
-        <div class="svc-detail-img reveal-x">
-          <img src="https://static.wixstatic.com/media/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png/v1/fill/w_900,h_680,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png" alt="Interior Architecture" loading="lazy">
-        </div>
-        <div class="reveal">
-          <span class="svc-num">03</span>
-          <div class="slabel">Service Three</div>
-          <h2 class="svc-detail-h">Interior <em>Architecture</em></h2>
-          <p class="svc-detail-p">Our interior architecture division ensures that the lived experience of a Sabdia home is as extraordinary as its exterior presence. Working in close collaboration with the architecture team from day one, our interior architects shape spaces that are luminous, considered, and deeply personal.</p>
-          <p class="svc-detail-p">Every kitchen, bathroom, bedroom, and living space is designed as part of a holistic vision — where each room flows effortlessly into the next, and light, material, and proportion conspire to create homes that feel genuinely special.</p>
-          <ul class="svc-detail-list">
-            <li>Interior concept and spatial design</li>
-            <li>Custom joinery design and specification</li>
-            <li>Material, finish, and hardware selection</li>
-            <li>Lighting design and coordination</li>
-            <li>FF&amp;E procurement and styling</li>
-            <li>Kitchen and bathroom design</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- 04 Construction -->
-      <div class="svc-detail-grid">
-        <div class="svc-detail-img reveal-r">
-          <img src="https://static.wixstatic.com/media/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png/v1/fill/w_900,h_680,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png" alt="Expert Construction" loading="lazy">
-        </div>
-        <div class="reveal">
-          <span class="svc-num">04</span>
-          <div class="slabel">Service Four</div>
-          <h2 class="svc-detail-h">Expert <em>Construction</em></h2>
-          <p class="svc-detail-p">Sabdia's construction arm brings the vision to life with precision, skill, and an obsessive attention to detail. Our team of master tradespeople — many of whom have worked with Sabdia for years — share our commitment to doing everything properly.</p>
-          <p class="svc-detail-p">We use only the finest materials, source from trusted suppliers, and never cut corners. The result is a home that not only looks extraordinary on the day of handover, but continues to perform to the highest standard for decades to come.</p>
-          <ul class="svc-detail-list">
-            <li>Full residential construction management</li>
-            <li>Premium material sourcing and procurement</li>
-            <li>Master tradesperson coordination</li>
-            <li>Quality assurance and defect management</li>
-            <li>Client reporting and site access</li>
-            <li>Post-completion aftercare and warranty</li>
-          </ul>
-        </div>
-      </div>
+      ))}
     </div>
   </section>
 
   <!-- PROCESS RECAP -->
   <section class="sp" style="background:var(--bg2);border-top:1px solid var(--border)">
     <div class="inner">
-      <div class="slabel reveal" style="margin-bottom:56px">The Process</div>
+      <div class="slabel reveal" style="margin-bottom:56px">{page.processLabel}</div>
       <div class="proc-track">
-        <div class="proc-step reveal"><div class="proc-n">1</div><div class="proc-t">Design</div><div class="proc-d">Vision-led architectural and interior design, guided by site, context, and client aspiration.</div></div>
-        <div class="proc-step reveal d1"><div class="proc-n">2</div><div class="proc-t">Develop</div><div class="proc-d">Comprehensive development management — approvals, planning, engineering, and finance.</div></div>
-        <div class="proc-step reveal d2"><div class="proc-n">3</div><div class="proc-t">Construct</div><div class="proc-d">Master-level construction with premium materials and rigorous quality control at every stage.</div></div>
-        <div class="proc-step reveal d3"><div class="proc-n">4</div><div class="proc-t">Deliver</div><div class="proc-d">Handover and aftercare — ensuring your home continues to exceed expectations.</div></div>
+        {processSteps.map((step, i) => (
+          <div class={`proc-step reveal ${['', 'd1', 'd2', 'd3'][i % 4]}`.trim()}>
+            <div class="proc-n">{i + 1}</div>
+            <div class="proc-t">{step.title}</div>
+            <div class="proc-d">{step.description}</div>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -160,12 +104,12 @@ import Base from '../layouts/Base.astro';
   <!-- CTA -->
   <section class="sp" style="background:var(--dark)">
     <div class="inner" style="text-align:center">
-      <div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">Start Your Project</div>
-      <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(36px,5vw,68px);font-weight:300;color:var(--white);margin-bottom:24px;letter-spacing:-.02em">Ready to build something <em style="color:var(--gold2)">remarkable</em>?</h2>
-      <p class="reveal d2" style="font-size:13px;font-weight:300;color:rgba(253,252,248,.45);max-width:440px;margin:0 auto 40px;line-height:1.8">Whether you have a site, a vision, or simply a desire for exceptional living — we'd love to hear from you.</p>
+      <div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">{page.cta.label}</div>
+      <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(36px,5vw,68px);font-weight:300;color:var(--white);margin-bottom:24px;letter-spacing:-.02em" set:html={page.cta.headingHtml} />
+      <p class="reveal d2" style="font-size:13px;font-weight:300;color:rgba(253,252,248,.45);max-width:440px;margin:0 auto 40px;line-height:1.8">{page.cta.text}</p>
       <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-        <a href="/contact/" class="btn-p">Begin a Conversation</a>
-        <a href="/properties/" class="btn-g btn-g-light">View Properties</a>
+        <a href={page.cta.primaryCta.href} class="btn-p">{page.cta.primaryCta.label}</a>
+        <a href={page.cta.secondaryCta.href} class="btn-g btn-g-light">{page.cta.secondaryCta.label}</a>
       </div>
     </div>
   </section>

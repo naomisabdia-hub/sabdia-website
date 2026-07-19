@@ -2,8 +2,12 @@
 import Base from '../layouts/Base.astro';
 import { wixResize, landLabel } from '../lib/wix.js';
 import { getProperties } from '../lib/db.js';
+import { getContent } from '../lib/content.js';
 
-const all = await getProperties();
+const [{ projects_page: page, home_stats: stats }, all] = await Promise.all([
+  getContent('projects_page', 'home_stats'),
+  getProperties(),
+]);
 const forSale = all.filter((p) => p.data.status === 'for-sale');
 const sold = all.filter((p) => p.data.status === 'sold');
 
@@ -13,15 +17,20 @@ const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`
   title="Projects | Sabdia Constructions"
   description="Browse Sabdia Constructions' portfolio of completed luxury residential developments across inner Brisbane. 100+ residences since 2013."
 >
+  <style is:inline slot="head">
+  .pfilter{font-size:10px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--taupe);transition:color .3s;background:none;border:none;cursor:none;padding:0 0 1px;border-bottom:1px solid transparent;font-family:var(--font-u)}
+  .pfilter:hover{color:var(--ink)}
+  .pfilter.on{color:var(--gold);border-bottom-color:var(--gold)}
+  </style>
 
   <!-- HERO -->
   <section class="page-hero">
-    <img src="https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg" alt="Projects" loading="eager">
+    <img src={page.hero.image} alt="Projects" loading="eager">
     <div class="page-hero-ov"></div>
     <div class="page-hero-content inner">
-      <div class="slabel slabel-dark">Portfolio</div>
-      <h1 class="page-h">Our<br><em>Projects</em></h1>
-      <p class="page-hero-sub">Over 100 residences delivered across inner Brisbane's most prestigious suburbs since 2013.</p>
+      <div class="slabel slabel-dark">{page.hero.label}</div>
+      <h1 class="page-h" set:html={page.hero.titleHtml} />
+      <p class="page-hero-sub">{page.hero.sub}</p>
     </div>
   </section>
 
@@ -29,17 +38,16 @@ const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px clamp(22px,5vw,80px)">
     <div class="inner" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
       <span style="font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--taupe)">Filter:</span>
-      <a href="#" style="font-size:10px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--gold);padding-bottom:1px">All</a>
-      <a href="#" style="font-size:10px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--taupe);transition:color .3s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--taupe)'">Current</a>
-      <a href="#" style="font-size:10px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--taupe);transition:color .3s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--taupe)'">Completed</a>
-      <a href="#" style="font-size:10px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--taupe);transition:color .3s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--taupe)'">Sold</a>
+      <button class="pfilter on" data-filter="all">All</button>
+      <button class="pfilter" data-filter="current">Current</button>
+      <button class="pfilter" data-filter="sold">Sold</button>
     </div>
   </div>
 
   <!-- CURRENT PROPERTIES -->
-  <section class="sp">
+  <section class="sp" data-proj-section="current">
     <div class="inner">
-      <div class="slabel reveal" style="margin-bottom:32px">For Sale — Current</div>
+      <div class="slabel reveal" style="margin-bottom:32px">{page.currentLabel}</div>
       <div class="projects-grid">
         {forSale.map((p, i) => (
           <a href={`/properties/${p.id}/`} class={`proj-card reveal ${i % 2 === 1 ? 'd1' : ''}`}>
@@ -58,9 +66,9 @@ const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`
   </section>
 
   <!-- SOLD PRIOR -->
-  <section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border)">
+  <section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border)" data-proj-section="sold">
     <div class="inner">
-      <div class="slabel reveal" style="margin-bottom:32px">Sold Prior to Completion</div>
+      <div class="slabel reveal" style="margin-bottom:32px">{page.soldLabel}</div>
       <div class="projects-grid">
         {sold.map((p, i) => (
           <a href={`/properties/${p.id}/`} class={`proj-card reveal ${i % 2 === 1 ? 'd1' : ''}`}>
@@ -81,22 +89,45 @@ const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`
   <!-- STATS BAND -->
   <div class="stats-band sp-sm">
     <div class="stats-grid inner">
-      <div class="stat reveal"><span class="stat-n">10<span class="stat-u">+</span></span><div class="stat-l">Years in Brisbane</div></div>
-      <div class="stat reveal d1"><span class="stat-n"><span class="counter" data-target="100">0</span><span class="stat-u">+</span></span><div class="stat-l">Residences Delivered</div></div>
-      <div class="stat reveal d2"><span class="stat-n">5<span class="stat-u">★</span></span><div class="stat-l">Multi-Award Winning</div></div>
-      <div class="stat reveal d3"><span class="stat-n">100<span class="stat-u">%</span></span><div class="stat-l">In-House Delivery</div></div>
+      {stats.items.map((s, i) => (
+        <div class={`stat reveal ${['', 'd1', 'd2', 'd3'][i % 4]}`.trim()}>
+          <span class="stat-n">
+            {s.count
+              ? <span class="counter" data-target={s.target}>0</span>
+              : s.target}<span class="stat-u">{s.suffix}</span>
+          </span>
+          <div class="stat-l">{s.label}</div>
+        </div>
+      ))}
     </div>
   </div>
 
   <!-- CTA -->
   <section class="sp" style="text-align:center">
     <div class="inner-sm">
-      <div class="slabel reveal" style="justify-content:center;margin-bottom:20px">Interested?</div>
-      <h2 class="about-h reveal d1" style="text-align:center;font-size:clamp(32px,5vw,60px)">Ready to find your<br><em>next home</em>?</h2>
+      <div class="slabel reveal" style="justify-content:center;margin-bottom:20px">{page.cta.label}</div>
+      <h2 class="about-h reveal d1" style="text-align:center;font-size:clamp(32px,5vw,60px)" set:html={page.cta.headingHtml} />
       <div class="reveal d2" style="display:flex;gap:14px;justify-content:center;margin-top:36px;flex-wrap:wrap">
-        <a href="/properties/" class="btn-p">View For Sale</a>
-        <a href="/contact/" class="btn-g">Enquire Now</a>
+        <a href={page.cta.primaryCta.href} class="btn-p">{page.cta.primaryCta.label}</a>
+        <a href={page.cta.secondaryCta.href} class="btn-g">{page.cta.secondaryCta.label}</a>
       </div>
     </div>
   </section>
+
+  <script is:inline>
+  (function () {
+    var buttons = document.querySelectorAll('.pfilter');
+    var sections = document.querySelectorAll('[data-proj-section]');
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        buttons.forEach(function (b) { b.classList.remove('on'); });
+        btn.classList.add('on');
+        var f = btn.dataset.filter;
+        sections.forEach(function (sec) {
+          sec.style.display = f === 'all' || sec.dataset.projSection === f ? '' : 'none';
+        });
+      });
+    });
+  })();
+  </script>
 </Base>

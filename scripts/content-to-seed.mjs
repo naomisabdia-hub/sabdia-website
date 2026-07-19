@@ -19,11 +19,11 @@ sql += 'insert into site_content (key, data)\nvalues\n';
 sql += contentKeys.map((k) => `  (${q(k)}, ${qj(seed[k])})`).join(',\n');
 sql += '\non conflict (key) do nothing;\n\n';
 
-sql += 'insert into services (sort, number, title, description, icon)\nselect * from (values\n';
+sql += 'insert into services (sort, number, title, description, icon, label, detail)\nselect * from (values\n';
 sql += seed.services
-  .map((s) => `  (${s.sort}, ${q(s.number)}, ${q(s.title)}, ${q(s.description)}, ${q(s.icon)})`)
+  .map((s) => `  (${s.sort}, ${q(s.number)}, ${q(s.title)}, ${q(s.description)}, ${q(s.icon)}, ${q(s.label ?? '')}, ${qj(s.detail ?? {})})`)
   .join(',\n');
-sql += '\n) as v(sort, number, title, description, icon)\nwhere not exists (select 1 from services);\n\n';
+sql += '\n) as v(sort, number, title, description, icon, label, detail)\nwhere not exists (select 1 from services);\n\n';
 
 sql += 'insert into process_steps (sort, title, description)\nselect * from (values\n';
 sql += seed.process_steps.map((s) => `  (${s.sort}, ${q(s.title)}, ${q(s.description)})`).join(',\n');

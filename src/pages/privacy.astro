@@ -1,0 +1,11 @@
+---
+import LegalPage from '../components/LegalPage.astro';
+import { getContent } from '../lib/content.js';
+
+const { legal_privacy: doc } = await getContent('legal_privacy');
+---
+<LegalPage
+  doc={doc}
+  title="Privacy Policy | Sabdia Constructions"
+  description="How Sabdia Constructions collects, uses, and protects your personal information, in accordance with the Privacy Act 1988 (Cth) and the Australian Privacy Principles."
+/>

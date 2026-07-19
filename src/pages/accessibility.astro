@@ -1,0 +1,11 @@
+---
+import LegalPage from '../components/LegalPage.astro';
+import { getContent } from '../lib/content.js';
+
+const { legal_accessibility: doc } = await getContent('legal_accessibility');
+---
+<LegalPage
+  doc={doc}
+  title="Accessibility Statement | Sabdia Constructions"
+  description="Sabdia Constructions' commitment to an accessible website — WCAG 2.1 AA conformance, keyboard navigation, reduced motion support, and how to report accessibility barriers."
+/>

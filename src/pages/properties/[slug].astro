@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PropertyCard from '../../components/PropertyCard.astro';
+import PropertyViewer from '../../components/PropertyViewer.astro';
 import { wixResize, landLabel } from '../../lib/wix.js';
 import { getProperties, getProperty } from '../../lib/db.js';
 
@@ -147,6 +148,7 @@ const jsonLd = JSON.stringify({
           </form>
         </div>
         <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+          {d.brochureUrl && <a href={d.brochureUrl} target="_blank" rel="noopener" class="btn-g btn-g-gold" style="justify-content:center" download>Download Brochure &darr;</a>}
           {sold && <a href="/properties/" class="btn-p" style="justify-content:center">View Current Properties</a>}
           <a href="/contact/" class={`btn-g ${sold ? '' : 'btn-g-gold'}`} style="justify-content:center">General Enquiry</a>
         </div>
@@ -165,6 +167,9 @@ const jsonLd = JSON.stringify({
       ))}
     </div>
   </div>
+
+  <!-- 3D VIEWER -->
+  <PropertyViewer property={entry} />
 
   <!-- RELATED -->
   <div class="prop-related inner">

@@ -4,32 +4,70 @@ import PropertyCard from '../../components/PropertyCard.astro';
 import SoldCard from '../../components/SoldCard.astro';
 import { wixResize, landLabel, countWord } from '../../lib/wix.js';
 import { getProperties } from '../../lib/db.js';
+import { getContent } from '../../lib/content.js';
 
-const all = await getProperties();
+const [{ properties_page: page }, all] = await Promise.all([
+  getContent('properties_page'),
+  getProperties(),
+]);
 const forSale = all.filter((p) => p.data.status === 'for-sale');
 const sold = all.filter((p) => p.data.status === 'sold');
 
 const featured = forSale[0];
 const rest = forSale.slice(1);
+const suburbs = [...new Set(forSale.map((p) => p.data.suburb))].sort();
 
 const names = forSale.map((p) => p.data.name).join(', ');
 const description = `Luxury properties for sale by Sabdia Constructions — Brisbane's award-winning boutique luxury home builder. Discover ${names}.`;
+const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
 ---
 <Base title="Properties For Sale | Sabdia Constructions" description={description}>
+  <style is:inline slot="head">
+  .prop-toolbar{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:18px clamp(22px,5vw,80px);background:var(--bg2);border-bottom:1px solid var(--border)}
+  .prop-toolbar-inner{display:flex;gap:28px;align-items:center;flex-wrap:wrap;max-width:1400px;margin:0 auto;width:100%}
+  .ptool-l{font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--taupe)}
+  .ptool-sel{font-family:var(--font-u);font-size:10.5px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;border:none;border-bottom:1px solid var(--border);padding:4px 22px 4px 0;cursor:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%239E8B6A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center}
+  .ptool-sel:focus{outline:none;border-bottom-color:var(--gold)}
+  .ptool-count{margin-left:auto;font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe)}
+  </style>
 
   <!-- PAGE HEADER -->
   <section style="padding:clamp(130px,18vw,180px) clamp(22px,5vw,80px) clamp(48px,6vw,72px);background:var(--bg);border-bottom:1px solid var(--border)">
     <div class="inner" style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap">
       <div>
-        <div class="slabel reveal" style="margin-bottom:18px">For Sale</div>
-        <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(48px,9vw,120px);font-weight:300;line-height:.88;letter-spacing:-.035em;color:var(--ink)"><em style="color:var(--gold)">Current</em><br>Properties.</h1>
+        <div class="slabel reveal" style="margin-bottom:18px">{page.label}</div>
+        <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(48px,9vw,120px);font-weight:300;line-height:.88;letter-spacing:-.035em;color:var(--ink)" set:html={page.headingHtml} />
       </div>
-      <p class="reveal d2" style="font-size:13.5px;font-weight:300;line-height:1.9;color:var(--ink3);max-width:380px;padding-bottom:6px">{countWord(forSale.length)} extraordinary residences across Brisbane's most sought-after inner suburbs — each designed, developed, and built entirely in-house by Sabdia.</p>
+      <p class="reveal d2" style="font-size:13.5px;font-weight:300;line-height:1.9;color:var(--ink3);max-width:380px;padding-bottom:6px">{intro}</p>
     </div>
   </section>
 
+  <!-- FILTER / SORT TOOLBAR -->
+  <div class="prop-toolbar">
+    <div class="prop-toolbar-inner">
+      <span class="ptool-l">Refine:</span>
+      <select class="ptool-sel" id="fSuburb" aria-label="Filter by suburb">
+        <option value="">All Suburbs</option>
+        {suburbs.map((s) => <option value={s}>{s}</option>)}
+      </select>
+      <select class="ptool-sel" id="fBeds" aria-label="Minimum bedrooms">
+        <option value="">Any Bedrooms</option>
+        <option value="4">4+ Bed</option>
+        <option value="5">5+ Bed</option>
+        <option value="6">6+ Bed</option>
+      </select>
+      <select class="ptool-sel" id="fSort" aria-label="Sort properties">
+        <option value="featured">Sort — Featured</option>
+        <option value="land">Land Size</option>
+        <option value="beds">Bedrooms</option>
+        <option value="name">Name A–Z</option>
+      </select>
+      <span class="ptool-count" id="fCount"></span>
+    </div>
+  </div>
+
   {featured && (
-    <section style="padding:clamp(40px,5vw,64px) clamp(22px,5vw,80px) 0;background:var(--bg)">
+    <section style="padding:clamp(40px,5vw,64px) clamp(22px,5vw,80px) 0;background:var(--bg)" id="featuredWrap">
       <div class="inner">
         <a href={`/properties/${featured.id}/`} class="reveal" style="display:block;position:relative;overflow:hidden;height:clamp(400px,52vw,680px);cursor:none;text-decoration:none">
           <img src={wixResize(featured.data.image, { w: 1600, h: 900, focus: featured.data.focus })}
@@ -58,11 +96,39 @@ const description = `Luxury properties for sale by Sabdia Constructions — Bris
     </section>
   )}
 
-  {rest.length > 0 && (
-    <section style="padding:clamp(8px,1vw,10px) clamp(22px,5vw,80px) 0;background:var(--bg)">
-      <div class="inner">
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-          {rest.map((p, i) => (
+  <section style="padding:clamp(8px,1vw,10px) clamp(22px,5vw,80px) 0;background:var(--bg)">
+    <div class="inner">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="propGrid">
+        {featured && (
+          <div
+            data-prop-card
+            data-featured="1"
+            data-suburb={featured.data.suburb}
+            data-beds={featured.data.beds}
+            data-land={featured.data.land}
+            data-name={featured.data.name}
+            data-order={featured.data.order}
+            style="display:none"
+          >
+            <PropertyCard
+              entry={featured}
+              style="aspect-ratio:16/10"
+              imgW={900}
+              imgH={562}
+              specs={[`${featured.data.beds} Bed`, `${featured.data.baths} Bath`, `${featured.data.cars} Garage`, landLabel(featured.data.land, featured.data.landOver)]}
+              sep="dot"
+            />
+          </div>
+        )}
+        {rest.map((p, i) => (
+          <div
+            data-prop-card
+            data-suburb={p.data.suburb}
+            data-beds={p.data.beds}
+            data-land={p.data.land}
+            data-name={p.data.name}
+            data-order={p.data.order}
+          >
             <PropertyCard
               entry={p}
               class={`reveal ${['', 'd1', 'd2'][i % 3]}`}
@@ -72,16 +138,17 @@ const description = `Luxury properties for sale by Sabdia Constructions — Bris
               specs={[`${p.data.beds} Bed`, `${p.data.baths} Bath`, `${p.data.cars} Garage`, landLabel(p.data.land, p.data.landOver)]}
               sep="dot"
             />
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
-    </section>
-  )}
+      <p id="fEmpty" style="display:none;padding:56px 0;text-align:center;font-family:var(--font-d);font-size:22px;font-weight:300;font-style:italic;color:var(--taupe)">No residences match your criteria — try widening your search.</p>
+    </div>
+  </section>
 
   {sold.length > 0 && (
     <section style="padding:clamp(64px,8vw,100px) clamp(22px,5vw,80px) clamp(80px,10vw,120px);background:var(--bg)">
       <div class="inner">
-        <div class="slabel reveal" style="margin-bottom:32px">Sold Prior to Completion</div>
+        <div class="slabel reveal" style="margin-bottom:32px">{page.soldLabel}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           {sold.map((p, i) => (
             <SoldCard entry={p} class={`reveal ${['', 'd1'][i % 2]}`} imgW={900} imgH={560} />
@@ -94,13 +161,62 @@ const description = `Luxury properties for sale by Sabdia Constructions — Bris
   <!-- ENQUIRE CTA -->
   <section class="sp" style="background:var(--bg2);border-top:1px solid var(--border);text-align:center">
     <div class="inner-sm">
-      <div class="slabel reveal" style="justify-content:center;margin-bottom:20px">Private Enquiry</div>
-      <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(32px,5vw,64px);font-weight:300;color:var(--ink);margin-bottom:20px;letter-spacing:-.02em">Interested in a<br><em style="color:var(--gold)">private viewing</em>?</h2>
-      <p class="reveal d2" style="font-size:13px;font-weight:300;color:var(--ink3);max-width:420px;margin:0 auto 36px;line-height:1.85">We offer private, exclusive viewings for serious buyers. Contact us to arrange an inspection at a time that suits you.</p>
+      <div class="slabel reveal" style="justify-content:center;margin-bottom:20px">{page.cta.label}</div>
+      <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(32px,5vw,64px);font-weight:300;color:var(--ink);margin-bottom:20px;letter-spacing:-.02em" set:html={page.cta.headingHtml} />
+      <p class="reveal d2" style="font-size:13px;font-weight:300;color:var(--ink3);max-width:420px;margin:0 auto 36px;line-height:1.85">{page.cta.text}</p>
       <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-        <a href="/contact/" class="btn-p">Request a Viewing &rarr;</a>
-        <a href="/agent-access/" class="btn-g">Agent Enquiries</a>
+        <a href={page.cta.primaryCta.href} class="btn-p">{page.cta.primaryCta.label} &rarr;</a>
+        <a href={page.cta.secondaryCta.href} class="btn-g">{page.cta.secondaryCta.label}</a>
       </div>
     </div>
   </section>
+
+  <script is:inline>
+  (function () {
+    var suburb = document.getElementById('fSuburb');
+    var beds = document.getElementById('fBeds');
+    var sort = document.getElementById('fSort');
+    var count = document.getElementById('fCount');
+    var empty = document.getElementById('fEmpty');
+    var grid = document.getElementById('propGrid');
+    var featuredWrap = document.getElementById('featuredWrap');
+    if (!grid) return;
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-prop-card]'));
+
+    function apply() {
+      var isDefault = !suburb.value && !beds.value && sort.value === 'featured';
+      if (featuredWrap) featuredWrap.style.display = isDefault ? '' : 'none';
+
+      var visible = 0;
+      cards.forEach(function (c) {
+        var ok = true;
+        if (isDefault && c.dataset.featured) ok = false; // featured shown in hero block instead
+        if (ok && suburb.value && c.dataset.suburb !== suburb.value) ok = false;
+        if (ok && beds.value && Number(c.dataset.beds) < Number(beds.value)) ok = false;
+        c.style.display = ok ? '' : 'none';
+        if (ok) visible++;
+        // ensure reveal animations don't hide re-shown cards
+        var r = c.querySelector('.reveal');
+        if (r) r.classList.add('vis');
+      });
+
+      var sorted = cards.slice().sort(function (a, b) {
+        if (sort.value === 'land') return Number(b.dataset.land) - Number(a.dataset.land);
+        if (sort.value === 'beds') return Number(b.dataset.beds) - Number(a.dataset.beds);
+        if (sort.value === 'name') return a.dataset.name.localeCompare(b.dataset.name);
+        return Number(a.dataset.order) - Number(b.dataset.order);
+      });
+      sorted.forEach(function (c) { grid.appendChild(c); });
+
+      empty.style.display = visible === 0 ? '' : 'none';
+      count.textContent = isDefault
+        ? ''
+        : visible + (visible === 1 ? ' Residence' : ' Residences');
+    }
+
+    [suburb, beds, sort].forEach(function (el) {
+      el.addEventListener('change', apply);
+    });
+  })();
+  </script>
 </Base>

@@ -26,9 +26,23 @@ create table if not exists properties (
   enquiry_text text not null default '',
   enquiry_button text not null default 'Submit Enquiry',
   description text not null default '',
+  viewer_type text not null default 'none' check (viewer_type in ('none', 'model', 'tour')),
+  model_url text not null default '',
+  poster_url text not null default '',
+  tour_url text not null default '',
+  hotspots jsonb not null default '[]',
+  brochure_url text not null default '',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Columns added after the original launch (no-ops on a fresh database)
+alter table properties add column if not exists viewer_type text not null default 'none';
+alter table properties add column if not exists model_url text not null default '';
+alter table properties add column if not exists poster_url text not null default '';
+alter table properties add column if not exists tour_url text not null default '';
+alter table properties add column if not exists hotspots jsonb not null default '[]';
+alter table properties add column if not exists brochure_url text not null default '';
 
 -- Anyone may read properties (the public website needs them);
 -- writing requires the service role or the Supabase dashboard.
@@ -76,9 +90,13 @@ create table if not exists services (
   title text not null,
   description text not null default '',
   icon text not null default 'home',
+  label text not null default '',
+  detail jsonb not null default '{}',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+alter table services add column if not exists label text not null default '';
+alter table services add column if not exists detail jsonb not null default '{}';
 alter table services enable row level security;
 drop policy if exists "Public read access" on services;
 create policy "Public read access" on services for select using (true);

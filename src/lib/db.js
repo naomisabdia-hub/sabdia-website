@@ -40,6 +40,12 @@ function toEntry(row) {
       enquiryHeading: row.enquiry_heading,
       enquiryText: row.enquiry_text,
       enquiryButton: row.enquiry_button || 'Submit Enquiry',
+      viewerType: row.viewer_type || 'none',
+      modelUrl: row.model_url || '',
+      posterUrl: row.poster_url || '',
+      tourUrl: row.tour_url || '',
+      hotspots: row.hotspots || [],
+      brochureUrl: row.brochure_url || '',
     },
     body: row.description || '',
   };

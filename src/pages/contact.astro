@@ -1,8 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getProperties } from '../lib/db.js';
+import { getContent } from '../lib/content.js';
 
-const forSale = (await getProperties()).filter((p) => p.data.status === 'for-sale');
+const [{ settings, contact_page: page }, all] = await Promise.all([
+  getContent('settings', 'contact_page'),
+  getProperties(),
+]);
+const forSale = all.filter((p) => p.data.status === 'for-sale');
+const socials = settings.socials;
 ---
 <Base
   title="Contact | Sabdia Constructions"
@@ -22,9 +28,9 @@ const forSale = (await getProperties()).filter((p) => p.data.status === 'for-sal
   <!-- HERO -->
   <section style="padding:clamp(140px,20vw,200px) clamp(22px,5vw,80px) clamp(52px,8vw,96px);background:var(--dark)">
     <div class="inner">
-      <div class="slabel slabel-dark reveal" style="margin-bottom:20px">Get In Touch</div>
-      <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(52px,10vw,140px);font-weight:300;line-height:.9;letter-spacing:-.035em;color:var(--white)">Let's start<br>a <em style="font-style:italic;color:var(--gold2)">conversation</em>.</h1>
-      <p class="reveal d2" style="font-size:13px;font-weight:300;color:rgba(253,252,248,.45);max-width:420px;margin-top:28px;line-height:1.85">We're always keen to hear from potential clients, real estate professionals, and development partners. Submit your details and we'll be in touch shortly.</p>
+      <div class="slabel slabel-dark reveal" style="margin-bottom:20px">{page.hero.label}</div>
+      <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(52px,10vw,140px);font-weight:300;line-height:.9;letter-spacing:-.035em;color:var(--white)" set:html={page.hero.titleHtml} />
+      <p class="reveal d2" style="font-size:13px;font-weight:300;color:rgba(253,252,248,.45);max-width:420px;margin-top:28px;line-height:1.85">{page.hero.text}</p>
     </div>
   </section>
 
@@ -33,29 +39,29 @@ const forSale = (await getProperties()).filter((p) => p.data.status === 'for-sal
     <div class="inner contact-page-grid">
       <!-- LEFT: Info -->
       <div>
-        <div class="slabel reveal">Direct Contact</div>
+        <div class="slabel reveal">{page.directLabel}</div>
         <ul class="cdet reveal d1" style="margin-top:12px">
-          <li class="cd"><span class="cd-l">Location</span><span class="cd-v">Brisbane, Queensland, Australia</span></li>
-          <li class="cd"><span class="cd-l">Instagram</span><a href="https://www.instagram.com/_sabdia/" target="_blank" class="cd-v">@_sabdia</a></li>
-          <li class="cd"><span class="cd-l">Facebook</span><a href="https://www.facebook.com/sabdiaconstructions/" target="_blank" class="cd-v">Sabdia Constructions</a></li>
-          <li class="cd"><span class="cd-l">LinkedIn</span><a href="https://www.linkedin.com/company/sabdia-constructions/" target="_blank" class="cd-v">Sabdia Constructions</a></li>
-          <li class="cd"><span class="cd-l">Website</span><a href="https://www.sabdiaconstructions.com.au" target="_blank" class="cd-v">sabdiaconstructions.com.au</a></li>
+          <li class="cd"><span class="cd-l">Location</span><span class="cd-v">{settings.location}</span></li>
+          <li class="cd"><span class="cd-l">Instagram</span><a href={socials.instagram.url} target="_blank" class="cd-v">{socials.instagram.label}</a></li>
+          <li class="cd"><span class="cd-l">Facebook</span><a href={socials.facebook.url} target="_blank" class="cd-v">{socials.facebook.label}</a></li>
+          <li class="cd"><span class="cd-l">LinkedIn</span><a href={socials.linkedin.url} target="_blank" class="cd-v">{socials.linkedin.label}</a></li>
+          <li class="cd"><span class="cd-l">Website</span><a href={settings.domainUrl} target="_blank" class="cd-v">{settings.domainDisplay}</a></li>
         </ul>
 
         <div class="contact-info-block reveal d2">
-          <div class="contact-info-h">Agent Enquiries</div>
-          <p style="font-size:13px;font-weight:300;color:rgba(253,252,248,.45);line-height:1.8">Real estate professionals seeking exclusive agent access — pre-launch information, priority access and commission structures — please visit our <a href="/agent-access/" style="color:var(--gold2);text-decoration:underline;text-underline-offset:3px">Agent Access page</a>.</p>
+          <div class="contact-info-h">{page.agentBlock.heading}</div>
+          <p style="font-size:13px;font-weight:300;color:rgba(253,252,248,.45);line-height:1.8" set:html={page.agentBlock.bodyHtml} />
         </div>
 
         <div class="contact-map-placeholder reveal d3" style="margin-top:32px">
-          <img src="https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_500,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg" alt="Brisbane">
-          <div class="contact-map-placeholder-label">Brisbane, Queensland</div>
+          <img src={page.map.image} alt={page.map.label}>
+          <div class="contact-map-placeholder-label">{page.map.label}</div>
         </div>
       </div>
 
       <!-- RIGHT: Form -->
       <div>
-        <div class="slabel reveal">Send a Message</div>
+        <div class="slabel reveal">{page.form.label}</div>
         <form class="cform reveal d1" id="cform" style="margin-top:12px" name="contact" method="POST" action="/api/contact">
           <input type="hidden" name="form-name" value="contact">
           <p class="hidden" style="display:none"><label>Don't fill this out: <input name="bot-field"></label></p>
@@ -71,17 +77,13 @@ const forSale = (await getProperties()).filter((p) => p.data.status === 'for-sal
               <option value="">Select an enquiry type…</option>
               <option>For Sale — Current Properties</option>
               {forSale.map((p) => <option>{p.data.name} — {p.data.suburb}</option>)}
-              <option>Custom Home / Bespoke Build</option>
-              <option>Development Partnership</option>
-              <option>Agent Access</option>
-              <option>Media &amp; Press</option>
-              <option>General Enquiry</option>
+              {page.form.interests.map((opt) => <option>{opt}</option>)}
             </select>
           </div>
           <div class="fg"><label class="fl">Your Message*</label><textarea class="fta" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-            <button type="submit" class="fsub" id="fsub">Submit Enquiry &rarr;</button>
-            <p class="form-note" style="margin:0">We respond within one business day.</p>
+            <button type="submit" class="fsub" id="fsub">{page.form.submitLabel} &rarr;</button>
+            <p class="form-note" style="margin:0">{page.form.note}</p>
           </div>
         </form>
       </div>
@@ -91,23 +93,15 @@ const forSale = (await getProperties()).filter((p) => p.data.status === 'for-sal
   <!-- QUICK LINKS -->
   <section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border)">
     <div class="inner">
-      <div class="slabel reveal" style="margin-bottom:32px">You May Also Be Interested In</div>
+      <div class="slabel reveal" style="margin-bottom:32px">{page.quickLinks.label}</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
-        <a href="/properties/" class="reveal" style="display:block;padding:32px;background:var(--white);border:1px solid var(--border);transition:border-color .3s;text-decoration:none">
-          <div style="font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">For Sale</div>
-          <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--ink);margin-bottom:8px">Current Properties</div>
-          <div style="font-size:12px;font-weight:300;color:var(--ink3)">View our current portfolio of luxury residences available for sale across Brisbane.</div>
-        </a>
-        <a href="/agent-access/" class="reveal d1" style="display:block;padding:32px;background:var(--white);border:1px solid var(--border);transition:border-color .3s;text-decoration:none">
-          <div style="font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Professionals</div>
-          <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--ink);margin-bottom:8px">Agent Access</div>
-          <div style="font-size:12px;font-weight:300;color:var(--ink3)">Exclusive pre-launch information, priority access, and commission structures for real estate professionals.</div>
-        </a>
-        <a href="/about/" class="reveal d2" style="display:block;padding:32px;background:var(--white);border:1px solid var(--border);transition:border-color .3s;text-decoration:none">
-          <div style="font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Company</div>
-          <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--ink);margin-bottom:8px">About Sabdia</div>
-          <div style="font-size:12px;font-weight:300;color:var(--ink3)">Learn about our story, values, and integrated approach to boutique luxury development.</div>
-        </a>
+        {page.quickLinks.items.map((l, i) => (
+          <a href={l.href} class={`reveal ${['', 'd1', 'd2'][i % 3]}`.trim()} style="display:block;padding:32px;background:var(--white);border:1px solid var(--border);transition:border-color .3s;text-decoration:none">
+            <div style="font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">{l.tag}</div>
+            <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--ink);margin-bottom:8px">{l.title}</div>
+            <div style="font-size:12px;font-weight:300;color:var(--ink3)">{l.desc}</div>
+          </a>
+        ))}
       </div>
     </div>
   </section>
