@@ -1,0 +1,176 @@
+{
+  "settings": {
+    "siteName": "Sabdia Constructions",
+    "legalName": "Sabdia Constructions Pty Ltd",
+    "estYear": 2013,
+    "logo": "https://static.wixstatic.com/media/1cc2db_f012027bbf0c45ebb4ae6d847309d59f~mv2.png/v1/fill/w_211,h_35,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/DESIGN%20%C2%B7%20DEVELOP%20%C2%B7%20CONSTRUCT.png",
+    "logoLarge": "https://static.wixstatic.com/media/1cc2db_f012027bbf0c45ebb4ae6d847309d59f~mv2.png/v1/fill/w_422,h_70,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/DESIGN%20%C2%B7%20DEVELOP%20%C2%B7%20CONSTRUCT.png",
+    "location": "Brisbane, Queensland, Australia",
+    "email": "sales@sabdia.com.au",
+    "phone": "",
+    "domainDisplay": "sabdiaconstructions.com.au",
+    "domainUrl": "https://www.sabdiaconstructions.com.au",
+    "socials": {
+      "instagram": { "label": "@_sabdia", "url": "https://www.instagram.com/_sabdia/" },
+      "facebook": { "label": "Sabdia Constructions", "url": "https://www.facebook.com/sabdiaconstructions/" },
+      "linkedin": { "label": "Sabdia Constructions", "url": "https://www.linkedin.com/company/sabdia-constructions/" }
+    },
+    "seo": {
+      "title": "Sabdia Constructions | Luxury Home Builders & Developers, Brisbane",
+      "description": "Boutique luxury home builder and developer in inner Brisbane. Multi-award winning, 100+ residences delivered since 2013. Design, Develop, Construct.",
+      "ogTitle": "Sabdia Constructions — Luxury Home Builders, Brisbane",
+      "ogDescription": "Boutique luxury home builder and developer in inner Brisbane. Multi-award winning, 100+ residences delivered since 2013.",
+      "ogImage": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1200,h_630,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg"
+    },
+    "jsonLdImage": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+    "jsonLdDescription": "Boutique luxury home builder and developer in inner Brisbane. Multi-award winning, 100+ residences delivered since 2013.",
+    "areaServed": "Brisbane, Queensland, Australia"
+  },
+  "nav": {
+    "items": [
+      { "label": "For Sale", "href": "/properties/" },
+      { "label": "Services", "href": "/services/" },
+      { "label": "About", "href": "/about/" },
+      { "label": "Projects", "href": "/projects/" },
+      { "label": "Collection", "href": "/collection/" },
+      { "label": "Agent Access", "href": "/agent-access/" }
+    ],
+    "mobileItems": [
+      { "label": "For Sale", "href": "/properties/" },
+      { "label": "Services", "href": "/services/" },
+      { "label": "About", "href": "/about/" },
+      { "label": "Projects", "href": "/projects/" },
+      { "label": "Collection", "href": "/collection/" },
+      { "label": "Agent Access", "href": "/agent-access/" },
+      { "label": "Contact", "href": "/contact/" }
+    ],
+    "cta": { "label": "Enquire", "href": "/contact/" },
+    "loaderMeta": "Sabdia · Est. 2013"
+  },
+  "footer": {
+    "taglineHtml": "Design. <em>Develop.</em><br>Construct.",
+    "taglineSub": "Boutique luxury home builder & developer delivering award-winning residences across inner Brisbane since 2013.",
+    "blurbHtml": "Boutique Luxury Home Builder &<br>Developer — Brisbane, QLD",
+    "companyLinks": [
+      { "label": "About Sabdia", "href": "/about/" },
+      { "label": "Services", "href": "/services/" },
+      { "label": "Projects", "href": "/projects/" },
+      { "label": "Collection", "href": "/collection/" },
+      { "label": "Agent Access", "href": "/agent-access/" }
+    ],
+    "legalLinks": [
+      { "label": "Accessibility", "href": "/contact/" },
+      { "label": "Privacy", "href": "/contact/" }
+    ]
+  },
+  "home_hero": {
+    "words": ["Design", "Develop", "Construct"],
+    "eyebrow": "Boutique Luxury Home Builder & Developer — Brisbane",
+    "description": "Redefining luxury through design, detail, and craftsmanship. For over ten years, Sabdia has delivered award-winning residences that set a new benchmark for contemporary living in Brisbane.",
+    "award": "Award-Winning Luxury Residences.",
+    "slides": [
+      { "image": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg", "alt": "Sabdia luxury home" },
+      { "image": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg", "alt": "Sabdia luxury home" },
+      { "image": "https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg", "alt": "Sabdia luxury home" }
+    ],
+    "primaryCta": { "label": "View Properties", "href": "/properties/" },
+    "secondaryCta": { "label": "Begin a Conversation", "href": "/contact/" }
+  },
+  "home_stats": {
+    "items": [
+      { "target": 10, "suffix": "+", "label": "Years in Brisbane", "count": true },
+      { "target": 100, "suffix": "+", "label": "Residences Delivered", "count": true },
+      { "target": 5, "suffix": "★", "label": "Multi-Award Winning", "count": true },
+      { "target": 100, "suffix": "%", "label": "In-House Delivery", "count": false }
+    ]
+  },
+  "home_marquee": {
+    "items": [
+      "Multi-Award Winning",
+      "Design · Develop · Construct",
+      "Inner Brisbane Specialist",
+      "100+ Residences Since 2013",
+      "Boutique Luxury Developer"
+    ]
+  },
+  "home_about": {
+    "label": "About Sabdia",
+    "headingHtml": "Crafting <em>Exquisite</em><br>Living Spaces.",
+    "images": [
+      { "image": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg", "alt": "Sabdia craftsmanship" },
+      { "image": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_500,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg", "alt": "Sabdia detail" }
+    ],
+    "paragraphs": [
+      "At Sabdia, we manage every step of the residential development journey in-house — from visionary design through to expert construction. This integrated approach allows us to maintain meticulous control over quality, timing, and innovation, delivering homes that stand the test of time.",
+      "With a focus on creating exceptional living spaces, Sabdia Constructions is dedicated to shaping the future of residential developments through innovation, quality, and unparalleled craftsmanship. Every project begins with a deep understanding of both the site and the clients who will call it home.",
+      "We are not merely builders — we are creators of legacy. Each residence we deliver is conceived as a singular work of architecture, thoughtfully designed to complement its surroundings and exceed every expectation of luxury living."
+    ],
+    "sigName": "Sabdia",
+    "sigTitle": "Founder & Principal",
+    "values": [
+      { "n": "i.", "title": "Integrated Delivery", "desc": "Design, develop, and construct under one roof — seamless from concept to keys." },
+      { "n": "ii.", "title": "Uncompromising Quality", "desc": "Only the finest materials, master tradespeople, and meticulous attention to detail." },
+      { "n": "iii.", "title": "Boutique & Personal", "desc": "Limited projects annually to ensure every client receives our full dedication." }
+    ],
+    "cta": { "label": "Our Full Story", "href": "/about/" }
+  },
+  "home_properties": {
+    "label": "For Sale",
+    "headingHtml": "<em>Current</em> Properties",
+    "cta": { "label": "View All", "href": "/properties/" }
+  },
+  "home_services": {
+    "label": "What We Do",
+    "headingHtml": "Full-spectrum<br><em>development</em><br>expertise.",
+    "text": "From site acquisition through to final handover, Sabdia manages every element in-house — ensuring seamless delivery and uncompromising quality at every stage.",
+    "cta": { "label": "Explore Services", "href": "/services/" }
+  },
+  "home_process": {
+    "label": "Our Process"
+  },
+  "home_agent": {
+    "label": "For Real Estate Professionals",
+    "headingHtml": "Exclusive <em>Agent</em><br>Access.",
+    "text": "Gain exclusive insight into Sabdia's future releases. Our agent-only preview list offers early access to premium developments, pre-launch information, and priority communication — giving your clients an edge in Brisbane's luxury market.",
+    "badge": "Exclusive Access",
+    "image": { "image": "https://static.wixstatic.com/media/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png/v1/fill/w_900,h_1100,q_85,enc_avif,quality_auto/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png", "alt": "Agent Access" },
+    "features": [
+      "Pre-release access to upcoming developments",
+      "Pre-launch pricing and floor plan information",
+      "Priority communication on new releases",
+      "Exclusive commission structures",
+      "Invitations to private project previews",
+      "Dedicated liaison with the Sabdia team"
+    ],
+    "primaryCta": { "label": "Apply for Access", "href": "/agent-access/" },
+    "secondaryCta": { "label": "Learn More", "href": "/contact/" }
+  },
+  "home_contact": {
+    "label": "Get In Touch",
+    "headingHtml": "Let's start<br>a <em>conversation</em>.",
+    "text": "Please submit your contact information and one of our team members will be in touch with you shortly.",
+    "interests": [
+      "For Sale — Current Properties",
+      "Custom Home Design",
+      "Development Partnership",
+      "Agent Access",
+      "General Enquiry"
+    ],
+    "note": "We typically respond within one business day."
+  },
+  "services": [
+    { "sort": 1, "number": "01", "title": "Luxury Residential Design", "description": "Bespoke single residences and boutique developments designed for discerning clients. From architectural concept to interior finishing — every detail considered, nothing left to chance.", "icon": "home" },
+    { "sort": 2, "number": "02", "title": "Development Management", "description": "End-to-end residential development managed from vision to completion. Our integrated in-house model maintains meticulous control over quality, timing, and innovation throughout.", "icon": "case" },
+    { "sort": 3, "number": "03", "title": "Interior Architecture", "description": "Integrated interior architecture that elevates every space. Our design team collaborates closely with builders to ensure perfect cohesion between vision and reality.", "icon": "clock" },
+    { "sort": 4, "number": "04", "title": "Expert Construction", "description": "Premium construction by master tradespeople. We use only the finest materials and proven methodologies — delivered with full transparency and precision at every stage.", "icon": "grid" }
+  ],
+  "process_steps": [
+    { "sort": 1, "title": "Design", "description": "Visionary design that balances beauty, functionality, and long-term value. Every project begins with a deep understanding of site, context, and client." },
+    { "sort": 2, "title": "Develop", "description": "We manage the complete development process in-house — approvals, planning, engineering — maintaining full control over every decision and outcome." },
+    { "sort": 3, "title": "Construct", "description": "Precision construction by our own team of master tradespeople, using premium materials and meticulous quality control at every stage of the build." },
+    { "sort": 4, "title": "Deliver", "description": "Handover marks the beginning of your story. Our aftercare ensures your home continues to perform and delight for decades to come." }
+  ],
+  "testimonials": [
+    { "sort": 1, "quote": "Sabdia delivered a home that exceeded every expectation. Their integrated approach — from design through to construction — meant every detail was perfectly executed. A truly exceptional result that we will treasure for generations.", "attribution": "Satisfied Client — Inner Brisbane Residence" }
+  ]
+}

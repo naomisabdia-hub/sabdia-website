@@ -6,6 +6,12 @@ backed by a [Supabase](https://supabase.com) database, and deployed on
 
 - **Properties live in Supabase** — edit a row in the `properties` table and
   the website updates immediately (pages are server-rendered, no rebuild).
+- **Site content lives in Supabase too** — homepage sections, nav, footer and
+  global settings are jsonb documents in `site_content`; services, process
+  steps and testimonials have their own tables. All fall back to
+  `src/lib/seed-content.json` when Supabase is unreachable.
+- **Fonts are self-hosted** — variable woff2 files in `public/fonts/`
+  (no Google Fonts request at runtime).
 - **Enquiries are saved to Supabase** — every form submission (contact,
   property enquiry, agent application) lands in the `enquiries` table, and can
   optionally be emailed to you via Resend.
@@ -46,7 +52,8 @@ vercel.json             # 301 redirects from the old .html URLs
 
 1. Create a project at [supabase.com](https://supabase.com) (free tier is fine).
 2. In the project, open **SQL Editor** and run the contents of
-   `supabase/schema.sql`, then `supabase/seed.sql`.
+   `supabase/schema.sql`, then `supabase/seed.sql`, then
+   `supabase/seed-content.sql`.
 3. Copy from **Project Settings → API**:
    - Project URL → `SUPABASE_URL`
    - `anon` `public` key → `SUPABASE_ANON_KEY`

@@ -1,33 +1,36 @@
 ---
 import { getProperties } from '../lib/db.js';
+import { getContent } from '../lib/content.js';
 
-const forSale = (await getProperties()).filter((p) => p.data.status === 'for-sale');
-
-const logoUrl =
-  'https://static.wixstatic.com/media/1cc2db_f012027bbf0c45ebb4ae6d847309d59f~mv2.png/v1/fill/w_211,h_35,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/DESIGN%20%C2%B7%20DEVELOP%20%C2%B7%20CONSTRUCT.png';
+const [{ settings, footer }, all] = await Promise.all([
+  getContent('settings', 'footer'),
+  getProperties(),
+]);
+const forSale = all.filter((p) => p.data.status === 'for-sale');
+const socials = settings.socials;
 const year = new Date().getFullYear();
 ---
 <footer>
   <div class="footer-tagline">
     <div class="footer-tagline-inner">
-      <h2 class="footer-tag-h">Design. <em>Develop.</em><br>Construct.</h2>
-      <p class="footer-tag-sub">Boutique luxury home builder &amp; developer delivering award-winning residences across inner Brisbane since 2013.</p>
+      <h2 class="footer-tag-h" set:html={footer.taglineHtml} />
+      <p class="footer-tag-sub">{footer.taglineSub}</p>
     </div>
   </div>
   <div class="fg-grid">
     <div>
-      <a href="/" class="flogo" aria-label="Sabdia Constructions">
-        <img src={logoUrl} alt="Sabdia Constructions">
+      <a href="/" class="flogo" aria-label={settings.siteName}>
+        <img src={settings.logo} alt={settings.siteName}>
       </a>
-      <p class="ftag">Boutique Luxury Home Builder &amp;<br>Developer — Brisbane, QLD</p>
+      <p class="ftag" set:html={footer.blurbHtml} />
       <div class="fsoc">
-        <a href="https://www.instagram.com/_sabdia/" target="_blank" rel="noopener" class="fsl" aria-label="Instagram">
+        <a href={socials.instagram.url} target="_blank" rel="noopener" class="fsl" aria-label="Instagram">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
         </a>
-        <a href="https://www.facebook.com/sabdiaconstructions/" target="_blank" rel="noopener" class="fsl" aria-label="Facebook">
+        <a href={socials.facebook.url} target="_blank" rel="noopener" class="fsl" aria-label="Facebook">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
         </a>
-        <a href="https://www.linkedin.com/company/sabdia-constructions/" target="_blank" rel="noopener" class="fsl" aria-label="LinkedIn">
+        <a href={socials.linkedin.url} target="_blank" rel="noopener" class="fsl" aria-label="LinkedIn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
         </a>
       </div>
@@ -44,29 +47,28 @@ const year = new Date().getFullYear();
     <div>
       <div class="fct">Company</div>
       <ul class="fcl">
-        <li><a href="/about/">About Sabdia</a></li>
-        <li><a href="/services/">Services</a></li>
-        <li><a href="/projects/">Projects</a></li>
-        <li><a href="/collection/">Collection</a></li>
-        <li><a href="/agent-access/">Agent Access</a></li>
+        {footer.companyLinks.map((l) => (
+          <li><a href={l.href}>{l.label}</a></li>
+        ))}
       </ul>
     </div>
     <div>
       <div class="fct">Connect</div>
       <ul class="fcl">
         <li><a href="/contact/">Contact Us</a></li>
-        <li><a href="https://www.instagram.com/_sabdia/" target="_blank" rel="noopener">Instagram @_sabdia</a></li>
-        <li><a href="https://www.facebook.com/sabdiaconstructions/" target="_blank" rel="noopener">Facebook</a></li>
-        <li><a href="https://www.linkedin.com/company/sabdia-constructions/" target="_blank" rel="noopener">LinkedIn</a></li>
-        <li><a href="https://www.sabdiaconstructions.com.au" target="_blank" rel="noopener">sabdiaconstructions.com.au</a></li>
+        <li><a href={socials.instagram.url} target="_blank" rel="noopener">Instagram {socials.instagram.label}</a></li>
+        <li><a href={socials.facebook.url} target="_blank" rel="noopener">Facebook</a></li>
+        <li><a href={socials.linkedin.url} target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href={settings.domainUrl} target="_blank" rel="noopener">{settings.domainDisplay}</a></li>
       </ul>
     </div>
   </div>
   <div class="fbot">
-    <div class="fcopy">&copy; {year} Sabdia Constructions Pty Ltd. All rights reserved.</div>
+    <div class="fcopy">&copy; {year} {settings.legalName}. All rights reserved.</div>
     <div class="flinks">
-      <a href="/contact/">Accessibility</a>
-      <a href="/contact/">Privacy</a>
+      {footer.legalLinks.map((l) => (
+        <a href={l.href}>{l.label}</a>
+      ))}
     </div>
   </div>
 </footer>

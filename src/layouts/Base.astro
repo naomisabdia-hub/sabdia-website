@@ -26,8 +26,9 @@ const { title, description, ogTitle, ogDescription, ogImage, preloadImage } = As
 {ogTitle && <meta property="og:type" content="website">}
 {ogImage && <meta property="og:image" content={ogImage}>}
 {ogImage && <meta name="twitter:card" content="summary_large_image">}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/jost-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/cormorant-garamond-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-var-italic.woff2" crossorigin>
 {preloadImage && <link rel="preload" as="image" href={preloadImage}>}
 <link rel="stylesheet" href="/css/style.css">
 <slot name="head" />
