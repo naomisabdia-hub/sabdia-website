@@ -1,0 +1,148 @@
+---
+/**
+ * WalkthroughCinema — chaptered cinematic walkthrough of a residence.
+ *
+ * A 9:16 cinema frame (matching the FilmBand look) that plays a curated
+ * sequence of rendered clips, one "room" per chapter. Visitors can let it
+ * run (chapters auto-advance) or jump via the chapter rail. Silent clips,
+ * muted playsinline; nothing loads until the section nears the viewport.
+ *
+ * chapters = [{ label: 'Arrival', src: 'https://…mp4' }, …]
+ *
+ * Swapping content: replace `src` URLs (Supabase media/walkthrough/…).
+ * Clips should be portrait (9:16), H264, silent, a few MB each.
+ */
+const { name, chapters = [] } = Astro.props;
+---
+{chapters.length > 0 && (
+  <section class="wt-band" id="walkthrough">
+    <div class="wt-grid inner">
+      <div class="wt-copy">
+        <div class="slabel slabel-dark reveal">The Walkthrough</div>
+        <h2 class="wt-h reveal d1">Move through <em>{name}</em>.</h2>
+        <p class="wt-p reveal d2">
+          Nine rooms, one continuous journey — rendered from the working
+          architectural model. Press play and drift, or choose a room.
+        </p>
+        <ol class="wt-rail reveal d3" data-wt-rail>
+          {chapters.map((c, i) => (
+            <li>
+              <button type="button" class={`wt-ch${i === 0 ? ' on' : ''}`} data-wt-ch={i}>
+                <span class="wt-ch-n">{String(i + 1).padStart(2, '0')}</span>
+                <span class="wt-ch-l">{c.label}</span>
+                <span class="wt-ch-bar"><span class="wt-ch-fill"></span></span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div class="wt-stage reveal d2" data-wt-stage>
+        <div class="wt-frame">
+          <video
+            data-wt-video
+            muted
+            playsinline
+            preload="none"
+            data-first={chapters[0].src}
+          ></video>
+          <button type="button" class="wt-play" data-wt-play aria-label="Play walkthrough">&#9654;</button>
+        </div>
+        <div class="wt-caption">
+          <b data-wt-cap>{chapters[0].label}</b>
+          <span>{name} — Rendered Walkthrough</span>
+        </div>
+      </div>
+    </div>
+    <script is:inline define:vars={{ srcs: chapters.map((c) => c.src) }}>
+    (function () {
+      var stage = document.querySelector('[data-wt-stage]');
+      if (!stage) return;
+      var video = stage.querySelector('[data-wt-video]');
+      var play = stage.querySelector('[data-wt-play]');
+      var cap = stage.querySelector('[data-wt-cap]');
+      var chips = [].slice.call(document.querySelectorAll('[data-wt-ch]'));
+      var cur = 0;
+      var started = false;
+
+      function setChip(i) {
+        chips.forEach(function (c, k) { c.classList.toggle('on', k === i); c.classList.toggle('done', k < i); });
+        cap.textContent = chips[i].querySelector('.wt-ch-l').textContent;
+      }
+      function load(i, autoplay) {
+        cur = (i + srcs.length) % srcs.length;
+        setChip(cur);
+        video.src = srcs[cur];
+        if (autoplay) { video.play(); play.classList.add('hide'); }
+      }
+      video.addEventListener('ended', function () {
+        if (cur < srcs.length - 1) load(cur + 1, true);
+        else { play.classList.remove('hide'); setChip(0); video.src = srcs[0]; cur = 0; }
+      });
+      video.addEventListener('timeupdate', function () {
+        var f = chips[cur].querySelector('.wt-ch-fill');
+        if (f && video.duration) f.style.transform = 'scaleX(' + (video.currentTime / video.duration) + ')';
+      });
+      play.addEventListener('click', function () {
+        started = true;
+        if (!video.src) load(0, true);
+        else { video.play(); }
+        play.classList.add('hide');
+      });
+      video.addEventListener('click', function () {
+        if (video.paused) { video.play(); play.classList.add('hide'); }
+        else { video.pause(); play.classList.remove('hide'); }
+      });
+      chips.forEach(function (chip, i) {
+        chip.addEventListener('click', function () { started = true; load(i, true); });
+      });
+
+      // lazy poster: load first chapter's metadata when section nears view
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (en) {
+          en.forEach(function (e) {
+            if (e.isIntersecting) {
+              if (!video.src) { video.src = video.dataset.first; video.preload = 'metadata'; }
+              io.disconnect();
+            }
+          });
+        }, { rootMargin: '400px 0px' });
+        io.observe(stage);
+      }
+    })();
+    </script>
+  </section>
+)}
+
+<style>
+  .wt-band{background:var(--dark2);border-top:1px solid rgba(255,255,255,.06);overflow:hidden}
+  .wt-grid{display:grid;grid-template-columns:5fr 4fr;gap:clamp(40px,6vw,96px);align-items:center;padding:clamp(72px,10vw,140px) clamp(22px,5vw,80px)}
+  .wt-h{font-family:var(--font-d);font-size:clamp(34px,4.5vw,60px);font-weight:300;color:var(--white);letter-spacing:-.02em;margin:0 0 18px}
+  .wt-h em{font-style:italic;color:var(--gold2)}
+  .wt-p{font-family:'EB Garamond',Georgia,serif;font-size:15px;font-weight:300;line-height:1.85;color:rgba(253,252,248,.6);max-width:420px;margin-bottom:34px}
+  .wt-rail{list-style:none;margin:0;padding:0;border-top:1px solid rgba(255,255,255,.08)}
+  .wt-ch{display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid rgba(255,255,255,.08);padding:13px 0;cursor:none;align-items:center;gap:2px 0;transition:padding-left .3s var(--ease)}
+  .wt-ch:hover{padding-left:8px}
+  .wt-ch-n{font-family:var(--font-d);font-size:12px;font-style:italic;color:var(--gold);grid-row:1}
+  .wt-ch-l{font-family:var(--font-u);font-size:11px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:rgba(253,252,248,.5);transition:color .3s;grid-row:1}
+  .wt-ch.on .wt-ch-l{color:var(--white)}
+  .wt-ch.done .wt-ch-l{color:rgba(196,172,135,.55)}
+  .wt-ch-bar{grid-column:2;grid-row:2;height:1px;background:rgba(255,255,255,.08);overflow:hidden;display:none}
+  .wt-ch.on .wt-ch-bar{display:block}
+  .wt-ch-fill{display:block;height:100%;background:var(--gold2);transform:scaleX(0);transform-origin:left}
+  .wt-stage{display:flex;flex-direction:column;gap:14px}
+  .wt-frame{position:relative;aspect-ratio:9/16;max-height:min(76vh,680px);margin:0 auto;overflow:hidden;background:var(--dark3);border:1px solid rgba(196,172,135,.22);box-shadow:0 40px 80px -40px rgba(0,0,0,.8);width:auto}
+  .wt-frame video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;cursor:none}
+  .wt-frame::after{content:'';position:absolute;inset:0;border:1px solid rgba(255,255,255,.05);pointer-events:none}
+  .wt-play{position:absolute;inset:0;margin:auto;width:64px;height:64px;border-radius:50%;background:rgba(14,13,11,.62);backdrop-filter:blur(10px);border:1px solid rgba(196,172,135,.5);color:var(--gold2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:none;transition:background .3s,opacity .3s;padding-left:4px}
+  .wt-play:hover{background:rgba(158,139,106,.3)}
+  .wt-play.hide{opacity:0;pointer-events:none}
+  .wt-caption{display:flex;justify-content:space-between;gap:16px;font-size:9px;font-weight:300;letter-spacing:.28em;text-transform:uppercase;color:rgba(253,252,248,.3);max-width:calc(min(76vh,680px)*9/16);margin:0 auto;width:100%}
+  .wt-caption b{font-weight:300;color:var(--gold2)}
+  @media(max-width:900px){
+    .wt-grid{grid-template-columns:1fr;gap:40px}
+    .wt-rail{display:grid;grid-template-columns:1fr 1fr;border-top:none;gap:0 18px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .wt-ch{transition:none}
+  }
+</style>

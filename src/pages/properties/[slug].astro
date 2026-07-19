@@ -4,6 +4,7 @@ import PropertyCard from '../../components/PropertyCard.astro';
 import PropertyViewer from '../../components/PropertyViewer.astro';
 import FilmBand from '../../components/FilmBand.astro';
 import SeriesStrip from '../../components/SeriesStrip.astro';
+import WalkthroughCinema from '../../components/WalkthroughCinema.astro';
 import { wixResize, landLabel } from '../../lib/wix.js';
 import { getProperties, getProperty } from '../../lib/db.js';
 import { getContent } from '../../lib/content.js';
@@ -28,6 +29,26 @@ const related = allProps
   .filter((p) => p.data.status === 'for-sale' && p.id !== entry.id)
   .sort((a, b) => a.data.order - b.data.order)
   .slice(0, 3);
+
+/* Cinematic walkthroughs — curated chapters of studio-rendered clips,
+   web-encoded and hosted in Supabase storage (media/walkthrough/<slug>/).
+   Add an entry per property as clip sets arrive; pages without one
+   simply skip the section. */
+const WT = 'https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough';
+const walkthroughs = {
+  qasr: [
+    { label: 'Arrival', src: `${WT}/qasr/web-clip14.mp4` },
+    { label: 'Motor Court', src: `${WT}/qasr/web-clip18.mp4` },
+    { label: 'Entry Void', src: `${WT}/qasr/web-clip19.mp4` },
+    { label: 'Lounge', src: `${WT}/qasr/web-clip22_3.mp4` },
+    { label: 'Fireside', src: `${WT}/qasr/web-clip25_1.mp4` },
+    { label: 'The Bar', src: `${WT}/qasr/web-clip21.mp4` },
+    { label: 'Dining', src: `${WT}/qasr/web-clip27_1.mp4` },
+    { label: 'Pool Courtyard', src: `${WT}/qasr/web-clip16.mp4` },
+    { label: 'Dusk', src: `${WT}/qasr/web-clip17_1.mp4` },
+  ],
+};
+const walkthrough = walkthroughs[entry.id];
 
 const heroImg = wixResize(d.image, { w: 1920, h: 1080, focus: d.focus, q: sold ? 85 : 90 });
 const ogImg = wixResize(d.image, { w: 1200, h: 630, focus: d.focus });
@@ -210,6 +231,9 @@ const jsonLd = JSON.stringify({
       captionRight={`${d.suburb}, ${d.state}`}
     />
   )}
+
+  <!-- CINEMATIC WALKTHROUGH -->
+  {walkthrough && <WalkthroughCinema name={d.name} chapters={walkthrough} />}
 
   <!-- 3D VIEWER -->
   <PropertyViewer property={entry} />
