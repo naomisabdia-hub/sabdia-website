@@ -24,6 +24,17 @@
  * reads as time-lapse). 1600×1000px landscape works best; anything with the
  * same aspect ratio will cover cleanly.
  *
+ * VIDEO-SCRUB MODE ("build it up"): pass `video` (mp4 URL) + `poster` on the
+ * project and the slider becomes a time-scrubber — dragging the handle moves
+ * the video's playhead, so a construction time-lapse literally assembles the
+ * house under the visitor's finger. A small ▶ button also plays the film from
+ * the current point, with the handle following live. Stage markers map to
+ * even fractions of the video (override with `at: 0..1` per stage) and the
+ * captions/finale behave exactly as in photo mode. If the video fails to
+ * load, the component silently falls back to photo cross-fade mode.
+ * Best source: an Instagram build-journey reel or a BT time-lapse, uploaded
+ * to Supabase storage (media/films/…) like the existing property films.
+ *
  * TRADE-OFFS / NOTES
  * - All stage images are stacked and lazy-loaded; nothing downloads until the
  *   slider approaches the viewport, then N images load (~40–80KB each as
@@ -49,7 +60,9 @@ const pct = (i) => (i / last) * 100;
     <button type="button" class="jour-skip" data-jour-skip>Skip to finished home &rarr;</button>
   </div>
 
-  <!-- Stage viewport: images stacked, cross-fade via .on -->
+  <!-- Stage viewport: images stacked, cross-fade via .on.
+       In video mode the <video> sits on top and the images become the
+       fallback (shown only if the video errors). -->
   <div class="jour-stage" data-jour-stage>
     {p.stages.map((s, i) => (
       <img
@@ -61,6 +74,22 @@ const pct = (i) => (i / last) * 100;
         decoding="async"
       />
     ))}
+    {p.video && (
+      <video
+        class="jour-video"
+        data-jour-video
+        src={p.video}
+        poster={p.poster}
+        muted
+        playsinline
+        preload="metadata"
+        aria-label={`${p.name} construction time-lapse`}
+      ></video>
+    )}
+    {p.video && (
+      <button type="button" class="jour-play" data-jour-play aria-label="Play the build film">&#9654;</button>
+    )}
+    {p.video && <div class="jour-hint" data-jour-hint>Drag the timeline to build</div>}
     <div class="jour-cap-band">
       <span class="jour-cap-label" data-jour-label>{p.stages[last].label}</span>
       <span class="jour-cap-text" data-jour-caption>{p.stages[last].caption}</span>
@@ -133,6 +162,13 @@ const pct = (i) => (i / last) * 100;
   .jour-stage{position:relative;aspect-ratio:16/9;max-height:620px;overflow:hidden;background:var(--bg3);touch-action:pan-y}
   .jour-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s ease;filter:saturate(.9)}
   .jour-stage img.on{opacity:1}
+  .jour-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;background:var(--dark3)}
+  .jour-video.off{display:none}
+  .jour-play{position:absolute;top:18px;right:18px;z-index:3;width:44px;height:44px;border-radius:50%;background:rgba(14,13,11,.6);backdrop-filter:blur(8px);border:1px solid rgba(196,172,135,.45);color:var(--gold2);font-size:13px;display:flex;align-items:center;justify-content:center;cursor:none;transition:background .3s,color .3s;padding-left:3px}
+  .jour-play:hover{background:rgba(158,139,106,.3);color:var(--white)}
+  .jour-play.playing{padding-left:0}
+  .jour-hint{position:absolute;bottom:78px;left:50%;transform:translateX(-50%);z-index:3;padding:8px 16px;background:rgba(14,13,11,.6);backdrop-filter:blur(8px);border:1px solid rgba(196,172,135,.3);color:var(--gold2);font-size:8.5px;font-weight:300;letter-spacing:.26em;text-transform:uppercase;white-space:nowrap;pointer-events:none;transition:opacity .5s}
+  .jour-hint.off{opacity:0}
   .jour-cap-band{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;padding:26px clamp(20px,3vw,40px) 20px;background:linear-gradient(transparent,rgba(14,13,11,.82));z-index:2}
   .jour-cap-label{font-family:var(--font-u);font-size:10px;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--gold2);white-space:nowrap}
   .jour-cap-text{font-family:'EB Garamond',Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:rgba(253,252,248,.85);letter-spacing:.01em}
@@ -194,54 +230,97 @@ const pct = (i) => (i / last) * 100;
     const capEl = root.querySelector('[data-jour-caption]');
     const skip = root.querySelector('[data-jour-skip]');
     const finale = root.querySelector('[data-jour-final]');
+    const video = root.querySelector('[data-jour-video]');
+    const playBtn = root.querySelector('[data-jour-play]');
+    const hint = root.querySelector('[data-jour-hint]');
     const n = imgs.length;
     const last = n - 1;
-    let cur = last; // markup default = completed (no-JS fallback)
+    let cur = last;        // markup default = completed (no-JS fallback)
+    let videoMode = !!video;
+    let pendingFrac = null; // frac requested before video metadata arrived
 
-    const setStage = (i) => {
-      i = Math.max(0, Math.min(last, i));
-      cur = i;
-      imgs.forEach((im, k) => im.classList.toggle('on', k === i));
+    // Shared UI update for a continuous position f (0..1)
+    const paintFrac = (f, near) => {
+      handle.style.left = f * 100 + '%';
+      fill.style.transform = `scaleX(${f})`;
       marks.forEach((m, k) => {
-        m.classList.toggle('on', k === i);
-        m.classList.toggle('done', k < i);
+        m.classList.toggle('on', k === near);
+        m.classList.toggle('done', k / last <= f && k !== near);
       });
-      handle.style.left = (i / last) * 100 + '%';
-      handle.setAttribute('aria-valuenow', i);
-      handle.setAttribute('aria-valuetext', marks[i].querySelector('.jour-mark-label').textContent);
-      fill.style.transform = `scaleX(${i / last})`;
-      labelEl.textContent = marks[i].querySelector('.jour-mark-label').textContent;
-      capEl.textContent = imgs[i].dataset.caption || '';
-      if (finale) finale.classList.toggle('open', i === last);
+      handle.setAttribute('aria-valuenow', near);
+      handle.setAttribute('aria-valuetext', marks[near].querySelector('.jour-mark-label').textContent);
+      labelEl.textContent = marks[near].querySelector('.jour-mark-label').textContent;
+      capEl.textContent = imgs[near].dataset.caption || '';
+      // finale opens at the very end of the scrub (or on the last stage in photo mode)
+      if (finale) finale.classList.toggle('open', videoMode ? f > 0.98 : near === last);
     };
 
+    // Seek the video to fraction f (queued until metadata is ready)
+    const seek = (f) => {
+      if (!video.duration) { pendingFrac = f; return; }
+      video.currentTime = f * (video.duration - 0.05);
+    };
+
+    const setFrac = (f) => {
+      f = Math.max(0, Math.min(1, f));
+      const near = Math.round(f * last);
+      cur = near;
+      if (videoMode) { seek(f); paintFrac(f, near); }
+      else {
+        imgs.forEach((im, k) => im.classList.toggle('on', k === near));
+        paintFrac(near / last, near);
+      }
+      if (hint) hint.classList.add('off');
+    };
+    const setStage = (i) => setFrac(Math.max(0, Math.min(last, i)) / last);
+
+    if (video) {
+      video.addEventListener('loadedmetadata', () => { if (pendingFrac !== null) { seek(pendingFrac); pendingFrac = null; } });
+      // video unavailable → fall back to photo mode silently
+      video.addEventListener('error', () => { videoMode = false; video.classList.add('off'); if (playBtn) playBtn.style.display = 'none'; setStage(cur); });
+      // ▶ plays the build from the current point; the handle follows live
+      if (playBtn) {
+        playBtn.addEventListener('click', () => {
+          if (video.paused) { video.play(); playBtn.textContent = '❚❚'; playBtn.classList.add('playing'); }
+          else { video.pause(); playBtn.textContent = '▶'; playBtn.classList.remove('playing'); }
+          if (hint) hint.classList.add('off');
+        });
+        video.addEventListener('timeupdate', () => {
+          if (video.paused || !video.duration) return;
+          const f = video.currentTime / video.duration;
+          paintFrac(f, Math.round(f * last));
+        });
+        video.addEventListener('ended', () => { playBtn.textContent = '▶'; playBtn.classList.remove('playing'); paintFrac(1, last); });
+      }
+    }
+
     marks.forEach((m) => m.addEventListener('click', () => setStage(+m.dataset.jourMark)));
-    if (skip) skip.addEventListener('click', () => setStage(last));
+    if (skip) skip.addEventListener('click', () => setFrac(1));
 
     // drag on the timeline (pointer events cover mouse + touch)
     const frac = (x) => {
       const r = line.getBoundingClientRect();
       return Math.max(0, Math.min(1, (x - r.left) / r.width));
     };
-    let dragging = false;
+    let dragging = false, rafId = null, lastX = 0;
     line.addEventListener('pointerdown', (e) => {
       dragging = true;
       handle.classList.add('dragging');
       line.setPointerCapture(e.pointerId);
-      setStage(Math.round(frac(e.clientX) * last));
+      if (video && !video.paused) { video.pause(); if (playBtn) { playBtn.textContent = '▶'; playBtn.classList.remove('playing'); } }
+      setFrac(frac(e.clientX));
     });
     line.addEventListener('pointermove', (e) => {
       if (!dragging) return;
-      const f = frac(e.clientX);
-      const near = Math.round(f * last);
-      if (near !== cur) setStage(near);
-      handle.style.left = f * 100 + '%'; // handle tracks the pointer while dragging
+      lastX = e.clientX;
+      if (rafId) return; // throttle seeks to one per frame
+      rafId = requestAnimationFrame(() => { rafId = null; setFrac(frac(lastX)); });
     });
     const endDrag = () => {
       if (!dragging) return;
       dragging = false;
       handle.classList.remove('dragging');
-      setStage(cur); // snap handle to the resolved stage
+      if (!videoMode) setStage(cur); // photo mode snaps to a stage; video mode stays continuous
     };
     line.addEventListener('pointerup', endDrag);
     line.addEventListener('pointercancel', endDrag);

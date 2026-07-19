@@ -5,8 +5,8 @@ import { wixResize, landLabel } from '../lib/wix.js';
 import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
 
-const [{ projects_page: page, home_stats: stats }, all] = await Promise.all([
-  getContent('projects_page', 'home_stats'),
+const [{ projects_page: page, home_stats: stats, films }, all] = await Promise.all([
+  getContent('projects_page', 'home_stats', 'films'),
   getProperties(),
 ]);
 const forSale = all.filter((p) => p.data.status === 'for-sale');
@@ -35,10 +35,17 @@ const journeyStage = (slug, gi, w = 1600, h = 1000) => {
 const journeys = [
   {
     // FOR-SALE example — full journey ending in the listing finale.
+    // `video` switches on scrub mode: dragging the timeline scrubs this film
+    // so the build assembles under the visitor's finger. Currently wired to
+    // the QASR property film as a stand-in — REPLACE with a true build
+    // time-lapse / Instagram journey reel (upload to Supabase media/films/)
+    // for the real "watch it rise" effect.
     name: 'QASR',
     suburb: 'Coorparoo',
     forSale: true,
     listingHref: '/properties/qasr/',
+    video: films?.byProperty?.qasr?.video,
+    poster: films?.byProperty?.qasr?.poster,
     gallery: bySlug.qasr?.data.gallery ?? [],
     stages: [
       { label: 'Site & Foundation', caption: 'Placeholder — swap for the real site photo: engineering the Coorparoo ridgeline.', image: journeyStage('qasr', 3) },
