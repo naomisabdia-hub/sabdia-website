@@ -10,6 +10,7 @@ const STATIC_PATHS = [
   '/properties/',
   '/contact/',
   '/agent-access/',
+  '/find-your-home/',
 ];
 
 export const GET: APIRoute = async ({ site }) => {

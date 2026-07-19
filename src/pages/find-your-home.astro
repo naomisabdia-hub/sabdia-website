@@ -1,0 +1,245 @@
+---
+/**
+ * Guided residence match — a question-led alternative to the classic
+ * enquiry form (which remains untouched on /contact/).
+ *
+ * Flow: 5 questions (timeline, flexibility, bedrooms, budget, area)
+ * → matched for-sale residences → contact details → submits to the
+ * same /api/contact endpoint as every other form (form-name
+ * "guided-match", answers serialised into the message body).
+ *
+ * Matching runs client-side over data-* attributes rendered per
+ * property. Budget is captured for the lead but NOT used to filter —
+ * properties carry no price data. If no residence matches, the full
+ * for-sale collection is offered with an "upcoming releases" note.
+ */
+import Base from '../layouts/Base.astro';
+import PropertyCard from '../components/PropertyCard.astro';
+import { landLabel } from '../lib/wix.js';
+import { getProperties } from '../lib/db.js';
+
+const all = await getProperties();
+const forSale = all.filter((p) => p.data.status === 'for-sale');
+
+// Suburb → area group used by the area question.
+const AREA: Record<string, string> = {
+  Coorparoo: 'inner-east',
+  'Camp Hill': 'inner-east',
+  Ascot: 'north',
+  Hendra: 'north',
+  'Holland Park West': 'south',
+  'Holland Park': 'south',
+};
+
+const steps = [
+  {
+    key: 'timeline',
+    q: 'When would you like to make your move?',
+    options: ['Ready now', 'Within 3–6 months', 'Within a year', 'Just exploring'],
+  },
+  {
+    key: 'flexibility',
+    q: 'Would you consider a residence still under construction?',
+    options: ['Completed homes only', 'Happy to watch it finish', 'Open to either'],
+  },
+  {
+    key: 'bedrooms',
+    q: 'How many bedrooms does your household need?',
+    options: ['Four', 'Five', 'Six or more', 'Flexible'],
+  },
+  {
+    key: 'budget',
+    q: 'Which range best matches your budget?',
+    options: ['$2–3 million', '$3–4 million', 'Above $4 million', 'Prefer to discuss'],
+  },
+  {
+    key: 'area',
+    q: 'Which pocket of Brisbane calls to you?',
+    options: ['Inner-East — Coorparoo, Camp Hill', 'North — Ascot, Hendra', 'South — Holland Park', 'Open to suggestions'],
+  },
+];
+---
+<Base
+  title="Find Your Residence | Sabdia Constructions"
+  description="Answer five short questions and we'll match you with the Sabdia residence that fits your timeline, household, and preferred pocket of Brisbane."
+>
+  <!-- PAGE HEADER -->
+  <section style="padding:clamp(130px,18vw,180px) clamp(22px,5vw,80px) clamp(40px,5vw,64px);background:var(--bg2);border-bottom:1px solid var(--border)">
+    <div class="inner-md" style="text-align:center">
+      <div class="slabel reveal" style="justify-content:center">A Guided Beginning</div>
+      <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(40px,7vw,84px);font-weight:300;line-height:.95;letter-spacing:-.03em;color:var(--ink)">
+        Find <em style="font-style:italic;color:var(--gold)">your</em> residence.
+      </h1>
+      <p class="reveal d2" style="font-family:'EB Garamond',Georgia,serif;font-size:15.5px;font-weight:300;line-height:1.85;color:var(--ink3);max-width:480px;margin:20px auto 0">
+        Five short questions — and we'll introduce you to the homes that fit.
+        Prefer the classic route? <a href="/contact/" style="color:var(--gold);border-bottom:1px solid rgba(158,139,106,.4)">Our enquiry form is here</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- WIZARD -->
+  <section class="sp-sm" style="min-height:60vh">
+    <div class="inner-md">
+      <!-- progress -->
+      <div class="fyh-progress" data-fyh-progress aria-hidden="true">
+        {steps.map((_, i) => <span class={`fyh-tick${i === 0 ? ' on' : ''}`}></span>)}
+        <span class="fyh-tick"></span>
+      </div>
+
+      <form class="cform" id="cform" name="guided-match" method="POST" action="/api/contact" data-fyh>
+        <input type="hidden" name="form-name" value="guided-match">
+        <input type="hidden" name="enquiry-type" value="Guided Match">
+        <input type="hidden" name="message" data-fyh-message value="">
+        <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+
+        {steps.map((s, i) => (
+          <fieldset class={`fyh-step${i === 0 ? ' on' : ''}`} data-fyh-step={s.key}>
+            <legend class="fyh-q">{s.q}</legend>
+            <div class="fyh-opts">
+              {s.options.map((o) => (
+                <button type="button" class="fyh-opt" data-fyh-answer={o}>{o}</button>
+              ))}
+            </div>
+          </fieldset>
+        ))}
+
+        <!-- RESULTS + DETAILS -->
+        <div class="fyh-step" data-fyh-results>
+          <div class="fyh-q" data-fyh-results-heading>Residences that fit.</div>
+          <p class="fyh-note" data-fyh-results-note></p>
+          <div class="fyh-matches" data-fyh-matches>
+            {forSale.map((p) => (
+              <div
+                data-fyh-card
+                data-beds={p.data.beds}
+                data-area={AREA[p.data.suburb] ?? 'other'}
+              >
+                <PropertyCard
+                  entry={p}
+                  style="aspect-ratio:16/10"
+                  imgW={800}
+                  imgH={500}
+                  specs={[`${p.data.beds} Bed`, `${p.data.baths} Bath`, landLabel(p.data.land, p.data.landOver)]}
+                  sep="dot"
+                />
+              </div>
+            ))}
+          </div>
+
+          <div class="fyh-details">
+            <div class="fyh-q" style="font-size:clamp(20px,2.6vw,30px)">Where shall we send your matches?</div>
+            <div class="frow">
+              <div class="fg"><label class="fl" for="fyh-first">First Name*</label><input type="text" id="fyh-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+              <div class="fg"><label class="fl" for="fyh-last">Last Name*</label><input type="text" id="fyh-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+            </div>
+            <div class="frow">
+              <div class="fg"><label class="fl" for="fyh-email">Email*</label><input type="email" id="fyh-email" name="email" class="fi" placeholder="Email address" autocomplete="email" required></div>
+              <div class="fg"><label class="fl" for="fyh-phone">Phone</label><input type="tel" id="fyh-phone" name="phone" class="fi" placeholder="Phone number" autocomplete="tel"></div>
+            </div>
+            <div class="fg"><label class="fl" for="fyh-notes">Anything else we should know?</label><textarea class="fta" id="fyh-notes" name="notes" placeholder="Land you already own, must-haves, questions…" style="min-height:88px"></textarea></div>
+            <button type="submit" class="fsub" id="fsub">Send My Matches &rarr;</button>
+            <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+            <p class="form-note">One of our team will be in touch within one business day.</p>
+          </div>
+        </div>
+
+        <button type="button" class="fyh-back" data-fyh-back style="display:none">&larr; Back</button>
+      </form>
+    </div>
+  </section>
+
+  <style is:inline>
+    .fyh-progress{display:flex;gap:10px;justify-content:center;margin-bottom:clamp(32px,5vw,56px)}
+    .fyh-tick{width:26px;height:1.5px;background:var(--border);transition:background .4s}
+    .fyh-tick.on{background:var(--gold)}
+    .fyh-step{display:none;border:none;opacity:0;transform:translateY(14px)}
+    .fyh-step.on{display:block;animation:fyhIn .55s var(--ease) forwards}
+    @keyframes fyhIn{to{opacity:1;transform:translateY(0)}}
+    .fyh-q{font-family:var(--font-d);font-size:clamp(24px,3.4vw,40px);font-weight:300;color:var(--ink);letter-spacing:-.015em;text-align:center;margin-bottom:clamp(24px,4vw,40px);width:100%}
+    .fyh-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;max-width:760px;margin:0 auto}
+    .fyh-opt{font-family:var(--font-u);font-size:11px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);background:var(--white);border:1px solid var(--border);padding:22px 18px;cursor:none;transition:border-color .3s,color .3s,transform .25s var(--ease)}
+    .fyh-opt:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+    .fyh-note{font-family:'EB Garamond',Georgia,serif;font-size:15px;font-style:italic;color:var(--ink3);text-align:center;margin:-14px 0 26px}
+    .fyh-matches{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:clamp(32px,5vw,52px)}
+    .fyh-matches [data-fyh-card]{display:none}
+    .fyh-matches [data-fyh-card].show{display:block}
+    .fyh-details{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+    .fyh-back{margin:34px auto 0;display:flex;background:none;border:none;font-family:var(--font-u);font-size:9.5px;font-weight:300;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe-d);cursor:none;transition:color .3s;padding:6px}
+    .fyh-back:hover{color:var(--ink)}
+    @media(max-width:760px){.fyh-matches{grid-template-columns:1fr}.fyh-opts{grid-template-columns:1fr}}
+    @media(prefers-reduced-motion:reduce){.fyh-step.on{animation:none;opacity:1;transform:none}}
+  </style>
+
+  <script is:inline>
+  (function () {
+    var form = document.querySelector('[data-fyh]');
+    if (!form) return;
+    var steps = [].slice.call(form.querySelectorAll('.fyh-step'));
+    var ticks = [].slice.call(document.querySelectorAll('.fyh-tick'));
+    var back = form.querySelector('[data-fyh-back]');
+    var msgField = form.querySelector('[data-fyh-message]');
+    var answers = {};
+    var idx = 0;
+
+    function show(i) {
+      idx = i;
+      steps.forEach(function (s, k) { s.classList.toggle('on', k === i); });
+      ticks.forEach(function (t, k) { t.classList.toggle('on', k <= i); });
+      back.style.display = i > 0 ? 'flex' : 'none';
+      window.scrollTo({ top: form.getBoundingClientRect().top + window.scrollY - 140, behavior: 'smooth' });
+      if (steps[i].hasAttribute('data-fyh-results')) buildResults();
+    }
+
+    steps.forEach(function (step, i) {
+      [].slice.call(step.querySelectorAll('[data-fyh-answer]')).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          answers[step.dataset.fyhStep] = btn.dataset.fyhAnswer;
+          show(i + 1);
+        });
+      });
+    });
+    back.addEventListener('click', function () { show(Math.max(0, idx - 1)); });
+
+    function buildResults() {
+      var cards = [].slice.call(form.querySelectorAll('[data-fyh-card]'));
+      var note = form.querySelector('[data-fyh-results-note]');
+      var heading = form.querySelector('[data-fyh-results-heading]');
+      var minBeds = { Four: 4, Five: 5, 'Six or more': 6 }[answers.bedrooms] || 0;
+      var area = { 'Inner-East — Coorparoo, Camp Hill': 'inner-east', 'North — Ascot, Hendra': 'north', 'South — Holland Park': 'south' }[answers.area] || null;
+
+      var matched = cards.filter(function (c) {
+        if (minBeds && Number(c.dataset.beds) < minBeds) return false;
+        if (area && c.dataset.area !== area) return false;
+        return true;
+      });
+
+      var showing = matched.length ? matched : cards;
+      cards.forEach(function (c) { c.classList.toggle('show', showing.indexOf(c) !== -1); });
+
+      if (matched.length) {
+        heading.textContent = matched.length === 1 ? 'One residence fits beautifully.' : 'Residences that fit.';
+        note.textContent = 'Matched to your bedrooms and preferred pocket of Brisbane.';
+      } else {
+        heading.textContent = 'Nothing exact — yet.';
+        note.textContent = 'None of our current releases match every answer, but new residences are always in design. Here is the full current collection — and we’ll flag upcoming releases that fit.';
+      }
+
+      // serialise the questionnaire into the lead message
+      msgField.value =
+        'Guided match enquiry\n' +
+        'Timeline: ' + (answers.timeline || '-') + '\n' +
+        'Construction flexibility: ' + (answers.flexibility || '-') + '\n' +
+        'Bedrooms: ' + (answers.bedrooms || '-') + '\n' +
+        'Budget: ' + (answers.budget || '-') + '\n' +
+        'Preferred area: ' + (answers.area || '-') + '\n' +
+        'Matches shown: ' + (matched.length || 'none (full collection shown)');
+    }
+
+    // fold the free-text notes into the message on submit
+    form.addEventListener('submit', function () {
+      var notes = form.querySelector('#fyh-notes');
+      if (notes && notes.value.trim()) msgField.value += '\nNotes: ' + notes.value.trim();
+    });
+  })();
+  </script>
+</Base>
