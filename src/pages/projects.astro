@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import JourneySlider from '../components/JourneySlider.astro';
 import { wixResize, landLabel } from '../lib/wix.js';
 import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
@@ -12,6 +13,57 @@ const forSale = all.filter((p) => p.data.status === 'for-sale');
 const sold = all.filter((p) => p.data.status === 'sold');
 
 const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`, landLabel(d.land, d.landOver)].join(' · ');
+
+/* ── CONSTRUCTION JOURNEY DATA ──────────────────────────────────────────
+   Two sample projects for the JourneySlider. The stage `image` values are
+   PLACEHOLDERS — they currently reuse finished-home photography from the
+   property galleries. To go live with real journeys:
+     1. Replace each stage's `image` with an actual progress photo
+        (same camera position per stage reads like a time-lapse).
+     2. Rewrite the captions to describe what actually happened on site.
+     3. `forSale: true` switches on the finale gallery + listing CTA;
+        use `forSale: false` for past-build showcases.
+   Long-term these belong in Supabase alongside the property rows —
+   say the word and the schema/admin form can be added. */
+const bySlug = Object.fromEntries(all.map((e) => [e.id, e]));
+const journeyStage = (slug, gi, w = 1600, h = 1000) => {
+  const e = bySlug[slug];
+  const g = e?.data.gallery?.[gi];
+  return g ? g.src : wixResize(e.data.image, { w, h, focus: e.data.focus });
+};
+
+const journeys = [
+  {
+    // FOR-SALE example — full journey ending in the listing finale.
+    name: 'QASR',
+    suburb: 'Coorparoo',
+    forSale: true,
+    listingHref: '/properties/qasr/',
+    gallery: bySlug.qasr?.data.gallery ?? [],
+    stages: [
+      { label: 'Site & Foundation', caption: 'Placeholder — swap for the real site photo: engineering the Coorparoo ridgeline.', image: journeyStage('qasr', 3) },
+      { label: 'Frame',             caption: 'Placeholder — the structural skeleton takes shape.', image: journeyStage('qasr', 1) },
+      { label: 'Lock-up',           caption: 'Placeholder — arched fenestration sets the facade rhythm.', image: journeyStage('qasr', 2) },
+      { label: 'Fit-out',           caption: 'Placeholder — travertine, brass and European oak move in.', image: journeyStage('qasr', 4) },
+      { label: 'Completed',         caption: 'A Mediterranean-inspired landmark, ready for its first owners.', image: journeyStage('qasr', 0) },
+    ],
+  },
+  {
+    // PAST-BUILD example — showcase mode, no finale panel.
+    name: 'CAPRI',
+    suburb: 'Hendra',
+    forSale: false,
+    listingHref: '/properties/capri/',
+    gallery: [],
+    stages: [
+      { label: 'Site & Foundation', caption: 'Placeholder — swap for the real excavation and slab photo.', image: journeyStage('capri', 3) },
+      { label: 'Frame',             caption: 'Placeholder — double-height voids defined in steel and timber.', image: journeyStage('capri', 1) },
+      { label: 'Lock-up',           caption: 'Placeholder — the sculpted facade closes to the weather.', image: journeyStage('capri', 2) },
+      { label: 'Fit-out',           caption: 'Placeholder — interiors layered in stone and warm oak.', image: journeyStage('capri', 4) },
+      { label: 'Completed',         caption: 'Sold prior to completion — a Hendra residence delivered in full.', image: journeyStage('capri', 0) },
+    ],
+  },
+];
 ---
 <Base
   title="Projects | Sabdia Constructions"
@@ -83,6 +135,21 @@ const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`
           </a>
         ))}
       </div>
+    </div>
+  </section>
+
+  <!-- CONSTRUCTION JOURNEY -->
+  <section class="sp" id="journey" style="border-top:1px solid var(--border)">
+    <div class="inner">
+      <div class="slabel reveal">The Journey</div>
+      <h2 class="about-h reveal d1" style="margin-bottom:8px">Watch a residence <em>take shape</em>.</h2>
+      <p class="reveal d2" style="font-size:15px;font-weight:300;line-height:1.85;color:var(--ink3);max-width:520px;font-family:'EB Garamond',Georgia,serif">
+        Every Sabdia home passes through five acts — drag the timeline to move through a build,
+        or skip straight to the finished residence.
+      </p>
+      {journeys.map((j) => (
+        <JourneySlider project={j} />
+      ))}
     </div>
   </section>
 

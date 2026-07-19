@@ -1,0 +1,271 @@
+---
+/**
+ * JourneySlider — "construction journey" timeline for one project.
+ *
+ * Walks a visitor through the stages of a build (Site → Frame → Lock-up →
+ * Fit-out → Completed) with a draggable handle, clickable stage markers,
+ * swipe on mobile, and a cross-fading stage image.
+ *
+ * PROPS (see projects.astro for two worked examples):
+ *   project = {
+ *     name:        "QASR",
+ *     suburb:      "Coorparoo",
+ *     forSale:     true,            // toggles the for-sale finale below
+ *     listingHref: "/properties/qasr/",   // used by the finale CTA
+ *     stages: [                     // 3–6 stages, in build order.
+ *       { label: "Site & Foundation", caption: "…", image: "https://…" },
+ *       …                           // LAST stage is always "Completed".
+ *     ],
+ *     gallery: [ { src: "https://…", alt: "…" }, … ]  // for-sale finale only
+ *   }
+ *
+ * SWAPPING IN REAL PHOTOS: replace each stage's `image` with a real progress
+ * photo (ideally the same camera position each visit — the cross-fade then
+ * reads as time-lapse). 1600×1000px landscape works best; anything with the
+ * same aspect ratio will cover cleanly.
+ *
+ * TRADE-OFFS / NOTES
+ * - All stage images are stacked and lazy-loaded; nothing downloads until the
+ *   slider approaches the viewport, then N images load (~40–80KB each as
+ *   AVIF via the Wix CDN). With 5 stages that's ≈300KB per slider — fine on
+ *   4G, and the finale gallery only loads for for-sale projects.
+ * - No-JS / crawler fallback: the COMPLETED stage is visible by default in
+ *   the markup; JS rewinds to stage 1 on init. Buyers with JS get the skip
+ *   button; buyers without JS simply see the finished home.
+ * - prefers-reduced-motion: cross-fades and handle easing become instant.
+ */
+const { project } = Astro.props;
+const p = project;
+const n = p.stages.length;
+const last = n - 1;
+const pct = (i) => (i / last) * 100;
+---
+<section class={`jour${p.forSale ? ' jour-sale' : ''}`} data-jour aria-label={`${p.name} construction journey`}>
+  <div class="jour-head">
+    <div>
+      <div class="jour-kicker">{p.suburb} — {p.forSale ? 'For Sale' : 'Completed'}</div>
+      <h3 class="jour-name">{p.name}</h3>
+    </div>
+    <button type="button" class="jour-skip" data-jour-skip>Skip to finished home &rarr;</button>
+  </div>
+
+  <!-- Stage viewport: images stacked, cross-fade via .on -->
+  <div class="jour-stage" data-jour-stage>
+    {p.stages.map((s, i) => (
+      <img
+        src={s.image}
+        alt={`${p.name} — ${s.label}`}
+        class={i === last ? 'on' : ''}
+        data-caption={s.caption}
+        loading="lazy"
+        decoding="async"
+      />
+    ))}
+    <div class="jour-cap-band">
+      <span class="jour-cap-label" data-jour-label>{p.stages[last].label}</span>
+      <span class="jour-cap-text" data-jour-caption>{p.stages[last].caption}</span>
+    </div>
+  </div>
+
+  <!-- Timeline: track + fill + markers + draggable handle -->
+  <div class="jour-line" data-jour-line>
+    <div class="jour-track"></div>
+    <div class="jour-fill" data-jour-fill style={`transform:scaleX(1)`}></div>
+    {p.stages.map((s, i) => (
+      <button
+        type="button"
+        class={`jour-mark${i === last ? ' on' : ''}`}
+        style={`left:${pct(i)}%`}
+        data-jour-mark={i}
+        aria-label={`Stage ${i + 1}: ${s.label}`}
+      >
+        <span class="jour-mark-dot"></span>
+        <span class="jour-mark-label">{s.label}</span>
+      </button>
+    ))}
+    <div
+      class="jour-handle"
+      data-jour-handle
+      style={`left:${pct(last)}%`}
+      role="slider"
+      tabindex="0"
+      aria-valuemin="0"
+      aria-valuemax={last}
+      aria-valuenow={last}
+      aria-valuetext={p.stages[last].label}
+      aria-label={`${p.name} build stage`}
+    ></div>
+  </div>
+
+  {p.forSale && (
+    <!-- FOR-SALE FINALE — expands when the Completed stage is active -->
+    <div class="jour-final" data-jour-final>
+      <div class="jour-final-inner">
+        <div class="jour-final-head">
+          <div class="jour-final-h">The finished home<em>.</em></div>
+          <div class="jour-final-ctas">
+            <a href={p.listingHref} class="btn-p">View Listing &rarr;</a>
+            <a href={`${p.listingHref}#cform`} class="btn-g">Enquire</a>
+          </div>
+        </div>
+        <div class="jour-final-grid">
+          {p.gallery.slice(0, 4).map((g, i) => (
+            <a href={p.listingHref} class={`jour-final-cell c${i}`}>
+              <img src={g.src} alt={g.alt} loading="lazy" decoding="async" />
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  )}
+</section>
+
+<style>
+  .jour{max-width:1400px;margin:0 auto;padding:clamp(36px,5vw,64px) 0}
+  .jour + .jour{border-top:1px solid var(--border)}
+  .jour-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:22px}
+  .jour-kicker{font-size:9px;font-weight:400;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+  .jour-name{font-family:var(--font-d);font-size:clamp(30px,4vw,52px);font-weight:300;line-height:1;letter-spacing:-.02em;color:var(--ink)}
+  .jour-skip{font-family:var(--font-u);font-size:9.5px;font-weight:300;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);background:none;border:none;border-bottom:1px solid rgba(158,139,106,.4);padding:0 0 4px;cursor:none;transition:color .3s,border-color .3s}
+  .jour-skip:hover{color:var(--ink);border-color:var(--ink)}
+
+  /* stage viewport */
+  .jour-stage{position:relative;aspect-ratio:16/9;max-height:620px;overflow:hidden;background:var(--bg3);touch-action:pan-y}
+  .jour-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .8s ease;filter:saturate(.9)}
+  .jour-stage img.on{opacity:1}
+  .jour-cap-band{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;padding:26px clamp(20px,3vw,40px) 20px;background:linear-gradient(transparent,rgba(14,13,11,.82));z-index:2}
+  .jour-cap-label{font-family:var(--font-u);font-size:10px;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--gold2);white-space:nowrap}
+  .jour-cap-text{font-family:'EB Garamond',Georgia,serif;font-size:15px;font-weight:300;font-style:italic;color:rgba(253,252,248,.85);letter-spacing:.01em}
+
+  /* timeline */
+  .jour-line{position:relative;height:64px;margin:26px 10px 0}
+  .jour-track{position:absolute;top:12px;left:0;right:0;height:1px;background:var(--border)}
+  .jour-fill{position:absolute;top:12px;left:0;right:0;height:1.5px;background:linear-gradient(90deg,var(--gold),var(--gold2));transform-origin:left;transition:transform .45s var(--ease)}
+  .jour-mark{position:absolute;top:0;transform:translateX(-50%);background:none;border:none;cursor:none;padding:6px 8px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .jour-mark-dot{width:7px;height:7px;transform:rotate(45deg);background:var(--bg);border:1px solid var(--taupe);transition:background .3s,border-color .3s}
+  .jour-mark.on .jour-mark-dot,.jour-mark.done .jour-mark-dot{background:var(--gold);border-color:var(--gold)}
+  .jour-mark-label{font-family:var(--font-u);font-size:8.5px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:var(--taupe-d);white-space:nowrap;transition:color .3s}
+  .jour-mark.on .jour-mark-label{color:var(--ink)}
+  .jour-handle{position:absolute;top:12px;width:26px;height:26px;transform:translate(-50%,-50%);border-radius:50%;background:var(--bg);border:1px solid var(--gold);box-shadow:0 4px 14px rgba(14,13,11,.14);cursor:none;transition:left .45s var(--ease);z-index:3}
+  .jour-handle::after{content:'';position:absolute;inset:8px;border-radius:50%;background:var(--gold)}
+  .jour-handle.dragging{transition:none}
+  .jour-handle:focus-visible{outline:1.5px solid var(--gold);outline-offset:4px}
+
+  /* for-sale finale */
+  .jour-final{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .7s var(--ease),opacity .5s ease .1s;pointer-events:none}
+  .jour-final.open{grid-template-rows:1fr;opacity:1;pointer-events:auto}
+  .jour-final-inner{overflow:hidden}
+  .jour-final-head{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:34px 0 22px}
+  .jour-final-h{font-family:var(--font-d);font-size:clamp(22px,2.6vw,34px);font-weight:300;color:var(--ink)}
+  .jour-final-h em{font-style:italic;color:var(--gold)}
+  .jour-final-ctas{display:flex;gap:12px;flex-wrap:wrap}
+  .jour-final-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
+  .jour-final-cell{overflow:hidden;aspect-ratio:4/3;display:block;cursor:none}
+  .jour-final-cell.c0{grid-row:span 2;aspect-ratio:auto}
+  .jour-final-cell img{width:100%;height:100%;object-fit:cover;filter:saturate(.9);transition:transform .8s var(--ease),filter .5s}
+  .jour-final-cell:hover img{transform:scale(1.04);filter:saturate(1)}
+
+  @media(max-width:700px){
+    .jour-mark-label{display:none}
+    .jour-mark.on .jour-mark-label{display:block;position:absolute;top:34px}
+    .jour-line{height:56px}
+    .jour-cap-text{font-size:13.5px}
+    .jour-final-grid{grid-template-columns:1fr 1fr}
+    .jour-final-cell.c0{grid-column:span 2;grid-row:auto}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .jour-stage img,.jour-fill,.jour-handle,.jour-final{transition:none}
+  }
+</style>
+
+<script>
+  // Runs once, wires every [data-jour] on the page (script is hoisted &
+  // deduplicated by Astro, so multiple sliders share this one module).
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll('[data-jour]').forEach((root) => {
+    const imgs = [...root.querySelectorAll('.jour-stage img')];
+    const marks = [...root.querySelectorAll('[data-jour-mark]')];
+    const handle = root.querySelector('[data-jour-handle]');
+    const fill = root.querySelector('[data-jour-fill]');
+    const line = root.querySelector('[data-jour-line]');
+    const stageEl = root.querySelector('[data-jour-stage]');
+    const labelEl = root.querySelector('[data-jour-label]');
+    const capEl = root.querySelector('[data-jour-caption]');
+    const skip = root.querySelector('[data-jour-skip]');
+    const finale = root.querySelector('[data-jour-final]');
+    const n = imgs.length;
+    const last = n - 1;
+    let cur = last; // markup default = completed (no-JS fallback)
+
+    const setStage = (i) => {
+      i = Math.max(0, Math.min(last, i));
+      cur = i;
+      imgs.forEach((im, k) => im.classList.toggle('on', k === i));
+      marks.forEach((m, k) => {
+        m.classList.toggle('on', k === i);
+        m.classList.toggle('done', k < i);
+      });
+      handle.style.left = (i / last) * 100 + '%';
+      handle.setAttribute('aria-valuenow', i);
+      handle.setAttribute('aria-valuetext', marks[i].querySelector('.jour-mark-label').textContent);
+      fill.style.transform = `scaleX(${i / last})`;
+      labelEl.textContent = marks[i].querySelector('.jour-mark-label').textContent;
+      capEl.textContent = imgs[i].dataset.caption || '';
+      if (finale) finale.classList.toggle('open', i === last);
+    };
+
+    marks.forEach((m) => m.addEventListener('click', () => setStage(+m.dataset.jourMark)));
+    if (skip) skip.addEventListener('click', () => setStage(last));
+
+    // drag on the timeline (pointer events cover mouse + touch)
+    const frac = (x) => {
+      const r = line.getBoundingClientRect();
+      return Math.max(0, Math.min(1, (x - r.left) / r.width));
+    };
+    let dragging = false;
+    line.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      handle.classList.add('dragging');
+      line.setPointerCapture(e.pointerId);
+      setStage(Math.round(frac(e.clientX) * last));
+    });
+    line.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const f = frac(e.clientX);
+      const near = Math.round(f * last);
+      if (near !== cur) setStage(near);
+      handle.style.left = f * 100 + '%'; // handle tracks the pointer while dragging
+    });
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      handle.classList.remove('dragging');
+      setStage(cur); // snap handle to the resolved stage
+    };
+    line.addEventListener('pointerup', endDrag);
+    line.addEventListener('pointercancel', endDrag);
+
+    // keyboard on the handle
+    handle.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); setStage(cur + 1); }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); setStage(cur - 1); }
+      if (e.key === 'Home') { e.preventDefault(); setStage(0); }
+      if (e.key === 'End') { e.preventDefault(); setStage(last); }
+    });
+
+    // horizontal swipe on the image (vertical scroll stays native)
+    let sx = null, sy = null;
+    stageEl.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; });
+    stageEl.addEventListener('pointerup', (e) => {
+      if (sx === null) return;
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.4) setStage(cur + (dx < 0 ? 1 : -1));
+      sx = sy = null;
+    });
+
+    // start of the journey (instant when reduced motion)
+    if (reduce) imgs.forEach((im) => (im.style.transition = 'none'));
+    setStage(0);
+  });
+</script>
