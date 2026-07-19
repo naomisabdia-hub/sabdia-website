@@ -98,21 +98,22 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
       <div>
         <form class="cform reveal d1" id="cform" name="agent-application" method="POST" action="/api/contact">
           <input type="hidden" name="form-name" value="agent-application">
-          <p class="hidden" style="display:none"><label>Don't fill this out: <input name="bot-field"></label></p>
+          <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
           <div class="frow">
-            <div class="fg"><label class="fl">First Name*</label><input type="text" name="first-name" class="fi" placeholder="First name" required></div>
-            <div class="fg"><label class="fl">Last Name*</label><input type="text" name="last-name" class="fi" placeholder="Last name" required></div>
+            <div class="fg"><label class="fl" for="aa-first">First Name*</label><input type="text" id="aa-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+            <div class="fg"><label class="fl" for="aa-last">Last Name*</label><input type="text" id="aa-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
           </div>
-          <div class="fg"><label class="fl">Agency / Company*</label><input type="text" name="agency" class="fi" placeholder="Agency or company name" required></div>
-          <div class="fg"><label class="fl">Email Address*</label><input type="email" name="email" class="fi" placeholder="your@email.com" required></div>
-          <div class="fg"><label class="fl">Phone Number*</label><input type="tel" name="phone" class="fi" placeholder="+61 4xx xxx xxx" required></div>
-          <div class="fg"><label class="fl">Real Estate Licence No.*</label><input type="text" name="licence-number" class="fi" placeholder="Your licence number" required></div>
+          <div class="fg"><label class="fl" for="aa-agency">Agency / Company*</label><input type="text" id="aa-agency" name="agency" class="fi" placeholder="Agency or company name" autocomplete="organization" required></div>
+          <div class="fg"><label class="fl" for="aa-email">Email Address*</label><input type="email" id="aa-email" name="email" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
+          <div class="fg"><label class="fl" for="aa-phone">Phone Number*</label><input type="tel" id="aa-phone" name="phone" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel" required></div>
+          <div class="fg"><label class="fl" for="aa-licence">Real Estate Licence No.*</label><input type="text" id="aa-licence" name="licence-number" class="fi" placeholder="Your licence number" autocomplete="off" required></div>
           <div class="fg">
-            <label class="fl">Primary Suburb Markets</label>
-            <input type="text" name="suburb-markets" class="fi" placeholder="e.g. Coorparoo, Camp Hill, New Farm…">
+            <label class="fl" for="aa-suburbs">Primary Suburb Markets</label>
+            <input type="text" id="aa-suburbs" name="suburb-markets" class="fi" placeholder="e.g. Coorparoo, Camp Hill, New Farm…">
           </div>
-          <div class="fg"><label class="fl">Additional Information</label><textarea class="fta" name="message" placeholder="Tell us about your client base, experience with luxury property, or any other relevant information…"></textarea></div>
+          <div class="fg"><label class="fl" for="aa-message">Additional Information</label><textarea class="fta" id="aa-message" name="message" placeholder="Tell us about your client base, experience with luxury property, or any other relevant information…"></textarea></div>
           <button type="submit" class="fsub" id="fsub">{page.apply.submitLabel} &rarr;</button>
+          <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
         </form>
       </div>
     </div>

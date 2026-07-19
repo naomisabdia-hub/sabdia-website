@@ -64,27 +64,28 @@ const socials = settings.socials;
         <div class="slabel reveal">{page.form.label}</div>
         <form class="cform reveal d1" id="cform" style="margin-top:12px" name="contact" method="POST" action="/api/contact">
           <input type="hidden" name="form-name" value="contact">
-          <p class="hidden" style="display:none"><label>Don't fill this out: <input name="bot-field"></label></p>
+          <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
           <div class="frow">
-            <div class="fg"><label class="fl">First Name*</label><input type="text" name="first-name" class="fi" placeholder="First name" required></div>
-            <div class="fg"><label class="fl">Last Name*</label><input type="text" name="last-name" class="fi" placeholder="Last name" required></div>
+            <div class="fg"><label class="fl" for="cf-first">First Name*</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+            <div class="fg"><label class="fl" for="cf-last">Last Name*</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
           </div>
-          <div class="fg"><label class="fl">Email Address*</label><input type="email" name="email" class="fi" placeholder="your@email.com" required></div>
-          <div class="fg"><label class="fl">Phone Number</label><input type="tel" name="phone" class="fi" placeholder="+61 4xx xxx xxx"></div>
+          <div class="fg"><label class="fl" for="cf-email">Email Address*</label><input type="email" id="cf-email" name="email" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
+          <div class="fg"><label class="fl" for="cf-phone">Phone Number</label><input type="tel" id="cf-phone" name="phone" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
           <div class="fg">
-            <label class="fl">How can we help?*</label>
-            <select class="fsel" name="enquiry-type" required>
+            <label class="fl" for="cf-interest">How can we help?*</label>
+            <select class="fsel" id="cf-interest" name="enquiry-type" required>
               <option value="">Select an enquiry type…</option>
               <option>For Sale — Current Properties</option>
               {forSale.map((p) => <option>{p.data.name} — {p.data.suburb}</option>)}
               {page.form.interests.map((opt) => <option>{opt}</option>)}
             </select>
           </div>
-          <div class="fg"><label class="fl">Your Message*</label><textarea class="fta" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
+          <div class="fg"><label class="fl" for="cf-message">Your Message*</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
             <button type="submit" class="fsub" id="fsub">{page.form.submitLabel} &rarr;</button>
             <p class="form-note" style="margin:0">{page.form.note}</p>
           </div>
+          <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
         </form>
       </div>
     </div>

@@ -12,6 +12,7 @@ interface Props {
 }
 
 const { title, description, ogTitle, ogDescription, ogImage, preloadImage } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -21,6 +22,8 @@ const { title, description, ogTitle, ogDescription, ogImage, preloadImage } = As
 <meta name="theme-color" content="#0E0D0B">
 <title>{title}</title>
 <meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<script is:inline>document.documentElement.classList.add('js');</script>
 {ogTitle && <meta property="og:title" content={ogTitle}>}
 {(ogDescription || ogTitle) && <meta property="og:description" content={ogDescription ?? description}>}
 {ogTitle && <meta property="og:type" content="website">}
@@ -35,9 +38,13 @@ const { title, description, ogTitle, ogDescription, ogImage, preloadImage } = As
 </head>
 <body>
 
+<a href="#main" class="skip-link">Skip to content</a>
+
 <Nav />
 
+<main id="main">
 <slot />
+</main>
 
 <Footer />
 <script src="/js/main.js" is:inline></script>

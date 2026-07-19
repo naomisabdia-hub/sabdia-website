@@ -132,13 +132,13 @@ const jsonLd = JSON.stringify({
           <form class="cform" id="cform" name="property-enquiry" method="POST" action="/api/contact">
             <input type="hidden" name="form-name" value="property-enquiry">
             <input type="hidden" name="property" value={d.name}>
-            <p class="hidden" style="display:none"><label>Don't fill this out: <input name="bot-field"></label></p>
+            <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
             <div class="frow">
-              <div class="fg"><label class="fl">First Name*</label><input type="text" name="first-name" class="fi" placeholder="First name" required></div>
-              <div class="fg"><label class="fl">Last Name*</label><input type="text" name="last-name" class="fi" placeholder="Last name" required></div>
+              <div class="fg"><label class="fl" for="pe-first">First Name*</label><input type="text" id="pe-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+              <div class="fg"><label class="fl" for="pe-last">Last Name*</label><input type="text" id="pe-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
             </div>
-            <div class="fg"><label class="fl">Email*</label><input type="email" name="email" class="fi" placeholder="Email address" required></div>
-            <div class="fg"><label class="fl">Phone</label><input type="tel" name="phone" class="fi" placeholder="Phone number"></div>
+            <div class="fg"><label class="fl" for="pe-email">Email*</label><input type="email" id="pe-email" name="email" class="fi" placeholder="Email address" autocomplete="email" required></div>
+            <div class="fg"><label class="fl" for="pe-phone">Phone</label><input type="tel" id="pe-phone" name="phone" class="fi" placeholder="Phone number" autocomplete="tel"></div>
             {!sold && (
               <div class="fg">
                 <label class="fl">Enquiry Type</label>
@@ -153,6 +153,7 @@ const jsonLd = JSON.stringify({
             <div class="fg"><label class="fl">Message</label><textarea class="fta" name="message" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
             <p class="form-note">By submitting this form you agree to our privacy policy. Your details will not be shared with third parties.</p>
             <button type="submit" class="fsub" id="fsub">{d.enquiryButton} &rarr;</button>
+            <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
           </form>
         </div>
         <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">

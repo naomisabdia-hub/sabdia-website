@@ -7,7 +7,7 @@ const specs = [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`, landLabel
 const loc = (showSuburb ? [`${d.suburb}, QLD`] : []).concat(specs).join(' · ');
 ---
 <a href={`/properties/${entry.id}/`} class={`sc-card ${cls}`}>
-  <img src={wixResize(d.image, { w: imgW, h: imgH, focus: d.focus, q: 85 })} alt={d.name} loading="lazy">
+  <img src={wixResize(d.image, { w: imgW, h: imgH, focus: d.focus, q: 85 })} alt={d.name} loading="lazy" decoding="async" width={imgW} height={imgH}>
   <div class="sc-ov"></div>
   <div class="sc-badge">Sold Prior to Completion</div>
   <div class="sc-info">

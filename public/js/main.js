@@ -108,14 +108,26 @@ if (slides.length > 1) {
     slides[si].classList.remove('active');
     si = (i + total) % total;
     slides[si].classList.add('active');
+    // restart the Ken Burns drift from scale(1) for the incoming slide
+    const img = slides[si].querySelector('img');
+    if (img && !reduceMotion) {
+      img.style.animation = 'none';
+      void img.offsetWidth;
+      img.style.animation = '';
+    }
     update();
   };
   update();
-  if (!reduceMotion) setInterval(() => goTo(si + 1), 6200);
+  let auto;
+  if (!reduceMotion) auto = setInterval(() => goTo(si + 1), 6200);
+  hDots.forEach((d, i) => d.addEventListener('click', () => {
+    if (auto) { clearInterval(auto); auto = null; }
+    goTo(i);
+  }));
 }
 
 // ── REVEAL ON SCROLL ────────────────────────────────────────
-if (!reduceMotion) {
+if (!reduceMotion && 'IntersectionObserver' in window) {
   const revealObs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); revealObs.unobserve(e.target); } });
   }, { threshold: 0.08, rootMargin: '0px 0px -52px 0px' });
@@ -125,7 +137,7 @@ if (!reduceMotion) {
 }
 
 // ── COUNTER ANIMATION ───────────────────────────────────────
-if (!reduceMotion) {
+if (!reduceMotion && 'IntersectionObserver' in window) {
   const counterObs = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (!e.isIntersecting) return;
@@ -151,7 +163,7 @@ if (!reduceMotion) {
 
 // ── PROCESS TIMELINE FILL ───────────────────────────────────
 const procTrack = document.querySelector('.proc-track');
-if (procTrack && !reduceMotion) {
+if (procTrack && !reduceMotion && 'IntersectionObserver' in window) {
   const procObs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { procTrack.classList.add('fill'); procObs.unobserve(procTrack); } });
   }, { threshold: 0.3 });
@@ -205,14 +217,87 @@ if (window.matchMedia('(pointer: fine)').matches && !reduceMotion) {
   });
 }
 
+// ── CINEMATIC LAYER ─────────────────────────────────────────
+// Scroll-linked effects: nav progress hairline, testimonial word
+// illumination, and parallax depth on editorial imagery. One rAF
+// loop, transform/color only, skipped under prefers-reduced-motion.
+(() => {
+  const progress = document.getElementById('navProgress');
+
+  // Testimonial: split into word spans; words "light up" as the
+  // quote moves through the viewport. Screen readers get the
+  // original text via aria-label on the blockquote.
+  let twSpans = [], twEl = null, twLit = -1;
+  const quote = document.querySelector('.testi-text');
+  if (quote && !reduceMotion) {
+    const text = quote.textContent.trim();
+    quote.setAttribute('aria-label', text);
+    quote.textContent = '';
+    text.split(/\s+/).forEach((w, i) => {
+      if (i > 0) quote.appendChild(document.createTextNode(' '));
+      const s = document.createElement('span');
+      s.className = 'tw';
+      s.setAttribute('aria-hidden', 'true');
+      s.textContent = w;
+      quote.appendChild(s);
+    });
+    twSpans = [...quote.querySelectorAll('.tw')];
+    twEl = quote;
+  }
+
+  // Parallax: editorial images drift gently against scroll.
+  const plxEls = (reduceMotion || window.innerWidth <= 768) ? [] :
+    [...document.querySelectorAll('.page-hero img, .prop-hero img, .cd-hero img')];
+  plxEls.forEach(el => el.classList.add('plx'));
+
+  if (!progress && !twEl && plxEls.length === 0) return;
+
+  let ticking = false;
+  const frame = () => {
+    ticking = false;
+    const vh = window.innerHeight;
+
+    if (progress) {
+      const max = document.documentElement.scrollHeight - vh;
+      progress.style.transform = `scaleX(${max > 0 ? Math.min(1, window.scrollY / max) : 0})`;
+    }
+
+    if (twEl) {
+      const r = twEl.getBoundingClientRect();
+      if (r.bottom > -100 && r.top < vh + 100) {
+        const p = Math.min(1, Math.max(0, (vh * 0.82 - r.top) / (r.height + vh * 0.3)));
+        const n = Math.round(p * twSpans.length);
+        if (n !== twLit) {
+          twSpans.forEach((s, i) => s.classList.toggle('lit', i < n));
+          twLit = n;
+        }
+      }
+    }
+
+    plxEls.forEach(el => {
+      const box = el.parentElement.getBoundingClientRect();
+      if (box.bottom < 0 || box.top > vh) return;
+      const shift = ((box.top + box.height / 2) - vh / 2) * -0.07;
+      el.style.transform = `translateY(${shift.toFixed(1)}px) scale(1.12)`;
+    });
+  };
+  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  frame();
+})();
+
 // ── CONTACT FORMS — submit to /api/contact via AJAX ─────────
 document.querySelectorAll('form#cform, form.cform').forEach(cform => {
   cform.addEventListener('submit', async e => {
     e.preventDefault();
     const btn = cform.querySelector('#fsub, .fsub');
     if (!btn || btn.disabled) return;
+    const status = cform.querySelector('[data-form-status]');
+    const announce = (msg) => { if (status) status.textContent = msg; };
     btn.textContent = 'Sending…';
     btn.style.background = '#6B6860';
+    announce('Sending your enquiry…');
     try {
       const body = new URLSearchParams(new FormData(cform)).toString();
       const res = await fetch(cform.getAttribute('action') || '/api/contact', {
@@ -224,9 +309,11 @@ document.querySelectorAll('form#cform, form.cform').forEach(cform => {
       btn.textContent = 'Thank you — we\'ll be in touch shortly.';
       btn.style.background = 'var(--ink2)';
       btn.disabled = true;
+      announce('Thank you — your enquiry was sent. We\'ll be in touch shortly.');
     } catch (err) {
       btn.textContent = 'Something went wrong — please try again.';
       btn.style.background = '';
+      announce('Something went wrong sending your enquiry — please try again.');
     }
   });
 });

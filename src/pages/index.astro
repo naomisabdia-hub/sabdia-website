@@ -88,6 +88,7 @@ const jsonLd = JSON.stringify({
             alt={slide.alt}
             loading={i === 0 ? 'eager' : 'lazy'}
             fetchpriority={i === 0 ? 'high' : undefined}
+            decoding={i === 0 ? undefined : 'async'}
           >
         </div>
       ))}
@@ -100,7 +101,8 @@ const jsonLd = JSON.stringify({
         <h1 class="h-title">
           {heroC.words.map((word, i) => (
             <>
-              {i > 0 && <span class="h-title-dot"> · </span>}{word}
+              {i > 0 && <span class="h-title-dot h-w"><span class="h-w-in" style={`--wi:${i * 2 - 1}`}>&nbsp;·&nbsp;</span></span>}
+              <span class="h-w"><span class="h-w-in" style={`--wi:${i * 2}`}>{word}</span></span>
             </>
           ))}
         </h1>
@@ -118,7 +120,7 @@ const jsonLd = JSON.stringify({
         <div class="h-bottom-left">
           <div class="h-dots" id="hDots">
             {heroC.slides.map((_, i) => (
-              <div class={`h-dot${i === 0 ? ' active' : ''}`}></div>
+              <button type="button" class={`h-dot${i === 0 ? ' active' : ''}`} aria-label={`Show slide ${i + 1} of ${heroC.slides.length}`}></button>
             ))}
           </div>
           <p class="h-award"><em>{heroC.award}</em></p>
@@ -154,11 +156,16 @@ const jsonLd = JSON.stringify({
   <!-- MARQUEE -->
   <div class="mq-band">
     <div class="mq-track">
-      {[...marquee.items, ...marquee.items].map((item, i) => (
-        <>
-          {i > 0 && <div class="mq-sep"></div>}
-          <div class="mq-item"><svg width="10" height="10" viewBox="0 0 14 14" fill="#9E8B6A"><polygon points="7,1 8.8,5.6 13.7,5.6 9.9,8.5 11.2,13.4 7,10.5 2.8,13.4 4.1,8.5 0.3,5.6 5.2,5.6"/></svg>{item}</div>
-        </>
+      {[false, true].map((dup) => (
+        <div class="mq-group" aria-hidden={dup ? 'true' : undefined}>
+          {marquee.items.map((item, i) => (
+            <>
+              {i > 0 && <div class="mq-sep"></div>}
+              <div class="mq-item"><svg width="10" height="10" viewBox="0 0 14 14" fill="#9E8B6A" aria-hidden="true"><polygon points="7,1 8.8,5.6 13.7,5.6 9.9,8.5 11.2,13.4 7,10.5 2.8,13.4 4.1,8.5 0.3,5.6 5.2,5.6"/></svg>{item}</div>
+            </>
+          ))}
+          <div class="mq-sep"></div>
+        </div>
       ))}
     </div>
   </div>
@@ -171,7 +178,7 @@ const jsonLd = JSON.stringify({
         <h2 class="about-h reveal d1" set:html={about.headingHtml} />
         <div class="about-img-strip reveal d2">
           {about.images.map((img) => (
-            <img src={img.image} alt={img.alt} loading="lazy">
+            <img src={img.image} alt={img.alt} loading="lazy" decoding="async">
           ))}
         </div>
       </div>
@@ -350,7 +357,7 @@ const jsonLd = JSON.stringify({
   <!-- AGENT ACCESS -->
   <div class="agent-grid" id="agents">
     <div class="agent-vis reveal-x">
-      <img src={agent.image.image} alt={agent.image.alt} loading="lazy">
+      <img src={agent.image.image} alt={agent.image.alt} loading="lazy" decoding="async">
       <div class="agent-frame"></div>
       <div class="agent-badge">{agent.badge}</div>
     </div>
@@ -387,23 +394,24 @@ const jsonLd = JSON.stringify({
       <div>
         <form class="cform reveal d1" id="cform" name="contact" method="POST" action="/api/contact">
           <input type="hidden" name="form-name" value="contact">
-          <p class="hidden" style="display:none"><label>Don't fill this out: <input name="bot-field"></label></p>
+          <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
           <div class="frow">
-            <div class="fg"><label class="fl">First Name*</label><input type="text" name="first-name" class="fi" placeholder="First name" required></div>
-            <div class="fg"><label class="fl">Last Name*</label><input type="text" name="last-name" class="fi" placeholder="Last name" required></div>
+            <div class="fg"><label class="fl" for="cf-first">First Name*</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+            <div class="fg"><label class="fl" for="cf-last">Last Name*</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
           </div>
-          <div class="fg"><label class="fl">Email*</label><input type="email" name="email" class="fi" placeholder="Email address" required></div>
-          <div class="fg"><label class="fl">Phone</label><input type="tel" name="phone" class="fi" placeholder="Phone number"></div>
+          <div class="fg"><label class="fl" for="cf-email">Email*</label><input type="email" id="cf-email" name="email" class="fi" placeholder="Email address" autocomplete="email" required></div>
+          <div class="fg"><label class="fl" for="cf-phone">Phone</label><input type="tel" id="cf-phone" name="phone" class="fi" placeholder="Phone number" autocomplete="tel"></div>
           <div class="fg">
-            <label class="fl">Interest</label>
-            <select class="fsel" name="enquiry-type">
+            <label class="fl" for="cf-interest">Interest</label>
+            <select class="fsel" id="cf-interest" name="enquiry-type">
               {contactC.interests.map((opt) => (
                 <option>{opt}</option>
               ))}
             </select>
           </div>
-          <div class="fg"><label class="fl">Message*</label><textarea class="fta" name="message" placeholder="Tell us about your interest..." required></textarea></div>
+          <div class="fg"><label class="fl" for="cf-message">Message*</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest..." required></textarea></div>
           <button type="submit" class="fsub" id="fsub">Submit &rarr;</button>
+          <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
           <p class="form-note">{contactC.note}</p>
         </form>
       </div>
