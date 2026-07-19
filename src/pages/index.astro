@@ -228,18 +228,6 @@ const jsonLd = JSON.stringify({
     </FilmBand>
   )}
 
-  <!-- KINETIC TYPE BAND -->
-  <div class="kin-band" aria-hidden="true">
-    <div class="kin-track">
-      {[false, true].map((dup) => (
-        <div class="kin-group" aria-hidden={dup ? 'true' : undefined}>
-          <span class="kin-item">{heroC.words.join(' · ')}</span>
-          <span class="kin-item kin-item-fill">Brisbane, Queensland</span>
-        </div>
-      ))}
-    </div>
-  </div>
-
   <!-- PROPERTIES -->
   <section id="properties" style="padding:0 0 clamp(80px,12vw,160px)">
     <div class="inner" style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px) clamp(44px,5vw,60px)">
