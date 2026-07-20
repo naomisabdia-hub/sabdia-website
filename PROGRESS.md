@@ -174,3 +174,21 @@
 - Leads Inbox: new "Guided matches" tab + section; every details field renders on the card
   with a friendly label; CSV export includes details columns; Resend email copies include
   every field too.
+
+## Phase 9+10 — Deployed live + handover (2026-07-21)
+- Vercel envs completed (Supabase set + Clerk, Production AND Preview; CLI prompt bug worked
+  around via the REST API). refine/go-live merged → main (fast-forward), production deployed:
+  **https://sabdia-website.vercel.app** (real domain untouched — still Wix until §9 of handover).
+- Two production-only bugs found by live QA and fixed:
+  1. /api/img 500 — inside a function, request.url carries the SSO-protected unique deployment
+     host, so the self-fetch of local masters got a login page; now fetches via
+     VERCEL_PROJECT_PRODUCTION_URL (same fix in /api/ai image fetch).
+  2. Astro's CSRF checkOrigin 403'd EVERY legitimate form POST in production (origin compared
+     against the internal host) — disabled; endpoints carry their own protections.
+- Live QA: 16/16 pages 200 · 0 wix refs · 79/79 image URLs load · resize endpoint 200 webp ·
+  contact + newsletter submitted FROM the live site and verified in Supabase · favicon · 404.
+- Lighthouse (live, mobile): Home 90/100/100/100; Caspian 86/92/100/100 (CLS 0, TBT 0ms).
+  Quick wins fixed: blockquote aria-label→sr-only copy, footer contrast .42→.64, "Learn More"
+  → "Start a Conversation" (seed + DB).
+- HANDOVER.md written (edit guide, Journal how-to, EDM, leads, restore points, activations,
+  Search Console/GBP, DNS go-live steps, housekeeping). Tagged v4.0-live.
