@@ -24,7 +24,7 @@ async function icon(size, out, pad = 0.18) {
   /* The wordmark is ink-on-transparent; recolour the glyph gold so it
      carries against the dark tile. */
   const glyph = await sharp(trimmed).resize(w, h).png().toBuffer();
-  const mark = await sharp({ create: { width: w, height: h, channels: 4, background: '#C3A96B' } })
+  const mark = await sharp({ create: { width: w, height: h, channels: 4, background: '#C8AF74' } })
     .composite([{ input: glyph, blend: 'dest-in' }])
     .png()
     .toBuffer();
