@@ -99,3 +99,23 @@
 - ShareRow on property pages: Facebook/LinkedIn/X/Email + Copy link (clipboard, no 3rd-party
   scripts). Social profile links verified (footer, contact, mobile menu).
 - Instagram feed embed: deliberately deferred (needs account token) — documented dormant.
+
+## Phase 7 — The Journal (blog in the existing CMS) (2026-07-20)
+- Public pages: /journal/ (lead story + card grid + graceful "first edition coming soon"
+  empty state) and /journal/[slug]/ (hero band, standfirst, editorial body typography,
+  tags, ShareRow, BlogPosting + BreadcrumbList JSON-LD). Styled inside the existing
+  design system; sitemap includes /journal/ + published posts; footer gained "The Journal"
+  (seed + live DB).
+- Data layer src/lib/blog.js: published-only reads, per-post reads, reading time, en-AU
+  dates, and a safe markdown-lite renderer (## / ### / > quote / - lists / bold / italic /
+  links; HTML-escaped first). Degrades to empty if the table is missing — verified.
+- Admin: new /admin/blog editor mirroring the properties pattern exactly (list → friendly
+  labelled form via blogSchema, draft/published badges, preview link, guarded delete,
+  "Insert starter outline" button with the house post structure). Admin nav shows Journal.
+- Supabase: supabase/blog.sql (table + RLS matching existing patterns + audit/updated_at
+  triggers). COULD NOT be applied from this machine: the stored SUPABASE_DB_URL password is
+  stale (pooler auth fails; correct host is aws-1-ap-southeast-2) and the CLI account
+  doesn't own this project → one-paste step for Naomi at Checkpoint 6, then
+  scripts/seed-blog-posts.mjs seeds 2 fact-checked DRAFT entries.
+- BLOG_PLAYBOOK.md: voice, structure, length, formatting cheatsheet, SEO checklist,
+  5 ready-to-write headlines, publishing rhythm.

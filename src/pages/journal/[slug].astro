@@ -1,0 +1,106 @@
+---
+import Base from '../../layouts/Base.astro';
+import ShareRow from '../../components/ShareRow.astro';
+import { getPost, getPosts, readingTime, renderBody, postDate } from '../../lib/blog.js';
+import { imgVariant } from '../../lib/images.js';
+
+const post = await getPost(Astro.params.slug);
+if (!post) {
+  return Astro.rewrite('/404');
+}
+
+const bodyHtml = renderBody(post.body);
+const others = (await getPosts()).filter((p) => p.slug !== post.slug).slice(0, 2);
+
+const base = (Astro.site ?? new URL('https://www.sabdiaconstructions.com.au')).origin;
+const postUrl = `${base}/journal/${post.slug}/`;
+const ogImg = post.og_image || (post.hero_image ? imgVariant(post.hero_image, { w: 1200, h: 630, q: 85 }) : undefined);
+
+const blogLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: post.seo_description || post.excerpt,
+  image: post.hero_image ? new URL(post.hero_image, Astro.site).href : undefined,
+  url: postUrl,
+  datePublished: post.published_at ?? post.created_at,
+  dateModified: post.updated_at,
+  author: { '@type': 'Organization', name: post.author || 'Sabdia Constructions' },
+  publisher: { '@id': `${base}/#org` },
+  mainEntityOfPage: postUrl,
+});
+const breadcrumbLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+    { '@type': 'ListItem', position: 2, name: 'The Journal', item: `${base}/journal/` },
+    { '@type': 'ListItem', position: 3, name: post.title, item: postUrl },
+  ],
+});
+---
+<Base
+  title={post.seo_title || `${post.title} | The Sabdia Journal`}
+  description={post.seo_description || post.excerpt}
+  ogTitle={post.title}
+  ogDescription={post.excerpt}
+  ogImage={ogImg}
+  lightNav={!post.hero_image}
+>
+  <script type="application/ld+json" slot="head" is:inline set:html={blogLd} />
+  <script type="application/ld+json" slot="head" is:inline set:html={breadcrumbLd} />
+
+  {post.hero_image ? (
+    <section class="jn-hero">
+      <img src={imgVariant(post.hero_image, { w: 1920, h: 900, q: 85 })} alt={post.hero_alt || post.title} loading="eager" fetchpriority="high" width="1920" height="900">
+      <div class="jn-hero-ov"></div>
+    </section>
+  ) : (
+    <div style="height:clamp(110px,14vw,150px)"></div>
+  )}
+
+  <article class="jn-article">
+    <div class="jn-article-head">
+      <div class="jn-meta reveal">
+        {post.category && <span class="jn-cat">{post.category}</span>}
+        <span>{postDate(post)}</span>
+        <span>·</span>
+        <span>{readingTime(post.body)}</span>
+      </div>
+      <h1 class="jn-title reveal d1">{post.title}</h1>
+      {post.excerpt && <p class="jn-standfirst reveal d2">{post.excerpt}</p>}
+      <div class="jn-byline reveal d2">By {post.author || 'Sabdia Constructions'}</div>
+    </div>
+
+    <div class="jn-body reveal d2" set:html={bodyHtml} />
+
+    {post.tags?.length > 0 && (
+      <div class="jn-tags">
+        {post.tags.map((t) => <span class="jn-tag">{t}</span>)}
+      </div>
+    )}
+
+    <ShareRow url={postUrl} title={`${post.title} — The Sabdia Journal`} />
+  </article>
+
+  {others.length > 0 && (
+    <section class="sp" style="background:var(--bg2);border-top:1px solid var(--border)">
+      <div class="inner">
+        <div class="slabel reveal">More from the Journal</div>
+        <div class="jn-grid" style="margin-top:28px">
+          {others.map((p) => (
+            <a href={`/journal/${p.slug}/`} class="jn-card reveal d1">
+              {p.hero_image && <img src={imgVariant(p.hero_image, { w: 900, h: 620, q: 84 })} alt={p.hero_alt || p.title} loading="lazy" decoding="async" width="900" height="620">}
+              <div class="jn-meta">
+                {p.category && <span class="jn-cat">{p.category}</span>}
+                <span>{postDate(p)}</span>
+              </div>
+              <h3 class="jn-card-h">{p.title}</h3>
+              <p class="jn-ex">{p.excerpt}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</Base>

@@ -490,6 +490,41 @@ a.cd-v:hover{color:var(--gold)}
 
 /* ── FOOTER ── */
 footer{background:var(--dark);padding-top:0}
+/* ── The Journal (blog) ─────────────────────────────────── */
+.jn-meta{display:flex;align-items:center;gap:10px;font-size:10.5px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:var(--ink3);flex-wrap:wrap}
+.jn-cat{color:var(--ink);border:1px solid var(--border);padding:4px 10px;border-radius:var(--r-sm)}
+.jn-lead{display:grid;grid-template-columns:7fr 5fr;gap:clamp(28px,4vw,64px);align-items:center;text-decoration:none;margin-bottom:clamp(48px,6vw,84px)}
+.jn-lead img{width:100%;height:auto;display:block}
+.jn-lead-h{font-family:var(--font-d);font-size:clamp(30px,4vw,52px);font-weight:300;line-height:1.08;letter-spacing:-.02em;color:var(--ink);margin:16px 0 14px}
+.jn-ex{font-size:14.5px;font-weight:300;color:var(--ink3);line-height:1.85;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.jn-more{display:inline-block;margin-top:20px;font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid var(--gold)}
+.jn-lead:hover .jn-lead-h,.jn-card:hover .jn-card-h{color:var(--ink2)}
+.jn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,3vw,44px)}
+.jn-card{text-decoration:none;display:block}
+.jn-card img{width:100%;height:auto;display:block;margin-bottom:18px}
+.jn-card-h{font-family:var(--font-d);font-size:clamp(20px,2.2vw,26px);font-weight:400;line-height:1.2;color:var(--ink);margin:12px 0 10px;transition:color .25s}
+@media(max-width:960px){.jn-lead{grid-template-columns:1fr}.jn-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.jn-grid{grid-template-columns:1fr}}
+.jn-hero{position:relative;height:clamp(320px,52vh,560px);overflow:hidden}
+.jn-hero img{width:100%;height:100%;object-fit:cover;display:block}
+.jn-hero-ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(31,27,20,.34),rgba(31,27,20,.06) 45%,rgba(247,243,235,0) 92%)}
+.jn-article{max-width:760px;margin:0 auto;padding:clamp(40px,6vw,72px) clamp(22px,5vw,40px) clamp(56px,7vw,96px)}
+.jn-article-head{margin-bottom:clamp(28px,4vw,44px)}
+.jn-title{font-family:var(--font-d);font-size:clamp(34px,5.4vw,62px);font-weight:300;line-height:1.05;letter-spacing:-.025em;color:var(--ink);margin:18px 0 16px}
+.jn-standfirst{font-family:'EB Garamond',Georgia,serif;font-style:italic;font-size:clamp(17px,2vw,21px);color:var(--ink2);line-height:1.6}
+.jn-byline{margin-top:18px;font-size:10.5px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--ink3)}
+.jn-body{font-size:15.5px;font-weight:300;color:var(--ink2);line-height:2}
+.jn-body p{margin-bottom:1.5em}
+.jn-body h2{font-family:var(--font-d);font-size:clamp(24px,3vw,32px);font-weight:400;color:var(--ink);margin:1.8em 0 .7em;line-height:1.2}
+.jn-body h3{font-family:var(--font-d);font-size:clamp(19px,2.4vw,24px);font-weight:400;color:var(--ink);margin:1.5em 0 .6em}
+.jn-body blockquote{font-family:'EB Garamond',Georgia,serif;font-style:italic;font-size:clamp(18px,2.2vw,23px);color:var(--ink);line-height:1.65;border-left:1px solid var(--gold);padding-left:26px;margin:2em 0}
+.jn-body ul{margin:0 0 1.5em 1.2em}
+.jn-body li{margin-bottom:.5em}
+.jn-body a{color:var(--ink);border-bottom:1px solid rgba(180,155,90,.45)}
+.jn-body a:hover{border-color:var(--gold)}
+.jn-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:36px}
+.jn-tag{font-size:10px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);border:1px solid var(--border);padding:5px 12px;border-radius:var(--r-sm)}
+
 /* Newsletter band — sits between the tagline and the link grid. */
 .nl-band{border-bottom:1px solid rgba(255,255,255,.06)}
 .nl-inner{max-width:1400px;margin:0 auto;padding:clamp(36px,5vw,56px) clamp(22px,5vw,80px);display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap}

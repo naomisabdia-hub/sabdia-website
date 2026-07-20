@@ -617,6 +617,35 @@ export const contentGroups = [
 ];
 
 /** Property editor schema (columns of the properties table). */
+export const BLOG_STARTER = [
+  'Open with the moment that matters — the decision, the reveal, the problem a client brought us. Two or three sentences that earn the read.',
+  '## The challenge',
+  'What made this hard, interesting, or worth writing about? Be specific — numbers, sites, constraints.',
+  "## Sabdia's approach",
+  'How we think about it: design-first, built in-house, no shortcuts. One idea per paragraph.',
+  '## Proof — a residence that shows it',
+  'Point to a real project (CASPIAN, QASR, a Collection residence). What the approach produced. Link the property page.',
+  '> A short pull quote — a line from a client, or the sentence you most want remembered.',
+  '## Talk to us',
+  "Close with the invitation: what the reader should do next, and a link to [start a conversation](/contact/).",
+].join('\n\n');
+
+export const blogSchema = [
+  { key: 'title', label: 'Title', type: 'text', help: 'the headline readers and Google see' },
+  { key: 'slug', label: 'Web address', type: 'text', help: 'lowercase, no spaces — becomes /journal/<this>/' },
+  { key: 'published', label: 'Visibility', type: 'checkbox', checkLabel: 'Published — visible on the website' },
+  { key: 'category', label: 'Category', type: 'text', help: 'one short label, e.g. "Design Notes", "New Release", "Behind the Build"' },
+  { key: 'excerpt', label: 'Excerpt', type: 'textarea', help: '1–2 sentences shown on the Journal index and when shared — make it earn the click' },
+  { key: 'hero_image', label: 'Hero image', type: 'image', folder: 'journal' },
+  { key: 'hero_alt', label: 'Hero image alt text', type: 'text', help: 'describe the image for accessibility' },
+  { key: 'body', label: 'Body', type: 'textarea', rows: 22, help: 'blank line between paragraphs · ## Subheading · ### Small heading · > pull quote · - bullet list · **bold** · *italic* · [link text](/contact/)' },
+  { key: 'author', label: 'Author', type: 'text', help: 'e.g. "Naomi Durcau" or leave as Sabdia Constructions' },
+  { key: 'tags', label: 'Tags', type: 'list', itemLabel: 'tag', help: 'a few short keywords, shown at the end of the post' },
+  { key: 'seo_title', label: 'Search engine title', type: 'text', help: 'optional — defaults to the post title' },
+  { key: 'seo_description', label: 'Search engine description', type: 'textarea', help: 'optional — defaults to the excerpt' },
+  { key: 'og_image', label: 'Social share image', type: 'image', folder: 'journal', help: 'optional — defaults to the hero image' },
+];
+
 export const propertySchema = [
   { key: 'name', label: 'Name', type: 'text' },
   { key: 'slug', label: 'Web address', type: 'text', help: 'lowercase, no spaces — becomes /properties/<this>/' },

@@ -1,0 +1,132 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Journal" active="blog">
+  <!-- LIST VIEW -->
+  <div id="listView">
+    <div class="ad-hdr">
+      <div>
+        <h1 class="ad-h1">The <em>Journal</em></h1>
+        <p class="ad-sub">Write, edit and publish Journal entries. Drafts stay hidden from the public website until you tick Published. See BLOG_PLAYBOOK.md in the project for the house style.</p>
+      </div>
+      <button class="ad-btn ad-btn-gold" id="newBtn">+ New Entry</button>
+    </div>
+    <table class="ad-table" id="postTable">
+      <thead><tr><th></th><th>Title</th><th>Category</th><th>Visibility</th><th>Date</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="ad-empty" id="postEmpty" style="display:none">No entries yet — press “+ New Entry” to write the first one.</div>
+  </div>
+
+  <!-- EDITOR VIEW -->
+  <div id="editView" style="display:none">
+    <div class="ad-hdr">
+      <div>
+        <h1 class="ad-h1" id="editTitle">Edit entry</h1>
+        <p class="ad-sub">Changes go live when you press Save. Drafts are only visible here until published.</p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="ad-btn ad-btn-ghost" id="starterBtn" title="Fills the body with the Sabdia post structure">Insert starter outline</button>
+        <a class="ad-btn ad-btn-ghost" id="previewBtn" target="_blank">View ↗</a>
+        <button class="ad-btn ad-btn-ghost" id="backBtn">← All entries</button>
+      </div>
+    </div>
+    <div class="ad-form" id="postForm"></div>
+    <div class="ad-savebar" id="saveBar">
+      <button class="ad-btn ad-btn-gold" data-save>Save</button>
+      <span class="ad-dirty">Unsaved changes</span>
+      <span class="spacer"></span>
+      <button class="ad-btn ad-btn-danger" id="deleteBtn">Delete entry</button>
+    </div>
+  </div>
+</AdminShell>
+
+<script>
+  import { supabase, requireAuth, el, toast } from '../../lib/admin/client.js';
+  import { buildForm, readForm, saveBar } from '../../lib/admin/forms.js';
+  import { blogSchema, BLOG_STARTER } from '../../lib/admin/schemas.js';
+
+  await requireAuth();
+
+  const listView = document.getElementById('listView');
+  const editView = document.getElementById('editView');
+  let current = null;
+
+  const fmtDate = (p) =>
+    new Date(p.published_at ?? p.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  async function loadList() {
+    listView.style.display = '';
+    editView.style.display = 'none';
+    const { data, error } = await supabase.from('blog_posts').select('*').order('created_at', { ascending: false });
+    if (error) return toast(error.message, true);
+    const tbody = document.querySelector('#postTable tbody');
+    tbody.innerHTML = '';
+    document.getElementById('postEmpty').style.display = data.length ? 'none' : '';
+    document.getElementById('postTable').style.display = data.length ? '' : 'none';
+    for (const p of data) {
+      tbody.appendChild(el('tr', { class: 'clickable', onclick: () => openEditor(p) }, [
+        el('td', {}, p.hero_image ? [el('img', { src: p.hero_image, alt: '', style: 'width:64px;height:42px;object-fit:cover;display:block' })] : []),
+        el('td', { text: p.title, style: 'font-weight:400' }),
+        el('td', { text: p.category || '—' }),
+        el('td', {}, [el('span', { class: `ad-badge ${p.published ? 'live' : 'draft'}`, text: p.published ? 'Published' : 'Draft' })]),
+        el('td', { text: fmtDate(p) }),
+      ]));
+    }
+  }
+
+  function openEditor(p) {
+    current = p;
+    listView.style.display = 'none';
+    editView.style.display = '';
+    document.getElementById('editTitle').textContent = p.id ? `Edit — ${p.title}` : 'New entry';
+    document.getElementById('previewBtn').href = `/journal/${p.slug || ''}/`;
+    document.getElementById('deleteBtn').style.display = p.id ? '' : 'none';
+    buildForm(document.getElementById('postForm'), blogSchema, p);
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById('newBtn').addEventListener('click', () =>
+    openEditor({ published: false, author: 'Sabdia Constructions', tags: [], category: '' }),
+  );
+  document.getElementById('backBtn').addEventListener('click', loadList);
+
+  document.getElementById('starterBtn').addEventListener('click', () => {
+    const body = document.querySelector('#postForm [data-k="body"]');
+    if (!body) return;
+    if (body.value.trim() && !confirm('Replace the current body with the starter outline?')) return;
+    body.value = BLOG_STARTER;
+    body.dispatchEvent(new Event('input', { bubbles: true }));
+    toast('Starter outline inserted — replace each section with your words.');
+  });
+
+  saveBar(document.getElementById('postForm'), document.getElementById('saveBar'), async () => {
+    const row = readForm(document.getElementById('postForm'), blogSchema, current);
+    if (!row.title || !row.slug) throw new Error('Title and web address are both required.');
+    row.slug = row.slug.toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '');
+    if (row.published && !current?.published_at && !row.published_at) row.published_at = new Date().toISOString();
+    delete row.created_at;
+    delete row.updated_at;
+    const { data, error } = current?.id
+      ? await supabase.from('blog_posts').update(row).eq('id', current.id).select().single()
+      : await supabase.from('blog_posts').insert(row).select().single();
+    if (error) throw error;
+    current = data;
+    document.getElementById('previewBtn').href = `/journal/${data.slug}/`;
+    document.getElementById('editTitle').textContent = `Edit — ${data.title}`;
+  });
+
+  document.getElementById('deleteBtn').addEventListener('click', async () => {
+    if (!current?.id) return;
+    if (!confirm(`Delete “${current.title}”? Consider unticking “Published” instead if you just want it off the website.`)) return;
+    if (!confirm('Really delete permanently?')) return;
+    const { error } = await supabase.from('blog_posts').delete().eq('id', current.id);
+    if (error) return toast(error.message, true);
+    toast('Entry deleted');
+    loadList();
+  });
+
+  await loadList();
+  if (new URLSearchParams(location.search).get('new')) document.getElementById('newBtn').click();
+</script>

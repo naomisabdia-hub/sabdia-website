@@ -122,6 +122,10 @@
       {
         "label": "Agent Access",
         "href": "/agent-access/"
+      },
+      {
+        "label": "The Journal",
+        "href": "/journal/"
       }
     ],
     "legalLinks": [
