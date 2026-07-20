@@ -64,7 +64,29 @@ const fmt = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-AU', { m
 )}
 
 <script is:inline>
-(function () {
+/* Escape closes whichever film player is open. This is the one listener
+   here bound to the document rather than to page elements, so it is
+   registered exactly once and resolves #lbv at event time — closing over
+   a page's element would both leak it and stack a fresh copy of this
+   handler on every navigation. */
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  var lbv = document.getElementById('lbv');
+  if (lbv && lbv.classList.contains('open')) closeSeriesFilm(lbv);
+});
+
+function closeSeriesFilm(lbv) {
+  var video = document.getElementById('lbvVideo');
+  lbv.classList.remove('open');
+  document.body.style.overflow = '';
+  if (video) {
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+  }
+}
+
+document.addEventListener('astro:page-load', function () {
   document.querySelectorAll('[data-series]').forEach(function (band) {
     if (band.dataset.init) return;
     band.dataset.init = '1';
@@ -95,20 +117,13 @@ const fmt = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-AU', { m
       document.body.style.overflow = 'hidden';
       video.play().catch(function () {});
     }
-    function closeV() {
-      lbv.classList.remove('open');
-      document.body.style.overflow = '';
-      video.pause();
-      video.removeAttribute('src');
-      video.load();
-    }
+    function closeV() { closeSeriesFilm(lbv); }
     document.querySelectorAll('[data-series-card][data-video]').forEach(function (card) {
       card.addEventListener('click', function () { openV(card.dataset.video, card.dataset.caption); });
       card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openV(card.dataset.video, card.dataset.caption); } });
     });
     document.getElementById('lbvClose').addEventListener('click', closeV);
     lbv.addEventListener('click', function (e) { if (e.target === lbv) closeV(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && lbv.classList.contains('open')) closeV(); });
   }
-})();
+});
 </script>

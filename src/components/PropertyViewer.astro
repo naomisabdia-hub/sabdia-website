@@ -93,7 +93,8 @@ const hotspots = Array.isArray(d.hotspots) ? d.hotspots : [];
 
 {show && (
   <script is:inline>
-  (function () {
+  /* Re-runs per navigation — see main.js for why. */
+  document.addEventListener('astro:page-load', function () {
     var frame = document.querySelector('.viewer-frame');
     if (!frame) return;
     var loaded = false;
@@ -140,6 +141,6 @@ const hotspots = Array.isArray(d.hotspots) ? d.hotspots : [];
     } else {
       activate();
     }
-  })();
+  });
   </script>
 )}

@@ -48,7 +48,9 @@ const delays = ['', 'd1', 'd2'];
   <CustomSections page="/collection/" position="end" />
 
   <script is:inline>
-  (function () {
+  /* Re-runs on every navigation: under ClientRouter this file is not
+     re-executed, but the elements it wires are replaced. */
+  document.addEventListener('astro:page-load', function () {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     document.querySelectorAll('[data-port-card]').forEach(function (card) {
       var video = card.querySelector('[data-port-video]');
@@ -61,6 +63,6 @@ const delays = ['', 'd1', 'd2'];
         video.classList.remove('playing');
       });
     });
-  })();
+  });
   </script>
 </Base>

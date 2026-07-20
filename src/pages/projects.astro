@@ -192,7 +192,8 @@ const journeys = [
   <CustomSections page="/projects/" position="end" />
 
   <script is:inline>
-  (function () {
+  /* Re-runs per navigation — see main.js for why. */
+  document.addEventListener('astro:page-load', function () {
     var buttons = document.querySelectorAll('.pfilter');
     var sections = document.querySelectorAll('[data-proj-section]');
     buttons.forEach(function (btn) {
@@ -205,6 +206,6 @@ const journeys = [
         });
       });
     });
-  })();
+  });
   </script>
 </Base>

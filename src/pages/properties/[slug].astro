@@ -289,7 +289,20 @@ const jsonLd = JSON.stringify({
   )}
 
   <script is:inline>
-  (function () {
+  /* Keyboard control lives on the document, so it is registered once and
+     talks to the current page through lbApi — which astro:page-load
+     rebuilds. Closing over `items`/`idx` directly would pin the first
+     property page's DOM in memory and stack a handler per navigation. */
+  var lbApi = null;
+  document.addEventListener('keydown', function (e) {
+    if (!lbApi || !lbApi.isOpen()) return;
+    if (e.key === 'Escape') lbApi.close();
+    if (e.key === 'ArrowLeft') lbApi.prev();
+    if (e.key === 'ArrowRight') lbApi.next();
+  });
+
+  document.addEventListener('astro:page-load', function () {
+    lbApi = null;
     var items = [].slice.call(document.querySelectorAll('[data-lb-item]'));
     if (!items.length) return;
     var lb = document.getElementById('lb');
@@ -316,13 +329,14 @@ const jsonLd = JSON.stringify({
     document.getElementById('lbNext').addEventListener('click', function () { show(idx + 1); });
     document.getElementById('lbClose').addEventListener('click', close);
     lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
-    document.addEventListener('keydown', function (e) {
-      if (!lb.classList.contains('open')) return;
-      if (e.key === 'Escape') close();
-      if (e.key === 'ArrowLeft') show(idx - 1);
-      if (e.key === 'ArrowRight') show(idx + 1);
-    });
-  })();
+
+    lbApi = {
+      isOpen: function () { return lb.classList.contains('open'); },
+      close: close,
+      prev: function () { show(idx - 1); },
+      next: function () { show(idx + 1); }
+    };
+  });
   </script>
 
   <!-- RELATED -->
@@ -352,7 +366,7 @@ const jsonLd = JSON.stringify({
         <a href="#cform" class="psb-btn">Enquire &rarr;</a>
       </div>
       <script is:inline>
-      (function () {
+      document.addEventListener('astro:page-load', function () {
         var bar = document.getElementById('stickyEnquire');
         var form = document.getElementById('cform');
         if (!bar || !form || !('IntersectionObserver' in window)) return;
@@ -362,7 +376,7 @@ const jsonLd = JSON.stringify({
           });
         }, { threshold: 0.15 });
         obs.observe(form);
-      })();
+      });
       </script>
     </>
   )}

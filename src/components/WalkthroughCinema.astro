@@ -36,7 +36,7 @@ const { name, chapters = [] } = Astro.props;
           ))}
         </ol>
       </div>
-      <div class="wt-stage reveal d2" data-wt-stage>
+      <div class="wt-stage reveal d2" data-wt-stage data-wt-srcs={JSON.stringify(chapters.map((c) => c.src))}>
         <div class="wt-frame">
           <video
             data-wt-video
@@ -53,10 +53,19 @@ const { name, chapters = [] } = Astro.props;
         </div>
       </div>
     </div>
-    <script is:inline define:vars={{ srcs: chapters.map((c) => c.src) }}>
-    (function () {
+    <script is:inline>
+    /* The chapter sources come off the element (data-wt-srcs), not from
+       define:vars. define:vars bakes the values into the script body, so
+       every property page emitted a *different* script — meaning none of
+       them dedupe, each navigation registers another astro:page-load
+       listener, and the stale ones then drive the new page's player with
+       the previous property's clips. Reading the DOM keeps this script
+       byte-identical everywhere, so exactly one listener ever exists. */
+    document.addEventListener('astro:page-load', function () {
       var stage = document.querySelector('[data-wt-stage]');
       if (!stage) return;
+      var srcs = JSON.parse(stage.dataset.wtSrcs || '[]');
+      if (!srcs.length) return;
       var video = stage.querySelector('[data-wt-video]');
       var play = stage.querySelector('[data-wt-play]');
       var cap = stage.querySelector('[data-wt-cap]');
@@ -108,7 +117,7 @@ const { name, chapters = [] } = Astro.props;
         }, { rootMargin: '400px 0px' });
         io.observe(stage);
       }
-    })();
+    });
     </script>
   </section>
 )}

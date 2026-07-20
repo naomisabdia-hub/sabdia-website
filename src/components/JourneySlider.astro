@@ -215,10 +215,13 @@ const pct = (i) => (i / last) * 100;
 </style>
 
 <script>
-  // Runs once, wires every [data-jour] on the page (script is hoisted &
+  // Wires every [data-jour] on the page (the script is hoisted &
   // deduplicated by Astro, so multiple sliders share this one module).
+  // Under ClientRouter the module is not re-executed on navigation, so
+  // the wiring hangs off astro:page-load — which also covers first load.
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  document.addEventListener('astro:page-load', () => {
   document.querySelectorAll('[data-jour]').forEach((root) => {
     const imgs = [...root.querySelectorAll('.jour-stage img')];
     const marks = [...root.querySelectorAll('[data-jour-mark]')];
@@ -346,5 +349,6 @@ const pct = (i) => (i / last) * 100;
     // start of the journey (instant when reduced motion)
     if (reduce) imgs.forEach((im) => (im.style.transition = 'none'));
     setStage(0);
+  });
   });
 </script>

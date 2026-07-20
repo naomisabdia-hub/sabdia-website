@@ -44,7 +44,9 @@ const { label, headingHtml, text, video, poster, captionLeft = '', captionRight 
 )}
 
 <script is:inline>
-(function () {
+/* Re-runs per navigation — see main.js for why. The dataset.filmInit
+   guard still prevents double-wiring within a single page. */
+document.addEventListener('astro:page-load', function () {
   document.querySelectorAll('[data-film]').forEach(function (frame) {
     if (frame.dataset.filmInit) return;
     frame.dataset.filmInit = '1';
@@ -72,5 +74,5 @@ const { label, headingHtml, text, video, poster, captionLeft = '', captionRight 
       label.textContent = video.muted ? 'Sound On' : 'Mute';
     });
   });
-})();
+});
 </script>

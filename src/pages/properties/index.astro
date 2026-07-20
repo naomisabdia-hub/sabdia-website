@@ -176,7 +176,8 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
   <CustomSections page="/properties/" position="end" />
 
   <script is:inline>
-  (function () {
+  /* Re-runs per navigation — see main.js for why. */
+  document.addEventListener('astro:page-load', function () {
     var suburb = document.getElementById('fSuburb');
     var beds = document.getElementById('fBeds');
     var sort = document.getElementById('fSort');
@@ -221,6 +222,6 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
     [suburb, beds, sort].forEach(function (el) {
       el.addEventListener('change', apply);
     });
-  })();
+  });
   </script>
 </Base>
