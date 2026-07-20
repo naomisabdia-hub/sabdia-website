@@ -47,3 +47,23 @@
 - Proof: 0 wixstatic refs in site code; 107/107 image URLs on 11 pages resolve; all pages
   200; no console errors; `npm run build` clean. Remaining wixstatic strings are provenance
   only (manifest wixIds, fetch script map, backups, docs).
+
+## Phase 3 — Design, UX & accessibility (2026-07-20)
+- Contrast (audit #9): VERIFIED already solved by the "accent follows the surface" system —
+  automated WCAG scan across 6 pages found zero real solid-background failures (all flagged
+  items were text over photos with scrims, correctly excluded). No change needed.
+- Reveal timing (audit #10): elements in the first viewport now get a quick entrance
+  (.fastin — 0.5s, minimal stagger) while scroll reveals keep the 0.9s editorial pace.
+  (Note: the "2s blank page" observed in audit was partly the preview tool throttling
+  animation clocks; the fix still meaningfully tightens first paint.)
+- Phone + email (audit #8): contact page Direct Contact list and footer Connect column now
+  render Phone (click-to-call tel:) and Email (mailto:) from CMS settings; phone row hidden
+  until Naomi fills settings.phone in /admin. Email live (sales@sabdia.com.au).
+- en-AU (audit #12): html lang="en-AU" on site + admin; US-spelling sweep of repo copy AND
+  all DB content tables — already clean Australian English throughout.
+- Mobile a11y: hamburger tap target enlarged to 44×44 (was 32×20) without visual change;
+  verified aria-expanded/aria-hidden toggling, 71px menu links, no horizontal overflow.
+- Corrections: js-yaml is NOT dead (used by properties-to-seed.mjs) — audit #15 amended;
+  properties-to-seed.mjs regeneration briefly reverted QASR's 3D-viewer config because
+  src/content/properties/qasr.md is STALE vs the seed/DB — reverted, flagged for handover:
+  don't run that script without syncing the markdown first.

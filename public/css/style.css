@@ -139,7 +139,9 @@ html.no-loader #loader{display:none}
 .nav-cta:hover{background:rgba(253,251,246,.12);border-color:var(--white);color:var(--white)}
 #mainNav.sc .nav-cta{border-color:var(--gold);color:var(--gold)}
 #mainNav.sc .nav-cta:hover{background:var(--gold);color:var(--ink);border-color:var(--gold)}
-.mob-btn{display:none;margin-left:auto;background:none;border:none;cursor:pointer;flex-direction:column;gap:6px;padding:6px;flex-shrink:0}
+/* 44x44 minimum hit area — padding grows the target, negative margin keeps
+   the visual footprint where it was. */
+.mob-btn{display:none;margin-left:auto;background:none;border:none;cursor:pointer;flex-direction:column;justify-content:center;align-items:center;gap:6px;padding:12px;margin-top:-12px;margin-bottom:-12px;min-width:44px;min-height:44px;flex-shrink:0}
 .mob-btn span{display:block;width:20px;height:1px;background:var(--white);transition:transform .35s var(--ease),opacity .3s}
 #mainNav.sc .mob-btn span{background:var(--ink)}
 /* Pages that open on a light surface (contact, properties index,
@@ -212,6 +214,14 @@ html.js .reveal-wipe.vis{clip-path:inset(0 0 0 0)}
 html.js .reveal-wipe-x{clip-path:inset(0 100% 0 0);transition:clip-path 1.15s var(--ease)}
 html.js .reveal-wipe-x.vis{clip-path:inset(0 0 0 0)}
 .d1{transition-delay:.1s!important}.d2{transition-delay:.2s!important}.d3{transition-delay:.3s!important}.d4{transition-delay:.4s!important}.d5{transition-delay:.5s!important}
+/* First-viewport reveals: quick entrance, minimal stagger. The .9s pace is
+   for elements arriving on scroll; content on screen at page-arrival must
+   never sit hidden long enough to read as a blank page. */
+html.js .fastin.reveal,html.js .fastin.reveal-x,html.js .fastin.reveal-r{transition-duration:.5s!important;transition-delay:.05s!important}
+html.js .fastin.reveal-wipe,html.js .fastin.reveal-wipe-x{transition-duration:.7s!important;transition-delay:.05s!important}
+html.js .fastin.d2,html.js .fastin.d3{transition-delay:.12s!important}
+html.js .fastin.d4,html.js .fastin.d5{transition-delay:.18s!important}
+html.js .slabel.fastin.reveal::before{transition-delay:.1s}
 
 /* Section labels */
 .slabel{font-size:10.5px;font-weight:500;letter-spacing:.34em;text-transform:uppercase;color:var(--ink);margin-bottom:16px;display:flex;align-items:center;gap:14px}

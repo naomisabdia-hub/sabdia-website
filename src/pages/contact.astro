@@ -51,6 +51,8 @@ const socials = settings.socials;
         <div class="slabel reveal">{page.directLabel}</div>
         <ul class="cdet reveal d1" style="margin-top:12px">
           <li class="cd"><span class="cd-l">Location</span><span class="cd-v">{settings.location}</span></li>
+          {settings.phone && <li class="cd"><span class="cd-l">Phone</span><a href={`tel:${settings.phone.replace(/[^+\d]/g, '')}`} class="cd-v">{settings.phone}</a></li>}
+          {settings.email && <li class="cd"><span class="cd-l">Email</span><a href={`mailto:${settings.email}`} class="cd-v">{settings.email}</a></li>}
           <li class="cd"><span class="cd-l">Instagram</span><a href={socials.instagram.url} target="_blank" class="cd-v">{socials.instagram.label}</a></li>
           <li class="cd"><span class="cd-l">Facebook</span><a href={socials.facebook.url} target="_blank" class="cd-v">{socials.facebook.label}</a></li>
           <li class="cd"><span class="cd-l">LinkedIn</span><a href={socials.linkedin.url} target="_blank" class="cd-v">{socials.linkedin.label}</a></li>

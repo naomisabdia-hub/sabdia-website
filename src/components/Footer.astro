@@ -56,6 +56,8 @@ const year = new Date().getFullYear();
       <div class="fct">Connect</div>
       <ul class="fcl">
         <li><a href="/contact/">Contact Us</a></li>
+        {settings.phone && <li><a href={`tel:${settings.phone.replace(/[^+\d]/g, '')}`}>{settings.phone}</a></li>}
+        {settings.email && <li><a href={`mailto:${settings.email}`}>{settings.email}</a></li>}
         <li><a href={socials.instagram.url} target="_blank" rel="noopener">Instagram {socials.instagram.label}</a></li>
         <li><a href={socials.facebook.url} target="_blank" rel="noopener">Facebook</a></li>
         <li><a href={socials.linkedin.url} target="_blank" rel="noopener">LinkedIn</a></li>

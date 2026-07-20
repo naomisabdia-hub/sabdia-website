@@ -349,6 +349,15 @@ function initPage() {
        rule directly from layout, which is cheap because it rides the
        existing rAF-throttled scroll driver and stops doing any work once
        everything has revealed. */
+    /* Anything already in the viewport right now gets the quick entrance
+       (.fastin) — the slow staggered pace is for elements arriving on
+       scroll, not for the content the visitor is looking at. */
+    const vh0 = window.innerHeight;
+    revealEls.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.top < vh0 && r.bottom > 0) el.classList.add('fastin');
+    });
+
     let pending = revealEls;
     revealSweep = () => {
       if (!pending.length) return;
