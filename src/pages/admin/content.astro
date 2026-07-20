@@ -70,7 +70,7 @@ export const prerender = true;
       if (!meta) continue;
       tbody.appendChild(el('tr', { class: 'clickable', onclick: () => openEditor(key) }, [
         el('td', { text: meta.title, style: 'font-weight:400' }),
-        el('td', { text: meta.description || '', style: 'color:var(--taupe)' }),
+        el('td', { text: meta.description || '', style: 'color:var(--taupe-d)' }),
       ]));
     }
     table.appendChild(tbody);

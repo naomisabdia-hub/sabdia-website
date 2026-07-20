@@ -339,12 +339,12 @@
   },
   "properties_page": {
     "label": "For Sale",
-    "headingHtml": "<em style=\"color:var(--gold)\">Current</em><br>Properties.",
+    "headingHtml": "<em style=\"color:var(--gold-d)\">Current</em><br>Properties.",
     "introTemplate": "{count} extraordinary residences across Brisbane's most sought-after inner suburbs — each designed, developed, and built entirely in-house by Sabdia.",
     "soldLabel": "Sold Prior to Completion",
     "cta": {
       "label": "Private Enquiry",
-      "headingHtml": "Interested in a<br><em style=\"color:var(--gold)\">private viewing</em>?",
+      "headingHtml": "Interested in a<br><em style=\"color:var(--gold-d)\">private viewing</em>?",
       "text": "We offer private, exclusive viewings for serious buyers. Contact us to arrange an inspection at a time that suits you.",
       "primaryCta": {
         "label": "Request a Viewing",
@@ -535,7 +535,7 @@
   },
   "collection_page": {
     "label": "Our Work",
-    "titleHtml": "The Sabdia<br><em style=\"color:var(--gold)\">Collection</em>.",
+    "titleHtml": "The Sabdia<br><em style=\"color:var(--gold-d)\">Collection</em>.",
     "text": "A portfolio of completed luxury residences across inner Brisbane — each one designed, developed, and constructed entirely in-house by Sabdia.",
     "items": [
       {

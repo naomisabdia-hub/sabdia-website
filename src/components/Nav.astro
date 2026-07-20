@@ -1,6 +1,14 @@
 ---
 import { getContent } from '../lib/content.js';
 
+interface Props {
+  /* Set on pages whose first section is a light surface rather than a
+     photograph or a dark band. The nav renders white-on-transparent by
+     default, which disappears entirely against cream. */
+  lightNav?: boolean;
+}
+const { lightNav = false } = Astro.props;
+
 const { settings, nav } = await getContent('settings', 'nav');
 const socials = settings.socials;
 ---
@@ -29,7 +37,7 @@ const socials = settings.socials;
   </div>
 </div>
 
-<nav id="mainNav" aria-label="Primary">
+<nav id="mainNav" class={lightNav ? 'on-light' : undefined} aria-label="Primary">
   <a href="/" class="nav-logo" aria-label={`${settings.siteName} — Home`}>
     <img class="logo-light" src={settings.logo} alt={`${settings.siteName} — Design Develop Construct`} style="filter:invert(1) brightness(10)">
     <img class="logo-dark" src={settings.logo} alt={`${settings.siteName} — Design Develop Construct`}>

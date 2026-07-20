@@ -118,25 +118,25 @@ const { name, chapters = [] } = Astro.props;
   .wt-grid{display:grid;grid-template-columns:5fr 4fr;gap:clamp(40px,6vw,96px);align-items:center;padding:clamp(72px,10vw,140px) clamp(22px,5vw,80px)}
   .wt-h{font-family:var(--font-d);font-size:clamp(34px,4.5vw,60px);font-weight:300;color:var(--white);letter-spacing:-.02em;margin:0 0 18px}
   .wt-h em{font-style:italic;color:var(--gold2)}
-  .wt-p{font-family:'EB Garamond',Georgia,serif;font-size:15px;font-weight:300;line-height:1.85;color:rgba(253,252,248,.6);max-width:420px;margin-bottom:34px}
+  .wt-p{font-family:'EB Garamond',Georgia,serif;font-size:15px;font-weight:300;line-height:1.85;color:rgba(253,251,246,.6);max-width:420px;margin-bottom:34px}
   .wt-rail{list-style:none;margin:0;padding:0;border-top:1px solid rgba(255,255,255,.08)}
   .wt-ch{display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid rgba(255,255,255,.08);padding:13px 0;cursor:pointer;align-items:center;gap:2px 0;transition:padding-left .3s var(--ease)}
   .wt-ch:hover{padding-left:8px}
   .wt-ch-n{font-family:var(--font-d);font-size:12px;font-style:italic;color:var(--gold);grid-row:1}
-  .wt-ch-l{font-family:var(--font-u);font-size:11px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:rgba(253,252,248,.5);transition:color .3s;grid-row:1}
+  .wt-ch-l{font-family:var(--font-u);font-size:11px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:rgba(253,251,246,.5);transition:color .3s;grid-row:1}
   .wt-ch.on .wt-ch-l{color:var(--white)}
-  .wt-ch.done .wt-ch-l{color:rgba(196,172,135,.55)}
+  .wt-ch.done .wt-ch-l{color:rgba(200,175,116,.55)}
   .wt-ch-bar{grid-column:2;grid-row:2;height:1px;background:rgba(255,255,255,.08);overflow:hidden;display:none}
   .wt-ch.on .wt-ch-bar{display:block}
   .wt-ch-fill{display:block;height:100%;background:var(--gold2);transform:scaleX(0);transform-origin:left}
   .wt-stage{display:flex;flex-direction:column;gap:14px}
-  .wt-frame{position:relative;aspect-ratio:9/16;width:min(100%,calc(min(76vh,680px)*0.5625));margin:0 auto;overflow:hidden;background:var(--dark3);border:1px solid rgba(196,172,135,.22);box-shadow:0 40px 80px -40px rgba(0,0,0,.8)}
+  .wt-frame{position:relative;aspect-ratio:9/16;width:min(100%,calc(min(76vh,680px)*0.5625));margin:0 auto;overflow:hidden;background:var(--dark3);border:1px solid rgba(200,175,116,.22);box-shadow:0 40px 80px -40px rgba(0,0,0,.8)}
   .wt-frame video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;cursor:pointer}
   .wt-frame::after{content:'';position:absolute;inset:0;border:1px solid rgba(255,255,255,.05);pointer-events:none}
-  .wt-play{position:absolute;inset:0;margin:auto;width:64px;height:64px;border-radius:50%;background:rgba(14,13,11,.62);backdrop-filter:blur(10px);border:1px solid rgba(196,172,135,.5);color:var(--gold2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .3s,opacity .3s;padding-left:4px}
-  .wt-play:hover{background:rgba(158,139,106,.3)}
+  .wt-play{position:absolute;inset:0;margin:auto;width:64px;height:64px;border-radius:50%;background:rgba(31,27,20,.62);backdrop-filter:blur(10px);border:1px solid rgba(200,175,116,.5);color:var(--gold2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .3s,opacity .3s;padding-left:4px}
+  .wt-play:hover{background:rgba(180,155,90,.3)}
   .wt-play.hide{opacity:0;pointer-events:none}
-  .wt-caption{display:flex;justify-content:space-between;gap:16px;font-size:9px;font-weight:300;letter-spacing:.28em;text-transform:uppercase;color:rgba(253,252,248,.3);width:min(100%,calc(min(76vh,680px)*0.5625));margin:0 auto}
+  .wt-caption{display:flex;justify-content:space-between;gap:16px;font-size:9px;font-weight:300;letter-spacing:.28em;text-transform:uppercase;color:rgba(253,251,246,.3);width:min(100%,calc(min(76vh,680px)*0.5625));margin:0 auto}
   .wt-caption b{font-weight:300;color:var(--gold2)}
   @media(max-width:900px){
     .wt-grid{grid-template-columns:1fr;gap:40px}

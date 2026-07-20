@@ -19,10 +19,10 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
   <style is:inline slot="head">
   .agent-bens{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:64px}
   .agent-ben{padding:40px 32px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:background .3s,border-color .3s}
-  .agent-ben:hover{background:rgba(158,139,106,.06);border-color:rgba(158,139,106,.2)}
-  .agent-ben-icon{width:44px;height:44px;border:1px solid rgba(196,172,135,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);margin-bottom:20px}
+  .agent-ben:hover{background:rgba(180,155,90,.06);border-color:rgba(180,155,90,.2)}
+  .agent-ben-icon{width:44px;height:44px;border:1px solid rgba(200,175,116,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);margin-bottom:20px}
   .agent-ben-t{font-family:var(--font-d);font-size:20px;font-weight:300;color:var(--white);margin-bottom:10px}
-  .agent-ben-d{font-size:13px;font-weight:300;line-height:1.78;color:rgba(253,252,248,.4)}
+  .agent-ben-d{font-size:14px;font-weight:400;line-height:1.78;color:rgba(253,251,246,.72)}
   .agent-apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start}
   @media(max-width:1024px){.agent-bens{grid-template-columns:repeat(2,1fr)}.agent-apply-grid{grid-template-columns:1fr;gap:52px}}
   @media(max-width:640px){.agent-bens{grid-template-columns:1fr}}
@@ -33,12 +33,12 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
   <!-- HERO (dark, full) -->
   <section style="position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;background:var(--dark)">
     <img src={page.hero.image} alt="Agent Access" loading="eager"
-         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.28) saturate(.6)">
-    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(14,13,11,.95) 0%,rgba(14,13,11,.3) 60%,transparent 100%)"></div>
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.92)">
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(31,27,20,.95) 0%,rgba(31,27,20,.3) 60%,transparent 100%)"></div>
     <div class="inner" style="position:relative;z-index:2;padding:clamp(22px,5vw,80px);padding-bottom:clamp(72px,12vw,140px)">
       <div class="slabel slabel-dark reveal" style="margin-bottom:20px">{page.hero.label}</div>
       <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(52px,10vw,140px);font-weight:300;line-height:.88;letter-spacing:-.035em;color:var(--white)" set:html={page.hero.titleHtml} />
-      <p class="reveal d2" style="font-size:13px;font-weight:300;color:rgba(253,252,248,.5);max-width:420px;margin-top:28px;line-height:1.85">{page.hero.text}</p>
+      <p class="reveal d2" style="font-size:15px;font-weight:400;color:rgba(253,251,246,.8);max-width:440px;margin-top:28px;line-height:1.85">{page.hero.text}</p>
     </div>
   </section>
 
@@ -96,8 +96,8 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
         <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px)" set:html={page.apply.headingHtml} />
         <p class="about-p reveal d2">{page.apply.text}</p>
         <div class="reveal d3" style="margin-top:36px;padding:28px;background:var(--dark);border-left:2px solid var(--gold)">
-          <div style="font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">{page.apply.noteLabel}</div>
-          <div style="font-size:13px;font-weight:300;color:rgba(253,252,248,.5);line-height:1.75">{page.apply.noteText}</div>
+          <div style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--gold3);margin-bottom:10px">{page.apply.noteLabel}</div>
+          <div style="font-size:14px;font-weight:400;color:rgba(253,251,246,.78);line-height:1.75">{page.apply.noteText}</div>
         </div>
       </div>
       <div>

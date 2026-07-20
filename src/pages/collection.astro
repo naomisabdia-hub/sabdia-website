@@ -9,6 +9,7 @@ const delays = ['', 'd1', 'd2'];
 <Base
   title="Collection | Sabdia Constructions"
   description="The Sabdia Collection — a portfolio of completed luxury residences across inner Brisbane. Award-winning homes designed, developed, and constructed by Sabdia."
+  lightNav
 >
   <!-- Portfolio grid/card styles live in the global stylesheet
        (style.css → COLLECTION PORTFOLIO GRID) so the collection detail
@@ -36,7 +37,7 @@ const delays = ['', 'd1', 'd2'];
               {item.video && <video src={item.video} muted loop playsinline preload="none" data-port-video></video>}
               {item.video && <span class="port-film-tag">Film</span>}
             </div>
-            <div class="port-name">{item.name} <span style="color:var(--gold);font-weight:300">&rarr;</span></div>
+            <div class="port-name">{item.name} <span style="color:var(--bronze);font-weight:400">&rarr;</span></div>
             <div class="port-loc">{item.loc}</div>
           </a>
         ))}

@@ -12,12 +12,12 @@ body.admin a,body.admin button,body.admin select,body.admin label{cursor:pointer
 .ad-side-logo img{height:22px;filter:invert(1) brightness(10)}
 .ad-side-logo span{display:block;margin-top:8px;font-size:8.5px;font-weight:300;letter-spacing:.32em;text-transform:uppercase;color:var(--gold2)}
 .ad-nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
-.ad-nav a{display:flex;align-items:center;gap:11px;padding:10px 14px;font-size:11.5px;font-weight:300;letter-spacing:.08em;color:rgba(253,252,248,.55);border-radius:2px;transition:background .2s,color .2s}
+.ad-nav a{display:flex;align-items:center;gap:11px;padding:10px 14px;font-size:11.5px;font-weight:300;letter-spacing:.08em;color:rgba(253,251,246,.55);border-radius:2px;transition:background .2s,color .2s}
 .ad-nav a:hover{background:rgba(255,255,255,.05);color:var(--white)}
-.ad-nav a.on{background:rgba(158,139,106,.14);color:var(--gold2)}
+.ad-nav a.on{background:rgba(180,155,90,.14);color:var(--gold2)}
 .ad-nav a svg{flex-shrink:0;opacity:.7}
 .ad-side-foot{margin-top:auto;padding:18px 26px 0;border-top:1px solid rgba(255,255,255,.08)}
-.ad-side-user{font-size:10.5px;font-weight:300;color:rgba(253,252,248,.45);margin-bottom:10px;word-break:break-all}
+.ad-side-user{font-size:10.5px;font-weight:300;color:rgba(253,251,246,.45);margin-bottom:10px;word-break:break-all}
 .ad-logout{font-size:9px;font-weight:300;letter-spacing:.24em;text-transform:uppercase;color:var(--gold2);background:none;border:none;padding:0}
 .ad-logout:hover{color:var(--gold3)}
 .ad-main{padding:40px clamp(24px,4vw,56px);max-width:1180px;width:100%}
@@ -53,11 +53,11 @@ body.admin a,body.admin button,body.admin select,body.admin label{cursor:pointer
 .ad-table tr.clickable{transition:background .15s}
 .ad-table tr.clickable:hover{background:var(--bg2)}
 .ad-badge{display:inline-block;padding:3px 10px;font-size:8.5px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;border:1px solid}
-.ad-badge.new{color:#7a5c22;border-color:rgba(158,139,106,.5);background:rgba(216,201,174,.25)}
+.ad-badge.new{color:#7a5c22;border-color:rgba(180,155,90,.5);background:rgba(216,201,174,.25)}
 .ad-badge.contacted{color:#3d5a46;border-color:rgba(61,90,70,.35);background:rgba(61,90,70,.08)}
 .ad-badge.closed{color:var(--taupe);border-color:var(--border);background:var(--bg2)}
 .ad-badge.live{color:#3d5a46;border-color:rgba(61,90,70,.35);background:rgba(61,90,70,.08)}
-.ad-badge.draft{color:#7a5c22;border-color:rgba(158,139,106,.5);background:rgba(216,201,174,.25)}
+.ad-badge.draft{color:#7a5c22;border-color:rgba(180,155,90,.5);background:rgba(216,201,174,.25)}
 .ad-badge.sold{color:var(--taupe);border-color:var(--border);background:var(--bg2)}
 
 /* Forms */
@@ -79,7 +79,7 @@ body.admin a,body.admin button,body.admin select,body.admin label{cursor:pointer
 .ad-item-bar button{background:none;border:1px solid var(--border);padding:4px 10px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);font-family:var(--font-u)}
 .ad-item-bar button:hover{border-color:var(--gold);color:var(--gold)}
 .ad-add{align-self:flex-start;background:none;border:1px dashed var(--gold);color:var(--gold);padding:8px 18px;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;font-family:var(--font-u)}
-.ad-add:hover{background:rgba(158,139,106,.07)}
+.ad-add:hover{background:rgba(180,155,90,.07)}
 
 /* Image fields */
 .ad-img-field{display:flex;gap:14px;align-items:flex-start}
@@ -102,10 +102,10 @@ body.admin a,body.admin button,body.admin select,body.admin label{cursor:pointer
 .ad-login-card{width:100%;max-width:400px;background:var(--dark2);border:1px solid rgba(255,255,255,.08);padding:44px}
 .ad-login-card img{height:26px;filter:invert(1) brightness(10);margin:0 auto 8px}
 .ad-login-sub{text-align:center;font-size:8.5px;font-weight:300;letter-spacing:.34em;text-transform:uppercase;color:var(--gold2);margin-bottom:32px}
-.ad-login .ad-fl{color:rgba(253,252,248,.5)}
+.ad-login .ad-fl{color:rgba(253,251,246,.5)}
 .ad-login .ad-fi{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12);color:var(--white)}
 .ad-login .ad-fi:focus{border-color:var(--gold2)}
-.ad-login-note{margin-top:18px;text-align:center;font-size:11.5px;font-weight:300;color:rgba(253,252,248,.4);line-height:1.7}
+.ad-login-note{margin-top:18px;text-align:center;font-size:11.5px;font-weight:300;color:rgba(253,251,246,.4);line-height:1.7}
 .ad-login-note a{color:var(--gold2)}
 /* Clerk mode — drop our card chrome so Clerk's (dark-themed) card stands
    alone beneath the Sabdia wordmark. */

@@ -107,12 +107,12 @@ export const prerender = true;
         el('div', { style: 'display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px' }, [
           el('strong', { text: `${l.first_name ?? ''} ${l.last_name ?? ''}`.trim() || 'Anonymous', style: 'font-weight:400;font-size:15px' }),
           badge,
-          el('span', { text: typeLabel, style: 'font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe)' }),
-          el('span', { text: fmtDate(l.created_at), style: 'margin-left:auto;font-size:11px;color:var(--taupe)' }),
+          el('span', { text: typeLabel, style: 'font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe-d)' }),
+          el('span', { text: fmtDate(l.created_at), style: 'margin-left:auto;font-size:11px;color:var(--taupe-d)' }),
         ]),
         el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 20px;margin-bottom:14px' },
           details.map(([k, v]) => el('div', { style: 'font-size:12.5px' }, [
-            el('span', { text: k + ': ', style: 'color:var(--taupe)' }),
+            el('span', { text: k + ': ', style: 'color:var(--taupe-d)' }),
             typeof v === 'string' ? el('span', { text: v }) : v,
           ])),
         ),

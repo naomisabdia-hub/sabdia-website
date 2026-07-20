@@ -22,14 +22,14 @@ const names = forSale.map((p) => p.data.name).join(', ');
 const description = `Luxury properties for sale by Sabdia Constructions — Brisbane's award-winning boutique luxury home builder. Discover ${names}.`;
 const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
 ---
-<Base title="Properties For Sale | Sabdia Constructions" description={description}>
+<Base title="Properties For Sale | Sabdia Constructions" description={description} lightNav>
   <style is:inline slot="head">
   .prop-toolbar{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:18px clamp(22px,5vw,80px);background:var(--bg2);border-bottom:1px solid var(--border)}
   .prop-toolbar-inner{display:flex;gap:28px;align-items:center;flex-wrap:wrap;max-width:1400px;margin:0 auto;width:100%}
-  .ptool-l{font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--taupe)}
-  .ptool-sel{font-family:var(--font-u);font-size:10.5px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;border:none;border-bottom:1px solid var(--border);padding:4px 22px 4px 0;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%239E8B6A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center}
+  .ptool-l{font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)}
+  .ptool-sel{font-family:var(--font-u);font-size:10.5px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;border:none;border-bottom:1px solid var(--border);padding:4px 22px 4px 0;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23B49B5A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center}
   .ptool-sel:focus{outline:none;border-bottom-color:var(--gold)}
-  .ptool-count{margin-left:auto;font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe)}
+  .ptool-count{margin-left:auto;font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe-d)}
   </style>
 
   <!-- PAGE HEADER -->
@@ -75,25 +75,25 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
         <a href={`/properties/${featured.id}/`} class="reveal" style="display:block;position:relative;overflow:hidden;height:clamp(400px,52vw,680px);cursor:pointer;text-decoration:none">
           <img src={wixResize(featured.data.image, { w: 1600, h: 900, focus: featured.data.focus })}
                alt={featured.data.name} loading="eager"
-               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.82) saturate(.88);transition:filter .7s,transform .7s">
-          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(14,13,11,.88) 0%,rgba(14,13,11,.1) 50%,transparent 100%);transition:opacity .4s"></div>
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.98) saturate(.96);transition:filter .7s,transform .7s">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(31,27,20,.88) 0%,rgba(31,27,20,.1) 50%,transparent 100%);transition:opacity .4s"></div>
           <div style="position:absolute;bottom:0;left:0;right:0;padding:clamp(28px,4vw,52px)">
             <div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
               <div style="width:5px;height:5px;border-radius:50%;background:var(--gold2);animation:pulse 2s ease-in-out infinite;flex-shrink:0"></div>
-              <span style="font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--gold2)">For Sale</span>
+              <span style="font-size:10.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2)">For Sale</span>
             </div>
             <div style="font-family:var(--font-d);font-size:clamp(44px,8vw,110px);font-weight:300;line-height:.88;letter-spacing:-.04em;color:var(--white);margin-bottom:10px">{featured.data.name}</div>
-            <div style="font-size:11px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:rgba(253,252,248,.5);margin-bottom:18px">{featured.data.suburb}, {featured.data.state}</div>
+            <div style="font-size:11.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(253,251,246,.78);margin-bottom:18px">{featured.data.suburb}, {featured.data.state}</div>
             <div style="display:flex;gap:18px;flex-wrap:wrap">
               {[`${featured.data.beds} Bed`, `${featured.data.baths} Bath`, `${featured.data.cars} Garage`, landLabel(featured.data.land, featured.data.landOver)].map((s, i) => (
                 <>
-                  {i > 0 && <span style="font-size:10px;color:rgba(253,252,248,.25)">&middot;</span>}
-                  <span style="font-size:10px;font-weight:300;letter-spacing:.08em;color:rgba(253,252,248,.6)">{s}</span>
+                  {i > 0 && <span style="font-size:11px;color:rgba(253,251,246,.45)">&middot;</span>}
+                  <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(253,251,246,.82)">{s}</span>
                 </>
               ))}
             </div>
           </div>
-          <div style="position:absolute;top:clamp(18px,3vw,32px);right:clamp(18px,3vw,32px);width:44px;height:44px;border:1px solid rgba(196,172,135,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);font-size:16px">&rarr;</div>
+          <div style="position:absolute;top:clamp(18px,3vw,32px);right:clamp(18px,3vw,32px);width:44px;height:44px;border:1px solid rgba(200,175,116,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);font-size:16px">&rarr;</div>
         </a>
       </div>
     </section>
@@ -144,7 +144,7 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
           </div>
         ))}
       </div>
-      <p id="fEmpty" style="display:none;padding:56px 0;text-align:center;font-family:var(--font-d);font-size:22px;font-weight:300;font-style:italic;color:var(--taupe)">No residences match your criteria — try widening your search.</p>
+      <p id="fEmpty" style="display:none;padding:56px 0;text-align:center;font-family:var(--font-d);font-size:22px;font-weight:300;font-style:italic;color:var(--taupe-d)">No residences match your criteria — try widening your search.</p>
     </div>
   </section>
 

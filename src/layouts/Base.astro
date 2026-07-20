@@ -11,9 +11,12 @@ interface Props {
   preloadImage?: string;
   preloadImageSet?: string;
   preloadImageSizes?: string;
+  /* Pass on pages that open on a light surface instead of a photograph
+     or dark band, so the nav renders dark-on-light from the top. */
+  lightNav?: boolean;
 }
 
-const { title, description, ogTitle, ogDescription, ogImage, preloadImage, preloadImageSet, preloadImageSizes } = Astro.props;
+const { title, description, ogTitle, ogDescription, ogImage, preloadImage, preloadImageSet, preloadImageSizes, lightNav } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!DOCTYPE html>
@@ -42,7 +45,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 
 <a href="#main" class="skip-link">Skip to content</a>
 
-<Nav />
+<Nav lightNav={lightNav} />
 
 <main id="main">
 <slot />
