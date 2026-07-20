@@ -28,7 +28,17 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 <title>{title}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonical}>
-<script is:inline>document.documentElement.classList.add('js');</script>
+<script is:inline>
+document.documentElement.classList.add('js');
+/* Runs before first paint so the loader never flashes on a repeat visit.
+   sessionStorage, not localStorage: the opening is worth seeing once per
+   visit, not once per lifetime. Wrapped because Safari private mode throws
+   on storage access — a failure here just means the loader plays. */
+try {
+  if (sessionStorage.getItem('sabdia:seen')) document.documentElement.classList.add('no-loader');
+  else sessionStorage.setItem('sabdia:seen', '1');
+} catch (e) {}
+</script>
 {ogTitle && <meta property="og:title" content={ogTitle}>}
 {(ogDescription || ogTitle) && <meta property="og:description" content={ogDescription ?? description}>}
 {ogTitle && <meta property="og:type" content="website">}

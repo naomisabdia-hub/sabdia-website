@@ -1,10 +1,19 @@
 ---
 import { wixResize, landLabel } from '../lib/wix.js';
+import SpecIcon from './SpecIcon.astro';
 
 const { entry, class: cls = '', imgW, imgH, showSuburb = true } = Astro.props;
 const d = entry.data;
-const specs = [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`, landLabel(d.land, d.landOver)];
-const loc = (showSuburb ? [`${d.suburb}, QLD`] : []).concat(specs).join(' · ');
+/* Same chip treatment as PropertyCard — these were previously flattened
+   into a single middot-joined string, which read as one long line of
+   small grey text at the exact moment the card is meant to be showing
+   off what sold. */
+const specs = [
+  { icon: 'beds', label: `${d.beds} Bed` },
+  { icon: 'baths', label: `${d.baths} Bath` },
+  { icon: 'cars', label: `${d.cars} Garage` },
+  { icon: 'land', label: landLabel(d.land, d.landOver) },
+];
 ---
 <a href={`/properties/${entry.id}/`} class={`sc-card ${cls}`}>
   <img
@@ -15,6 +24,11 @@ const loc = (showSuburb ? [`${d.suburb}, QLD`] : []).concat(specs).join(' · ');
   <div class="sc-badge">Sold Prior to Completion</div>
   <div class="sc-info">
     <div class="sc-name">{d.name}</div>
-    <div class="sc-loc">{loc}</div>
+    {showSuburb && <div class="pc-loc"><SpecIcon icon="pin" />{d.suburb}, QLD</div>}
+    <ul class="pc-specs">
+      {specs.map((s) => (
+        <li class="pc-spec"><SpecIcon icon={s.icon} /><span>{s.label}</span></li>
+      ))}
+    </ul>
   </div>
 </a>

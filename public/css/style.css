@@ -32,6 +32,12 @@
   --gold3:     #E0D0A8;
   --gold-d:    #96762F;
   --bronze:    #7A5C2E;
+  /* Corner softening. Deliberately small — the reference sites round
+     their chrome (chips, buttons, panels) while leaving photography
+     square-cut, which keeps the editorial feel but stops the UI reading
+     as austere. Images stay at 0. */
+  --r-sm:      3px;
+  --r-md:      6px;
   --white:     #FDFBF6;
   --border:    rgba(180,155,90,0.30);
   --border-dk: rgba(224,208,168,0.16);
@@ -90,6 +96,9 @@ body.ch-dark #cur-r{border-color:rgba(212,201,174,.3)}
 /* ── LOADER ── */
 #loader{position:fixed;inset:0;background:var(--bg);z-index:10000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:32px;transition:opacity .5s var(--ease)}
 #loader.out{opacity:0;pointer-events:none}
+/* Repeat visit in the same session — set in Base.astro's head script, so
+   this applies before the loader has a chance to paint. */
+html.no-loader #loader{display:none}
 .ld-logo{opacity:0;transform:translateY(18px);animation:fup .5s var(--ease) .05s forwards}
 .ld-logo img{height:clamp(24px,3.5vw,44px)}
 .ld-meta{font-size:10px;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--taupe-d)}
@@ -113,7 +122,7 @@ body.ch-dark #cur-r{border-color:rgba(212,201,174,.3)}
 #mainNav.sc .nav-center a{color:var(--ink3)}
 #mainNav.sc .nav-center a:hover{color:var(--ink)}
 .nav-right{display:flex;align-items:center;gap:12px;margin-left:auto}
-.nav-cta{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border:1px solid rgba(253,251,246,.45);color:rgba(253,251,246,.85);font-size:10.5px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;transition:all .3s;white-space:nowrap}
+.nav-cta{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:var(--r-sm);border:1px solid rgba(253,251,246,.45);color:rgba(253,251,246,.85);font-size:10.5px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;transition:all .3s;white-space:nowrap}
 .nav-cta:hover{background:rgba(253,251,246,.12);border-color:var(--white);color:var(--white)}
 #mainNav.sc .nav-cta{border-color:var(--gold);color:var(--gold)}
 #mainNav.sc .nav-cta:hover{background:var(--gold);color:var(--white);border-color:var(--gold)}
@@ -185,9 +194,9 @@ html.js .slabel.reveal.vis::before{width:24px}
 /* Buttons */
 /* Primary CTA sits on bronze, not gold: white on --gold is only 2.6:1,
    which fails badly at this 10.5px tracked-out size. Bronze is ~6:1. */
-.btn-p{display:inline-flex;align-items:center;gap:10px;padding:15px 38px;background:var(--bronze);color:var(--white);font-size:10.5px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;transition:background .3s,transform .25s var(--ease)}
+.btn-p{display:inline-flex;align-items:center;gap:10px;padding:15px 38px;border-radius:var(--r-sm);background:var(--bronze);color:var(--white);font-size:10.5px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;transition:background .3s,transform .25s var(--ease)}
 .btn-p:hover{background:#8E6D37;transform:translateY(-2px)}
-.btn-g{display:inline-flex;align-items:center;gap:10px;padding:15px 38px;border:1px solid var(--border);color:var(--ink2);font-size:10.5px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;transition:border-color .3s,color .3s,transform .25s var(--ease)}
+.btn-g{display:inline-flex;align-items:center;gap:10px;padding:15px 38px;border-radius:var(--r-sm);border:1px solid var(--border);color:var(--ink2);font-size:10.5px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;transition:border-color .3s,color .3s,transform .25s var(--ease)}
 .btn-g:hover{border-color:var(--bronze);color:var(--bronze);transform:translateY(-2px)}
 .btn-g-light{border-color:rgba(253,251,246,.45);color:rgba(253,251,246,.88)}
 .btn-g-light:hover{border-color:var(--white);color:var(--white)}
@@ -234,12 +243,17 @@ html.js .slabel.reveal.vis::before{width:24px}
 .h-mid{position:relative;z-index:4;flex:1;display:flex;align-items:center;justify-content:center;padding-top:var(--nav-h);padding-bottom:clamp(20px,3vw,40px)}
 .h-mid-content{display:flex;flex-direction:column;align-items:center;gap:20px}
 .h-desc-bar{position:relative;z-index:4;padding:0 clamp(22px,5vw,80px) 12px;display:flex;justify-content:flex-end;flex-shrink:0}
-.h-bottom{position:relative;z-index:4;flex-shrink:0;opacity:0;animation:fin .8s ease 2s forwards}
+/* Hero entrance timings are tuned to land as the loader clears (~900ms,
+   see main.js). They previously started at 1.35s and ran to 2.4s, which
+   was pitched against a much longer opening wash — leaving a beat of
+   empty photograph once that was shortened. Sequence now: title 0.75s →
+   words 0.85s → eyebrow 1.15s → action bar 1.4s → scroll cue 1.8s. */
+.h-bottom{position:relative;z-index:4;flex-shrink:0;opacity:0;animation:fin .8s ease 1.4s forwards}
 .h-bottom-rule{height:1.5px;background:var(--gold);margin:0 clamp(22px,5vw,80px)}
 .h-bottom-inner{padding:clamp(12px,1.4vw,20px) clamp(22px,5vw,80px);display:flex;align-items:center;justify-content:space-between;gap:40px}
 .h-bottom-left{display:flex;align-items:center;gap:32px}
 
-.h-eyebrow-txt{font-size:11.5px;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--gold3);text-align:center;opacity:0;transform:translateY(12px);animation:fup .8s var(--ease) 1.7s forwards}
+.h-eyebrow-txt{font-size:11.5px;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--gold3);text-align:center;opacity:0;transform:translateY(12px);animation:fup .8s var(--ease) 1.15s forwards}
 
 /* The slideshow cycles photographs of very different exposure — one is a
    near-white kitchen — so a fixed scrim alone can't guarantee the hero
@@ -250,19 +264,19 @@ html.js .slabel.reveal.vis::before{width:24px}
 
 .h-award{font-family:var(--font-d);font-size:clamp(14px,1.4vw,22px);font-weight:300;font-style:italic;color:var(--gold2);letter-spacing:.03em;white-space:nowrap}
 
-.h-title{font-family:var(--font-u);font-size:30px;font-weight:300;letter-spacing:.28em;text-transform:uppercase;color:rgba(253,251,246,.85);white-space:nowrap;text-align:center;opacity:0;animation:fin .5s ease 1.35s forwards}
+.h-title{font-family:var(--font-u);font-size:30px;font-weight:300;letter-spacing:.28em;text-transform:uppercase;color:rgba(253,251,246,.85);white-space:nowrap;text-align:center;opacity:0;animation:fin .5s ease .75s forwards}
 .h-title-dot{color:var(--gold2);letter-spacing:.1em;font-size:1.4em;position:relative;top:-0.08em}
 /* cinematic word-mask reveal */
 .h-w{display:inline-block;overflow:hidden;vertical-align:bottom}
-.h-w-in{display:inline-block;transform:translateY(115%);animation:hword .85s var(--ease) calc(1.45s + var(--wi,0)*.09s) forwards}
+.h-w-in{display:inline-block;transform:translateY(115%);animation:hword .85s var(--ease) calc(.85s + var(--wi,0)*.09s) forwards}
 @keyframes hword{to{transform:translateY(0)}}
 
 .h-actions{display:flex;gap:12px;align-items:center;flex-shrink:0}
 .h-desc{font-size:13px;font-weight:300;line-height:1.8;color:rgba(253,251,246,.8);letter-spacing:.02em;max-width:380px;text-align:right}
 
-.h-scroll-wrap{position:absolute;bottom:clamp(170px,22vw,240px);right:clamp(22px,5vw,80px);z-index:4;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;animation:fin 1s ease 2.4s forwards}
+.h-scroll-wrap{position:absolute;bottom:clamp(170px,22vw,240px);right:clamp(22px,5vw,80px);z-index:4;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;animation:fin 1s ease 1.8s forwards}
 .h-scroll-num{font-size:10px;font-weight:400;letter-spacing:.22em;color:rgba(253,251,246,.72)}
-.h-scroll-line{width:1px;height:56px;background:linear-gradient(to bottom,transparent,var(--gold2));animation:spulse 2.4s ease-in-out 2.7s infinite}
+.h-scroll-line{width:1px;height:56px;background:linear-gradient(to bottom,transparent,var(--gold2));animation:spulse 2.4s ease-in-out 2.1s infinite}
 .h-dots{display:flex;gap:8px;flex-shrink:0}
 .h-dot{position:relative;width:18px;height:1.5px;background:rgba(253,251,246,.35);cursor:pointer;transition:background .3s,width .4s var(--ease);border:none;padding:0;appearance:none}
 .h-dot::before{content:'';position:absolute;inset:-14px -4px}
@@ -309,21 +323,32 @@ html.js .slabel.reveal.vis::before{width:24px}
 .pc:hover img{filter:brightness(.82) saturate(1);transform:scale(1.035)}
 .pc-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(31,27,20,.86) 0%,rgba(31,27,20,.16) 52%,transparent 78%);transition:opacity .4s}
 .pc-info{position:absolute;bottom:0;left:0;right:0;padding:28px 32px}
-.pc-status{display:inline-flex;align-items:center;gap:6px;font-size:9px;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--gold2);margin-bottom:6px}
-.pc-dot{width:4px;height:4px;border-radius:50%;background:var(--gold2);animation:pulse 2.2s ease-in-out infinite;flex-shrink:0}
+/* Status moved out of the text stack and up to the corner as a chip,
+   the way every reference treats it — it reads as metadata about the
+   listing rather than as a line of the title block. */
+.pc-status-chip{position:absolute;top:20px;left:20px;z-index:2;display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:var(--r-sm);background:rgba(31,27,20,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(224,208,168,.28);font-size:9.5px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold3)}
+.pc-dot{width:5px;height:5px;border-radius:50%;background:var(--gold2);animation:pulse 2.2s ease-in-out infinite;flex-shrink:0}
 .pc-dot.sold{background:#8C8880;animation:none}
-.pc-name{font-family:var(--font-d);font-size:clamp(20px,2.5vw,36px);font-weight:300;color:var(--white);line-height:1.05;margin-bottom:4px}
-.pc-loc{font-size:10px;font-weight:300;letter-spacing:.18em;color:rgba(253,251,246,.6);text-transform:uppercase}
-.pc-specs{display:flex;gap:18px;margin-top:10px;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .4s var(--ease)}
-.pc:hover .pc-specs{opacity:1;transform:translateY(0)}
-.pc-spec{font-size:10px;font-weight:300;letter-spacing:.08em;color:rgba(253,251,246,.65);display:flex;align-items:center;gap:5px}
+.pc-name{font-family:var(--font-d);font-size:clamp(20px,2.5vw,36px);font-weight:300;color:var(--white);line-height:1.05;margin-bottom:6px}
+.pc-loc{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:400;letter-spacing:.18em;color:rgba(253,251,246,.78);text-transform:uppercase}
+.pc-loc svg{width:1.25em;height:1.25em;flex-shrink:0;opacity:.8}
+/* Specs were opacity:0 until :hover — which meant they never appeared
+   at all on a touch device, hiding bed/bath/car counts from every phone
+   visitor. They are now persistent chips. */
+.pc-specs{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;list-style:none;padding:0}
+.pc-spec{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:var(--r-sm);background:rgba(31,27,20,.38);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(253,251,246,.22);font-size:11px;font-weight:400;letter-spacing:.04em;color:rgba(253,251,246,.92);white-space:nowrap}
+.pc-spec svg{width:1.25em;height:1.25em;flex-shrink:0;opacity:.75}
 .pc-arrow{position:absolute;top:22px;right:22px;width:38px;height:38px;border:1px solid rgba(200,175,116,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.6);transition:opacity .35s,transform .45s var(--ease);color:var(--gold2);font-size:14px}
 .pc:hover .pc-arrow{opacity:1;transform:scale(1)}
 .pc-hero .pc-name{font-size:clamp(28px,3.5vw,52px)}
 .pc-hero .pc-info{padding:40px 44px}
 
-/* 3-col row grid (for properties page) */
+/* 3-col row grid (for properties page). The listing markup used to set
+   this inline, which no media query could override — so the For Sale
+   page rendered three ~104px cards side by side on a phone. Kept as a
+   class with a tablet step so it can actually respond. */
 .proj-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:1100px){.proj-grid-3{grid-template-columns:repeat(2,1fr)}}
 /* 2-col sold grid */
 .proj-grid-sold{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:64px}
 .sold-label{font-size:9px;font-weight:300;letter-spacing:.36em;text-transform:uppercase;color:var(--taupe-d);padding-bottom:20px;display:flex;align-items:center;gap:12px;margin-bottom:0}
@@ -335,7 +360,7 @@ html.js .slabel.reveal.vis::before{width:24px}
 .sc-card img{width:100%;height:100%;object-fit:cover;filter:brightness(.95) saturate(.9);transition:filter .6s,transform .8s var(--ease)}
 .sc-card:hover img{filter:brightness(.8) saturate(.95);transform:scale(1.035)}
 .sc-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(31,27,20,.84) 0%,rgba(31,27,20,.14) 50%,transparent 76%)}
-.sc-badge{position:absolute;top:16px;left:16px;padding:6px 13px;background:rgba(31,27,20,.78);border:1px solid rgba(200,175,116,.34);font-size:9.5px;font-weight:400;letter-spacing:.24em;text-transform:uppercase;color:var(--gold3);backdrop-filter:blur(8px)}
+.sc-badge{position:absolute;top:16px;left:16px;padding:6px 13px;border-radius:var(--r-sm);background:rgba(31,27,20,.78);border:1px solid rgba(200,175,116,.34);font-size:9.5px;font-weight:400;letter-spacing:.24em;text-transform:uppercase;color:var(--gold3);backdrop-filter:blur(8px)}
 .sc-info{position:absolute;bottom:0;left:0;right:0;padding:22px 26px}
 .sc-name{font-family:var(--font-d);font-size:clamp(18px,2vw,28px);font-weight:300;color:var(--white);line-height:1.05;margin-bottom:4px}
 .sc-loc{font-size:10px;font-weight:300;letter-spacing:.14em;color:rgba(253,251,246,.55);text-transform:uppercase}
@@ -390,7 +415,7 @@ html.js .proc-track.fill .proc-step:nth-child(4) .proc-n{transition-delay:1.25s}
 .agent-vis img{width:100%;height:100%;object-fit:cover;filter:brightness(.97) saturate(.95);transition:transform 8s linear}
 .agent-vis:hover img{transform:scale(1.04)}
 .agent-frame{position:absolute;top:20px;left:20px;right:-20px;bottom:-20px;border:1px solid rgba(180,155,90,.22);pointer-events:none;z-index:2}
-.agent-badge{position:absolute;top:28px;right:28px;z-index:3;padding:10px 18px;background:rgba(247,243,235,.94);border:1px solid var(--gold);font-size:9.5px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--bronze);backdrop-filter:blur(12px)}
+.agent-badge{position:absolute;top:28px;right:28px;z-index:3;padding:10px 18px;border-radius:var(--r-sm);background:rgba(247,243,235,.94);border:1px solid var(--gold);font-size:9.5px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--bronze);backdrop-filter:blur(12px)}
 .agent-content{padding:clamp(52px,8vw,120px) clamp(36px,6vw,96px);display:flex;flex-direction:column;justify-content:center;background:var(--bg2)}
 .agent-h{font-family:var(--font-d);font-size:clamp(36px,4.5vw,60px);font-weight:300;line-height:1.05;color:var(--ink);margin-bottom:20px;letter-spacing:-.02em}
 .agent-h em{font-style:italic;color:var(--gold-d)}
@@ -413,12 +438,12 @@ a.cd-v:hover{color:var(--gold)}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .fg{display:flex;flex-direction:column;gap:7px}
 .fl{font-size:9px;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--taupe-d)}
-.fi,.fta,.fsel{background:var(--white);border:1px solid var(--border);color:var(--ink);padding:13px 16px;font-family:var(--font-u);font-size:13px;font-weight:300;outline:none;transition:border-color .3s,box-shadow .3s;width:100%;border-radius:0}
+.fi,.fta,.fsel{background:var(--white);border:1px solid var(--border);color:var(--ink);padding:13px 16px;font-family:var(--font-u);font-size:13px;font-weight:300;outline:none;transition:border-color .3s,box-shadow .3s;width:100%;border-radius:var(--r-sm)}
 .fi:focus,.fta:focus,.fsel:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(180,155,90,.08)}
 .fi::placeholder,.fta::placeholder{color:var(--taupe-d)}
 .fta{resize:vertical;min-height:108px}
 .fsel{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23B49B5A' stroke-width='1' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 15px center}
-.fsub{padding:16px 44px;background:var(--bronze);color:var(--white);font-family:var(--font-u);font-size:10.5px;font-weight:400;letter-spacing:.24em;text-transform:uppercase;border:none;transition:background .3s,transform .25s var(--ease);align-self:flex-start}
+.fsub{padding:16px 44px;border-radius:var(--r-sm);background:var(--bronze);color:var(--white);font-family:var(--font-u);font-size:10.5px;font-weight:400;letter-spacing:.24em;text-transform:uppercase;border:none;transition:background .3s,transform .25s var(--ease);align-self:flex-start}
 .fsub:hover{background:#8E6D37;transform:translateY(-2px)}
 .form-note{font-size:11px;font-weight:300;color:var(--taupe-d);letter-spacing:.04em}
 
@@ -497,7 +522,7 @@ footer{background:var(--dark);padding-top:0}
 .prop-feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .prop-feat{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:300;color:var(--ink3)}
 .prop-feat::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
-.prop-enquire{margin-top:40px;padding:40px;background:var(--bg2);border:1px solid var(--border);border-top:2px solid var(--gold)}
+.prop-enquire{margin-top:40px;padding:40px;border-radius:var(--r-md);background:var(--bg2);border:1px solid var(--border);border-top:2px solid var(--gold)}
 .prop-enquire-h{font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--ink);margin-bottom:20px}
 .prop-gallery{padding:0 clamp(22px,5vw,80px) clamp(64px,9vw,130px)}
 .prop-gallery-h{font-family:var(--font-d);font-size:clamp(30px,4vw,52px);font-weight:300;color:var(--ink);letter-spacing:-.02em}
@@ -798,7 +823,7 @@ h1 em, h2 em, h3 em,
 .mq-item{font-size:10px;letter-spacing:.26em;color:var(--ink2)}
 .stat-l{font-size:10.5px;letter-spacing:.24em}
 .sold-label{font-size:10.5px;letter-spacing:.28em}
-.pc-status{font-size:10px;letter-spacing:.26em}
+.pc-status-chip{font-size:9.5px;letter-spacing:.22em}
 .pc-loc{font-size:10.5px}
 .pc-spec{font-size:11px}
 .sc-loc{font-size:10.5px}

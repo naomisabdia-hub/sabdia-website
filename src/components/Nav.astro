@@ -11,17 +11,26 @@ const { lightNav = false } = Astro.props;
 
 const { settings, nav } = await getContent('settings', 'nav');
 const socials = settings.socials;
+
+/* The opening loader is a homepage-only gesture. It used to render inside
+   every page (Nav sits in Base), so a full-screen cream overlay flashed on
+   every single navigation — an interruption, not an overture. A repeat
+   visit within the same session skips it too; see the head script in
+   Base.astro, which sets html.no-loader before first paint. */
+const isHome = Astro.url.pathname === '/';
 ---
 <div id="cur" aria-hidden="true"></div>
 <div id="cur-r" aria-hidden="true"></div>
 
-<div id="loader" aria-hidden="true">
-  <div class="ld-logo">
-    <img src={settings.logoLarge} alt="" loading="eager">
+{isHome && (
+  <div id="loader" aria-hidden="true">
+    <div class="ld-logo">
+      <img src={settings.logoLarge} alt="" loading="eager">
+    </div>
+    <div class="ld-rule"></div>
+    <div class="ld-meta">{nav.loaderMeta}</div>
   </div>
-  <div class="ld-rule"></div>
-  <div class="ld-meta">{nav.loaderMeta}</div>
-</div>
+)}
 
 <div class="mob-nav" id="mobNav" aria-hidden="true">
   <nav class="mob-nav-links" aria-label="Mobile">

@@ -252,7 +252,6 @@ const jsonLd = JSON.stringify({
             imgW={1400}
             imgH={900}
             specs={[`${hero.data.beds} Bed`, `${hero.data.baths} Bath`, `${hero.data.cars} Garage`, landLabel(hero.data.land, hero.data.landOver)]}
-            sep="dot"
           />
         )}
         {smallA && (
@@ -263,7 +262,6 @@ const jsonLd = JSON.stringify({
             imgW={900}
             imgH={680}
             specs={[`${smallA.data.beds} Bed`, `${smallA.data.baths} Bath`, landLabel(smallA.data.land, smallA.data.landOver)]}
-            sep="dot"
           />
         )}
         {smallB && (
@@ -274,13 +272,12 @@ const jsonLd = JSON.stringify({
             imgW={900}
             imgH={680}
             specs={[`${smallB.data.beds} Bed`, `${smallB.data.baths} Bath`, landLabel(smallB.data.land, smallB.data.landOver)]}
-            sep="dot"
           />
         )}
       </div>
 
       {(restRow.length > 0 || sold.length > 0) && (
-        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div class="proj-grid-3" style="margin-top:10px">
           {restRow.map((p) => (
             <PropertyCard
               entry={p}
@@ -289,7 +286,6 @@ const jsonLd = JSON.stringify({
               imgW={900}
               imgH={560}
               specs={[`${p.data.beds} Bed`, `${p.data.baths} Bath`, landLabel(p.data.land, p.data.landOver)]}
-              sep="dot"
             />
           ))}
           {sold.map((p, i) => (

@@ -101,7 +101,7 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
 
   <section style="padding:clamp(8px,1vw,10px) clamp(22px,5vw,80px) 0;background:var(--bg)">
     <div class="inner">
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="propGrid">
+      <div class="proj-grid-3" id="propGrid">
         {featured && (
           <div
             data-prop-card
@@ -119,7 +119,6 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
               imgW={900}
               imgH={562}
               specs={[`${featured.data.beds} Bed`, `${featured.data.baths} Bath`, `${featured.data.cars} Garage`, landLabel(featured.data.land, featured.data.landOver)]}
-              sep="dot"
             />
           </div>
         )}
@@ -139,7 +138,6 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
               imgW={900}
               imgH={562}
               specs={[`${p.data.beds} Bed`, `${p.data.baths} Bath`, `${p.data.cars} Garage`, landLabel(p.data.land, p.data.landOver)]}
-              sep="dot"
             />
           </div>
         ))}
@@ -152,7 +150,7 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
     <section style="padding:clamp(64px,8vw,100px) clamp(22px,5vw,80px) clamp(80px,10vw,120px);background:var(--bg)">
       <div class="inner">
         <div class="slabel reveal" style="margin-bottom:32px">{page.soldLabel}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="proj-grid-sold" style="margin-top:0">
           {sold.map((p, i) => (
             <SoldCard entry={p} class={`reveal ${['', 'd1'][i % 2]}`} imgW={900} imgH={560} />
           ))}

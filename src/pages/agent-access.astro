@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import BenefitIcon from '../components/BenefitIcon.astro';
 import CustomSections from '../components/CustomSections.astro';
+import PropertyCard from '../components/PropertyCard.astro';
 import { wixResize, landLabel } from '../lib/wix.js';
 import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
@@ -70,16 +71,14 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
       <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px);margin-bottom:48px" set:html={page.listings.headingHtml} />
       <div class="agent-listings-grid">
         {forSale.map((p, i) => (
-          <a href={`/properties/${p.id}/`} class={`pc reveal ${i % 2 === 1 ? 'd1' : ''}`} style="aspect-ratio:16/10">
-            <img src={wixResize(p.data.image, { w: 900, h: 560, focus: p.data.focus })} alt={p.data.name} loading="lazy">
-            <div class="pc-ov"></div>
-            <div class="pc-info">
-              <div class="pc-status"><div class="pc-dot"></div>For Sale</div>
-              <div class="pc-name">{p.data.name}</div>
-              <div class="pc-loc">{p.data.suburb}, QLD &middot; {p.data.beds} Bed &middot; {p.data.baths} Bath &middot; {landLabel(p.data.land, p.data.landOver)}</div>
-            </div>
-            <div class="pc-arrow">&rarr;</div>
-          </a>
+          <PropertyCard
+            entry={p}
+            class={`reveal ${i % 2 === 1 ? 'd1' : ''}`.trim()}
+            style="aspect-ratio:16/10"
+            imgW={900}
+            imgH={560}
+            specs={[`${p.data.beds} Bed`, `${p.data.baths} Bath`, landLabel(p.data.land, p.data.landOver)]}
+          />
         ))}
       </div>
       <div style="text-align:center;margin-top:28px">

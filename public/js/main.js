@@ -20,17 +20,33 @@ if (navTime) {
 }
 
 // ── LOADER ──────────────────────────────────────────────────
-// Held the page for 1.6s after load plus a 0.95s fade — ~2.5s of blank
-// screen before anyone saw a home. Now a brief warm wash that clears
-// quickly; it reads as a considered opening rather than a wait.
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const l = document.getElementById('loader');
-    if (!l) return;
-    l.classList.add('out');
-    setTimeout(() => l.remove(), 520);
-  }, reduceMotion ? 120 : 420);
-});
+// Homepage-only, first visit per session (see Nav.astro + Base.astro).
+//
+// This used to hang off `window.load`, which waits for every image on the
+// page — on a slideshow hero that is seconds of cream, and the visitor is
+// held behind a wash long after the first slide is actually paintable. Now
+// whichever comes first wins: the load event, or a hard cap. The cap is the
+// one that fires in practice, and it means a slow image can never hold the
+// door shut.
+(() => {
+  const loader = document.getElementById('loader');
+  if (!loader) return;
+
+  let done = false;
+  const dismiss = () => {
+    if (done) return;
+    done = true;
+    loader.classList.add('out');
+    setTimeout(() => loader.remove(), 520);
+  };
+
+  const hold = reduceMotion ? 120 : 420;
+  // Cap measured from now (the script runs at end of body, so the markup
+  // is parsed and the hero is already painting behind the overlay).
+  const cap = reduceMotion ? 200 : 900;
+  setTimeout(dismiss, cap);
+  window.addEventListener('load', () => setTimeout(dismiss, hold));
+})();
 
 // ── KEYBOARD VS MOUSE — restore real cursor on Tab ──────────
 document.addEventListener('keydown', (e) => {
