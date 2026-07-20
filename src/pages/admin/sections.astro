@@ -198,7 +198,16 @@ export const prerender = true;
   ];
   let isNew = false;
   function schemaFor(s) {
-    return [...commonSchema, ...(sectionLayouts[s.layout]?.fields ?? [])];
+    /* The layout is switchable after creation: fields shared between
+       layouts (label, heading, image, CTA…) carry across, and readForm
+       preserves values a layout doesn't show, so switching back loses
+       nothing until save. */
+    const layoutField = {
+      key: 'layout', label: 'Layout', type: 'select',
+      help: 'switch the design of this section — the words and images you\'ve entered carry across',
+      options: Object.entries(sectionLayouts).map(([k, v]) => [k, v.name]),
+    };
+    return [...commonSchema, layoutField, ...(sectionLayouts[s.layout]?.fields ?? [])];
   }
   function openEditor(s, fresh = false) {
     current = s;
@@ -207,7 +216,17 @@ export const prerender = true;
     document.getElementById('editTitle').textContent = `${fresh ? 'New' : 'Edit'} — ${layout.name}`;
     document.getElementById('editDesc').textContent = layout.description;
     document.getElementById('previewBtn').href = pageUrl(s.page);
-    buildForm(document.getElementById('sectionForm'), schemaFor(s), s);
+    const form = document.getElementById('sectionForm');
+    buildForm(form, schemaFor(s), s);
+    /* Rebuild the field set live when the layout changes. */
+    form.querySelector('[data-k="layout"]').addEventListener('change', (e) => {
+      const draft = readForm(form, schemaFor(current), current);
+      draft.layout = e.target.value;
+      const i = doc.sections.findIndex((x) => x.id === current.id);
+      if (i >= 0) doc.sections[i] = draft; else doc.sections.push(draft);
+      openEditor(draft, isNew);
+      form.dispatchEvent(new CustomEvent('ad-dirty', { bubbles: true }));
+    });
     show('edit');
   }
 
