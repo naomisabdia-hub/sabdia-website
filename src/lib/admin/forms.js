@@ -20,12 +20,53 @@ function markDirty(container) {
   container.dispatchEvent(new CustomEvent('ad-dirty', { bubbles: true }));
 }
 
+/* Formatting toolbar for long-text fields. Buttons insert the site's own
+   markup — markdown-lite on textareas (what the Journal renderer reads),
+   HTML emphasis on 'html' fields — so every emphasis option an editor has
+   stays inside the design system. */
+const TOOLBARS = {
+  textarea: [
+    ['B', 'Bold', '**', '**'],
+    ['I', 'Italic', '*', '*'],
+    ['H2', 'Section heading', '\n\n## ', ''],
+    ['H3', 'Small heading', '\n\n### ', ''],
+    ['“”', 'Pull quote', '\n\n> ', ''],
+    ['•', 'Bullet list', '\n\n- ', ''],
+    ['Link', 'Link — select text first', '[', '](/contact/)'],
+  ],
+  html: [
+    ['I gold', 'Gold italic emphasis', '<em>', '</em>'],
+    ['↵', 'Line break', '<br>', ''],
+  ],
+};
+
+function wrapSelection(ta, before, after) {
+  const start = ta.selectionStart ?? ta.value.length;
+  const end = ta.selectionEnd ?? ta.value.length;
+  const sel = ta.value.slice(start, end);
+  ta.value = ta.value.slice(0, start) + before + sel + after + ta.value.slice(end);
+  ta.focus();
+  const pos = start + before.length + sel.length;
+  ta.setSelectionRange(sel ? pos + after.length : start + before.length, sel ? pos + after.length : start + before.length + 0);
+  ta.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function withToolbar(field, ta) {
+  const spec = TOOLBARS[field.type];
+  if (!spec || field.plain) return ta;
+  const bar = el('div', { class: 'ad-fmtbar' },
+    spec.map(([label, title, before, after]) =>
+      el('button', { type: 'button', class: 'ad-fmtbtn', title, text: label,
+        onclick: () => wrapSelection(ta, before, after) })));
+  return el('div', { class: 'ad-fta-wrap' }, [bar, ta]);
+}
+
 function inputFor(field, value, container) {
   const v = value ?? '';
   switch (field.type) {
     case 'textarea':
     case 'html':
-      return el('textarea', { class: 'ad-fta', 'data-k': field.key, text: v });
+      return withToolbar(field, el('textarea', { class: 'ad-fta', 'data-k': field.key, text: v }));
     case 'number':
       return el('input', { class: 'ad-fi', type: 'number', 'data-k': field.key, value: v });
     case 'checkbox': {

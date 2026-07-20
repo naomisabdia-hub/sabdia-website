@@ -32,6 +32,24 @@ export const prerender = true;
         <button class="ad-btn ad-btn-ghost" id="backBtn">← All entries</button>
       </div>
     </div>
+    <div class="ad-card" id="aiPanel" style="margin-bottom:18px">
+      <div class="ad-card-h" style="display:flex;align-items:center;gap:10px">AI writing assistant
+        <span id="aiStatus" style="font-size:11px;font-weight:300;letter-spacing:.04em;color:var(--taupe-d);text-transform:none"></span>
+      </div>
+      <div style="padding:16px 18px">
+        <label class="ad-fl" for="aiNotes">Notes &amp; resources — facts, links, fragments; the assistant only uses what you give it</label>
+        <textarea class="ad-fi" id="aiNotes" rows="4" placeholder="e.g. CASPIAN open home Sat 2pm · new landscaping by X · quote from the client: '…' · paste anything"></textarea>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <button type="button" class="ad-btn ad-btn-gold" data-ai="draft">Draft entry from notes</button>
+          <button type="button" class="ad-btn ad-btn-ghost" data-ai="polish">Polish body</button>
+          <button type="button" class="ad-btn ad-btn-ghost" data-ai="tighten">Tighten body</button>
+          <button type="button" class="ad-btn ad-btn-ghost" data-ai="meta">Suggest excerpt + SEO</button>
+          <button type="button" class="ad-btn ad-btn-ghost" data-ai="alt">Suggest image alt text</button>
+          <button type="button" class="ad-btn ad-btn-ghost" data-ai="headlines">Headline ideas</button>
+        </div>
+        <pre id="aiOut" style="display:none;white-space:pre-wrap;font-family:var(--font-u);font-size:12.5px;line-height:1.7;background:var(--bg2);border:1px solid var(--border);padding:14px;margin-top:12px;max-height:220px;overflow:auto"></pre>
+      </div>
+    </div>
     <div class="ad-form" id="postForm"></div>
     <div class="ad-savebar" id="saveBar">
       <button class="ad-btn ad-btn-gold" data-save>Save</button>
@@ -125,6 +143,74 @@ export const prerender = true;
     if (error) return toast(error.message, true);
     toast('Entry deleted');
     loadList();
+  });
+
+  // ── AI assistant ─────────────────────────────────────────
+  const aiStatus = document.getElementById('aiStatus');
+  const aiOut = document.getElementById('aiOut');
+  const field = (k) => document.querySelector(`#postForm [data-k="${k}"]`);
+  const setField = (k, v) => {
+    const el = field(k);
+    if (!el || v == null) return;
+    el.value = v;
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+
+  document.getElementById('aiPanel').addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-ai]');
+    if (!btn) return;
+    const task = btn.getAttribute('data-ai');
+    const body = field('body')?.value ?? '';
+    const notes = document.getElementById('aiNotes').value;
+    if (['polish', 'tighten', 'meta'].includes(task) && !body.trim()) return toast('Write or draft a body first.', true);
+    if (task === 'draft' && !notes.trim() && !confirm('No notes provided — draft a structure with [CHECK] placeholders instead?')) return;
+
+    const { accessToken } = await import('../../lib/admin/client.js');
+    const buttons = [...document.querySelectorAll('[data-ai]')];
+    buttons.forEach((b) => (b.disabled = true));
+    aiStatus.textContent = 'Thinking…';
+    try {
+      const res = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await accessToken()}` },
+        body: JSON.stringify({
+          task,
+          text: body,
+          notes,
+          title: field('title')?.value ?? '',
+          category: field('category')?.value ?? '',
+          image: field('hero_image')?.value ?? '',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `AI request failed (${res.status})`);
+      let text = data.text;
+
+      if (task === 'draft' || task === 'polish' || task === 'tighten') {
+        const m = text.match(/^TITLE:\s*(.+)\n+/);
+        if (m) { setField('title', m[1].trim()); text = text.slice(m[0].length); }
+        setField('body', text);
+        toast('Body updated — review every line before publishing.');
+      } else if (task === 'meta') {
+        const meta = JSON.parse(text.replace(/^```json?\n?|```$/g, ''));
+        setField('excerpt', meta.excerpt);
+        setField('seo_title', meta.seo_title);
+        setField('seo_description', meta.seo_description);
+        if (!field('category')?.value) setField('category', meta.category);
+        toast('Excerpt + SEO fields filled — review before saving.');
+      } else if (task === 'alt') {
+        setField('hero_alt', text);
+        toast('Alt text suggested from the actual image — check it reads true.');
+      } else {
+        aiOut.style.display = '';
+        aiOut.textContent = text;
+      }
+    } catch (err) {
+      toast(err.message, true);
+    } finally {
+      buttons.forEach((b) => (b.disabled = false));
+      aiStatus.textContent = '';
+    }
   });
 
   await loadList();

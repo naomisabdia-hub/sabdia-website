@@ -136,3 +136,21 @@
 - Leads Inbox verified with real login: all 5 test records visible (3 enquiries incl.
   property-specific, 2 newsletter signups), status workflow buttons present. Audit #11 closed.
 - Journal admin verified: both seed drafts listed with Draft badges.
+
+## Editorial suite — AI assistant, formatting, brand mark, image SEO (2026-07-21)
+- AI writing assistant in /admin → Journal editor (Claude Opus 4.8 via official SDK):
+  Draft from notes / Polish / Tighten / Suggest excerpt+SEO (structured) / Suggest image alt
+  text (vision — reads the actual hero image) / Headline ideas. Grounded by a hard no-invented-
+  facts rule ([CHECK: …] placeholders for gaps) + the Sabdia voice + AU English + markdown-lite
+  output. Endpoint /api/ai verifies the caller against is_admin_user() before any model call;
+  DORMANT until ANTHROPIC_API_KEY is set (verified 503 with activation message).
+- Formatting toolbar on every long-text field in every admin form (B / I / H2 / H3 / quote /
+  list / link on markdown fields; gold-italic + line break on HTML fields) — inserts only the
+  design system's own markup, keeping all emphasis inside the brand palette per Naomi's
+  colour-consistency rule. Verified rendering on 3 fields in the Journal editor.
+- Brand rule systemised: renderBody() now sets every standalone "Sabdia"/"SABDIA" in Journal
+  prose in the wordmark's letter-style (.brand-mark — tracked caps, Jost 500). Exact-case only;
+  URLs and lowercase untouched (unit-tested: 4/4 matches, href safe).
+- Image SEO audit: 206 rendered images across 17 pages — 0 missing alt attributes; the 7
+  empty alts are correct (decorative loader logo + lightbox placeholder whose alt is set by JS
+  on open — verified). CMS enforces alt fields with help text; AI can now write them.

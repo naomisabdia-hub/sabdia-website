@@ -59,7 +59,10 @@ function inline(s) {
   return s
     .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]*)\)/g, '<a href="$2">$1</a>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    /* Brand rule: the name always appears in the wordmark's letter-style.
+       Exact-case match only, so URLs (lowercase) are never touched. */
+    .replace(/\b(SABDIA|Sabdia)\b/g, '<span class="brand-mark">$1</span>');
 }
 
 /**

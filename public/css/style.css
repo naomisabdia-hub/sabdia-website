@@ -526,6 +526,10 @@ footer{background:var(--dark);padding-top:0}
 .jn-body li{margin-bottom:.5em}
 .jn-body a{color:var(--ink);border-bottom:1px solid rgba(180,155,90,.45)}
 .jn-body a:hover{border-color:var(--gold)}
+/* The brand name set in the wordmark's letter-style wherever it appears
+   in Journal prose — tracked caps in the UI face, slightly undersized so
+   it sits on the serif baseline like a small-cap mark. */
+.brand-mark{font-family:var(--font-u);font-weight:500;letter-spacing:.13em;text-transform:uppercase;font-size:.82em}
 .jn-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:36px}
 .jn-tag{font-size:10px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);border:1px solid var(--border);padding:5px 12px;border-radius:var(--r-sm)}
 

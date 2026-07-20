@@ -60,6 +60,13 @@ export const supabase = configured
     )
   : null;
 
+/** The signed-in portal user's bearer token (Clerk or Supabase mode). */
+export async function accessToken() {
+  if (clerkMode) return (await getClerk())?.session?.getToken() ?? null;
+  const { data } = await supabase.auth.getSession();
+  return data?.session?.access_token ?? null;
+}
+
 const toLogin = (query) => {
   location.href = '/admin/login/' + query;
 };

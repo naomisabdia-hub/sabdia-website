@@ -68,6 +68,10 @@ body.admin a,body.admin button,body.admin select,body.admin label{cursor:pointer
 .ad-fi,.ad-fta,.ad-fsel{font-family:var(--font-u);font-size:13px;font-weight:300;color:var(--ink);background:var(--white);border:1px solid var(--border);padding:10px 13px;width:100%;transition:border-color .2s}
 .ad-fi:focus,.ad-fta:focus,.ad-fsel:focus{outline:none;border-color:var(--gold)}
 .ad-fta{min-height:110px;resize:vertical;line-height:1.7}
+.ad-fta-wrap{width:100%}
+.ad-fmtbar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.ad-fmtbtn{font-family:var(--font-u);font-size:10.5px;font-weight:500;letter-spacing:.08em;color:var(--ink2);background:var(--white);border:1px solid var(--border);padding:4px 10px;cursor:pointer;border-radius:var(--r-sm);transition:border-color .2s,color .2s}
+.ad-fmtbtn:hover{border-color:var(--gold);color:var(--ink)}
 .ad-frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .ad-frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 .ad-check{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:300;color:var(--ink2)}
