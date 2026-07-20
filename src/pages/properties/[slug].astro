@@ -5,6 +5,7 @@ import PropertyCard from '../../components/PropertyCard.astro';
 import PropertyViewer from '../../components/PropertyViewer.astro';
 import FilmBand from '../../components/FilmBand.astro';
 import SeriesStrip from '../../components/SeriesStrip.astro';
+import ShareRow from '../../components/ShareRow.astro';
 import WalkthroughCinema from '../../components/WalkthroughCinema.astro';
 import { imgVariant, landLabel } from '../../lib/images.js';
 import { getProperties, getProperty } from '../../lib/db.js';
@@ -290,6 +291,12 @@ const jsonLd = JSON.stringify({
       </div>
     </section>
   )}
+
+  <section style="padding:0 clamp(22px,5vw,80px) clamp(48px,6vw,72px)">
+    <div class="inner" style="display:flex;justify-content:center">
+      <ShareRow url={`${base}/properties/${entry.id}/`} title={`${d.name} — ${d.suburb} | Sabdia Constructions`} />
+    </div>
+  </section>
 
   <script is:inline>
   /* Keyboard control lives on the document, so it is registered once and

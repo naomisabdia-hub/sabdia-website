@@ -1292,5 +1292,12 @@
   },
   "custom_sections": {
     "sections": []
+  },
+  "newsletter": {
+    "heading": "The Sabdia Journal",
+    "text": "Occasional notes from our studio — new releases, completed residences, and ideas in luxury living. No noise, unsubscribe any time.",
+    "placeholder": "Your email address",
+    "button": "Subscribe",
+    "success": "Welcome — you're on the list."
   }
 }

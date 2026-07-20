@@ -2,8 +2,8 @@
 import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
 
-const [{ settings, footer }, all] = await Promise.all([
-  getContent('settings', 'footer'),
+const [{ settings, footer, newsletter }, all] = await Promise.all([
+  getContent('settings', 'footer', 'newsletter'),
   getProperties(),
 ]);
 const forSale = all.filter((p) => p.data.status === 'for-sale');
@@ -15,6 +15,21 @@ const year = new Date().getFullYear();
     <div class="footer-tagline-inner">
       <h2 class="footer-tag-h" set:html={footer.taglineHtml} />
       <p class="footer-tag-sub">{footer.taglineSub}</p>
+    </div>
+  </div>
+  <div class="nl-band">
+    <div class="nl-inner">
+      <div class="nl-copy">
+        <div class="nl-h">{newsletter.heading}</div>
+        <p class="nl-t">{newsletter.text}</p>
+      </div>
+      <form class="nl-form" id="nlForm" method="POST" action="/api/subscribe" data-success={newsletter.success}>
+        <p style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <label class="sr-only" for="nlEmail">Email address</label>
+        <input class="nl-in" id="nlEmail" type="email" name="email" placeholder={newsletter.placeholder} autocomplete="email" required>
+        <button class="nl-btn" type="submit">{newsletter.button}</button>
+        <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+      </form>
     </div>
   </div>
   <div class="fg-grid">

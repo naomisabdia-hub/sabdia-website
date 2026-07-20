@@ -1,0 +1,34 @@
+---
+/**
+ * Share row — property pages (and blog posts once they exist).
+ * Plain sharer links, no third-party scripts; the copy-link button is
+ * progressive enhancement wired up in main.js.
+ */
+interface Props {
+  url: string; // absolute
+  title: string;
+}
+const { url, title } = Astro.props;
+const eu = encodeURIComponent(url);
+const et = encodeURIComponent(title);
+const links = [
+  { label: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${eu}` },
+  { label: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${eu}` },
+  { label: 'X', href: `https://twitter.com/intent/tweet?url=${eu}&text=${et}` },
+  { label: 'Email', href: `mailto:?subject=${et}&body=${et}%0A${eu}` },
+];
+---
+<div class="share-row" aria-label="Share this page">
+  <span class="share-l">Share</span>
+  {links.map((l) => (
+    <a href={l.href} target="_blank" rel="noopener" class="share-a">{l.label}</a>
+  ))}
+  <button type="button" class="share-a share-copy" data-share-url={url}>Copy link</button>
+</div>
+
+<style is:global>
+.share-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:36px}
+.share-l{font-size:10px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}
+.share-a{background:none;border:none;cursor:pointer;padding:4px 0;font-family:var(--font-u);font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(180,155,90,.35);transition:color .25s,border-color .25s;text-decoration:none}
+.share-a:hover{color:var(--ink);border-color:var(--gold)}
+</style>

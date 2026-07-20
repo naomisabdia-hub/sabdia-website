@@ -21,6 +21,17 @@ const img = (key, label, folder) => ({
 });
 
 export const contentSchemas = {
+  newsletter: {
+    label: 'Newsletter signup',
+    help: 'The email signup band that sits above the footer on every page.',
+    schema: [
+      { key: 'heading', label: 'Heading', type: 'text' },
+      { key: 'text', label: 'Intro text', type: 'textarea', help: 'one or two short sentences — what subscribers receive' },
+      { key: 'placeholder', label: 'Email field placeholder', type: 'text' },
+      { key: 'button', label: 'Button label', type: 'text' },
+      { key: 'success', label: 'Success message', type: 'text', help: 'shown after a successful signup' },
+    ],
+  },
   settings: {
     title: 'Global Settings',
     description: 'Company details, social links, and search-engine defaults used across the whole site.',

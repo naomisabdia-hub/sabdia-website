@@ -207,6 +207,49 @@ document.addEventListener('submit', async (e) => {
   }
 });
 
+/* Share row: copy-link. */
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.share-copy');
+  if (!btn) return;
+  try {
+    await navigator.clipboard.writeText(btn.getAttribute('data-share-url') || location.href);
+    const t = btn.textContent;
+    btn.textContent = 'Copied';
+    setTimeout(() => { btn.textContent = t; }, 1800);
+  } catch (err) {
+    window.prompt('Copy this link:', btn.getAttribute('data-share-url') || location.href);
+  }
+});
+
+/* Newsletter signup (footer, every page). */
+document.addEventListener('submit', async (e) => {
+  const form = e.target.closest('#nlForm');
+  if (!form) return;
+  e.preventDefault();
+  const btn = form.querySelector('.nl-btn');
+  const status = form.querySelector('[data-form-status]');
+  const announce = (msg) => { if (status) status.textContent = msg; };
+  if (!btn || btn.disabled) return;
+  const original = btn.textContent;
+  btn.textContent = '…';
+  btn.disabled = true;
+  try {
+    const res = await fetch(form.getAttribute('action') || '/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(new FormData(form)).toString()
+    });
+    if (!res.ok) throw new Error('subscribe failed: ' + res.status);
+    const done = form.getAttribute('data-success') || 'Thank you — you\'re subscribed.';
+    form.innerHTML = '<p class="nl-done">' + done + '</p>';
+    announce(done);
+  } catch (err) {
+    btn.textContent = original;
+    btn.disabled = false;
+    announce('Something went wrong — please try again.');
+  }
+});
+
 /* ============================================================
    PER PAGE — re-run on every astro:page-load
    ============================================================ */
