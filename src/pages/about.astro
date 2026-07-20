@@ -81,7 +81,7 @@ const { about_page: page } = await getContent('about_page');
         <div class="vals-grid">
           {page.values.items.map((v, i) => (
             <div class={`reveal ${['', 'd1', 'd2'][i % 3]}`.trim()}>
-              <div style="font-family:var(--font-d);font-size:56px;font-weight:300;font-style:italic;color:rgba(180,155,90,.18);line-height:1;margin-bottom:20px">{v.n}</div>
+              <div style="font-family:var(--font-d);font-size:56px;font-weight:300;font-style:italic;color:rgba(168,135,74,.18);line-height:1;margin-bottom:20px">{v.n}</div>
               <div style="font-family:var(--font-d);font-size:24px;font-weight:300;color:var(--white);margin-bottom:12px">{v.title}</div>
               <div style="font-size:13px;font-weight:300;line-height:1.8;color:rgba(253,251,246,.4)">{v.desc}</div>
             </div>
