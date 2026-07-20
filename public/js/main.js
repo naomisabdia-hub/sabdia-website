@@ -82,6 +82,16 @@ document.addEventListener('keydown', (e) => {
 });
 document.addEventListener('mousedown', () => document.body.classList.remove('kb-nav'));
 
+/* The moment a backgrounded tab is looked at, re-run the reveal sweep. A
+   browser that suspended IntersectionObserver while hidden may have left
+   elements unrevealed, and with .reveal-wipe that reads as missing content.
+   Document-scoped, so registered once and routed through whatever the
+   current page's sweep is. */
+let revealSweep = null;
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && revealSweep) revealSweep();
+});
+
 // Escape closes the mobile menu from anywhere on the page, so it has to be
 // document-scoped. Registered once and routed through mobNavApi, which
 // initPage rebuilds — binding it to the button instead would only work
@@ -301,13 +311,44 @@ function initPage() {
 
   // ── REVEAL ON SCROLL ──────────────────────────────────────
   const revealSel = '.reveal,.reveal-x,.reveal-r,.reveal-wipe,.reveal-wipe-x';
+  revealSweep = null;
   if (!reduceMotion && 'IntersectionObserver' in window) {
+    const revealEls = [...document.querySelectorAll(revealSel)];
     const revealObs = onObserve(new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (e.isIntersecting) { e.target.classList.add('vis'); revealObs.unobserve(e.target); }
       });
     }, { threshold: 0.08, rootMargin: '0px 0px -52px 0px' }));
-    document.querySelectorAll(revealSel).forEach((el) => revealObs.observe(el));
+    revealEls.forEach((el) => revealObs.observe(el));
+
+    /* Backstop. .reveal-wipe hides content behind a clip-path, so a reveal
+       that never fires leaves it invisible rather than merely un-animated —
+       a decorative effect silently eating real content.
+
+       That is reachable in normal use: a browser suspends
+       IntersectionObserver while a tab is backgrounded, so a page opened
+       with cmd-click, restored with a session, or throttled can finish
+       loading having never received a callback. This recomputes the same
+       rule directly from layout, which is cheap because it rides the
+       existing rAF-throttled scroll driver and stops doing any work once
+       everything has revealed. */
+    let pending = revealEls;
+    revealSweep = () => {
+      if (!pending.length) return;
+      const vh = window.innerHeight;
+      pending = pending.filter((el) => {
+        if (el.classList.contains('vis')) return false;
+        const r = el.getBoundingClientRect();
+        if (r.top < vh - 52 && r.bottom > 0) {
+          el.classList.add('vis');
+          revealObs.unobserve(el);
+          return false;
+        }
+        return true;
+      });
+    };
+    onScroll(revealSweep);
+    revealSweep();
   } else {
     document.querySelectorAll(revealSel).forEach((el) => el.classList.add('vis'));
   }
