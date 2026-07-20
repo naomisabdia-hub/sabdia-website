@@ -20,7 +20,7 @@ const { doc, title, description } = Astro.props;
       {doc.sections.map((s, i) => (
         <div class="reveal" style="margin-top:44px;padding-top:36px;border-top:1px solid var(--border)">
           <div style="display:flex;gap:24px;align-items:baseline">
-            <span style="font-family:var(--font-d);font-size:15px;font-style:italic;color:var(--bronze);flex-shrink:0">{String(i + 1).padStart(2, '0')}.</span>
+            <span style="font-family:var(--font-d);font-size:15px;font-style:italic;color:var(--ink);flex-shrink:0">{String(i + 1).padStart(2, '0')}.</span>
             <div>
               <h2 style="font-family:var(--font-d);font-size:clamp(20px,2.5vw,28px);font-weight:300;color:var(--ink);margin-bottom:12px">{s.heading}</h2>
               <div class="about-p" style="margin-bottom:0" set:html={s.bodyHtml} />

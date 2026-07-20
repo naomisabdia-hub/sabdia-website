@@ -137,7 +137,7 @@ const jsonLd = JSON.stringify({
   {sold && (
     <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:22px clamp(22px,5vw,80px)">
       <div class="inner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-        <div style="padding:7px 16px;background:rgba(180,155,90,.14);border:1px solid rgba(180,155,90,.4);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--bronze)">{pp.soldBadge}</div>
+        <div style="padding:7px 16px;background:rgba(180,155,90,.14);border:1px solid rgba(180,155,90,.4);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--ink)">{pp.soldBadge}</div>
         <span style="font-size:13.5px;font-weight:400;color:var(--ink3)">{pp.soldNotice}</span>
         <a href="/properties/" class="btn-g btn-g-gold" style="margin-left:auto;padding:9px 20px;font-size:10px">View Available &rarr;</a>
       </div>
@@ -169,7 +169,7 @@ const jsonLd = JSON.stringify({
       </div>
       <div class="prop-spec-item">
         <div class="prop-spec-l">Status</div>
-        <div class="prop-spec-v" style={`font-size:16px;color:${sold ? 'var(--taupe-d)' : 'var(--bronze)'}`}>{sold ? 'Sold' : 'For Sale'}</div>
+        <div class="prop-spec-v" style={`font-size:16px;color:${sold ? 'var(--taupe-d)' : 'var(--ink)'}`}>{sold ? 'Sold' : 'For Sale'}</div>
       </div>
     </div>
   </div>
