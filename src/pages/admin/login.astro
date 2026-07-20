@@ -57,7 +57,12 @@ export const prerender = true;
     }
     if (!clerk.user || params.get('denied')) {
       clerk.mountSignIn(mount, {
+        // Pin every flow back to the admin — sign-in, sign-up, and OAuth
+        // all land on `next` instead of the public website.
         forceRedirectUrl: next,
+        fallbackRedirectUrl: next,
+        signUpForceRedirectUrl: next,
+        signUpFallbackRedirectUrl: next,
         appearance: {
           variables: {
             colorPrimary: '#9E8B6A',

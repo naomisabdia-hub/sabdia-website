@@ -20,18 +20,24 @@ if (navTime) {
 }
 
 // ── LOADER ──────────────────────────────────────────────────
+// Held the page for 1.6s after load plus a 0.95s fade — ~2.5s of blank
+// screen before anyone saw a home. Now a brief warm wash that clears
+// quickly; it reads as a considered opening rather than a wait.
 window.addEventListener('load', () => {
   setTimeout(() => {
     const l = document.getElementById('loader');
     if (!l) return;
     l.classList.add('out');
-    setTimeout(() => l.remove(), 950);
-  }, reduceMotion ? 200 : 1600);
+    setTimeout(() => l.remove(), 520);
+  }, reduceMotion ? 120 : 420);
 });
 
 // ── KEYBOARD VS MOUSE — restore real cursor on Tab ──────────
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Tab') document.body.classList.add('kb-nav');
+  if (e.key === 'Tab') {
+    document.body.classList.add('kb-nav');
+    document.documentElement.classList.remove('cursor-fx');
+  }
 });
 document.addEventListener('mousedown', () => document.body.classList.remove('kb-nav'));
 
@@ -41,9 +47,13 @@ if (window.matchMedia('(pointer: fine)').matches && !reduceMotion) {
   const curR = document.getElementById('cur-r');
   if (cur && curR) {
     let mx = 0, my = 0, rx = 0, ry = 0;
+    // Hide the system cursor only after the custom one is provably
+    // following the mouse — never before, so a failure here can't leave
+    // the visitor without a pointer.
     document.addEventListener('mousemove', e => {
       mx = e.clientX; my = e.clientY;
       cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+      document.documentElement.classList.add('cursor-fx');
     });
     (function animate() {
       rx += (mx - rx) * 0.13; ry += (my - ry) * 0.13;
