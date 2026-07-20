@@ -22,8 +22,8 @@ const img = (key, label, folder) => ({
 
 export const contentSchemas = {
   series: {
-    label: 'Instagram series strip',
-    help: 'The "series" band on property pages. The heading and handle are editable here; the per-residence post tiles are curated with your developer.',
+    title: 'Instagram series strip',
+    description: 'The "series" band on property pages. The heading and handle are editable here; the per-residence post tiles are curated with your developer.',
     schema: [
       { key: 'label', label: 'Small label', type: 'text' },
       { key: 'handle', label: 'Instagram handle', type: 'text', help: 'e.g. @_sabdia' },
@@ -32,8 +32,8 @@ export const contentSchemas = {
     ],
   },
   newsletter: {
-    label: 'Newsletter signup',
-    help: 'The email signup band that sits above the footer on every page.',
+    title: 'Newsletter signup',
+    description: 'The email signup band that sits above the footer on every page.',
     schema: [
       { key: 'heading', label: 'Heading', type: 'text' },
       { key: 'text', label: 'Intro text', type: 'textarea', help: 'one or two short sentences — what subscribers receive' },
@@ -530,6 +530,27 @@ contentSchemas.notfound = {
 const themeField = { key: 'theme', label: 'Background', type: 'select', options: [['light', 'Light — warm stone'], ['dark', 'Dark — obsidian']] };
 
 export const sectionLayouts = {
+  'properties-strip': {
+    name: 'Properties banner (live)',
+    description: 'A banner of residences drawn live from your Properties — always current, nothing to maintain. Choose For Sale or Sold and how many to show.',
+    fields: [
+      { key: 'label', label: 'Small label', type: 'text', help: 'e.g. "Current Releases"' },
+      { key: 'headingHtml', label: 'Heading', type: 'html', help: 'use <em>…</em> for gold italics' },
+      { key: 'propStatus', label: 'Which residences', type: 'select', options: [['for-sale', 'For Sale'], ['sold', 'Sold Prior to Completion']] },
+      { key: 'count', label: 'How many', type: 'number', help: '1–4 (the newest first)' },
+      cta('cta', 'Button (optional — e.g. "View all properties" → /properties/)'),
+    ],
+  },
+  'journal-strip': {
+    name: 'Journal entries (live)',
+    description: 'The latest published Journal entries, automatically — perfect at the end of the About or Services page.',
+    fields: [
+      { key: 'label', label: 'Small label', type: 'text', help: 'e.g. "From the Journal"' },
+      { key: 'headingHtml', label: 'Heading', type: 'html' },
+      { key: 'count', label: 'How many', type: 'number', help: '1–3 (the newest first)' },
+      cta('cta', 'Button (optional — e.g. "Read the Journal" → /journal/)'),
+    ],
+  },
   editorial: {
     name: 'Editorial text',
     description: 'Small gold label, large serif heading, and paragraphs. The classic Sabdia section.',

@@ -490,6 +490,10 @@ a.cd-v:hover{color:var(--gold)}
 
 /* ── FOOTER ── */
 footer{background:var(--dark);padding-top:0}
+.cs-props{display:grid;grid-template-columns:repeat(var(--cs-pcols,3),1fr);gap:clamp(20px,2.6vw,36px)}
+@media(max-width:960px){.cs-props{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.cs-props{grid-template-columns:1fr}}
+
 /* ── The Journal (blog) ─────────────────────────────────── */
 .jn-meta{display:flex;align-items:center;gap:10px;font-size:10.5px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:var(--ink3);flex-wrap:wrap}
 .jn-cat{color:var(--ink);border:1px solid var(--border);padding:4px 10px;border-radius:var(--r-sm)}

@@ -119,3 +119,20 @@
   scripts/seed-blog-posts.mjs seeds 2 fact-checked DRAFT entries.
 - BLOG_PLAYBOOK.md: voice, structure, length, formatting cheatsheet, SEO checklist,
   5 ready-to-write headlines, publishing rhythm.
+
+## Phase 8 — CMS polish & the Tamsin test (2026-07-21, Naomi signed in)
+- Coverage: newsletter + series added to admin content nav (fixed a title/description shape
+  bug that rendered them blank); every seed content key now editable except series byProject
+  (dev-curated, top-level text editable). readForm verified to preserve unknown keys.
+- NEW: two LIVE data-driven Page Section layouts, buildable by a non-technical user on any
+  page/position: "Properties banner (live)" (For Sale/Sold picker, count, CTA — renders real
+  PropertyCard/SoldCard) and "Journal entries (live)" (latest published posts). Naomi's
+  exact request — a properties banner at the end of the About page — was created THROUGH the
+  admin UI and verified live (QASR/SOLACE/SIERRA cards + CTA). Left in place; unpublish or
+  delete from /admin/sections any time.
+- Full Tamsin edit loop PROVEN with Naomi's Clerk login: newsletter heading edited in
+  /admin → "Saved — live on the website now" → verified in the rendered public footer →
+  reverted. This also proves the Clerk→Supabase third-party-auth RLS WRITE path.
+- Leads Inbox verified with real login: all 5 test records visible (3 enquiries incl.
+  property-specific, 2 newsletter signups), status workflow buttons present. Audit #11 closed.
+- Journal admin verified: both seed drafts listed with Draft badges.

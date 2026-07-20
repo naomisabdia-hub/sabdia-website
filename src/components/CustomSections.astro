@@ -13,6 +13,11 @@
  * plus the cs-* helpers in style.css.
  */
 import { getContent } from '../lib/content.js';
+import { getProperties } from '../lib/db.js';
+import { getPosts, readingTime, postDate } from '../lib/blog.js';
+import { imgVariant, landLabel } from '../lib/images.js';
+import PropertyCard from './PropertyCard.astro';
+import SoldCard from './SoldCard.astro';
 
 const { page, position = 'end' } = Astro.props;
 const { custom_sections } = await getContent('custom_sections');
@@ -20,6 +25,13 @@ const sections = (custom_sections?.sections ?? []).filter(
   (s) => s.page === page && (s.position ?? 'end') === position && s.published !== false,
 );
 const hasBtn = (c) => c && c.label;
+
+/* Live data for the data-driven layouts — fetched only when a section on
+   this page actually needs it. */
+const allProps = sections.some((s) => s.layout === 'properties-strip') ? await getProperties() : [];
+const allPosts = sections.some((s) => s.layout === 'journal-strip') ? await getPosts() : [];
+const clampN = (n, lo, hi, dflt) => Math.min(hi, Math.max(lo, parseInt(n, 10) || dflt));
+const propSpecs = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, landLabel(d.land, d.landOver)];
 ---
 {sections.map((s) => {
   const dark = s.theme === 'dark';
@@ -101,6 +113,63 @@ const hasBtn = (c) => c && c.label;
           </div>
         </section>
       )}
+
+      {s.layout === 'properties-strip' && (() => {
+        const wanted = s.propStatus === 'sold' ? 'sold' : 'for-sale';
+        const picks = allProps.filter((p) => p.data.status === wanted).slice(0, clampN(s.count, 1, 4, 3));
+        return picks.length > 0 && (
+          <section class="sp-sm cs-section">
+            <div class="inner">
+              {s.label && <div class="slabel reveal">{s.label}</div>}
+              {s.headingHtml && <h2 class="cs-h reveal d1" style="margin-bottom:36px" set:html={s.headingHtml} />}
+              <div class="cs-props" style={`--cs-pcols:${Math.min(picks.length, 3)}`}>
+                {picks.map((p, i) =>
+                  wanted === 'sold'
+                    ? <SoldCard entry={p} class={`reveal ${['', 'd1', 'd2', 'd3'][i % 4]}`.trim()} imgW={900} imgH={620} />
+                    : <PropertyCard entry={p} class={`reveal ${['', 'd1', 'd2', 'd3'][i % 4]}`.trim()} imgW={900} imgH={620} specs={propSpecs(p.data)} />
+                )}
+              </div>
+              {hasBtn(s.cta) && (
+                <div class="reveal d2" style="margin-top:36px">
+                  <a href={s.cta.href || '/properties/'} class="btn-g btn-g-gold">{s.cta.label} &rarr;</a>
+                </div>
+              )}
+            </div>
+          </section>
+        );
+      })()}
+
+      {s.layout === 'journal-strip' && (() => {
+        const picks = allPosts.slice(0, clampN(s.count, 1, 3, 2));
+        return picks.length > 0 && (
+          <section class="sp-sm cs-section">
+            <div class="inner">
+              {s.label && <div class="slabel reveal">{s.label}</div>}
+              {s.headingHtml && <h2 class="cs-h reveal d1" style="margin-bottom:36px" set:html={s.headingHtml} />}
+              <div class="jn-grid">
+                {picks.map((p, i) => (
+                  <a href={`/journal/${p.slug}/`} class={`jn-card reveal ${['', 'd1', 'd2'][i % 3]}`.trim()}>
+                    {p.hero_image && <img src={imgVariant(p.hero_image, { w: 900, h: 620, q: 84 })} alt={p.hero_alt || p.title} loading="lazy" decoding="async" width="900" height="620">}
+                    <div class="jn-meta">
+                      {p.category && <span class="jn-cat">{p.category}</span>}
+                      <span>{postDate(p)}</span>
+                      <span>·</span>
+                      <span>{readingTime(p.body)}</span>
+                    </div>
+                    <h3 class="jn-card-h">{p.title}</h3>
+                    <p class="jn-ex">{p.excerpt}</p>
+                  </a>
+                ))}
+              </div>
+              {hasBtn(s.cta) && (
+                <div class="reveal d2" style="margin-top:36px">
+                  <a href={s.cta.href || '/journal/'} class="btn-g btn-g-gold">{s.cta.label} &rarr;</a>
+                </div>
+              )}
+            </div>
+          </section>
+        );
+      })()}
 
       {s.layout === 'gallery-strip' && (s.images ?? []).length > 0 && (
         <section class="sp-sm cs-section">
