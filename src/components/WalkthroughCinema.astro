@@ -130,13 +130,13 @@ const { name, chapters = [] } = Astro.props;
   .wt-ch.on .wt-ch-bar{display:block}
   .wt-ch-fill{display:block;height:100%;background:var(--gold2);transform:scaleX(0);transform-origin:left}
   .wt-stage{display:flex;flex-direction:column;gap:14px}
-  .wt-frame{position:relative;aspect-ratio:9/16;max-height:min(76vh,680px);margin:0 auto;overflow:hidden;background:var(--dark3);border:1px solid rgba(196,172,135,.22);box-shadow:0 40px 80px -40px rgba(0,0,0,.8);width:auto}
+  .wt-frame{position:relative;aspect-ratio:9/16;width:min(100%,calc(min(76vh,680px)*0.5625));margin:0 auto;overflow:hidden;background:var(--dark3);border:1px solid rgba(196,172,135,.22);box-shadow:0 40px 80px -40px rgba(0,0,0,.8)}
   .wt-frame video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;cursor:none}
   .wt-frame::after{content:'';position:absolute;inset:0;border:1px solid rgba(255,255,255,.05);pointer-events:none}
   .wt-play{position:absolute;inset:0;margin:auto;width:64px;height:64px;border-radius:50%;background:rgba(14,13,11,.62);backdrop-filter:blur(10px);border:1px solid rgba(196,172,135,.5);color:var(--gold2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:none;transition:background .3s,opacity .3s;padding-left:4px}
   .wt-play:hover{background:rgba(158,139,106,.3)}
   .wt-play.hide{opacity:0;pointer-events:none}
-  .wt-caption{display:flex;justify-content:space-between;gap:16px;font-size:9px;font-weight:300;letter-spacing:.28em;text-transform:uppercase;color:rgba(253,252,248,.3);max-width:calc(min(76vh,680px)*9/16);margin:0 auto;width:100%}
+  .wt-caption{display:flex;justify-content:space-between;gap:16px;font-size:9px;font-weight:300;letter-spacing:.28em;text-transform:uppercase;color:rgba(253,252,248,.3);width:min(100%,calc(min(76vh,680px)*0.5625));margin:0 auto}
   .wt-caption b{font-weight:300;color:var(--gold2)}
   @media(max-width:900px){
     .wt-grid{grid-template-columns:1fr;gap:40px}
