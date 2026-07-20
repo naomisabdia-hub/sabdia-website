@@ -65,6 +65,23 @@ document.addEventListener('astro:after-swap', () => {
   document.documentElement.classList.add('js', 'no-loader');
 });
 
+/* Navigation feedback. The gap between a click and the new page's HTML
+   arriving is entirely invisible otherwise — no spinner, no page unload,
+   nothing — so a slow render reads as an interface that ignored you.
+   Driven from the preparation events rather than the swap, because it is
+   precisely the fetch that needs covering. Classes live on <html>, which
+   survives the swap; the bar itself is replaced with the rest of the body,
+   so `nav-done` is cleared on the next tick ready for the next navigation. */
+document.addEventListener('astro:before-preparation', () => {
+  document.documentElement.classList.remove('nav-done');
+  document.documentElement.classList.add('is-navigating');
+});
+document.addEventListener('astro:after-preparation', () => {
+  document.documentElement.classList.remove('is-navigating');
+  document.documentElement.classList.add('nav-done');
+  setTimeout(() => document.documentElement.classList.remove('nav-done'), 600);
+});
+
 /* A navigation cancels any open overlay, and body scroll-lock is set
    on the old body — but Astro carries inline style across the swap,
    so a lightbox left open would strand the next page unscrollable. */

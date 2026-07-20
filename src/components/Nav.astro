@@ -22,6 +22,11 @@ const isHome = Astro.url.pathname === '/';
 <div id="cur" aria-hidden="true"></div>
 <div id="cur-r" aria-hidden="true"></div>
 
+<!-- Navigation progress. Sits above the nav and outside it, so it reads the
+     same on a photographic hero as on a cream page, and is not tied to the
+     nav's scrolled state the way the scroll-progress hairline is. -->
+<div class="nav-load" id="navLoad" aria-hidden="true"></div>
+
 {isHome && (
   <div id="loader" aria-hidden="true">
     <div class="ld-logo">
