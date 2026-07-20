@@ -37,6 +37,7 @@ export const prerender = true;
     ['property-enquiry', 'Property enquiries'],
     ['contact', 'General contact'],
     ['agent-application', 'Agent applications'],
+    ['guided-match', 'Guided matches'],
     ['newsletter', 'Newsletter signups'],
   ];
 
@@ -114,6 +115,11 @@ export const prerender = true;
       ['Licence no.', l.licence_number],
       ['Suburb markets', l.suburb_markets],
       ['Message', l.message],
+      /* Catch-all details — every extra answer the visitor gave, verbatim. */
+      ...Object.entries(l.details || {}).map(([k, v]) => [
+        k.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase()),
+        String(v),
+      ]),
     ].filter(([, v]) => v);
 
     const badge = el('span', { class: 'ad-badge ' + l.status, text: l.status });
@@ -129,7 +135,7 @@ export const prerender = true;
       }, 900);
     });
 
-    const typeLabel = { 'contact': 'Contact', 'property-enquiry': 'Property enquiry', 'agent-application': 'Agent application', 'newsletter': 'Newsletter' }[typeOf(l)] || l.form_name;
+    const typeLabel = { 'contact': 'Contact', 'property-enquiry': 'Property enquiry', 'agent-application': 'Agent application', 'guided-match': 'Guided match', 'newsletter': 'Newsletter' }[typeOf(l)] || l.form_name;
 
     return el('div', { class: 'ad-card' }, [
       el('div', { style: 'display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px' }, [
@@ -194,8 +200,8 @@ export const prerender = true;
 
     if (activeType === '') {
       /* The overview: every stream in its own section, newest first inside each. */
-      const order = ['property-enquiry', 'contact', 'agent-application', 'newsletter'];
-      const labels = { 'property-enquiry': 'Property enquiries', 'contact': 'General contact', 'agent-application': 'Agent applications', 'newsletter': 'Newsletter signups' };
+      const order = ['property-enquiry', 'guided-match', 'contact', 'agent-application', 'newsletter'];
+      const labels = { 'property-enquiry': 'Property enquiries', 'guided-match': 'Guided matches', 'contact': 'General contact', 'agent-application': 'Agent applications', 'newsletter': 'Newsletter signups' };
       for (const t of order) {
         const leads = rows.filter((l) => typeOf(l) === t);
         if (!leads.length) continue;
@@ -225,6 +231,7 @@ export const prerender = true;
       property: l.property, enquiry_type: l.enquiry_type, agency: l.agency,
       licence_number: l.licence_number, suburb_markets: l.suburb_markets,
       message: l.message, notes: l.notes,
+      ...(l.details || {}),
     }));
     csvExport(rows, activeType ? `sabdia-leads-${activeType}.csv` : 'sabdia-leads.csv');
   });

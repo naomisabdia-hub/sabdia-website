@@ -163,3 +163,14 @@
 - Newsletter signups render as compact rows (email · date · status) instead of full cards.
 - Leads with no name now display their email instead of "Anonymous"; status changes update
   the tab counts immediately; CSV export respects the active tab and names the file after it.
+
+## Leads: capture-everything guarantee (2026-07-21)
+- Found + fixed a real data loss: the Find Your Home guided-match form's "Anything else we
+  should know?" notes field was dropped by api/contact.ts, and guided-match leads had no tab.
+- api/contact.ts now stores EVERY submitted field: known fields in their columns, everything
+  else verbatim in a new `details` jsonb catch-all (supabase/lead-details.sql — one-paste
+  migration). Until the migration runs, extras are folded into the message text instead, so
+  nothing is lost either way (verified live: test guided-match lead retained its notes).
+- Leads Inbox: new "Guided matches" tab + section; every details field renders on the card
+  with a friendly label; CSV export includes details columns; Resend email copies include
+  every field too.

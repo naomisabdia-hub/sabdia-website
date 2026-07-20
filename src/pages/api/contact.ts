@@ -58,7 +58,8 @@ export const POST: APIRoute = async ({ request }) => {
   rateLog.set(ip, recent);
   if (rateLog.size > 1000) rateLog.clear();
 
-  const record = {
+  const MAPPED = ['form-name', 'property', 'first-name', 'last-name', 'email', 'phone', 'enquiry-type', 'message', 'agency', 'licence-number', 'suburb-markets', 'bot-field'];
+  const record: Record<string, unknown> = {
     form_name: fields['form-name'] || 'contact',
     property: fields['property'] || null,
     first_name: fields['first-name'] || null,
@@ -72,13 +73,32 @@ export const POST: APIRoute = async ({ request }) => {
     suburb_markets: fields['suburb-markets'] || null,
   };
 
+  /* Catch-all: every other field the visitor filled in (e.g. the guided
+     match's "anything else we should know", or any field added to a form
+     later) is kept verbatim — nothing a visitor types is ever dropped. */
+  const details: Record<string, string> = {};
+  for (const [key, value] of Object.entries(fields)) {
+    if (!MAPPED.includes(key) && String(value).trim()) details[key] = String(value);
+  }
+  if (Object.keys(details).length) record.details = details;
+
   let stored = false;
 
   const supabaseUrl = env('SUPABASE_URL');
   const serviceKey = env('SUPABASE_SERVICE_ROLE_KEY');
   if (supabaseUrl && serviceKey) {
     const supabase = createClient(supabaseUrl, serviceKey);
-    const { error } = await supabase.from('enquiries').insert(record);
+    let { error } = await supabase.from('enquiries').insert(record);
+    if (error && record.details && /details/.test(error.message)) {
+      /* The details column migration hasn't been run yet — never lose the
+         data: fold the extra answers into the message text instead. */
+      const extras = Object.entries(record.details as Record<string, string>)
+        .map(([k, v]) => `${k.replace(/-/g, ' ')}: ${v}`)
+        .join('\n');
+      const fallback = { ...record, details: undefined, message: [record.message, '—', extras].filter(Boolean).join('\n') };
+      delete fallback.details;
+      ({ error } = await supabase.from('enquiries').insert(fallback));
+    }
     if (error) {
       console.error('Failed to store enquiry:', error.message);
     } else {
@@ -91,9 +111,9 @@ export const POST: APIRoute = async ({ request }) => {
   const resendKey = env('RESEND_API_KEY');
   const contactEmail = env('CONTACT_EMAIL');
   if (resendKey && contactEmail) {
-    const lines = Object.entries(record)
+    const lines = Object.entries({ ...record, details: undefined, ...details })
       .filter(([, value]) => value)
-      .map(([key, value]) => `${key.replace(/_/g, ' ')}: ${value}`);
+      .map(([key, value]) => `${key.replace(/[_-]/g, ' ')}: ${value}`);
     const subject = ['Website enquiry', record.form_name, record.property]
       .filter(Boolean)
       .join(' — ');
