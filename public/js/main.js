@@ -433,30 +433,11 @@ function initPage() {
     document.querySelectorAll(revealSel).forEach((el) => el.classList.add('vis'));
   }
 
-  // ── COUNTER ANIMATION ─────────────────────────────────────
-  if (!reduceMotion && 'IntersectionObserver' in window) {
-    const counterObs = onObserve(new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        const el = e.target;
-        const target = parseInt(el.dataset.target);
-        const start = performance.now();
-        const duration = 2000;
-        const tick = (now) => {
-          const p = Math.min((now - start) / duration, 1);
-          const ep = 1 - Math.pow(1 - p, 4);
-          el.textContent = Math.floor(ep * target);
-          if (p < 1) requestAnimationFrame(tick);
-          else el.textContent = target;
-        };
-        requestAnimationFrame(tick);
-        counterObs.unobserve(el);
-      });
-    }, { threshold: 0.5 }));
-    document.querySelectorAll('.counter').forEach((el) => counterObs.observe(el));
-  } else {
-    document.querySelectorAll('.counter').forEach((el) => { el.textContent = el.dataset.target; });
-  }
+  // ── STATS COUNTERS ────────────────────────────────────────
+  // Count-up animation removed intentionally (owner decision): the numbers
+  // render static at their final values. The markup also ships the final
+  // value server-side; this line just covers any stale cached HTML.
+  document.querySelectorAll('.counter').forEach((el) => { el.textContent = el.dataset.target; });
 
   // ── PROCESS TIMELINE FILL ─────────────────────────────────
   const procTrack = document.querySelector('.proc-track');

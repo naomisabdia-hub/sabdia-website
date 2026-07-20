@@ -168,7 +168,7 @@ const journeys = [
         <div class={`stat reveal ${['', 'd1', 'd2', 'd3'][i % 4]}`.trim()}>
           <span class="stat-n">
             {s.count
-              ? <span class="counter" data-target={s.target}>0</span>
+              ? <span class="counter" data-target={s.target}>{s.target}</span>
               : s.target}<span class="stat-u">{s.suffix}</span>
           </span>
           <div class="stat-l">{s.label}</div>
@@ -192,10 +192,14 @@ const journeys = [
   <CustomSections page="/projects/" position="end" />
 
   <script is:inline>
-  /* Re-runs per navigation — see main.js for why. */
-  document.addEventListener('astro:page-load', function () {
+  /* Re-runs per navigation — see main.js for why. Also called immediately:
+     during a ClientRouter swap this script can execute after that
+     navigation's page-load event already fired. */
+  function sabdiaProjFilterInit() {
     var buttons = document.querySelectorAll('.pfilter');
     var sections = document.querySelectorAll('[data-proj-section]');
+    if (!buttons.length || buttons[0].dataset.filterInit) return;
+    buttons[0].dataset.filterInit = '1';
     buttons.forEach(function (btn) {
       btn.addEventListener('click', function () {
         buttons.forEach(function (b) { b.classList.remove('on'); });
@@ -206,6 +210,8 @@ const journeys = [
         });
       });
     });
-  });
+  }
+  sabdiaProjFilterInit();
+  document.addEventListener('astro:page-load', sabdiaProjFilterInit);
   </script>
 </Base>
