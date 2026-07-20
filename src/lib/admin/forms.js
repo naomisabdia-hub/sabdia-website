@@ -13,6 +13,7 @@
  * partial forms never destroy unknown keys.
  */
 import { el, uploadFile, toast } from './client.js';
+import { openImageLibrary } from './library.js';
 
 const get = (obj, key) => (obj == null ? undefined : obj[key]);
 
@@ -108,7 +109,17 @@ function inputFor(field, value, container) {
         }
         label.textContent = 'Upload';
       });
-      const ctl = el('div', { class: 'ad-img-ctl' }, [input, wrap]);
+      /* Image fields also offer the shared library — reuse anything
+         already uploaded or bundled, without re-uploading. */
+      const libBtn = field.type === 'image'
+        ? el('button', { type: 'button', class: 'ad-btn ad-btn-ghost', text: 'Library', onclick: () =>
+            openImageLibrary((url) => {
+              input.value = url;
+              if (prev) prev.src = url;
+              markDirty(container);
+            }) })
+        : null;
+      const ctl = el('div', { class: 'ad-img-ctl' }, [input, wrap, libBtn].filter(Boolean));
       return el('div', { class: 'ad-img-field' }, [prev, ctl]);
     }
     default:
