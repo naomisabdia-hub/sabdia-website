@@ -57,6 +57,13 @@ Every form on the site — contact, property enquiries, agent applications, the 
 
 To ALSO get an email copy of every enquiry: set up Resend (§7). Until then, check the Leads Inbox — that's the source of truth.
 
+**Inbox management (added 2026-07-21):** every lead now has **Reply**, **Edit** and **Delete** buttons. Two one-off setup steps:
+
+1. **Unlock Delete + reply history:** Supabase → SQL editor → paste and run the contents of `supabase/inbox-management.sql` (in the code folder). Until then, Delete shows a clear "blocked by database permissions" message and reply threads can't be logged. Editing works already.
+2. **Unlock in-app replies:** replies send by email through Resend, **from** the address in `CONTACT_FROM`. So that they don't land in spam, first verify the domain: Resend dashboard → Domains → Add `sabdiaconstructions.com.au` → add the DNS records it shows (at the domain registrar) → wait for "Verified". Then in Vercel env vars set `RESEND_API_KEY`, `CONTACT_FROM` (e.g. `Sabdia Constructions <sales@sabdiaconstructions.com.au>`) and `CONTACT_EMAIL`, and redeploy. Until `CONTACT_FROM` is set, the Send button explains what's missing rather than sending from a generic address.
+
+**Image library (added 2026-07-21):** every image field in the admin now has a **Library** button beside Upload — pick any image already uploaded or built into the site instead of re-uploading. **Page sections** can now also switch their **Layout** after creation (the words and images carry across).
+
 ## 6. Restore points (roll back anything)
 
 Every milestone is a named tag on GitHub. To roll the site back: `git checkout <tag>` in the code folder (or ask your developer/assistant), then push.
