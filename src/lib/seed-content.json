@@ -344,6 +344,9 @@
   "properties_page": {
     "label": "For Sale",
     "headingHtml": "<em>Current</em><br>Properties.",
+    "hero": {
+      "image": "/images/qasr-hero.jpg"
+    },
     "introTemplate": "{count} extraordinary residences across Brisbane's most sought-after inner suburbs — each designed, developed, and built entirely in-house by Sabdia.",
     "soldLabel": "Sold Prior to Completion",
     "cta": {

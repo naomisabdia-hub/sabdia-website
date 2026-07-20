@@ -34,26 +34,33 @@ const itemListLd = JSON.stringify({
 const names = forSale.map((p) => p.data.name).join(', ');
 const description = `Luxury properties for sale by Sabdia Constructions — Brisbane's award-winning boutique luxury home builder. Discover ${names}.`;
 const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
+
+/* Header hero image — CMS-editable via properties_page.hero.image in the
+   admin (Site Content → For Sale page). The Supabase row may predate this
+   key, so the fallback lives here in code, not only in the seed. */
+const heroImage = page.hero?.image || '/images/qasr-hero.jpg';
 ---
-<Base title="Properties For Sale | Sabdia Constructions" description={description} lightNav>
+<Base title="Properties For Sale | Sabdia Constructions" description={description}>
   <script type="application/ld+json" slot="head" is:inline set:html={itemListLd} />
   <style is:inline slot="head">
   .prop-toolbar{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:18px clamp(22px,5vw,80px);background:var(--bg2);border-bottom:1px solid var(--border)}
   .prop-toolbar-inner{display:flex;gap:28px;align-items:center;flex-wrap:wrap;max-width:1400px;margin:0 auto;width:100%}
   .ptool-l{font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)}
-  .ptool-sel{font-family:var(--font-u);font-size:10.5px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;border:none;border-bottom:1px solid var(--border);padding:4px 22px 4px 0;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23B49B5A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center}
+  .ptool-sel{font-family:var(--font-u);font-size:10.5px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;border:none;border-bottom:1px solid var(--border);padding:4px 22px 4px 0;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23A8874A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center}
   .ptool-sel:focus{outline:none;border-bottom-color:var(--gold)}
   .ptool-count{margin-left:auto;font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe-d)}
   </style>
 
-  <!-- PAGE HEADER -->
-  <section style="padding:clamp(130px,18vw,180px) clamp(22px,5vw,80px) clamp(48px,6vw,72px);background:var(--bg);border-bottom:1px solid var(--border)">
-    <div class="inner" style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap">
-      <div>
-        <div class="slabel reveal" style="margin-bottom:18px">{page.label}</div>
-        <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(48px,9vw,120px);font-weight:300;line-height:.88;letter-spacing:-.035em;color:var(--ink)" set:html={page.headingHtml} />
-      </div>
-      <p class="reveal d2" style="font-size:13.5px;font-weight:300;line-height:1.9;color:var(--ink3);max-width:380px;padding-bottom:6px">{intro}</p>
+  <!-- PAGE HEADER — photographic hero matching the Projects page treatment
+       (dark gradient overlay keeps the heading legible; nav reads
+       light-on-image and switches on scroll). -->
+  <section class="page-hero">
+    <img src={imgVariant(heroImage, { w: 1920, h: 1080 })} alt="" loading="eager" width="1920" height="1080">
+    <div class="page-hero-ov"></div>
+    <div class="page-hero-content inner">
+      <div class="slabel slabel-dark">{page.label}</div>
+      <h1 class="page-h" set:html={page.headingHtml} />
+      <p class="page-hero-sub">{intro}</p>
     </div>
   </section>
 
@@ -107,7 +114,7 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
               ))}
             </div>
           </div>
-          <div style="position:absolute;top:clamp(18px,3vw,32px);right:clamp(18px,3vw,32px);width:44px;height:44px;border:1px solid rgba(200,175,116,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);font-size:16px">&rarr;</div>
+          <div style="position:absolute;top:clamp(18px,3vw,32px);right:clamp(18px,3vw,32px);width:44px;height:44px;border:1px solid rgba(195,164,94,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);font-size:16px">&rarr;</div>
         </a>
       </div>
     </section>
@@ -190,8 +197,11 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
   <CustomSections page="/properties/" position="end" />
 
   <script is:inline>
-  /* Re-runs per navigation — see main.js for why. */
-  document.addEventListener('astro:page-load', function () {
+  /* Re-runs per navigation — see main.js for why. Also called immediately:
+     during a ClientRouter swap this script can execute after that
+     navigation's page-load event already fired, which left the filter
+     toolbar dead until a manual refresh. */
+  function sabdiaPropFilterInit() {
     var suburb = document.getElementById('fSuburb');
     var beds = document.getElementById('fBeds');
     var sort = document.getElementById('fSort');
@@ -199,7 +209,8 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
     var empty = document.getElementById('fEmpty');
     var grid = document.getElementById('propGrid');
     var featuredWrap = document.getElementById('featuredWrap');
-    if (!grid) return;
+    if (!grid || grid.dataset.filterInit) return;
+    grid.dataset.filterInit = '1';
     var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-prop-card]'));
 
     function apply() {
@@ -236,6 +247,8 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
     [suburb, beds, sort].forEach(function (el) {
       el.addEventListener('change', apply);
     });
-  });
+  }
+  sabdiaPropFilterInit();
+  document.addEventListener('astro:page-load', sabdiaPropFilterInit);
   </script>
 </Base>

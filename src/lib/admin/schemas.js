@@ -220,6 +220,12 @@ export const contentSchemas = {
     schema: [
       { key: 'label', label: 'Small label', type: 'text' },
       { key: 'headingHtml', label: 'Heading', type: 'html' },
+      {
+        key: 'hero', label: 'Header background', type: 'object',
+        fields: [
+          { key: 'image', label: 'Image', type: 'image', folder: 'hero' },
+        ],
+      },
       { key: 'introTemplate', label: 'Intro paragraph', type: 'textarea', help: '{count} becomes the number of listings, e.g. "Four"' },
       { key: 'soldLabel', label: 'Sold section label', type: 'text' },
       {
