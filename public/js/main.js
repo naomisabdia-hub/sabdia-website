@@ -526,15 +526,18 @@ function initPage() {
   const progress = document.getElementById('navProgress');
 
   // Testimonial: split into word spans; words "light up" as the quote
-  // moves through the viewport. Screen readers get the original text
-  // via aria-label on the blockquote.
+  // moves through the viewport. Screen readers get the original text via
+  // a visually-hidden copy (aria-label is prohibited on blockquote).
   let twSpans = [], twEl = null, twLit = -1;
   const quote = document.querySelector('.testi-text');
   if (quote && !reduceMotion && !quote.dataset.split) {
     quote.dataset.split = '1';
     const text = quote.textContent.trim();
-    quote.setAttribute('aria-label', text);
     quote.textContent = '';
+    const sr = document.createElement('span');
+    sr.className = 'sr-only';
+    sr.textContent = text;
+    quote.appendChild(sr);
     text.split(/\s+/).forEach((w, i) => {
       if (i > 0) quote.appendChild(document.createTextNode(' '));
       const s = document.createElement('span');

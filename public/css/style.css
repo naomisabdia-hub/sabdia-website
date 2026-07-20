@@ -564,9 +564,9 @@ footer{background:var(--dark);padding-top:0}
 .fcl a{font-size:12px;font-weight:300;color:rgba(253,251,246,.55);transition:color .3s;letter-spacing:.04em}
 .fcl a:hover{color:rgba(253,251,246,.75)}
 .fbot{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:22px clamp(22px,5vw,80px);flex-wrap:wrap;gap:10px}
-.fcopy{font-size:10px;font-weight:300;color:rgba(253,251,246,.42);letter-spacing:.08em}
+.fcopy{font-size:10px;font-weight:300;color:rgba(253,251,246,.64);letter-spacing:.08em}
 .flinks{display:flex;gap:20px}
-.flinks a{font-size:10px;font-weight:300;color:rgba(253,251,246,.42);transition:color .3s}
+.flinks a{font-size:10px;font-weight:300;color:rgba(253,251,246,.64);transition:color .3s}
 .flinks a:hover{color:rgba(253,251,246,.55)}
 
 /* ── PAGE HERO (inner pages) ── */
