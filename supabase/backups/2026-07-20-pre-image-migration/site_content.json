@@ -1,0 +1,1239 @@
+[
+  {
+    "key": "settings",
+    "data": {
+      "seo": {
+        "title": "Sabdia Constructions | Luxury Home Builders & Developers, Brisbane",
+        "ogImage": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1200,h_630,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "ogTitle": "Sabdia Constructions — Luxury Home Builders, Brisbane",
+        "description": "Boutique luxury home builder and developer in inner Brisbane. Multi-award winning, 100+ residences delivered since 2013. Design, Develop, Construct.",
+        "ogDescription": "Boutique luxury home builder and developer in inner Brisbane. Multi-award winning, 100+ residences delivered since 2013."
+      },
+      "logo": "https://static.wixstatic.com/media/1cc2db_f012027bbf0c45ebb4ae6d847309d59f~mv2.png/v1/fill/w_211,h_35,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/DESIGN%20%C2%B7%20DEVELOP%20%C2%B7%20CONSTRUCT.png",
+      "email": "sales@sabdia.com.au",
+      "phone": "",
+      "estYear": 2013,
+      "socials": {
+        "facebook": {
+          "url": "https://www.facebook.com/sabdiaconstructions/",
+          "label": "Sabdia Constructions"
+        },
+        "linkedin": {
+          "url": "https://www.linkedin.com/company/sabdia-constructions/",
+          "label": "Sabdia Constructions"
+        },
+        "instagram": {
+          "url": "https://www.instagram.com/_sabdia/",
+          "label": "@_sabdia"
+        }
+      },
+      "location": "Brisbane, Queensland, Australia",
+      "siteName": "Sabdia Constructions",
+      "domainUrl": "https://www.sabdiaconstructions.com.au",
+      "legalName": "Sabdia Constructions Pty Ltd",
+      "logoLarge": "https://static.wixstatic.com/media/1cc2db_f012027bbf0c45ebb4ae6d847309d59f~mv2.png/v1/fill/w_422,h_70,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/DESIGN%20%C2%B7%20DEVELOP%20%C2%B7%20CONSTRUCT.png",
+      "areaServed": "Brisbane, Queensland, Australia",
+      "jsonLdImage": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+      "domainDisplay": "sabdiaconstructions.com.au",
+      "jsonLdDescription": "Boutique luxury home builder and developer in inner Brisbane. Multi-award winning, 100+ residences delivered since 2013."
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "nav",
+    "data": {
+      "cta": {
+        "href": "/contact/",
+        "label": "Enquire"
+      },
+      "items": [
+        {
+          "href": "/properties/",
+          "label": "For Sale"
+        },
+        {
+          "href": "/services/",
+          "label": "Services"
+        },
+        {
+          "href": "/about/",
+          "label": "About"
+        },
+        {
+          "href": "/projects/",
+          "label": "Projects"
+        },
+        {
+          "href": "/collection/",
+          "label": "Collection"
+        },
+        {
+          "href": "/agent-access/",
+          "label": "Agent Access"
+        }
+      ],
+      "loaderMeta": "Sabdia · Est. 2013",
+      "mobileItems": [
+        {
+          "href": "/properties/",
+          "label": "For Sale"
+        },
+        {
+          "href": "/services/",
+          "label": "Services"
+        },
+        {
+          "href": "/about/",
+          "label": "About"
+        },
+        {
+          "href": "/projects/",
+          "label": "Projects"
+        },
+        {
+          "href": "/collection/",
+          "label": "Collection"
+        },
+        {
+          "href": "/agent-access/",
+          "label": "Agent Access"
+        },
+        {
+          "href": "/contact/",
+          "label": "Contact"
+        }
+      ]
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "footer",
+    "data": {
+      "blurbHtml": "Boutique Luxury Home Builder &<br>Developer — Brisbane, QLD",
+      "legalLinks": [
+        {
+          "href": "/accessibility/",
+          "label": "Accessibility"
+        },
+        {
+          "href": "/privacy/",
+          "label": "Privacy"
+        }
+      ],
+      "taglineSub": "Boutique luxury home builder & developer delivering award-winning residences across inner Brisbane since 2013.",
+      "taglineHtml": "Design. <em>Develop.</em><br>Construct.",
+      "companyLinks": [
+        {
+          "href": "/about/",
+          "label": "About Sabdia"
+        },
+        {
+          "href": "/services/",
+          "label": "Services"
+        },
+        {
+          "href": "/projects/",
+          "label": "Projects"
+        },
+        {
+          "href": "/collection/",
+          "label": "Collection"
+        },
+        {
+          "href": "/agent-access/",
+          "label": "Agent Access"
+        }
+      ]
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "home_hero",
+    "data": {
+      "award": "Award-Winning Luxury Residences.",
+      "words": [
+        "Design",
+        "Develop",
+        "Construct"
+      ],
+      "slides": [
+        {
+          "alt": "Sabdia luxury home",
+          "image": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg"
+        },
+        {
+          "alt": "Sabdia luxury home",
+          "image": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg"
+        },
+        {
+          "alt": "Sabdia luxury home",
+          "image": "https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg"
+        }
+      ],
+      "eyebrow": "Boutique Luxury Home Builder & Developer — Brisbane",
+      "primaryCta": {
+        "href": "/properties/",
+        "label": "View Properties"
+      },
+      "description": "Redefining luxury through design, detail, and craftsmanship. For over ten years, Sabdia has delivered award-winning residences that set a new benchmark for contemporary living in Brisbane.",
+      "secondaryCta": {
+        "href": "/contact/",
+        "label": "Begin a Conversation"
+      }
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "home_stats",
+    "data": {
+      "items": [
+        {
+          "count": true,
+          "label": "Years in Brisbane",
+          "suffix": "+",
+          "target": 10
+        },
+        {
+          "count": true,
+          "label": "Residences Delivered",
+          "suffix": "+",
+          "target": 100
+        },
+        {
+          "count": true,
+          "label": "Multi-Award Winning",
+          "suffix": "★",
+          "target": 5
+        },
+        {
+          "count": false,
+          "label": "In-House Delivery",
+          "suffix": "%",
+          "target": 100
+        }
+      ]
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "home_marquee",
+    "data": {
+      "items": [
+        "Multi-Award Winning",
+        "Design · Develop · Construct",
+        "Inner Brisbane Specialist",
+        "100+ Residences Since 2013",
+        "Boutique Luxury Developer"
+      ]
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "home_about",
+    "data": {
+      "cta": {
+        "href": "/about/",
+        "label": "Our Full Story"
+      },
+      "label": "About Sabdia",
+      "images": [
+        {
+          "alt": "Sabdia craftsmanship",
+          "image": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg"
+        },
+        {
+          "alt": "Sabdia detail",
+          "image": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_500,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg"
+        }
+      ],
+      "values": [
+        {
+          "n": "i.",
+          "desc": "Design, develop, and construct under one roof — seamless from concept to keys.",
+          "title": "Integrated Delivery"
+        },
+        {
+          "n": "ii.",
+          "desc": "Only the finest materials, master tradespeople, and meticulous attention to detail.",
+          "title": "Uncompromising Quality"
+        },
+        {
+          "n": "iii.",
+          "desc": "Limited projects annually to ensure every client receives our full dedication.",
+          "title": "Boutique & Personal"
+        }
+      ],
+      "sigName": "Sabdia",
+      "sigTitle": "Founder & Principal",
+      "paragraphs": [
+        "At Sabdia, we manage every step of the residential development journey in-house — from visionary design through to expert construction. This integrated approach allows us to maintain meticulous control over quality, timing, and innovation, delivering homes that stand the test of time.",
+        "With a focus on creating exceptional living spaces, Sabdia Constructions is dedicated to shaping the future of residential developments through innovation, quality, and unparalleled craftsmanship. Every project begins with a deep understanding of both the site and the clients who will call it home.",
+        "We are not merely builders — we are creators of legacy. Each residence we deliver is conceived as a singular work of architecture, thoughtfully designed to complement its surroundings and exceed every expectation of luxury living."
+      ],
+      "headingHtml": "Crafting <em>Exquisite</em><br>Living Spaces."
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "home_properties",
+    "data": {
+      "cta": {
+        "href": "/properties/",
+        "label": "View All"
+      },
+      "label": "For Sale",
+      "headingHtml": "<em>Current</em> Properties"
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "home_services",
+    "data": {
+      "cta": {
+        "href": "/services/",
+        "label": "Explore Services"
+      },
+      "text": "From site acquisition through to final handover, Sabdia manages every element in-house — ensuring seamless delivery and uncompromising quality at every stage.",
+      "label": "What We Do",
+      "headingHtml": "Full-spectrum<br><em>development</em><br>expertise."
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "home_process",
+    "data": {
+      "label": "Our Process"
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "home_agent",
+    "data": {
+      "text": "Gain exclusive insight into Sabdia's future releases. Our agent-only preview list offers early access to premium developments, pre-launch information, and priority communication — giving your clients an edge in Brisbane's luxury market.",
+      "badge": "Exclusive Access",
+      "image": {
+        "alt": "Agent Access",
+        "image": "https://static.wixstatic.com/media/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png/v1/fill/w_900,h_1100,q_85,enc_avif,quality_auto/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png"
+      },
+      "label": "For Real Estate Professionals",
+      "features": [
+        "Pre-release access to upcoming developments",
+        "Pre-launch pricing and floor plan information",
+        "Priority communication on new releases",
+        "Exclusive commission structures",
+        "Invitations to private project previews",
+        "Dedicated liaison with the Sabdia team"
+      ],
+      "primaryCta": {
+        "href": "/agent-access/",
+        "label": "Apply for Access"
+      },
+      "headingHtml": "Exclusive <em>Agent</em><br>Access.",
+      "secondaryCta": {
+        "href": "/contact/",
+        "label": "Learn More"
+      }
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "home_contact",
+    "data": {
+      "note": "We typically respond within one business day.",
+      "text": "Please submit your contact information and one of our team members will be in touch with you shortly.",
+      "label": "Get In Touch",
+      "interests": [
+        "For Sale — Current Properties",
+        "Custom Home Design",
+        "Development Partnership",
+        "Agent Access",
+        "General Enquiry"
+      ],
+      "headingHtml": "Let's start<br>a <em>conversation</em>."
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "properties_page",
+    "data": {
+      "cta": {
+        "text": "We offer private, exclusive viewings for serious buyers. Contact us to arrange an inspection at a time that suits you.",
+        "label": "Private Enquiry",
+        "primaryCta": {
+          "href": "/contact/",
+          "label": "Request a Viewing"
+        },
+        "headingHtml": "Interested in a<br><em style=\"color:var(--gold)\">private viewing</em>?",
+        "secondaryCta": {
+          "href": "/agent-access/",
+          "label": "Agent Enquiries"
+        }
+      },
+      "label": "For Sale",
+      "soldLabel": "Sold Prior to Completion",
+      "headingHtml": "<em style=\"color:var(--gold)\">Current</em><br>Properties.",
+      "introTemplate": "{count} extraordinary residences across Brisbane's most sought-after inner suburbs — each designed, developed, and built entirely in-house by Sabdia."
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "projects_page",
+    "data": {
+      "cta": {
+        "label": "Interested?",
+        "primaryCta": {
+          "href": "/properties/",
+          "label": "View For Sale"
+        },
+        "headingHtml": "Ready to find your<br><em>next home</em>?",
+        "secondaryCta": {
+          "href": "/contact/",
+          "label": "Enquire Now"
+        }
+      },
+      "hero": {
+        "sub": "Over 100 residences delivered across inner Brisbane's most prestigious suburbs since 2013.",
+        "image": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+        "label": "Portfolio",
+        "titleHtml": "Our<br><em>Projects</em>"
+      },
+      "soldLabel": "Sold Prior to Completion",
+      "currentLabel": "For Sale — Current"
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "services_page",
+    "data": {
+      "cta": {
+        "text": "Whether you have a site, a vision, or simply a desire for exceptional living — we'd love to hear from you.",
+        "label": "Start Your Project",
+        "primaryCta": {
+          "href": "/contact/",
+          "label": "Begin a Conversation"
+        },
+        "headingHtml": "Ready to build something <em style=\"color:var(--gold2)\">remarkable</em>?",
+        "secondaryCta": {
+          "href": "/properties/",
+          "label": "View Properties"
+        }
+      },
+      "hero": {
+        "sub": "Full-spectrum residential development expertise delivered entirely in-house.",
+        "image": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+        "label": "What We Offer",
+        "titleHtml": "Our<br><em>Services</em>"
+      },
+      "intro": {
+        "label": "Integrated Approach",
+        "paragraphs": [
+          "At Sabdia, we believe the best residential developments are those where design, development, and construction work as one seamless system — not as separate, disconnected disciplines. Our fully integrated in-house model is our defining advantage.",
+          "From the first sketch to the final handover, every decision is made by the same team, with the same vision, and the same commitment to excellence."
+        ],
+        "headingHtml": "Every element,<br><em>under one roof</em>."
+      },
+      "processLabel": "The Process"
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "about_page",
+    "data": {
+      "cta": {
+        "text": "Whether you're seeking a current property for sale or have a vision for a bespoke home, we'd love to begin a conversation.",
+        "label": "Begin Your Journey",
+        "primaryCta": {
+          "href": "/properties/",
+          "label": "View Properties"
+        },
+        "headingHtml": "Ready to create something <em>extraordinary</em>?",
+        "secondaryCta": {
+          "href": "/contact/",
+          "label": "Get In Touch"
+        }
+      },
+      "hero": {
+        "sub": "A decade of redefining luxury residential development in inner Brisbane.",
+        "image": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "label": "Our Story",
+        "titleHtml": "About<br><em>Sabdia</em>"
+      },
+      "awards": {
+        "items": [
+          {
+            "org": "UDIA Queensland Awards",
+            "year": "2024",
+            "title": "Best Luxury Residential Development"
+          },
+          {
+            "org": "HIA Australian Housing Awards",
+            "year": "2023",
+            "title": "Excellence in Design"
+          },
+          {
+            "org": "Property Council of Australia",
+            "year": "2022",
+            "title": "Best New Residential Development"
+          },
+          {
+            "org": "IDEA Awards",
+            "year": "2021",
+            "title": "Residential Interior Design — Luxury"
+          },
+          {
+            "org": "Master Builders Queensland",
+            "year": "2020",
+            "title": "Custom Home of the Year — QLD"
+          },
+          {
+            "org": "REIQ Awards for Excellence",
+            "year": "2019",
+            "title": "Best Luxury Home Builder — Brisbane"
+          }
+        ],
+        "label": "Recognition",
+        "headingHtml": "Award-winning<br><em>excellence</em>."
+      },
+      "values": {
+        "items": [
+          {
+            "n": "i.",
+            "desc": "We say what we do, and we do what we say. Transparency with our clients is non-negotiable at every stage of the journey.",
+            "title": "Integrity"
+          },
+          {
+            "n": "ii.",
+            "desc": "We push the boundaries of design and construction, constantly seeking better ways to create residences that will stand the test of time.",
+            "title": "Innovation"
+          },
+          {
+            "n": "iii.",
+            "desc": "We do not accept 'good enough'. Every detail, from the grandest architectural gesture to the smallest finishing touch, must be exceptional.",
+            "title": "Excellence"
+          }
+        ],
+        "label": "Our Values"
+      },
+      "journey": {
+        "text": "From a single vision to over 100 delivered residences, each year has brought new achievements and raised the bar for what luxury living in Brisbane can be.",
+        "items": [
+          {
+            "desc": "Sabdia Constructions established with a vision to redefine boutique luxury residential development in inner Brisbane.",
+            "year": "2013",
+            "title": "Founded"
+          },
+          {
+            "desc": "Recognised with our first industry award for design excellence, validating the Sabdia approach to integrated development.",
+            "year": "2015",
+            "title": "First Award"
+          },
+          {
+            "desc": "A major milestone — 50 homes delivered to satisfied clients across inner Brisbane's most prestigious suburbs.",
+            "year": "2017",
+            "title": "50 Residences Delivered"
+          },
+          {
+            "desc": "Expanded in-house capabilities to include a dedicated interior architecture team, deepening creative integration across all projects.",
+            "year": "2020",
+            "title": "Interior Architecture Division"
+          },
+          {
+            "desc": "Surpassed 100 completed residences — a testament to a decade of consistency, quality, and unwavering commitment to excellence.",
+            "year": "2023",
+            "title": "100+ Residences"
+          },
+          {
+            "desc": "The launch of QASR, Coorparoo — Sabdia's most ambitious and extraordinary residence to date, representing a new pinnacle of Brisbane luxury.",
+            "year": "2025",
+            "title": "QASR — Flagship Release"
+          }
+        ],
+        "label": "Our Journey",
+        "headingHtml": "A decade of<br><em>milestones</em>."
+      },
+      "mission": {
+        "label": "Mission",
+        "sigName": "Sabdia",
+        "sigTitle": "Founder & Principal",
+        "paragraphs": [
+          "Founded in 2013, Sabdia Constructions was born from a singular conviction: that the residential development industry in Brisbane deserved a boutique operator who refused to compromise. One that would bring together exceptional design, rigorous development management, and master-level construction under a single, unified vision.",
+          "Over a decade later, that conviction has been validated more than 100 times — in every residence we have delivered, in every client who has trusted us with their most significant investment, and in every award that has recognised our commitment to excellence.",
+          "We remain boutique by choice. By limiting the number of projects we undertake each year, we ensure that every development receives the full force of our attention, creativity, and craftsmanship. We do not build in volume. We build in detail."
+        ],
+        "headingHtml": "Built on <em>vision</em>,<br>delivered with<br>precision."
+      }
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "agent_page",
+    "data": {
+      "hero": {
+        "text": "Join Sabdia's exclusive agent network and be the first to know about our next landmark development before it reaches the market.",
+        "image": "https://static.wixstatic.com/media/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png/v1/fill/w_1400,h_1800,q_85,enc_avif,quality_auto/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png",
+        "label": "For Real Estate Professionals",
+        "titleHtml": "Exclusive<br><em style=\"color:var(--gold2)\">Agent</em><br>Access."
+      },
+      "apply": {
+        "text": "Complete the form and a member of the Sabdia team will be in touch within one business day to discuss your application and confirm your access to our exclusive agent program.",
+        "label": "Apply for Access",
+        "noteText": "The Sabdia agent program is available to licensed real estate professionals only. We may request verification of your licence at the time of application approval.",
+        "noteLabel": "Please note",
+        "headingHtml": "Join the <em>network</em>.",
+        "submitLabel": "Submit Application"
+      },
+      "benefits": {
+        "items": [
+          {
+            "desc": "Be first to know about upcoming developments before they reach the public market. Give your clients a genuine first-mover advantage.",
+            "icon": "layers",
+            "title": "Pre-Release Access"
+          },
+          {
+            "desc": "Access pre-launch floor plans and indicative pricing information exclusively — everything you need to prepare your clients before public release.",
+            "icon": "plan",
+            "title": "Floor Plans & Pricing"
+          },
+          {
+            "desc": "A dedicated Sabdia liaison to keep you informed, respond to questions, and support you throughout the sales process.",
+            "icon": "phone",
+            "title": "Priority Communication"
+          },
+          {
+            "desc": "Competitive and exclusive commission structures for agent network members — recognising the value of your relationships and referrals.",
+            "icon": "dollar",
+            "title": "Exclusive Commissions"
+          },
+          {
+            "desc": "Invitations to exclusive agent-only preview events — an opportunity to walk through completed or near-complete residences before public launch.",
+            "icon": "users",
+            "title": "Private Previews"
+          },
+          {
+            "desc": "Represent Brisbane's most acclaimed boutique luxury developer — a brand that your clients will immediately recognise as a hallmark of quality.",
+            "icon": "star",
+            "title": "Award-Winning Product"
+          }
+        ],
+        "label": "Why Join",
+        "headingHtml": "The Sabdia agent program gives you <em style=\"color:var(--gold2)\">a genuine edge</em>."
+      },
+      "listings": {
+        "cta": {
+          "href": "/properties/",
+          "label": "View All Properties"
+        },
+        "label": "Current Opportunities",
+        "headingHtml": "Properties available <em>now</em>."
+      }
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "contact_page",
+    "data": {
+      "map": {
+        "image": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_500,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "label": "Brisbane, Queensland"
+      },
+      "form": {
+        "note": "We respond within one business day.",
+        "label": "Send a Message",
+        "interests": [
+          "Custom Home / Bespoke Build",
+          "Development Partnership",
+          "Agent Access",
+          "Media & Press",
+          "General Enquiry"
+        ],
+        "submitLabel": "Submit Enquiry"
+      },
+      "hero": {
+        "text": "We're always keen to hear from potential clients, real estate professionals, and development partners. Submit your details and we'll be in touch shortly.",
+        "label": "Get In Touch",
+        "titleHtml": "Let's start<br>a <em style=\"font-style:italic;color:var(--gold2)\">conversation</em>."
+      },
+      "agentBlock": {
+        "heading": "Agent Enquiries",
+        "bodyHtml": "Real estate professionals seeking exclusive agent access — pre-launch information, priority access and commission structures — please visit our <a href=\"/agent-access/\" style=\"color:var(--gold2);text-decoration:underline;text-underline-offset:3px\">Agent Access page</a>."
+      },
+      "quickLinks": {
+        "items": [
+          {
+            "tag": "For Sale",
+            "desc": "View our current portfolio of luxury residences available for sale across Brisbane.",
+            "href": "/properties/",
+            "title": "Current Properties"
+          },
+          {
+            "tag": "Professionals",
+            "desc": "Exclusive pre-launch information, priority access, and commission structures for real estate professionals.",
+            "href": "/agent-access/",
+            "title": "Agent Access"
+          },
+          {
+            "tag": "Company",
+            "desc": "Learn about our story, values, and integrated approach to boutique luxury development.",
+            "href": "/about/",
+            "title": "About Sabdia"
+          }
+        ],
+        "label": "You May Also Be Interested In"
+      },
+      "directLabel": "Direct Contact"
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "legal_privacy",
+    "data": {
+      "intro": "Sabdia Constructions Pty Ltd is committed to protecting your privacy in accordance with the Privacy Act 1988 (Cth) and the Australian Privacy Principles. This policy explains how we collect, use, and safeguard your personal information.",
+      "label": "Legal",
+      "updated": "July 2026",
+      "sections": [
+        {
+          "heading": "What we collect",
+          "bodyHtml": "When you submit an enquiry, register interest in a property, or apply for agent access, we collect the information you provide — typically your name, email address, phone number, and the details of your enquiry. Agent applicants may also provide their agency, licence number, and market areas. We do not collect sensitive information through this website."
+        },
+        {
+          "heading": "How we use it",
+          "bodyHtml": "Your information is used solely to respond to your enquiry, keep you informed about the properties or programs you have expressed interest in, and improve our services. We do not sell, rent, or trade your personal information to third parties."
+        },
+        {
+          "heading": "Storage and security",
+          "bodyHtml": "Enquiries are stored securely with our database provider and access is restricted to authorised Sabdia team members. We take reasonable steps to protect your information from misuse, interference, loss, and unauthorised access, modification, or disclosure."
+        },
+        {
+          "heading": "Disclosure",
+          "bodyHtml": "We may share your information with trusted service providers who help us operate this website and communicate with you (for example, our email delivery provider). These providers are bound to handle your information only for the purpose of providing services to us."
+        },
+        {
+          "heading": "Cookies and analytics",
+          "bodyHtml": "This website may use privacy-friendly analytics to understand how visitors use the site. Analytics data is aggregated and does not identify you personally."
+        },
+        {
+          "heading": "Access and correction",
+          "bodyHtml": "You may request access to, or correction of, the personal information we hold about you at any time by contacting us. We will respond within a reasonable period."
+        },
+        {
+          "heading": "Contact",
+          "bodyHtml": "For any privacy-related questions or requests, contact us via the enquiry form on this website or by email. If you are not satisfied with our response, you may contact the Office of the Australian Information Commissioner (OAIC)."
+        }
+      ],
+      "titleHtml": "Privacy <em>Policy</em>."
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "legal_accessibility",
+    "data": {
+      "intro": "Sabdia Constructions is committed to ensuring this website is accessible to the widest possible audience, regardless of technology or ability. We aim to conform to the Web Content Accessibility Guidelines (WCAG) 2.1 at Level AA.",
+      "label": "Legal",
+      "updated": "July 2026",
+      "sections": [
+        {
+          "heading": "What we do",
+          "bodyHtml": "This website is built with semantic HTML landmarks, supports full keyboard navigation with visible focus states, maintains WCAG AA colour contrast, provides descriptive alternative text for images, and respects your system's reduced-motion preference by disabling non-essential animation."
+        },
+        {
+          "heading": "Known limitations",
+          "bodyHtml": "Some third-party embedded content (such as interactive 3D models and virtual tours) may not be fully accessible. Where these features appear, the same property information is always available in accessible text form on the same page."
+        },
+        {
+          "heading": "Feedback",
+          "bodyHtml": "We welcome your feedback on the accessibility of this website. If you encounter an accessibility barrier, please contact us via the enquiry form and we will make every reasonable effort to address it promptly."
+        }
+      ],
+      "titleHtml": "Accessibility <em>Statement</em>."
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "notfound",
+    "data": {
+      "text": "Like our finest residences, the page you're looking for has found a new owner — or never existed at all. Let us guide you back.",
+      "label": "404",
+      "titleHtml": "This page has<br><em>moved on</em>.",
+      "primaryCta": {
+        "href": "/",
+        "label": "Return Home"
+      },
+      "secondaryCta": {
+        "href": "/properties/",
+        "label": "View Properties"
+      }
+    },
+    "updated_at": "2026-07-19T09:02:16.938237+00:00"
+  },
+  {
+    "key": "films",
+    "data": {
+      "brand": {
+        "text": "A look at the residences, the craftsmanship, and the people behind every Sabdia home.",
+        "label": "The Sabdia Story",
+        "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand.mp4",
+        "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand-poster.jpg",
+        "headingHtml": "Crafted moments,<br><em>captured on film</em>."
+      },
+      "byProperty": {
+        "qasr": {
+          "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/qasr.mp4",
+          "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/qasr-poster.jpg"
+        },
+        "capri": {
+          "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/capri.mp4",
+          "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/capri-poster.jpg"
+        },
+        "aether": {
+          "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/aether.mp4",
+          "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/aether-poster.jpg"
+        },
+        "sierra": {
+          "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/sierra.mp4",
+          "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/sierra-poster.jpg"
+        },
+        "solace": {
+          "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/solace.mp4",
+          "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/solace-poster.jpg"
+        }
+      },
+      "sectionLabel": "The Film"
+    },
+    "updated_at": "2026-07-19T09:22:27.805906+00:00"
+  },
+  {
+    "key": "collection_page",
+    "data": {
+      "text": "A portfolio of completed luxury residences across inner Brisbane — each one designed, developed, and constructed entirely in-house by Sabdia.",
+      "items": [
+        {
+          "loc": "Camp Hill QLD, Australia",
+          "name": "MILOS",
+          "image": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos-poster.jpg",
+          "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos.mp4"
+        },
+        {
+          "loc": "Taringa QLD, Australia",
+          "name": "AMMOS",
+          "image": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos-poster.jpg",
+          "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos.mp4"
+        },
+        {
+          "loc": "Camp Hill QLD, Australia",
+          "name": "CALLE",
+          "image": "https://static.wixstatic.com/media/1cc2db_a11d808ebc4648de9b8a25918f19e192~mv2.png/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_a11d808ebc4648de9b8a25918f19e192~mv2.png",
+          "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/calle.mp4"
+        },
+        {
+          "loc": "Holland Park QLD, Australia",
+          "name": "ELYSIUM",
+          "image": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium-poster.jpg",
+          "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium.mp4"
+        },
+        {
+          "loc": "Brisbane QLD, Australia",
+          "name": "ALHAMBRA",
+          "image": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra-poster.jpg",
+          "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra.mp4"
+        },
+        {
+          "loc": "Camp Hill QLD, Australia",
+          "name": "ENCANTO",
+          "image": "https://static.wixstatic.com/media/1cc2db_4d7d30024fef47ba8f5f9859e08bb47b~mv2.jpeg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_4d7d30024fef47ba8f5f9859e08bb47b~mv2.jpeg"
+        },
+        {
+          "loc": "Rochedale QLD, Australia",
+          "name": "NERO",
+          "image": "https://static.wixstatic.com/media/1cc2db_9ed4e50eba3b453885aa6a4917ba5607~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_9ed4e50eba3b453885aa6a4917ba5607~mv2.jpg"
+        },
+        {
+          "loc": "Camp Hill QLD, Australia",
+          "name": "HERMOSA",
+          "image": "https://static.wixstatic.com/media/1cc2db_9cbfa41ef2dd4ed3b14b5277765cc446~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_9cbfa41ef2dd4ed3b14b5277765cc446~mv2.jpg"
+        },
+        {
+          "loc": "Graceville QLD, Australia",
+          "name": "FRASER",
+          "image": "https://static.wixstatic.com/media/1cc2db_fb04f5dbe53b4d34ab710537a2e24b40~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_fb04f5dbe53b4d34ab710537a2e24b40~mv2.jpg"
+        },
+        {
+          "loc": "Taringa QLD, Australia",
+          "name": "PETRA",
+          "image": "https://static.wixstatic.com/media/1cc2db_64f35b15dd914a189eee2aeb79b86284~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_64f35b15dd914a189eee2aeb79b86284~mv2.jpg"
+        },
+        {
+          "loc": "Brisbane QLD, Australia",
+          "name": "KIRRA",
+          "image": "https://static.wixstatic.com/media/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png/v1/fill/w_800,h_600,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png"
+        }
+      ],
+      "label": "Our Work",
+      "titleHtml": "The Sabdia<br><em style=\"color:var(--gold)\">Collection</em>."
+    },
+    "updated_at": "2026-07-19T09:22:27.949444+00:00"
+  },
+  {
+    "key": "series",
+    "data": {
+      "text": "Every Sabdia residence is documented from first render to final reveal. Explore the journey as it was shared.",
+      "label": "The Series",
+      "handle": "@_sabdia",
+      "byProject": {
+        "qasr": [
+          {
+            "date": "2026-07-06",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/qasr-0-thumb.webp",
+            "metric": "178",
+            "caption": "KAH-sar. Arabic for palace."
+          },
+          {
+            "date": "2026-06-09",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/qasr-1-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/qasr-1.mp4",
+            "metric": "7.4K",
+            "caption": "Positioned high on one of Coorparoo’s most prestigious addresses, QASR is a residence designed to make a lasting impression."
+          },
+          {
+            "date": "2026-05-19",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/qasr-2-thumb.webp",
+            "metric": "265",
+            "caption": "Progress continues to unfold at QASR. A home inspired by Arabian architecture, where scale, texture and materiality come together to create something truly immersive."
+          },
+          {
+            "date": "2026-03-31",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/qasr-3-thumb.webp",
+            "metric": "146",
+            "caption": "QASR is a celebration of detail and design. Inspired by the elegance of Arabian architecture, the home weaves together warm textures, sculptural forms, and intricate patterns that create depth and character. From the str"
+          },
+          {
+            "date": "2026-03-17",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/qasr-4-thumb.webp",
+            "metric": "193",
+            "caption": "Every element of the façade has been carefully composed to create a layered architectural story. Breeze blocks introduce rhythm and texture, softening the structure while allowing light and shadow to move across the elev"
+          },
+          {
+            "date": "2026-03-04",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/qasr-5-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/qasr-5.mp4",
+            "metric": "3.7K",
+            "caption": "Inspired by timeless architecture and a refined material palette, QASR is a home where texture and craftsmanship shape every experience of space. Natural stone, warm timber, and bespoke finishes are layered with intentio"
+          },
+          {
+            "date": "2026-02-25",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/qasr-6-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/qasr-6.mp4",
+            "metric": "5.1K",
+            "caption": "The dining space at QASR is designed to be both intimate and grand. A central fireplace anchors the room, creating warmth and ambience, while expansive windows frame serene views of the pool and landscaped surroundings. "
+          }
+        ],
+        "ammos": [
+          {
+            "date": "2025-09-08",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ammos-0-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ammos-0.mp4",
+            "metric": "25.1K",
+            "caption": "A modern Mediterranean residence defined by natural stone, soft textures, and a palette that is both timeless and contemporary."
+          },
+          {
+            "date": "2025-08-05",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ammos-1-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ammos-1.mp4",
+            "metric": "20.1K",
+            "caption": "Set high in the hills of Taringa — soft curves, tonal render and a refined material palette, designed to feel grounded, sunlit, and effortless."
+          }
+        ],
+        "calle": [
+          {
+            "date": "2026-03-26",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/calle-0-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/calle-0.mp4",
+            "metric": "5.6K",
+            "caption": "A home defined by detail — where every junction, material, and finish has been carefully considered to create a cohesive, elevated result. From the warmth of natural timbers to the refinement of stone and bespoke joinery"
+          },
+          {
+            "date": "2026-03-18",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/calle-1-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/calle-1.mp4",
+            "metric": "8K",
+            "caption": "A considered arrival, designed to leave a lasting impression. The entrance unfolds as a composition of texture and tone—warm timber detailing meeting natural travertine crazy pave underfoot, creating a grounded yet refin"
+          },
+          {
+            "date": "2026-03-02",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/calle-2-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/calle-2.mp4",
+            "metric": "8.5K",
+            "caption": "At CALLE, every detail reflects our commitment to building with intention. Designed in-house and delivered with precision, this home showcases the level of care, quality, and craftsmanship that defines each of our builds"
+          },
+          {
+            "date": "2026-02-23",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/calle-3-thumb.webp",
+            "metric": "47",
+            "caption": "Handed over in Camp Hill, CALLE is a Modern inspired Mediterranean residence elevated with Organic Modern details, where every element has been carefully considered. From the light-filled interiors to the thoughtful layo"
+          }
+        ],
+        "capri": [
+          {
+            "date": "2026-06-19",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/capri-0-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/capri-0.mp4",
+            "metric": "7.7K",
+            "caption": "Now in its final stages and ready to welcome its new owners, CAPRI is a refined expression of modern Mediterranean living in the heart of Holland Park West."
+          },
+          {
+            "date": "2026-06-11",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/capri-1-thumb.webp",
+            "metric": "139",
+            "caption": "Sold prior to completion."
+          },
+          {
+            "date": "2026-04-17",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/capri-2-thumb.webp",
+            "metric": "155",
+            "caption": "Now nearing completion, this residence has been carefully shaped from concept through to construction — balancing warmth, texture and architectural clarity. From the layered façade to the considered interior palette, eve"
+          },
+          {
+            "date": "2026-03-12",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/capri-3-thumb.webp",
+            "metric": "127",
+            "caption": "Set high in Holland Park West, CAPRI captures elevated outlooks toward the Brisbane city skyline while embracing a refined Modern Mediterranean influence."
+          },
+          {
+            "date": "2026-03-05",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/capri-4-thumb.webp",
+            "metric": "179",
+            "caption": "Recently sold off market in Holland Park West, CAPRI brings a refined Modern Mediterranean influence to contemporary living. Clean architectural lines, warm natural materials, and thoughtfully curated finishes create a h"
+          }
+        ],
+        "milos": [
+          {
+            "date": "2025-10-13",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/milos-0-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/milos-0.mp4",
+            "metric": "11K",
+            "caption": "MILOS in Camp Hill has officially been SOLD — flowing living spaces and a seamless indoor-outdoor connection."
+          },
+          {
+            "date": "2025-08-19",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/milos-1-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/milos-1.mp4",
+            "metric": "22K",
+            "caption": "Modern Mediterranean in form and spirit — where arched openings, warm textures, and a sun-washed palette create a sense of timeless elegance."
+          },
+          {
+            "date": "2025-07-25",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/milos-2-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/milos-2.mp4",
+            "metric": "10.7K",
+            "caption": "An architectural expression of warmth and intention — refined detailing with soft, sculptural elements."
+          }
+        ],
+        "petra": [
+          {
+            "date": "2026-04-02",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/petra-0-thumb.webp",
+            "metric": "51",
+            "caption": "Palm Springs influence, reinterpreted through a refined, architectural lens."
+          }
+        ],
+        "aether": [
+          {
+            "date": "2026-04-30",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/aether-0-thumb.webp",
+            "metric": "84",
+            "caption": "Light, air, and quiet precision."
+          },
+          {
+            "date": "2026-03-09",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/aether-1-thumb.webp",
+            "metric": "64",
+            "caption": "Progress continues to unfold at AETHER, where every element of the home is being carefully brought to life. Positioned in a highly sought-after pocket, the residence has been designed to respond to its surroundings—balan"
+          }
+        ],
+        "sierra": [
+          {
+            "date": "2026-06-10",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/sierra-0-thumb.webp",
+            "metric": "61",
+            "caption": "Approaching completion in Holland Park West, SIERRA is beginning to reveal the vision behind every detail."
+          },
+          {
+            "date": "2026-05-28",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/sierra-1-thumb.webp",
+            "metric": "120",
+            "caption": "A contemporary home grounded in warmth, texture, and refined detailing. Rich timbers, natural stone, and soft layered finishes come together to create a residence that feels both elevated and timeless."
+          },
+          {
+            "date": "2026-04-28",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/sierra-2-thumb.webp",
+            "metric": "104",
+            "caption": "A home that comes alive after dark."
+          },
+          {
+            "date": "2026-03-11",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/sierra-3-thumb.webp",
+            "metric": "142",
+            "caption": "A sophisticated retreat in Holland Park West, SIERRA is designed to maximise city views while balancing warmth and comfort. The home features bespoke walnut cabinetry paired with natural stone, creating a refined backdro"
+          },
+          {
+            "date": "2026-03-03",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/sierra-4-thumb.webp",
+            "metric": "42",
+            "caption": "Located in Holland Park West, SIERRA is a home defined by clarity of form and considered detail. Designed to balance sophistication with everyday liveability, the residence brings together refined materials, generous pro"
+          }
+        ],
+        "solace": [
+          {
+            "date": "2026-07-07",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-0-thumb.webp",
+            "metric": "57",
+            "caption": "SOLACE is a home defined by calm, balance, and considered design. Every space has been thoughtfully crafted to create a sense of warmth, sophistication, and effortless liveability, with timeless materials and refined det"
+          },
+          {
+            "date": "2026-06-08",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-1-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-1.mp4",
+            "metric": "6.6K",
+            "caption": "A home defined by texture, warmth, and timeless materiality."
+          },
+          {
+            "date": "2026-05-26",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-2-thumb.webp",
+            "metric": "125",
+            "caption": "⠀⠀⠀⠀⠀⠀⠀⠀⠀"
+          },
+          {
+            "date": "2026-05-13",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-3-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-3.mp4",
+            "metric": "13.8K",
+            "caption": "Time, texture, and restraint define this residence — where every surface has been considered, refined, and resolved through craft."
+          },
+          {
+            "date": "2026-05-12",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-4-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-4.mp4",
+            "metric": "5.7K",
+            "caption": "Welcome to SOLACE."
+          },
+          {
+            "date": "2026-05-11",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-5-thumb.webp",
+            "metric": "92",
+            "caption": "A BESPOKE RESIDENCE BY SABDIA"
+          },
+          {
+            "date": "2026-05-10",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-6-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-6.mp4",
+            "metric": "34.8K",
+            "caption": "A new benchmark for refined living is about to arrive in Camp Hill."
+          },
+          {
+            "date": "2026-05-08",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-7-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/solace-7.mp4",
+            "metric": "5.6K",
+            "caption": "Coming to Camp Hill."
+          }
+        ],
+        "caspian": [
+          {
+            "date": "2026-07-08",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/caspian-0-thumb.webp",
+            "metric": "179",
+            "caption": "From carefully considered design to the built form now taking shape, CASPIAN continues to progress exactly as envisioned. Seeing each architectural detail translate from concept into reality is a rewarding milestone, wit"
+          },
+          {
+            "date": "2026-06-22",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/caspian-1-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/caspian-1.mp4",
+            "metric": "6.9K",
+            "caption": "Rising above one of Brisbane’s most sought-after addresses, CASPIAN is continuing to take shape in the prestigious suburb of Ascot."
+          },
+          {
+            "date": "2026-06-03",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/caspian-2-thumb.webp",
+            "metric": "181",
+            "caption": "Progress continues to take shape in Ascot as CASPIAN moves closer to completion. Elevated to capture sweeping city views, this residence has been carefully designed to balance timeless architecture with contemporary luxu"
+          },
+          {
+            "date": "2026-03-19",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/caspian-3-thumb.webp",
+            "metric": "174",
+            "caption": "As dusk settles, the home begins to shift—light softens, shadows lengthen, and the city beyond comes alive. Positioned on an elevated site in Ascot, CASPIAN has been carefully oriented to capture uninterrupted, breathtak"
+          }
+        ],
+        "elysium": [
+          {
+            "date": "2025-12-16",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/elysium-0-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/elysium-0.mp4",
+            "metric": "9.5K",
+            "caption": "A Modern Mediterranean-inspired sanctuary in Holland Park — expansive open-plan spaces flow seamlessly from living and dining to alfresco and poolside."
+          },
+          {
+            "date": "2025-08-01",
+            "type": "VIDEO",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/elysium-1-thumb.jpg",
+            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/elysium-1.mp4",
+            "metric": "8K",
+            "caption": "The pool house offers a serene retreat, while sculptural seating and a sunken firepit create moments made for connection."
+          }
+        ],
+        "alhambra": [
+          {
+            "date": "2026-04-06",
+            "type": "CAROUSEL",
+            "thumb": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/alhambra-0-thumb.webp",
+            "metric": "123",
+            "caption": "Mediterranean influence, expressed through form, texture, and restraint."
+          }
+        ]
+      },
+      "headingHtml": "Follow the <em>story</em>."
+    },
+    "updated_at": "2026-07-19T09:36:51.394555+00:00"
+  }
+]

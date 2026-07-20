@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import CustomSections from '../components/CustomSections.astro';
 import { getContent } from '../lib/content.js';
+import { imgVariant } from '../lib/images.js';
 
 const { collection_page: page } = await getContent('collection_page');
 const delays = ['', 'd1', 'd2'];
@@ -33,7 +34,7 @@ const delays = ['', 'd1', 'd2'];
         {page.items.map((item, i) => (
           <a href={`/collection/${item.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}/`} class={`port-card reveal ${delays[i % 3]}`} data-port-card>
             <div class="port-img-wrap">
-              <img src={item.image} alt={item.name} loading="lazy">
+              <img src={item.image.startsWith('/images/') ? imgVariant(item.image, { w: 800, h: 600 }) : item.image} alt={item.name} loading="lazy">
               {item.video && <video src={item.video} muted loop playsinline preload="none" data-port-video></video>}
               {item.video && <span class="port-film-tag">Film</span>}
             </div>

@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import CustomSections from '../components/CustomSections.astro';
 import JourneySlider from '../components/JourneySlider.astro';
-import { wixResize, landLabel } from '../lib/wix.js';
+import { imgVariant, landLabel } from '../lib/images.js';
 import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
 
@@ -30,7 +30,7 @@ const bySlug = Object.fromEntries(all.map((e) => [e.id, e]));
 const journeyStage = (slug, gi, w = 1600, h = 1000) => {
   const e = bySlug[slug];
   const g = e?.data.gallery?.[gi];
-  return g ? g.src : wixResize(e.data.image, { w, h, focus: e.data.focus });
+  return g ? g.src : imgVariant(e.data.image, { w, h, focus: e.data.focus });
 };
 
 const journeys = [
@@ -83,7 +83,7 @@ const journeys = [
 
   <!-- HERO -->
   <section class="page-hero">
-    <img src={page.hero.image} alt="Projects" loading="eager">
+    <img src={imgVariant(page.hero.image, { w: 1920, h: 1080 })} alt="Projects" loading="eager" width="1920" height="1080">
     <div class="page-hero-ov"></div>
     <div class="page-hero-content inner">
       <div class="slabel slabel-dark">{page.hero.label}</div>
@@ -111,7 +111,7 @@ const journeys = [
       <div class="projects-grid">
         {forSale.map((p, i) => (
           <a href={`/properties/${p.id}/`} class={`proj-card reveal ${i % 2 === 1 ? 'd1' : ''}`}>
-            <img src={wixResize(p.data.image, { w: 1200, h: 750, focus: p.data.focus })} alt={p.data.name} loading="lazy">
+            <img src={imgVariant(p.data.image, { w: 1200, h: 750, focus: p.data.focus })} alt={p.data.name} loading="lazy">
             <div class="proj-card-ov"></div>
             <div class="proj-card-info">
               <div class="proj-card-year">{p.data.year} · For Sale</div>
@@ -132,7 +132,7 @@ const journeys = [
       <div class="projects-grid">
         {sold.map((p, i) => (
           <a href={`/properties/${p.id}/`} class={`proj-card reveal ${i % 2 === 1 ? 'd1' : ''}`}>
-            <img src={wixResize(p.data.image, { w: 1200, h: 750, focus: p.data.focus, q: 85 })} alt={p.data.name} loading="lazy">
+            <img src={imgVariant(p.data.image, { w: 1200, h: 750, focus: p.data.focus, q: 85 })} alt={p.data.name} loading="lazy">
             <div class="proj-card-ov"></div>
             <div class="sc-badge">Sold Prior to Completion</div>
             <div class="proj-card-info">

@@ -26,3 +26,24 @@
   on 8 pages), 9× 🟡, 3× 🟢. All 16 Wix source images still downloadable — recovery window open.
 - Confirmed production content flows from Supabase (properties + site_content), so the image
   migration must update DB rows too — flagged for approval at Checkpoint 2.
+
+## Phase 2 — Own the images & performance (2026-07-20)
+- Downloaded all 16 Wix-hosted originals (Sabdia's own Dropbox photography) →
+  `public/images/` with semantic names; normalised to ≤3200px lean masters (21MB total);
+  manifest at src/lib/image-manifest.json keeps provenance (wixId per file).
+- New self-hosted resize pipeline replacing wixResize/Wix CDN entirely:
+  `src/lib/images.js` (imgVariant) + `src/pages/api/img.ts` — sharp endpoint doing exact
+  focal-point cover crops to WebP, immutable CDN cache headers, sources restricted to
+  /images/ + the project's Supabase media bucket. lib/wix.js deleted.
+- Repointed: 8 call-site files, seed-content.json (26), seed-properties.json (42),
+  6 property .md (43), 3 supabase SQL seeds (138), 4 hardcoded refs.
+- Production Supabase migrated (approved): 20 rows across properties/site_content/services
+  rewritten; full pre-write backups in supabase/backups/2026-07-20-pre-image-migration/.
+- OG images now absolutised in Base.astro (crawlers need absolute URLs).
+- Mobile hero fix: phones now get true 9:16 portrait crops via <picture> (was a landscape
+  frame cover-zoomed ~4×) + media-gated preloads for both crops.
+- Favicon set shipped (gold "S" letterform from the wordmark on brand ink):
+  favicon-16/32, apple-touch-icon, icon-512 + head links.
+- Proof: 0 wixstatic refs in site code; 107/107 image URLs on 11 pages resolve; all pages
+  200; no console errors; `npm run build` clean. Remaining wixstatic strings are provenance
+  only (manifest wixIds, fetch script map, backups, docs).

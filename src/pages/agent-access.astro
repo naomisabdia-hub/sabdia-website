@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import BenefitIcon from '../components/BenefitIcon.astro';
 import CustomSections from '../components/CustomSections.astro';
 import PropertyCard from '../components/PropertyCard.astro';
-import { wixResize, landLabel } from '../lib/wix.js';
+import { imgVariant, landLabel } from '../lib/images.js';
 import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
 
@@ -33,7 +33,7 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
 
   <!-- HERO (dark, full) -->
   <section style="position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;background:var(--dark)">
-    <img src={page.hero.image} alt="Agent Access" loading="eager"
+    <img src={imgVariant(page.hero.image, { w: 1400, h: 1800 })} alt="Agent Access" loading="eager" width="1400" height="1800"
          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.92)">
     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(31,27,20,.95) 0%,rgba(31,27,20,.3) 60%,transparent 100%)"></div>
     <div class="inner" style="position:relative;z-index:2;padding:clamp(22px,5vw,80px);padding-bottom:clamp(72px,12vw,140px)">

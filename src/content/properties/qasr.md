@@ -10,11 +10,11 @@ baths: 7
 cars: 9
 land: 1000
 landOver: true
-image: https://static.wixstatic.com/media/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png/v1/fill/w_1920,h_1080,q_90,enc_avif,quality_auto/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png
+image: /images/qasr-hero.jpg
 focus: ""
 viewerType: none
 modelUrl: /models/placeholder-home.glb
-posterUrl: https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1600,h_900,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg
+posterUrl: /images/home-hero-1.jpg
 headline: A palace for<br><em>the extraordinary life</em>.
 seoDescription: QASR by Sabdia Constructions — a masterwork of contemporary residential architecture in Coorparoo, Queensland. Five bedrooms, seven bathrooms, nine-car garage.
 features:
@@ -31,17 +31,17 @@ features:
   - Study / Home Office
   - Multiple Living Zones
 gallery:
-  - src: https://static.wixstatic.com/media/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png/v1/fill/w_1200,h_1600,q_90,enc_avif,quality_auto/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png
+  - src: /images/qasr-hero.jpg
     alt: QASR
-  - src: https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg
+  - src: /images/home-hero-1.jpg
     alt: QASR Interior
-  - src: https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg
+  - src: /images/home-hero-2.jpg
     alt: QASR Living
-  - src: https://static.wixstatic.com/media/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png/v1/fill/w_700,h_400,fp_0.3_0.5,q_85,enc_avif,quality_auto/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png
+  - src: /images/qasr-hero.jpg
     alt: QASR Detail
-  - src: https://static.wixstatic.com/media/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png/v1/fill/w_700,h_400,fp_0.6_0.4,q_85,enc_avif,quality_auto/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png
+  - src: /images/qasr-hero.jpg
     alt: QASR Exterior
-  - src: https://static.wixstatic.com/media/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png/v1/fill/w_700,h_400,fp_0.5_0.7,q_85,enc_avif,quality_auto/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png
+  - src: /images/qasr-hero.jpg
     alt: QASR Pool
 enquiryHeading: Enquire About QASR
 enquiryText: Register your interest or arrange a private inspection. Our team will be in touch within one business day.

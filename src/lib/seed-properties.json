@@ -12,7 +12,7 @@
     "cars": 9,
     "land": 1000,
     "land_over": true,
-    "image": "https://static.wixstatic.com/media/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png/v1/fill/w_1920,h_1080,q_90,enc_avif,quality_auto/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png",
+    "image": "/images/qasr-hero.jpg",
     "focus": "",
     "headline": "A palace for<br><em>the extraordinary life</em>.",
     "seo_description": "QASR by Sabdia Constructions — a masterwork of contemporary residential architecture in Coorparoo, Queensland. Five bedrooms, seven bathrooms, nine-car garage.",
@@ -32,27 +32,27 @@
     ],
     "gallery": [
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png/v1/fill/w_1200,h_1600,q_90,enc_avif,quality_auto/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png",
+        "src": "/images/qasr-hero.jpg",
         "alt": "QASR"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "src": "/images/home-hero-1.jpg",
         "alt": "QASR Interior"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+        "src": "/images/home-hero-2.jpg",
         "alt": "QASR Living"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png/v1/fill/w_700,h_400,fp_0.3_0.5,q_85,enc_avif,quality_auto/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png",
+        "src": "/images/qasr-hero.jpg",
         "alt": "QASR Detail"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png/v1/fill/w_700,h_400,fp_0.6_0.4,q_85,enc_avif,quality_auto/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png",
+        "src": "/images/qasr-hero.jpg",
         "alt": "QASR Exterior"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png/v1/fill/w_700,h_400,fp_0.5_0.7,q_85,enc_avif,quality_auto/1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png",
+        "src": "/images/qasr-hero.jpg",
         "alt": "QASR Pool"
       }
     ],
@@ -80,7 +80,7 @@
     "cars": 4,
     "land": 632,
     "land_over": false,
-    "image": "https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_1920,h_1080,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg",
+    "image": "/images/solace-hero.jpg",
     "focus": "fp_0.5_0.65",
     "headline": "Where calm<br><em>becomes architecture</em>.",
     "seo_description": "SOLACE by Sabdia Constructions — an exercise in architectural restraint and material refinement. A five-bedroom luxury family home in Camp Hill, Queensland.",
@@ -100,27 +100,27 @@
     ],
     "gallery": [
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_1200,h_1600,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg",
+        "src": "/images/solace-hero.jpg",
         "alt": "SOLACE"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "src": "/images/home-hero-1.jpg",
         "alt": "SOLACE Interior"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+        "src": "/images/home-hero-2.jpg",
         "alt": "SOLACE Living"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_700,h_400,fp_0.3_0.5,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg",
+        "src": "/images/solace-hero.jpg",
         "alt": "SOLACE Detail"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_700,h_400,fp_0.6_0.7,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg",
+        "src": "/images/solace-hero.jpg",
         "alt": "SOLACE Terrace"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_700,h_400,fp_0.5_0.4,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg",
+        "src": "/images/solace-hero.jpg",
         "alt": "SOLACE Pool"
       }
     ],
@@ -148,7 +148,7 @@
     "cars": 3,
     "land": 573,
     "land_over": false,
-    "image": "https://static.wixstatic.com/media/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png/v1/fill/w_1920,h_1080,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png",
+    "image": "/images/sierra-hero.jpg",
     "focus": "fp_0.5_0.65",
     "headline": "Architecture born<br><em>from the landscape</em>.",
     "seo_description": "SIERRA by Sabdia Constructions — bold architecture commanding sweeping views across the Brisbane skyline. A five-bedroom luxury residence in Holland Park West, Queensland.",
@@ -168,27 +168,27 @@
     ],
     "gallery": [
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png/v1/fill/w_1200,h_1600,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png",
+        "src": "/images/sierra-hero.jpg",
         "alt": "SIERRA"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "src": "/images/home-hero-1.jpg",
         "alt": "SIERRA Interior"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+        "src": "/images/home-hero-2.jpg",
         "alt": "SIERRA Living"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png/v1/fill/w_700,h_400,fp_0.3_0.5,q_90,enc_avif,quality_auto/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png",
+        "src": "/images/sierra-hero.jpg",
         "alt": "SIERRA Detail"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png/v1/fill/w_700,h_400,fp_0.6_0.4,q_90,enc_avif,quality_auto/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png",
+        "src": "/images/sierra-hero.jpg",
         "alt": "SIERRA Terrace"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png/v1/fill/w_700,h_400,fp_0.5_0.7,q_90,enc_avif,quality_auto/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png",
+        "src": "/images/sierra-hero.jpg",
         "alt": "SIERRA Pool"
       }
     ],
@@ -216,7 +216,7 @@
     "cars": 3,
     "land": 544,
     "land_over": false,
-    "image": "https://static.wixstatic.com/media/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png/v1/fill/w_1920,h_1080,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png",
+    "image": "/images/caspian-hero.jpg",
     "focus": "fp_0.5_0.65",
     "headline": "Grace, proportion,<br><em>and quiet grandeur</em>.",
     "seo_description": "CASPIAN by Sabdia Constructions — a residence of exceptional grace and proportion in one of Ascot's most prestigious addresses. Five bedrooms, resort pool, chef's kitchen.",
@@ -236,27 +236,27 @@
     ],
     "gallery": [
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png/v1/fill/w_1200,h_1600,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png",
+        "src": "/images/caspian-hero.jpg",
         "alt": "CASPIAN"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "src": "/images/home-hero-1.jpg",
         "alt": "CASPIAN Interior"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+        "src": "/images/home-hero-2.jpg",
         "alt": "CASPIAN Living"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png/v1/fill/w_700,h_400,fp_0.3_0.5,q_90,enc_avif,quality_auto/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png",
+        "src": "/images/caspian-hero.jpg",
         "alt": "CASPIAN Detail"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png/v1/fill/w_700,h_400,fp_0.6_0.4,q_90,enc_avif,quality_auto/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png",
+        "src": "/images/caspian-hero.jpg",
         "alt": "CASPIAN Exterior"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png/v1/fill/w_700,h_400,fp_0.5_0.7,q_90,enc_avif,quality_auto/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png",
+        "src": "/images/caspian-hero.jpg",
         "alt": "CASPIAN Pool"
       }
     ],
@@ -284,7 +284,7 @@
     "cars": 3,
     "land": 545,
     "land_over": false,
-    "image": "https://static.wixstatic.com/media/1cc2db_e8590ba3e20e4a3aa61c5fabafcae28b~mv2.png/v1/fill/w_1920,h_1080,q_85,enc_avif,quality_auto/1cc2db_e8590ba3e20e4a3aa61c5fabafcae28b~mv2.png",
+    "image": "/images/capri-hero.jpg",
     "focus": "",
     "headline": "A residence that defined<br><em>a suburb's standard</em>.",
     "seo_description": "CAPRI by Sabdia Constructions — sold prior to completion. A 5-bedroom luxury residence delivering resort-style living in inner Brisbane.",
@@ -304,27 +304,27 @@
     ],
     "gallery": [
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_e8590ba3e20e4a3aa61c5fabafcae28b~mv2.png/v1/fill/w_1200,h_1600,q_85,enc_avif,quality_auto/1cc2db_e8590ba3e20e4a3aa61c5fabafcae28b~mv2.png",
+        "src": "/images/capri-hero.jpg",
         "alt": "CAPRI"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "src": "/images/home-hero-1.jpg",
         "alt": "CAPRI detail"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+        "src": "/images/home-hero-2.jpg",
         "alt": "CAPRI interior"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_e8590ba3e20e4a3aa61c5fabafcae28b~mv2.png/v1/fill/w_700,h_400,fp_0.5_0.8,q_85,enc_avif,quality_auto/1cc2db_e8590ba3e20e4a3aa61c5fabafcae28b~mv2.png",
+        "src": "/images/capri-hero.jpg",
         "alt": "CAPRI exterior"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_700,h_400,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg",
+        "src": "/images/solace-hero.jpg",
         "alt": "CAPRI pool"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png/v1/fill/w_700,h_400,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png",
+        "src": "/images/sierra-hero.jpg",
         "alt": "CAPRI kitchen"
       }
     ],
@@ -352,7 +352,7 @@
     "cars": 3,
     "land": 572,
     "land_over": false,
-    "image": "https://static.wixstatic.com/media/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png/v1/fill/w_1920,h_1080,q_85,enc_avif,quality_auto/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png",
+    "image": "/images/aether-hero.jpg",
     "focus": "",
     "headline": "Light, air, and<br><em>elevated living</em>.",
     "seo_description": "AETHER by Sabdia Constructions — sold prior to completion. A luxury 5-bedroom residence in Hendra, inner Brisbane.",
@@ -372,27 +372,27 @@
     ],
     "gallery": [
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png/v1/fill/w_1200,h_1600,q_85,enc_avif,quality_auto/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png",
+        "src": "/images/aether-hero.jpg",
         "alt": "AETHER"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "src": "/images/home-hero-1.jpg",
         "alt": "AETHER"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+        "src": "/images/home-hero-2.jpg",
         "alt": "AETHER"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png/v1/fill/w_700,h_400,fp_0.3_0.5,q_85,enc_avif,quality_auto/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png",
+        "src": "/images/aether-hero.jpg",
         "alt": "AETHER"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_700,h_400,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg",
+        "src": "/images/solace-hero.jpg",
         "alt": "AETHER"
       },
       {
-        "src": "https://static.wixstatic.com/media/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png/v1/fill/w_700,h_400,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png",
+        "src": "/images/sierra-hero.jpg",
         "alt": "AETHER"
       }
     ],

@@ -1,0 +1,98 @@
+{
+  "logo": {
+    "file": "/images/logo.png",
+    "width": 500,
+    "height": 500,
+    "wixId": "1cc2db_f012027bbf0c45ebb4ae6d847309d59f~mv2.png"
+  },
+  "home-hero-1": {
+    "file": "/images/home-hero-1.jpg",
+    "width": 3200,
+    "height": 2133,
+    "wixId": "1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg"
+  },
+  "home-hero-2": {
+    "file": "/images/home-hero-2.jpg",
+    "width": 3200,
+    "height": 2134,
+    "wixId": "1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg"
+  },
+  "solace-hero": {
+    "file": "/images/solace-hero.jpg",
+    "width": 3200,
+    "height": 2134,
+    "wixId": "1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg"
+  },
+  "agent-portrait": {
+    "file": "/images/agent-portrait.jpg",
+    "width": 3200,
+    "height": 2131,
+    "wixId": "1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png"
+  },
+  "collection-calle": {
+    "file": "/images/collection-calle.jpg",
+    "width": 1920,
+    "height": 1279,
+    "wixId": "1cc2db_a11d808ebc4648de9b8a25918f19e192~mv2.png"
+  },
+  "collection-encanto": {
+    "file": "/images/collection-encanto.jpg",
+    "width": 3000,
+    "height": 2000,
+    "wixId": "1cc2db_4d7d30024fef47ba8f5f9859e08bb47b~mv2.jpeg"
+  },
+  "collection-nero": {
+    "file": "/images/collection-nero.jpg",
+    "width": 3200,
+    "height": 2133,
+    "wixId": "1cc2db_9ed4e50eba3b453885aa6a4917ba5607~mv2.jpg"
+  },
+  "collection-hermosa": {
+    "file": "/images/collection-hermosa.jpg",
+    "width": 3000,
+    "height": 2001,
+    "wixId": "1cc2db_9cbfa41ef2dd4ed3b14b5277765cc446~mv2.jpg"
+  },
+  "collection-fraser": {
+    "file": "/images/collection-fraser.jpg",
+    "width": 3000,
+    "height": 2931,
+    "wixId": "1cc2db_fb04f5dbe53b4d34ab710537a2e24b40~mv2.jpg"
+  },
+  "collection-petra": {
+    "file": "/images/collection-petra.jpg",
+    "width": 2000,
+    "height": 1334,
+    "wixId": "1cc2db_64f35b15dd914a189eee2aeb79b86284~mv2.jpg"
+  },
+  "caspian-hero": {
+    "file": "/images/caspian-hero.jpg",
+    "width": 2560,
+    "height": 1706,
+    "wixId": "1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png"
+  },
+  "sierra-hero": {
+    "file": "/images/sierra-hero.jpg",
+    "width": 3200,
+    "height": 2133,
+    "wixId": "1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png"
+  },
+  "qasr-hero": {
+    "file": "/images/qasr-hero.jpg",
+    "width": 3200,
+    "height": 1800,
+    "wixId": "1cc2db_f85ca82c83644534943559cb4b0067c9~mv2.png"
+  },
+  "capri-hero": {
+    "file": "/images/capri-hero.jpg",
+    "width": 3200,
+    "height": 2133,
+    "wixId": "1cc2db_e8590ba3e20e4a3aa61c5fabafcae28b~mv2.png"
+  },
+  "aether-hero": {
+    "file": "/images/aether-hero.jpg",
+    "width": 3200,
+    "height": 2133,
+    "wixId": "1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png"
+  }
+}

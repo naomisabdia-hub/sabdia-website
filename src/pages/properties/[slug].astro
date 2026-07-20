@@ -6,7 +6,7 @@ import PropertyViewer from '../../components/PropertyViewer.astro';
 import FilmBand from '../../components/FilmBand.astro';
 import SeriesStrip from '../../components/SeriesStrip.astro';
 import WalkthroughCinema from '../../components/WalkthroughCinema.astro';
-import { wixResize, landLabel } from '../../lib/wix.js';
+import { imgVariant, landLabel } from '../../lib/images.js';
 import { getProperties, getProperty } from '../../lib/db.js';
 import { getContent } from '../../lib/content.js';
 
@@ -75,13 +75,13 @@ const gallery = galleryUnique.map((g, i) => {
   return {
     ...g,
     slot: slotFor(i),
-    src: wixResize(g.src, { w, h, q: 88 }),
-    full: wixResize(g.src, { w: Math.round(w * 1.5), h: Math.round(h * 1.5), q: 85 }),
+    src: imgVariant(g.src, { w, h, q: 88 }),
+    full: imgVariant(g.src, { w: Math.round(w * 1.5), h: Math.round(h * 1.5), q: 85 }),
   };
 });
 
-const heroImg = wixResize(d.image, { w: 1920, h: 1080, focus: d.focus, q: sold ? 85 : 90 });
-const ogImg = wixResize(d.image, { w: 1200, h: 630, focus: d.focus });
+const heroImg = imgVariant(d.image, { w: 1920, h: 1080, focus: d.focus, q: sold ? 85 : 90 });
+const ogImg = imgVariant(d.image, { w: 1200, h: 630, focus: d.focus });
 
 const base = (Astro.site ?? new URL('https://www.sabdiaconstructions.com.au')).origin;
 const breadcrumbLd = JSON.stringify({

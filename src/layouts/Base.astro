@@ -12,13 +12,17 @@ interface Props {
   preloadImage?: string;
   preloadImageSet?: string;
   preloadImageSizes?: string;
+  /* Optional media query gating the preload (e.g. desktop-only hero crop). */
+  preloadImageMedia?: string;
   /* Pass on pages that open on a light surface instead of a photograph
      or dark band, so the nav renders dark-on-light from the top. */
   lightNav?: boolean;
 }
 
-const { title, description, ogTitle, ogDescription, ogImage, preloadImage, preloadImageSet, preloadImageSizes, lightNav } = Astro.props;
+const { title, description, ogTitle, ogDescription, ogImage, preloadImage, preloadImageSet, preloadImageSizes, preloadImageMedia, lightNav } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+/* Crawlers need og:image absolute; pages pass site-relative paths. */
+const ogImageAbs = ogImage ? new URL(ogImage, Astro.site).href : undefined;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -29,6 +33,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 <title>{title}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonical}>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <script is:inline>
 document.documentElement.classList.add('js');
 /* Runs before first paint so the loader never flashes on a repeat visit.
@@ -43,12 +50,12 @@ try {
 {ogTitle && <meta property="og:title" content={ogTitle}>}
 {(ogDescription || ogTitle) && <meta property="og:description" content={ogDescription ?? description}>}
 {ogTitle && <meta property="og:type" content="website">}
-{ogImage && <meta property="og:image" content={ogImage}>}
-{ogImage && <meta name="twitter:card" content="summary_large_image">}
+{ogImageAbs && <meta property="og:image" content={ogImageAbs}>}
+{ogImageAbs && <meta name="twitter:card" content="summary_large_image">}
 <link rel="preload" as="font" type="font/woff2" href="/fonts/jost-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/cormorant-garamond-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-var-italic.woff2" crossorigin>
-{preloadImage && <link rel="preload" as="image" href={preloadImage} imagesrcset={preloadImageSet} imagesizes={preloadImageSet ? (preloadImageSizes ?? '100vw') : undefined}>}
+{preloadImage && <link rel="preload" as="image" href={preloadImage} imagesrcset={preloadImageSet} imagesizes={preloadImageSet ? (preloadImageSizes ?? '100vw') : undefined} media={preloadImageMedia}>}
 <link rel="stylesheet" href="/css/style.css">
 <ClientRouter />
 <slot name="head" />

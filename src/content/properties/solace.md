@@ -10,7 +10,7 @@ baths: 5
 cars: 4
 land: 632
 landOver: false
-image: https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_1920,h_1080,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg
+image: /images/solace-hero.jpg
 focus: fp_0.5_0.65
 headline: Where calm<br><em>becomes architecture</em>.
 seoDescription: SOLACE by Sabdia Constructions — an exercise in architectural restraint and material refinement. A five-bedroom luxury family home in Camp Hill, Queensland.
@@ -28,17 +28,17 @@ features:
   - Laundry with Ample Storage
   - Landscaped Gardens
 gallery:
-  - src: https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_1200,h_1600,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg
+  - src: /images/solace-hero.jpg
     alt: SOLACE
-  - src: https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg
+  - src: /images/home-hero-1.jpg
     alt: SOLACE Interior
-  - src: https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg
+  - src: /images/home-hero-2.jpg
     alt: SOLACE Living
-  - src: https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_700,h_400,fp_0.3_0.5,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg
+  - src: /images/solace-hero.jpg
     alt: SOLACE Detail
-  - src: https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_700,h_400,fp_0.6_0.7,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg
+  - src: /images/solace-hero.jpg
     alt: SOLACE Terrace
-  - src: https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_700,h_400,fp_0.5_0.4,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg
+  - src: /images/solace-hero.jpg
     alt: SOLACE Pool
 enquiryHeading: Enquire About SOLACE
 enquiryText: Register your interest or arrange a private inspection. Our team will be in touch within one business day.

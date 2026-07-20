@@ -3,8 +3,8 @@
     "siteName": "Sabdia Constructions",
     "legalName": "Sabdia Constructions Pty Ltd",
     "estYear": 2013,
-    "logo": "https://static.wixstatic.com/media/1cc2db_f012027bbf0c45ebb4ae6d847309d59f~mv2.png/v1/fill/w_211,h_35,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/DESIGN%20%C2%B7%20DEVELOP%20%C2%B7%20CONSTRUCT.png",
-    "logoLarge": "https://static.wixstatic.com/media/1cc2db_f012027bbf0c45ebb4ae6d847309d59f~mv2.png/v1/fill/w_422,h_70,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/DESIGN%20%C2%B7%20DEVELOP%20%C2%B7%20CONSTRUCT.png",
+    "logo": "/images/logo.png",
+    "logoLarge": "/images/logo.png",
     "location": "Brisbane, Queensland, Australia",
     "email": "sales@sabdia.com.au",
     "phone": "",
@@ -29,9 +29,9 @@
       "description": "Boutique luxury home builder and developer in inner Brisbane. Multi-award winning, 100+ residences delivered since 2013. Design, Develop, Construct.",
       "ogTitle": "Sabdia Constructions — Luxury Home Builders, Brisbane",
       "ogDescription": "Boutique luxury home builder and developer in inner Brisbane. Multi-award winning, 100+ residences delivered since 2013.",
-      "ogImage": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1200,h_630,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg"
+      "ogImage": "/images/home-hero-1.jpg"
     },
-    "jsonLdImage": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+    "jsonLdImage": "/images/home-hero-1.jpg",
     "jsonLdDescription": "Boutique luxury home builder and developer in inner Brisbane. Multi-award winning, 100+ residences delivered since 2013.",
     "areaServed": "Brisbane, Queensland, Australia"
   },
@@ -146,15 +146,15 @@
     "award": "Award-Winning Luxury Residences.",
     "slides": [
       {
-        "image": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "image": "/images/home-hero-1.jpg",
         "alt": "Sabdia luxury home"
       },
       {
-        "image": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+        "image": "/images/home-hero-2.jpg",
         "alt": "Sabdia luxury home"
       },
       {
-        "image": "https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg",
+        "image": "/images/solace-hero.jpg",
         "alt": "Sabdia luxury home"
       }
     ],
@@ -209,11 +209,11 @@
     "headingHtml": "Crafting <em>Exquisite</em><br>Living Spaces.",
     "images": [
       {
-        "image": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "image": "/images/home-hero-1.jpg",
         "alt": "Sabdia craftsmanship"
       },
       {
-        "image": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_500,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+        "image": "/images/home-hero-2.jpg",
         "alt": "Sabdia detail"
       }
     ],
@@ -272,7 +272,7 @@
     "text": "Gain exclusive insight into Sabdia's future releases. Our agent-only preview list offers early access to premium developments, pre-launch information, and priority communication — giving your clients an edge in Brisbane's luxury market.",
     "badge": "Exclusive Access",
     "image": {
-      "image": "https://static.wixstatic.com/media/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png/v1/fill/w_900,h_1100,q_85,enc_avif,quality_auto/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png",
+      "image": "/images/agent-portrait.jpg",
       "alt": "Agent Access"
     },
     "features": [
@@ -358,7 +358,7 @@
   },
   "projects_page": {
     "hero": {
-      "image": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+      "image": "/images/home-hero-2.jpg",
       "label": "Portfolio",
       "titleHtml": "Our<br><em>Projects</em>",
       "sub": "Over 100 residences delivered across inner Brisbane's most prestigious suburbs since 2013."
@@ -380,7 +380,7 @@
   },
   "services_page": {
     "hero": {
-      "image": "https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg",
+      "image": "/images/home-hero-2.jpg",
       "label": "What We Offer",
       "titleHtml": "Our<br><em>Services</em>",
       "sub": "Full-spectrum residential development expertise delivered entirely in-house."
@@ -410,7 +410,7 @@
   },
   "about_page": {
     "hero": {
-      "image": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+      "image": "/images/home-hero-1.jpg",
       "label": "Our Story",
       "titleHtml": "About<br><em>Sabdia</em>",
       "sub": "A decade of redefining luxury residential development in inner Brisbane."
@@ -553,7 +553,7 @@
       {
         "name": "CALLE",
         "loc": "Camp Hill QLD, Australia",
-        "image": "https://static.wixstatic.com/media/1cc2db_a11d808ebc4648de9b8a25918f19e192~mv2.png/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_a11d808ebc4648de9b8a25918f19e192~mv2.png",
+        "image": "/images/collection-calle.jpg",
         "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/calle.mp4"
       },
       {
@@ -571,38 +571,38 @@
       {
         "name": "ENCANTO",
         "loc": "Camp Hill QLD, Australia",
-        "image": "https://static.wixstatic.com/media/1cc2db_4d7d30024fef47ba8f5f9859e08bb47b~mv2.jpeg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_4d7d30024fef47ba8f5f9859e08bb47b~mv2.jpeg"
+        "image": "/images/collection-encanto.jpg"
       },
       {
         "name": "NERO",
         "loc": "Rochedale QLD, Australia",
-        "image": "https://static.wixstatic.com/media/1cc2db_9ed4e50eba3b453885aa6a4917ba5607~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_9ed4e50eba3b453885aa6a4917ba5607~mv2.jpg"
+        "image": "/images/collection-nero.jpg"
       },
       {
         "name": "HERMOSA",
         "loc": "Camp Hill QLD, Australia",
-        "image": "https://static.wixstatic.com/media/1cc2db_9cbfa41ef2dd4ed3b14b5277765cc446~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_9cbfa41ef2dd4ed3b14b5277765cc446~mv2.jpg"
+        "image": "/images/collection-hermosa.jpg"
       },
       {
         "name": "FRASER",
         "loc": "Graceville QLD, Australia",
-        "image": "https://static.wixstatic.com/media/1cc2db_fb04f5dbe53b4d34ab710537a2e24b40~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_fb04f5dbe53b4d34ab710537a2e24b40~mv2.jpg"
+        "image": "/images/collection-fraser.jpg"
       },
       {
         "name": "PETRA",
         "loc": "Taringa QLD, Australia",
-        "image": "https://static.wixstatic.com/media/1cc2db_64f35b15dd914a189eee2aeb79b86284~mv2.jpg/v1/fill/w_800,h_600,al_c,q_85,enc_avif,quality_auto/1cc2db_64f35b15dd914a189eee2aeb79b86284~mv2.jpg"
+        "image": "/images/collection-petra.jpg"
       },
       {
         "name": "KIRRA",
         "loc": "Brisbane QLD, Australia",
-        "image": "https://static.wixstatic.com/media/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png/v1/fill/w_800,h_600,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png"
+        "image": "/images/caspian-hero.jpg"
       }
     ]
   },
   "agent_page": {
     "hero": {
-      "image": "https://static.wixstatic.com/media/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png/v1/fill/w_1400,h_1800,q_85,enc_avif,quality_auto/1cc2db_7d6ddb5093af4f3eb6b9d3acd088be79~mv2.png",
+      "image": "/images/agent-portrait.jpg",
       "label": "For Real Estate Professionals",
       "titleHtml": "Exclusive<br><em style=\"color:var(--gold2)\">Agent</em><br>Access.",
       "text": "Join Sabdia's exclusive agent network and be the first to know about our next landmark development before it reaches the market."
@@ -672,7 +672,7 @@
       "bodyHtml": "Real estate professionals seeking exclusive agent access — pre-launch information, priority access and commission structures — please visit our <a href=\"/agent-access/\" style=\"color:var(--gold2);text-decoration:underline;text-underline-offset:3px\">Agent Access page</a>."
     },
     "map": {
-      "image": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_500,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+      "image": "/images/home-hero-1.jpg",
       "label": "Brisbane, Queensland"
     },
     "form": {
@@ -790,7 +790,7 @@
       "label": "Service One",
       "detail": {
         "headingHtml": "Luxury Residential <em>Design</em>",
-        "image": "https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_680,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg",
+        "image": "/images/home-hero-1.jpg",
         "alt": "Luxury Residential Design",
         "paragraphs": [
           "Our in-house architecture and design team creates residences that are as functional as they are breathtaking. We approach each project as a singular creative endeavour — absorbing the site's character, the client's aspirations, and the neighbourhood's context before a single line is drawn.",
@@ -815,7 +815,7 @@
       "label": "Service Two",
       "detail": {
         "headingHtml": "Development <em>Management</em>",
-        "image": "https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_900,h_680,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg",
+        "image": "/images/solace-hero.jpg",
         "alt": "Development Management",
         "paragraphs": [
           "Development management is the complex art of orchestrating every moving part of a residential project — land acquisition, town planning, engineering, approvals, finance, sales, and delivery — into one coherent, high-performing whole.",
@@ -840,7 +840,7 @@
       "label": "Service Three",
       "detail": {
         "headingHtml": "Interior <em>Architecture</em>",
-        "image": "https://static.wixstatic.com/media/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png/v1/fill/w_900,h_680,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png",
+        "image": "/images/sierra-hero.jpg",
         "alt": "Interior Architecture",
         "paragraphs": [
           "Our interior architecture division ensures that the lived experience of a Sabdia home is as extraordinary as its exterior presence. Working in close collaboration with the architecture team from day one, our interior architects shape spaces that are luminous, considered, and deeply personal.",
@@ -865,7 +865,7 @@
       "label": "Service Four",
       "detail": {
         "headingHtml": "Expert <em>Construction</em>",
-        "image": "https://static.wixstatic.com/media/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png/v1/fill/w_900,h_680,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_74fc877fe2204d2a98e663d0c7df421b~mv2.png",
+        "image": "/images/caspian-hero.jpg",
         "alt": "Expert Construction",
         "paragraphs": [
           "Sabdia's construction arm brings the vision to life with precision, skill, and an obsessive attention to detail. Our team of master tradespeople — many of whom have worked with Sabdia for years — share our commitment to doing everything properly.",

@@ -1,5 +1,5 @@
 ---
-import { wixResize, landLabel } from '../lib/wix.js';
+import { imgVariant, landLabel } from '../lib/images.js';
 import SpecIcon from './SpecIcon.astro';
 
 const { entry, class: cls = '', imgW, imgH, showSuburb = true } = Astro.props;
@@ -17,8 +17,8 @@ const specs = [
 ---
 <a href={`/properties/${entry.id}/`} class={`sc-card ${cls}`}>
   <img
-    src={wixResize(d.image, { w: imgW, h: imgH, focus: d.focus, q: 85 })}
-    srcset={`${wixResize(d.image, { w: imgW, h: imgH, focus: d.focus, q: 85 })} 1x, ${wixResize(d.image, { w: imgW * 2, h: imgH * 2, focus: d.focus, q: 72 })} 2x`}
+    src={imgVariant(d.image, { w: imgW, h: imgH, focus: d.focus, q: 85 })}
+    srcset={`${imgVariant(d.image, { w: imgW, h: imgH, focus: d.focus, q: 85 })} 1x, ${imgVariant(d.image, { w: imgW * 2, h: imgH * 2, focus: d.focus, q: 72 })} 2x`}
     alt={d.name} loading="lazy" decoding="async" width={imgW} height={imgH}>
   <div class="sc-ov"></div>
   <div class="sc-badge">Sold Prior to Completion</div>

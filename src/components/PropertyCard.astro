@@ -1,12 +1,12 @@
 ---
-import { wixResize } from '../lib/wix.js';
+import { imgVariant } from '../lib/images.js';
 import SpecIcon from './SpecIcon.astro';
 
 const { entry, class: cls = '', style, imgW, imgH, specs = [] } = Astro.props;
 const d = entry.data;
 
 /* Callers pass specs as ready-made strings ("5 Bed", "1000m²+"), all of
-   them produced by the same two helpers in lib/wix.js, so the icon can
+   them produced by the same two helpers in lib/images.js, so the icon can
    be inferred from the label rather than forcing every call site to
    switch to a structured shape. Anything unrecognised simply renders
    as a chip with no icon. */
@@ -21,8 +21,8 @@ const iconFor = (label) => {
 ---
 <a href={`/properties/${entry.id}/`} class={`pc ${cls}`} style={style}>
   <img
-    src={wixResize(d.image, { w: imgW, h: imgH, focus: d.focus })}
-    srcset={`${wixResize(d.image, { w: imgW, h: imgH, focus: d.focus })} 1x, ${wixResize(d.image, { w: imgW * 2, h: imgH * 2, focus: d.focus, q: 75 })} 2x`}
+    src={imgVariant(d.image, { w: imgW, h: imgH, focus: d.focus })}
+    srcset={`${imgVariant(d.image, { w: imgW, h: imgH, focus: d.focus })} 1x, ${imgVariant(d.image, { w: imgW * 2, h: imgH * 2, focus: d.focus, q: 75 })} 2x`}
     alt={d.name} loading="lazy" decoding="async" width={imgW} height={imgH}>
   <div class="pc-ov"></div>
   <div class="pc-status-chip"><span class="pc-dot"></span>For Sale</div>

@@ -5,7 +5,7 @@ import SoldCard from '../components/SoldCard.astro';
 import ServiceIcon from '../components/ServiceIcon.astro';
 import FilmBand from '../components/FilmBand.astro';
 import CustomSections from '../components/CustomSections.astro';
-import { landLabel, wixResize } from '../lib/wix.js';
+import { landLabel, imgVariant } from '../lib/images.js';
 import { getProperties } from '../lib/db.js';
 import { getContent, getServices, getProcessSteps, getTestimonials } from '../lib/content.js';
 
@@ -53,8 +53,11 @@ const restRow = forSale.slice(3);
 
 // Responsive AVIF variants for the hero slideshow — the seed URLs are
 // 1920px q85 JPEGs; these cut the LCP asset dramatically on all screens.
-const heroSrc = (img: string, w: number) => wixResize(img, { w, h: Math.round(w * 0.5625), q: 80 });
+const heroSrc = (img: string, w: number) => imgVariant(img, { w, h: Math.round(w * 0.5625), q: 80 });
 const heroSet = (img: string) => [768, 1280, 1920].map((w) => `${heroSrc(img, w)} ${w}w`).join(', ');
+/* Phones get a true portrait crop (9:16) instead of a landscape frame
+   cover-zoomed ~4× into a portrait viewport. */
+const heroSetPortrait = (img: string) => [480, 768, 1080].map((w) => `${imgVariant(img, { w, h: Math.round(w * 16 / 9), q: 80 })} ${w}w`).join(', ');
 const heroPreload = heroC.slides[0] ? heroSrc(heroC.slides[0].image, 1280) : undefined;
 const delays = ['', 'd1', 'd2', 'd3', 'd4', 'd5'];
 
@@ -81,7 +84,18 @@ const jsonLd = JSON.stringify({
   ogImage={settings.seo.ogImage}
   preloadImage={heroPreload}
   preloadImageSet={heroC.slides[0] ? heroSet(heroC.slides[0].image) : undefined}
+  preloadImageMedia="(min-width: 768px)"
 >
+  {heroC.slides[0] && (
+    <link
+      slot="head"
+      rel="preload"
+      as="image"
+      imagesrcset={heroSetPortrait(heroC.slides[0].image)}
+      imagesizes="100vw"
+      media="(max-width: 767px)"
+    />
+  )}
   <script type="application/ld+json" slot="head" is:inline set:html={jsonLd} />
 
   <!-- HERO -->
@@ -89,15 +103,18 @@ const jsonLd = JSON.stringify({
     <div class="h-slides" id="hSlides">
       {heroC.slides.map((slide, i) => (
         <div class={`h-slide${i === 0 ? ' active' : ''}`}>
-          <img
-            src={heroSrc(slide.image, 1920)}
-            srcset={heroSet(slide.image)}
-            sizes="100vw"
-            alt={slide.alt}
-            loading={i === 0 ? 'eager' : 'lazy'}
-            fetchpriority={i === 0 ? 'high' : undefined}
-            decoding={i === 0 ? undefined : 'async'}
-          >
+          <picture>
+            <source media="(max-width: 767px)" srcset={heroSetPortrait(slide.image)} sizes="100vw" />
+            <img
+              src={heroSrc(slide.image, 1920)}
+              srcset={heroSet(slide.image)}
+              sizes="100vw"
+              alt={slide.alt}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : undefined}
+              decoding={i === 0 ? undefined : 'async'}
+            >
+          </picture>
         </div>
       ))}
     </div>
@@ -187,8 +204,8 @@ const jsonLd = JSON.stringify({
         <div class="slabel reveal">{about.label}</div>
         <h2 class="about-h reveal d1" set:html={about.headingHtml} />
         <div class="about-img-strip reveal-wipe d2">
-          {about.images.map((img) => (
-            <img src={img.image} alt={img.alt} loading="lazy" decoding="async">
+          {about.images.map((img, i) => (
+            <img src={imgVariant(img.image, i === 0 ? { w: 900, h: 600 } : { w: 500, h: 600 })} alt={img.alt} loading="lazy" decoding="async">
           ))}
         </div>
       </div>
@@ -363,7 +380,7 @@ const jsonLd = JSON.stringify({
   <!-- AGENT ACCESS -->
   <div class="agent-grid" id="agents">
     <div class="agent-vis reveal-wipe-x">
-      <img src={agent.image.image} alt={agent.image.alt} loading="lazy" decoding="async">
+      <img src={imgVariant(agent.image.image, { w: 900, h: 1100 })} alt={agent.image.alt} loading="lazy" decoding="async" width="900" height="1100">
       <div class="agent-frame"></div>
       <div class="agent-badge">{agent.badge}</div>
     </div>

@@ -10,7 +10,7 @@ baths: 5
 cars: 3
 land: 572
 landOver: false
-image: https://static.wixstatic.com/media/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png/v1/fill/w_1920,h_1080,q_85,enc_avif,quality_auto/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png
+image: /images/aether-hero.jpg
 focus: ""
 headline: Light, air, and<br><em>elevated living</em>.
 seoDescription: AETHER by Sabdia Constructions — sold prior to completion. A luxury 5-bedroom residence in Hendra, inner Brisbane.
@@ -28,17 +28,17 @@ features:
   - Study / Home Office
   - Landscaped Gardens
 gallery:
-  - src: https://static.wixstatic.com/media/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png/v1/fill/w_1200,h_1600,q_85,enc_avif,quality_auto/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png
+  - src: /images/aether-hero.jpg
     alt: AETHER
-  - src: https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg
+  - src: /images/home-hero-1.jpg
     alt: AETHER
-  - src: https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_900,h_600,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg
+  - src: /images/home-hero-2.jpg
     alt: AETHER
-  - src: https://static.wixstatic.com/media/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png/v1/fill/w_700,h_400,fp_0.3_0.5,q_85,enc_avif,quality_auto/1cc2db_7d5ad42861414a26bf1236edfa6e4603~mv2.png
+  - src: /images/aether-hero.jpg
     alt: AETHER
-  - src: https://static.wixstatic.com/media/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg/v1/fill/w_700,h_400,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_5186783e26c04be6ab983f26b9b78377~mv2.jpg
+  - src: /images/solace-hero.jpg
     alt: AETHER
-  - src: https://static.wixstatic.com/media/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png/v1/fill/w_700,h_400,fp_0.5_0.65,q_90,enc_avif,quality_auto/1cc2db_62a0dd9b4ea14ac390c3e94abab03d56~mv2.png
+  - src: /images/sierra-hero.jpg
     alt: AETHER
 enquiryHeading: Register for Future Releases
 enquiryText: AETHER has been sold. Register your details to receive priority notification of upcoming Sabdia developments before they reach the market.

@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import CustomSections from '../components/CustomSections.astro';
 import { getContent } from '../lib/content.js';
+import { imgVariant } from '../lib/images.js';
 
 const { about_page: page } = await getContent('about_page');
 ---
@@ -10,7 +11,7 @@ const { about_page: page } = await getContent('about_page');
   description="Boutique luxury home builder and developer in inner Brisbane since 2013. Learn about Sabdia's story, values, and integrated approach to luxury residential development."
   ogTitle="About — Sabdia Constructions"
   ogDescription={page.hero.sub}
-  ogImage="https://static.wixstatic.com/media/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg/v1/fill/w_1200,h_630,al_c,q_85/1cc2db_4e48586f78704fc3ae5d00ddb8a125ee~mv2.jpg"
+  ogImage="/api/img?src=%2Fimages%2Fhome-hero-1.jpg&w=1200&h=630"
 >
   <style is:inline slot="head">
   .timeline{position:relative;padding-left:40px;margin-top:0}
@@ -42,7 +43,7 @@ const { about_page: page } = await getContent('about_page');
 
   <!-- HERO -->
   <section class="page-hero">
-    <img src={page.hero.image} alt="Sabdia Constructions" loading="eager">
+    <img src={imgVariant(page.hero.image, { w: 1920, h: 1080 })} alt="Sabdia Constructions" loading="eager" width="1920" height="1080">
     <div class="page-hero-ov"></div>
     <div class="page-hero-content inner">
       <div class="slabel slabel-dark">{page.hero.label}</div>

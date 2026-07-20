@@ -11,7 +11,8 @@
   "dependencies": {
     "@astrojs/vercel": "^9.0.5",
     "@supabase/supabase-js": "^2.108.1",
-    "astro": "^5.8.0"
+    "astro": "^5.8.0",
+    "sharp": "^0.35.3"
   },
   "devDependencies": {
     "js-yaml": "^4.2.0"

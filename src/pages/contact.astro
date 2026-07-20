@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import CustomSections from '../components/CustomSections.astro';
 import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
+import { imgVariant } from '../lib/images.js';
 
 const [{ settings, contact_page: page }, all] = await Promise.all([
   getContent('settings', 'contact_page'),
@@ -62,7 +63,7 @@ const socials = settings.socials;
         </div>
 
         <div class="contact-map-placeholder reveal d3" style="margin-top:32px">
-          <img src={page.map.image} alt={page.map.label}>
+          <img src={imgVariant(page.map.image, { w: 900, h: 500 })} alt={page.map.label} loading="lazy" width="900" height="500">
           <div class="contact-map-placeholder-label">{page.map.label}</div>
         </div>
       </div>

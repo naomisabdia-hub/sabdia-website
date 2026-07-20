@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import CustomSections from '../components/CustomSections.astro';
 import { getContent, getServices, getProcessSteps } from '../lib/content.js';
+import { imgVariant } from '../lib/images.js';
 
 const [{ services_page: page }, services, processSteps] = await Promise.all([
   getContent('services_page'),
@@ -14,7 +15,7 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
   description="Full-spectrum luxury residential development services — design, development management, interior architecture, and expert construction by Sabdia Constructions, Brisbane."
   ogTitle="Services — Sabdia Constructions"
   ogDescription={page.hero.sub}
-  ogImage="https://static.wixstatic.com/media/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg/v1/fill/w_1200,h_630,al_c,q_85/1cc2db_9e730867446c414c9fe72c1549cb7261~mv2.jpg"
+  ogImage="/api/img?src=%2Fimages%2Fhome-hero-2.jpg&w=1200&h=630"
 >
   <style is:inline slot="head">
   .svc-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:center;padding:clamp(72px,10vw,140px) 0}
@@ -38,7 +39,7 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
 
   <!-- HERO -->
   <section class="page-hero">
-    <img src={page.hero.image} alt="Services" loading="eager">
+    <img src={imgVariant(page.hero.image, { w: 1920, h: 1080 })} alt="Services" loading="eager" width="1920" height="1080">
     <div class="page-hero-ov"></div>
     <div class="page-hero-content inner">
       <div class="slabel slabel-dark">{page.hero.label}</div>
@@ -70,7 +71,7 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
       {services.map((s, i) => (
         <div class="svc-detail-grid">
           <div class={`svc-detail-img ${i % 2 === 0 ? 'reveal-x' : 'reveal-r'}`}>
-            <img src={s.detail.image} alt={s.detail.alt || s.title} loading="lazy">
+            <img src={imgVariant(s.detail.image, { w: 1200, h: 906 })} alt={s.detail.alt || s.title} loading="lazy" width="1200" height="906">
           </div>
           <div class="reveal">
             <span class="svc-num">{s.number}</span>
