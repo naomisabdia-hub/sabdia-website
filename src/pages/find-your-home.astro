@@ -244,10 +244,13 @@ const steps = [
   </style>
 
   <script is:inline>
-  /* Re-runs per navigation — see main.js for why. */
-  document.addEventListener('astro:page-load', function () {
+  /* Re-runs per navigation — see main.js for why. Also called immediately:
+     during a ClientRouter swap this script can execute after that
+     navigation's page-load event already fired. */
+  function sabdiaFyhInit() {
     var form = document.querySelector('[data-fyh]');
-    if (!form) return;
+    if (!form || form.dataset.fyhInit) return;
+    form.dataset.fyhInit = '1';
     var steps = [].slice.call(form.querySelectorAll('.fyh-step'));
     var ticks = [].slice.call(document.querySelectorAll('.fyh-tick'));
     var back = form.querySelector('[data-fyh-back]');
@@ -372,6 +375,8 @@ const steps = [
       var notes = form.querySelector('#fyh-notes');
       if (notes && notes.value.trim()) msgField.value += '\nNotes: ' + notes.value.trim();
     });
-  });
+  }
+  sabdiaFyhInit();
+  document.addEventListener('astro:page-load', sabdiaFyhInit);
   </script>
 </Base>

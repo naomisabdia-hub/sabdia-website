@@ -50,10 +50,14 @@ const delays = ['', 'd1', 'd2'];
 
   <script is:inline>
   /* Re-runs on every navigation: under ClientRouter this file is not
-     re-executed, but the elements it wires are replaced. */
-  document.addEventListener('astro:page-load', function () {
+     re-executed, but the elements it wires are replaced. Also called
+     immediately — during a ClientRouter swap this script can execute after
+     that navigation's page-load event already fired. */
+  function initPortCards() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     document.querySelectorAll('[data-port-card]').forEach(function (card) {
+      if (card.dataset.portInit) return;
+      card.dataset.portInit = '1';
       var video = card.querySelector('[data-port-video]');
       if (!video) return;
       card.addEventListener('mouseenter', function () {
@@ -64,6 +68,8 @@ const delays = ['', 'd1', 'd2'];
         video.classList.remove('playing');
       });
     });
-  });
+  }
+  initPortCards();
+  document.addEventListener('astro:page-load', initPortCards);
   </script>
 </Base>

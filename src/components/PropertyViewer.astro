@@ -93,10 +93,13 @@ const hotspots = Array.isArray(d.hotspots) ? d.hotspots : [];
 
 {show && (
   <script is:inline>
-  /* Re-runs per navigation — see main.js for why. */
-  document.addEventListener('astro:page-load', function () {
+  /* Re-runs per navigation — see main.js for why. Also called immediately:
+     during a ClientRouter swap this script can execute after that
+     navigation's page-load event already fired. */
+  function sabdiaViewerInit() {
     var frame = document.querySelector('.viewer-frame');
-    if (!frame) return;
+    if (!frame || frame.dataset.viewerInit) return;
+    frame.dataset.viewerInit = '1';
     var loaded = false;
     function activate() {
       if (loaded) return;
@@ -141,6 +144,8 @@ const hotspots = Array.isArray(d.hotspots) ? d.hotspots : [];
     } else {
       activate();
     }
-  });
+  }
+  sabdiaViewerInit();
+  document.addEventListener('astro:page-load', sabdiaViewerInit);
   </script>
 )}

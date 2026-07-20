@@ -45,8 +45,12 @@ const { label, headingHtml, text, video, poster, captionLeft = '', captionRight 
 
 <script is:inline>
 /* Re-runs per navigation — see main.js for why. The dataset.filmInit
-   guard still prevents double-wiring within a single page. */
-document.addEventListener('astro:page-load', function () {
+   guard still prevents double-wiring within a single page.
+   Called immediately as well as on astro:page-load: during a ClientRouter
+   swap this script can be (re)parsed after that navigation's page-load
+   event has already fired, so waiting on the event alone leaves the
+   section dead until a manual refresh. */
+function sabdiaFilmInit() {
   document.querySelectorAll('[data-film]').forEach(function (frame) {
     if (frame.dataset.filmInit) return;
     frame.dataset.filmInit = '1';
@@ -74,5 +78,7 @@ document.addEventListener('astro:page-load', function () {
       label.textContent = video.muted ? 'Sound On' : 'Mute';
     });
   });
-});
+}
+sabdiaFilmInit();
+document.addEventListener('astro:page-load', sabdiaFilmInit);
 </script>

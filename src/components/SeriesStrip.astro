@@ -86,7 +86,10 @@ function closeSeriesFilm(lbv) {
   }
 }
 
-document.addEventListener('astro:page-load', function () {
+/* Called immediately as well as on astro:page-load: during a ClientRouter
+   swap this script can execute after that navigation's page-load event
+   already fired. The dataset.init guards prevent double-wiring. */
+function sabdiaSeriesInit() {
   document.querySelectorAll('[data-series]').forEach(function (band) {
     if (band.dataset.init) return;
     band.dataset.init = '1';
@@ -125,5 +128,7 @@ document.addEventListener('astro:page-load', function () {
     document.getElementById('lbvClose').addEventListener('click', closeV);
     lbv.addEventListener('click', function (e) { if (e.target === lbv) closeV(); });
   }
-});
+}
+sabdiaSeriesInit();
+document.addEventListener('astro:page-load', sabdiaSeriesInit);
 </script>

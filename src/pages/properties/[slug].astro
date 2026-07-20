@@ -138,7 +138,7 @@ const jsonLd = JSON.stringify({
   {sold && (
     <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:22px clamp(22px,5vw,80px)">
       <div class="inner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-        <div style="padding:7px 16px;background:rgba(180,155,90,.14);border:1px solid rgba(180,155,90,.4);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--ink)">{pp.soldBadge}</div>
+        <div style="padding:7px 16px;background:rgba(168,135,74,.14);border:1px solid rgba(168,135,74,.4);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--ink)">{pp.soldBadge}</div>
         <span style="font-size:13.5px;font-weight:400;color:var(--ink3)">{pp.soldNotice}</span>
         <a href="/properties/" class="btn-g btn-g-gold" style="margin-left:auto;padding:9px 20px;font-size:10px">View Available &rarr;</a>
       </div>
@@ -311,11 +311,17 @@ const jsonLd = JSON.stringify({
     if (e.key === 'ArrowRight') lbApi.next();
   });
 
-  document.addEventListener('astro:page-load', function () {
+  /* Called immediately as well as on astro:page-load: during a ClientRouter
+     swap this script can execute after that navigation's page-load event
+     already fired. On a repeat run over the same DOM the guard restores the
+     already-built lbApi instead of stacking duplicate listeners. */
+  function sabdiaLightboxInit() {
     lbApi = null;
     var items = [].slice.call(document.querySelectorAll('[data-lb-item]'));
     if (!items.length) return;
     var lb = document.getElementById('lb');
+    if (lb.dataset.lbInit) { lbApi = lb._sabdiaLbApi || null; return; }
+    lb.dataset.lbInit = '1';
     var img = document.getElementById('lbImg');
     var cap = document.getElementById('lbCap');
     var count = document.getElementById('lbCount');
@@ -346,7 +352,10 @@ const jsonLd = JSON.stringify({
       prev: function () { show(idx - 1); },
       next: function () { show(idx + 1); }
     };
-  });
+    lb._sabdiaLbApi = lbApi;
+  }
+  sabdiaLightboxInit();
+  document.addEventListener('astro:page-load', sabdiaLightboxInit);
   </script>
 
   <!-- RELATED -->
@@ -376,17 +385,22 @@ const jsonLd = JSON.stringify({
         <a href="#cform" class="psb-btn">Enquire &rarr;</a>
       </div>
       <script is:inline>
-      document.addEventListener('astro:page-load', function () {
+      /* Runs immediately as well as on astro:page-load — see the lightbox
+         script above for why. */
+      function sabdiaStickyInit() {
         var bar = document.getElementById('stickyEnquire');
         var form = document.getElementById('cform');
-        if (!bar || !form || !('IntersectionObserver' in window)) return;
+        if (!bar || bar.dataset.stickyInit || !form || !('IntersectionObserver' in window)) return;
+        bar.dataset.stickyInit = '1';
         var obs = new IntersectionObserver(function (entries) {
           entries.forEach(function (e) {
             bar.classList.toggle('psb-hidden', e.isIntersecting);
           });
         }, { threshold: 0.15 });
         obs.observe(form);
-      });
+      }
+      sabdiaStickyInit();
+      document.addEventListener('astro:page-load', sabdiaStickyInit);
       </script>
     </>
   )}
