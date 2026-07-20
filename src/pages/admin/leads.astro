@@ -6,7 +6,7 @@ export const prerender = true;
   <div class="ad-hdr">
     <div>
       <h1 class="ad-h1">Leads <em>Inbox</em></h1>
-      <p class="ad-sub">Every enquiry from every form on the website, broken down by where it came from. Update the status as you work through them — nothing is ever deleted.</p>
+      <p class="ad-sub">Every enquiry from every form on the website, broken down by where it came from. Update statuses as you work through them, reply without leaving the inbox, correct a lead's details, or delete what you don't need.</p>
     </div>
     <button class="ad-btn ad-btn-ghost" id="csvBtn">Export CSV</button>
   </div>
@@ -28,7 +28,7 @@ export const prerender = true;
 </AdminShell>
 
 <script>
-  import { supabase, requireAuth, el, toast, csvExport, fmtDate } from '../../lib/admin/client.js';
+  import { supabase, requireAuth, accessToken, el, toast, csvExport, fmtDate } from '../../lib/admin/client.js';
 
   await requireAuth();
 
@@ -46,8 +46,25 @@ export const prerender = true;
 
   const typeOf = (l) => l.form_name || 'contact';
 
+  /* Sent replies per enquiry (see supabase/inbox-management.sql). If the
+     replies table doesn't exist yet the inbox still works — the compose
+     box shows, threads just can't be displayed. */
+  let repliesBy = new Map();
+  async function loadReplies() {
+    const { data, error } = await supabase.from('replies').select('*').order('sent_at', { ascending: true });
+    repliesBy = new Map();
+    if (error) return console.warn('Reply history unavailable (run supabase/inbox-management.sql):', error.message);
+    for (const r of data) {
+      if (!repliesBy.has(r.enquiry_id)) repliesBy.set(r.enquiry_id, []);
+      repliesBy.get(r.enquiry_id).push(r);
+    }
+  }
+
   async function load() {
-    const { data, error } = await supabase.from('enquiries').select('*').order('created_at', { ascending: false });
+    const [{ data, error }] = await Promise.all([
+      supabase.from('enquiries').select('*').order('created_at', { ascending: false }),
+      loadReplies(),
+    ]);
     if (error) return toast(error.message, true);
     all = data;
     renderTabs();
@@ -104,6 +121,115 @@ export const prerender = true;
     return `${l.first_name ?? ''} ${l.last_name ?? ''}`.trim() || l.email || 'Anonymous';
   }
 
+  /* Delete with an in-page two-step confirm — the first click arms the
+     button for four seconds, the second actually deletes. */
+  function deleteButton(l) {
+    const btn = el('button', { class: 'ad-btn ad-btn-ghost', text: 'Delete', title: 'Delete this lead permanently', style: 'padding:8px 14px;font-size:10px' });
+    let armed = false, timer;
+    btn.addEventListener('click', async () => {
+      if (!armed) {
+        armed = true;
+        btn.textContent = 'Confirm delete?';
+        btn.classList.remove('ad-btn-ghost');
+        btn.classList.add('ad-btn-danger');
+        timer = setTimeout(() => { armed = false; btn.textContent = 'Delete'; btn.classList.add('ad-btn-ghost'); btn.classList.remove('ad-btn-danger'); }, 4000);
+        return;
+      }
+      clearTimeout(timer);
+      btn.disabled = true;
+      /* .select() so a policy-blocked delete (0 rows, no error) is visible. */
+      const { data, error } = await supabase.from('enquiries').delete().eq('id', l.id).select('id');
+      if (error) { btn.disabled = false; return toast(error.message, true); }
+      if (!data?.length) { btn.disabled = false; return toast('Delete was blocked by database permissions — run supabase/inbox-management.sql in the Supabase SQL editor first.', true); }
+      all = all.filter((x) => x.id !== l.id);
+      toast('Lead deleted');
+      renderTabs();
+      render();
+    });
+    return btn;
+  }
+
+  const EDIT_FIELDS = [
+    ['first_name', 'First name'], ['last_name', 'Last name'], ['email', 'Email'], ['phone', 'Phone'],
+    ['property', 'Property'], ['enquiry_type', 'Enquiry type'], ['agency', 'Agency'],
+    ['licence_number', 'Licence no.'], ['suburb_markets', 'Suburb markets'],
+  ];
+  function editArea(l) {
+    const inputs = {};
+    const grid = el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 16px;margin:14px 0' },
+      EDIT_FIELDS.map(([k, label]) => {
+        inputs[k] = el('input', { class: 'ad-fi', value: l[k] ?? '' });
+        return el('div', {}, [el('label', { class: 'ad-fl', text: label }), inputs[k]]);
+      }));
+    const msg = el('textarea', { class: 'ad-fta', text: l.message || '', style: 'min-height:80px' });
+    const save = el('button', { class: 'ad-btn ad-btn-gold', text: 'Save changes' });
+    const cancel = el('button', { class: 'ad-btn ad-btn-ghost', text: 'Cancel' });
+    save.addEventListener('click', async () => {
+      const patch = { message: msg.value.trim() || null };
+      for (const [k] of EDIT_FIELDS) patch[k] = inputs[k].value.trim() || null;
+      save.disabled = true;
+      const { data, error } = await supabase.from('enquiries').update(patch).eq('id', l.id).select('id');
+      save.disabled = false;
+      if (error) return toast(error.message, true);
+      if (!data?.length) return toast('Save was blocked by database permissions — check the enquiries update policy.', true);
+      Object.assign(l, patch);
+      toast('Lead updated');
+      renderTabs();
+      render();
+    });
+    cancel.addEventListener('click', () => { renderTabs(); render(); });
+    return el('div', { style: 'border-top:1px solid var(--border);margin-top:14px;padding-top:4px;width:100%' }, [
+      grid,
+      el('div', { style: 'margin-bottom:12px' }, [el('label', { class: 'ad-fl', text: 'Message' }), msg]),
+      el('div', { style: 'display:flex;gap:10px' }, [save, cancel]),
+    ]);
+  }
+
+  function replyArea(l) {
+    const wrap = el('div', { style: 'border-top:1px solid var(--border);margin-top:14px;padding-top:14px;width:100%' });
+    const subject = el('input', { class: 'ad-fi', value: `Re: ${['Your enquiry', l.property].filter(Boolean).join(' — ')} | Sabdia Constructions` });
+    const body = el('textarea', { class: 'ad-fta', placeholder: `Write your reply to ${leadName(l)} — it sends by email and is logged here…`, style: 'min-height:100px' });
+    const send = el('button', { class: 'ad-btn ad-btn-gold', text: 'Send reply' });
+    send.addEventListener('click', async () => {
+      if (!body.value.trim()) return toast('Write a message first', true);
+      send.disabled = true;
+      send.textContent = 'Sending…';
+      try {
+        const token = await accessToken();
+        const resp = await fetch('/api/reply', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({ enquiryId: l.id, subject: subject.value, body: body.value }),
+        });
+        const out = await resp.json();
+        if (!resp.ok) throw new Error(out.error || 'The reply could not be sent.');
+        toast(out.logged ? 'Reply sent' : 'Reply sent — but not logged; run supabase/inbox-management.sql');
+        await loadReplies();
+        renderTabs();
+        render();
+        return;
+      } catch (e) {
+        toast(e.message, true);
+      }
+      send.disabled = false;
+      send.textContent = 'Send reply';
+    });
+    wrap.appendChild(el('div', { style: 'margin-bottom:10px' }, [el('label', { class: 'ad-fl', text: 'Subject' }), subject]));
+    wrap.appendChild(el('div', { style: 'margin-bottom:12px' }, [body]));
+    wrap.appendChild(send);
+    return wrap;
+  }
+
+  function threadList(l) {
+    const thread = repliesBy.get(l.id) || [];
+    if (!thread.length) return null;
+    return el('div', { style: 'width:100%;margin-top:12px;display:flex;flex-direction:column;gap:8px' },
+      thread.map((r) => el('div', { style: 'background:var(--bg2);border-left:2px solid var(--gold);padding:10px 14px' }, [
+        el('div', { text: `Replied ${fmtDate(r.sent_at)}${r.sent_by ? ' · ' + r.sent_by : ''} · ${r.subject}`, style: 'font-size:10.5px;color:var(--taupe-d);margin-bottom:4px' }),
+        el('div', { text: r.body, style: 'font-size:12.5px;white-space:pre-wrap' }),
+      ])));
+  }
+
   /* Full card for contact / property / agent leads. */
   function leadCard(l, { hideProperty = false } = {}) {
     const details = [
@@ -137,6 +263,20 @@ export const prerender = true;
 
     const typeLabel = { 'contact': 'Contact', 'property-enquiry': 'Property enquiry', 'agent-application': 'Agent application', 'guided-match': 'Guided match', 'newsletter': 'Newsletter' }[typeOf(l)] || l.form_name;
 
+    /* Reply / Edit panels mount into this slot on demand; each button
+       closes the other so only one panel is open per card. */
+    const panel = el('div', { style: 'width:100%' });
+    let openPanel = null;
+    const togglePanel = (name, build) => {
+      panel.innerHTML = '';
+      if (openPanel === name) { openPanel = null; return; }
+      openPanel = name;
+      panel.appendChild(build());
+    };
+    const thread = repliesBy.get(l.id) || [];
+    const replyBtn = l.email && el('button', { class: 'ad-btn ad-btn-ghost', text: thread.length ? `Reply (${thread.length})` : 'Reply', style: 'padding:8px 14px;font-size:10px', onclick: () => togglePanel('reply', () => replyArea(l)) });
+    const editBtn = el('button', { class: 'ad-btn ad-btn-ghost', text: 'Edit', style: 'padding:8px 14px;font-size:10px', onclick: () => togglePanel('edit', () => editArea(l)) });
+
     return el('div', { class: 'ad-card' }, [
       el('div', { style: 'display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px' }, [
         el('strong', { text: leadName(l), style: 'font-weight:400;font-size:15px' }),
@@ -150,7 +290,13 @@ export const prerender = true;
           typeof v === 'string' ? el('span', { text: v }) : v,
         ])),
       ),
-      el('div', { style: 'display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap' }, [statusSel, notes]),
+      el('div', { style: 'display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap' }, [
+        statusSel,
+        notes,
+        el('div', { style: 'display:flex;gap:8px;margin-left:auto' }, [replyBtn, editBtn, deleteButton(l)].filter(Boolean)),
+      ]),
+      threadList(l),
+      panel,
     ]);
   }
 
@@ -161,7 +307,7 @@ export const prerender = true;
       el('a', { href: 'mailto:' + l.email, text: l.email, style: 'color:var(--gold);font-size:13.5px' }),
       badge,
       el('span', { text: fmtDate(l.created_at), style: 'font-size:11px;color:var(--taupe-d)' }),
-      el('span', { style: 'margin-left:auto' }, [statusControl(l, badge)]),
+      el('span', { style: 'margin-left:auto;display:flex;gap:8px;align-items:center' }, [statusControl(l, badge), deleteButton(l)]),
     ]);
   }
 
