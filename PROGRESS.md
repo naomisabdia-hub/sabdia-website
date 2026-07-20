@@ -192,3 +192,11 @@
   → "Start a Conversation" (seed + DB).
 - HANDOVER.md written (edit guide, Journal how-to, EDM, leads, restore points, activations,
   Search Console/GBP, DNS go-live steps, housekeeping). Tagged v4.0-live.
+
+## Post-launch fix: empty env vars on Vercel (2026-07-21)
+- Live /admin showed "Supabase is not configured": Vercel CLI 52's non-interactive `env add`
+  silently stored EMPTY values for everything piped via stdin; the build inlined "" into the
+  browser bundle. Fixed by upserting all six vars (+ CONTACT_EMAIL, also empty) with real
+  values via the Vercel REST API and shipping a verified prebuilt deploy. Live bundle now
+  carries the Supabase host + Clerk key; admin sign-in renders correctly on production.
+- Lesson recorded: never trust `vercel env add` via stdin — use the REST API (or dashboard).
