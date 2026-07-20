@@ -21,6 +21,16 @@ const img = (key, label, folder) => ({
 });
 
 export const contentSchemas = {
+  series: {
+    label: 'Instagram series strip',
+    help: 'The "series" band on property pages. The heading and handle are editable here; the per-residence post tiles are curated with your developer.',
+    schema: [
+      { key: 'label', label: 'Small label', type: 'text' },
+      { key: 'handle', label: 'Instagram handle', type: 'text', help: 'e.g. @_sabdia' },
+      { key: 'headingHtml', label: 'Heading', type: 'html', help: 'use <em>…</em> for gold italics' },
+      { key: 'text', label: 'Intro text', type: 'textarea' },
+    ],
+  },
   newsletter: {
     label: 'Newsletter signup',
     help: 'The email signup band that sits above the footer on every page.',
@@ -613,7 +623,7 @@ export const sectionPositions = [
 export const contentGroups = [
   { name: 'Homepage', keys: ['home_hero', 'home_stats', 'home_marquee', 'home_about', 'home_properties', 'home_services', 'home_process', 'home_agent', 'home_contact'] },
   { name: 'Pages', keys: ['properties_page', 'property_page', 'projects_page', 'services_page', 'about_page', 'collection_page', 'agent_page', 'contact_page', 'find_home', 'notfound'] },
-  { name: 'Site-wide', keys: ['films', 'nav', 'footer', 'legal_privacy', 'legal_accessibility'] },
+  { name: 'Site-wide', keys: ['films', 'nav', 'footer', 'newsletter', 'series', 'legal_privacy', 'legal_accessibility'] },
 ];
 
 /** Property editor schema (columns of the properties table). */
