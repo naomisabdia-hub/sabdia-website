@@ -4,6 +4,7 @@ import PropertyCard from '../components/PropertyCard.astro';
 import SoldCard from '../components/SoldCard.astro';
 import ServiceIcon from '../components/ServiceIcon.astro';
 import FilmBand from '../components/FilmBand.astro';
+import CustomSections from '../components/CustomSections.astro';
 import { landLabel, wixResize } from '../lib/wix.js';
 import { getProperties } from '../lib/db.js';
 import { getContent, getServices, getProcessSteps, getTestimonials } from '../lib/content.js';
@@ -176,6 +177,8 @@ const jsonLd = JSON.stringify({
       ))}
     </div>
   </div>
+
+  <CustomSections page="/" position="top" />
 
   <!-- ABOUT -->
   <section class="sp" id="about">
@@ -424,4 +427,6 @@ const jsonLd = JSON.stringify({
       </div>
     </div>
   </section>
+
+  <CustomSections page="/" position="end" />
 </Base>

@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import BenefitIcon from '../components/BenefitIcon.astro';
+import CustomSections from '../components/CustomSections.astro';
 import { wixResize, landLabel } from '../lib/wix.js';
 import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
@@ -25,6 +26,8 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
   .agent-apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start}
   @media(max-width:1024px){.agent-bens{grid-template-columns:repeat(2,1fr)}.agent-apply-grid{grid-template-columns:1fr;gap:52px}}
   @media(max-width:640px){.agent-bens{grid-template-columns:1fr}}
+  .agent-listings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media(max-width:768px){.agent-listings-grid{grid-template-columns:1fr}}
   </style>
 
   <!-- HERO (dark, full) -->
@@ -38,6 +41,8 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
       <p class="reveal d2" style="font-size:13px;font-weight:300;color:rgba(253,252,248,.5);max-width:420px;margin-top:28px;line-height:1.85">{page.hero.text}</p>
     </div>
   </section>
+
+  <CustomSections page="/agent-access/" position="top" />
 
   <!-- BENEFITS -->
   <section style="background:var(--dark2);padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px)">
@@ -63,7 +68,7 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
     <div class="inner">
       <div class="slabel reveal" style="margin-bottom:20px">{page.listings.label}</div>
       <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px);margin-bottom:48px" set:html={page.listings.headingHtml} />
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      <div class="agent-listings-grid">
         {forSale.map((p, i) => (
           <a href={`/properties/${p.id}/`} class={`pc reveal ${i % 2 === 1 ? 'd1' : ''}`} style="aspect-ratio:16/10">
             <img src={wixResize(p.data.image, { w: 900, h: 560, focus: p.data.focus })} alt={p.data.name} loading="lazy">
@@ -118,4 +123,6 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
       </div>
     </div>
   </section>
+
+  <CustomSections page="/agent-access/" position="end" />
 </Base>

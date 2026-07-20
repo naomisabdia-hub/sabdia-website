@@ -1,0 +1,122 @@
+---
+/**
+ * CustomSections — renders team-authored sections from the admin portal.
+ *
+ * Sections live in site_content key `custom_sections` as
+ *   { sections: [{ id, page, position, layout, published, ...fields }] }
+ * and are managed at /admin/sections/. Every public page includes this
+ * component twice — position "top" (under the hero) and "end" (before
+ * the footer). Pages with no sections render nothing.
+ *
+ * Layouts: editorial, image-text, image-band, quote, cta-band,
+ * gallery-strip — markup reuses the site's global design system classes
+ * plus the cs-* helpers in style.css.
+ */
+import { getContent } from '../lib/content.js';
+
+const { page, position = 'end' } = Astro.props;
+const { custom_sections } = await getContent('custom_sections');
+const sections = (custom_sections?.sections ?? []).filter(
+  (s) => s.page === page && (s.position ?? 'end') === position && s.published !== false,
+);
+const hasBtn = (c) => c && c.label;
+---
+{sections.map((s) => {
+  const dark = s.theme === 'dark';
+  return (
+    <Fragment>
+      {s.layout === 'editorial' && (
+        <section class={`sp cs-section ${dark ? 'cs-dark' : ''}`}>
+          <div class="inner-md">
+            {s.label && <div class={`slabel ${dark ? 'slabel-dark' : ''} reveal`}>{s.label}</div>}
+            {s.headingHtml && <h2 class="cs-h reveal d1" set:html={s.headingHtml} />}
+            {(s.paragraphs ?? []).map((p) => <p class="cs-p reveal d2">{p}</p>)}
+            {hasBtn(s.cta) && (
+              <div class="reveal d3" style="margin-top:36px">
+                <a href={s.cta.href || '/contact/'} class={dark ? 'btn-g btn-g-light' : 'btn-g btn-g-gold'}>{s.cta.label} &rarr;</a>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {s.layout === 'image-text' && (
+        <section class={`sp cs-section ${dark ? 'cs-dark' : ''}`}>
+          <div class={`inner cs-it-grid ${s.imageSide === 'right' ? 'cs-it-flip' : ''}`}>
+            <div class="cs-it-img reveal-wipe">
+              {s.image && <img src={s.image} alt={s.alt || ''} loading="lazy" decoding="async">}
+            </div>
+            <div>
+              {s.label && <div class={`slabel ${dark ? 'slabel-dark' : ''} reveal`}>{s.label}</div>}
+              {s.headingHtml && <h2 class="cs-h reveal d1" set:html={s.headingHtml} />}
+              {(s.paragraphs ?? []).map((p) => <p class="cs-p reveal d2">{p}</p>)}
+              {hasBtn(s.cta) && (
+                <div class="reveal d3" style="margin-top:32px">
+                  <a href={s.cta.href || '/contact/'} class={dark ? 'btn-g btn-g-light' : 'btn-g btn-g-gold'}>{s.cta.label} &rarr;</a>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {s.layout === 'image-band' && s.image && (
+        <section class="cs-band">
+          <div class="cs-band-img reveal-wipe">
+            <img src={s.image} alt={s.alt || ''} loading="lazy" decoding="async">
+          </div>
+          {(s.captionLeft || s.captionRight) && (
+            <div class="cs-band-cap inner">
+              <span>{s.captionLeft}</span>
+              <span>{s.captionRight}</span>
+            </div>
+          )}
+        </section>
+      )}
+
+      {s.layout === 'quote' && s.quote && (
+        <section class={`sp cs-section ${dark ? 'cs-dark' : 'cs-quote-light'}`}>
+          <div class="inner-md" style="text-align:center">
+            <blockquote class="cs-quote reveal">&ldquo;{s.quote}&rdquo;</blockquote>
+            {s.attribution && (
+              <div class="cs-quote-auth reveal d1">
+                <span class="cs-quote-line"></span>
+                <span>{s.attribution}</span>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {s.layout === 'cta-band' && (
+        <section class={`sp cs-section ${s.theme !== 'light' ? 'cs-dark' : ''}`} style="text-align:center">
+          <div class="inner-sm">
+            {s.label && <div class={`slabel ${s.theme !== 'light' ? 'slabel-dark' : ''} reveal`} style="justify-content:center">{s.label}</div>}
+            {s.headingHtml && <h2 class="cs-h reveal d1" set:html={s.headingHtml} />}
+            {s.text && <p class="cs-p reveal d2" style="margin-left:auto;margin-right:auto">{s.text}</p>}
+            <div class="reveal d3" style="margin-top:36px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+              {hasBtn(s.primaryCta) && <a href={s.primaryCta.href || '/contact/'} class="btn-p">{s.primaryCta.label} &rarr;</a>}
+              {hasBtn(s.secondaryCta) && <a href={s.secondaryCta.href || '/contact/'} class={s.theme !== 'light' ? 'btn-g btn-g-light' : 'btn-g'}>{s.secondaryCta.label}</a>}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {s.layout === 'gallery-strip' && (s.images ?? []).length > 0 && (
+        <section class="sp-sm cs-section">
+          <div class="inner">
+            {s.label && <div class="slabel reveal">{s.label}</div>}
+            {s.headingHtml && <h2 class="cs-h reveal d1" style="margin-bottom:36px" set:html={s.headingHtml} />}
+            <div class="cs-grid" style={`--cs-cols:${['2', '3', '4'].includes(String(s.columns)) ? s.columns : 3}`}>
+              {(s.images ?? []).map((g, i) => (
+                <div class={`cs-grid-item reveal-wipe ${['', 'd1', 'd2', 'd3'][i % 4]}`}>
+                  {g.image && <img src={g.image} alt={g.alt || ''} loading="lazy" decoding="async">}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+    </Fragment>
+  );
+})}

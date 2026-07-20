@@ -1270,5 +1270,27 @@
         }
       ]
     }
+  },
+  "property_page": {
+    "galleryLabel": "Gallery",
+    "galleryHeadingHtml": "The residence, <em>in stills</em>.",
+    "soldBadge": "Sold Prior to Completion",
+    "soldNotice": "This residence has been sold. View our current properties for sale below.",
+    "cta": {
+      "label": "Private Viewings",
+      "headingHtml": "See {name} <em>in person</em>.",
+      "text": "Inspections are by private appointment. Register your interest and our team will be in touch within one business day.",
+      "button": "Enquire About {name}"
+    },
+    "relatedHeadingHtml": "Explore more <em>Sabdia residences</em>",
+    "relatedHeadingSoldHtml": "Properties <em>for sale now</em>"
+  },
+  "find_home": {
+    "label": "A Guided Beginning",
+    "titleHtml": "Find <em>your</em> residence.",
+    "subHtml": "Five short questions — and we'll introduce you to the homes that fit. Prefer the classic route? <a href=\"/contact/\">Our enquiry form is here</a>."
+  },
+  "custom_sections": {
+    "sections": []
   }
 }

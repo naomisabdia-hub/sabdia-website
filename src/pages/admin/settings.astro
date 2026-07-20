@@ -16,7 +16,7 @@ export const prerender = true;
     <span class="ad-dirty">Unsaved changes</span>
   </div>
 
-  <div class="ad-card" style="margin-top:28px">
+  <div class="ad-card" style="margin-top:28px" id="pwCard">
     <div class="ad-card-h">Your password</div>
     <p class="ad-sub" style="margin-bottom:16px">Set or change the password for your own sign-in. (You can always use the email-link option on the login page instead.)</p>
     <form class="ad-form" id="pwForm" style="max-width:380px">
@@ -29,23 +29,44 @@ export const prerender = true;
   </div>
 
   <div class="ad-card" style="margin-top:28px" id="usersCard">
-    <div class="ad-card-h">Portal users</div>
-    <p class="ad-sub" style="margin-bottom:16px">Who can sign in to this portal. Adding someone: they must first create their login via the email sign-in link on the login page, then an admin adds them here.</p>
+    <div class="ad-card-h">Team access</div>
+    <p class="ad-sub" style="margin-bottom:16px" id="usersHelp">Who can sign in to this portal. <b>Editors</b> can change content and properties; <b>Admins</b> can also manage the team.</p>
     <table class="ad-table" id="usersTable">
-      <thead><tr><th>Email</th><th>Role</th><th>Added</th></tr></thead>
+      <thead><tr><th>Email</th><th>Role</th><th>Added</th><th></th></tr></thead>
       <tbody></tbody>
     </table>
-    <p class="ad-sub" style="margin-top:12px">To add or remove users, or reset a password, use the Supabase dashboard (Authentication → Users) — or ask your developer. Password reset: the "Email me a sign-in link" option on the login page always works.</p>
+    <form class="ad-form" id="addUserForm" style="margin-top:18px;display:none">
+      <div class="ad-frow3">
+        <div class="ad-fg">
+          <label class="ad-fl" for="nuEmail">Email</label>
+          <input class="ad-fi" type="email" id="nuEmail" placeholder="teammate@sabdia.com.au" required>
+        </div>
+        <div class="ad-fg">
+          <label class="ad-fl" for="nuRole">Role</label>
+          <select class="ad-fsel" id="nuRole">
+            <option value="editor">Editor</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="ad-fg">
+          <label class="ad-fl">&nbsp;</label>
+          <button class="ad-btn ad-btn-gold" type="submit">Add team member</button>
+        </div>
+      </div>
+    </form>
   </div>
 </AdminShell>
 
 <script>
-  import { supabase, requireAuth, el, fmtDate, toast } from '../../lib/admin/client.js';
+  import { supabase, requireAuth, el, fmtDate, toast, clerkMode } from '../../lib/admin/client.js';
   import { buildForm, readForm, saveBar } from '../../lib/admin/forms.js';
   import { contentSchemas } from '../../lib/admin/schemas.js';
   import seed from '../../lib/seed-content.json';
 
-  await requireAuth();
+  const me = await requireAuth();
+
+  // Clerk manages passwords when it is active.
+  if (clerkMode) document.getElementById('pwCard').style.display = 'none';
 
   const schema = contentSchemas.settings.schema;
   const { data } = await supabase.from('site_content').select('data').eq('key', 'settings').maybeSingle();
@@ -66,13 +87,50 @@ export const prerender = true;
     toast('Password updated');
   });
 
-  const { data: users } = await supabase.from('admin_users').select('*').order('created_at');
-  const tbody = document.querySelector('#usersTable tbody');
-  for (const u of users ?? []) {
-    tbody.appendChild(el('tr', {}, [
-      el('td', { text: u.email }),
-      el('td', { text: u.role }),
-      el('td', { text: fmtDate(u.created_at) }),
-    ]));
+  const isAdmin = me.role === 'admin';
+  const addForm = document.getElementById('addUserForm');
+  addForm.style.display = isAdmin ? '' : 'none';
+  if (isAdmin) {
+    document.getElementById('usersHelp').innerHTML +=
+      clerkMode
+        ? ' New teammates: add their email below, then they sign in at <b>/admin/login/</b> with that email.'
+        : ' New teammates: add their email below, then they use “Email me a sign-in link” at <b>/admin/login/</b>.';
   }
+
+  async function loadUsers() {
+    const { data: users } = await supabase.from('admin_users').select('*').order('created_at');
+    const tbody = document.querySelector('#usersTable tbody');
+    tbody.innerHTML = '';
+    for (const u of users ?? []) {
+      tbody.appendChild(el('tr', {}, [
+        el('td', { text: u.email }),
+        el('td', { text: u.role }),
+        el('td', { text: fmtDate(u.created_at) }),
+        el('td', { style: 'text-align:right' }, [
+          isAdmin && u.email !== me.user?.primaryEmailAddress?.emailAddress && u.email !== (me.user?.email ?? '')
+            ? el('button', { class: 'ad-btn ad-btn-danger', text: 'Remove', style: 'padding:6px 14px', onclick: async () => {
+                if (!confirm(`Remove ${u.email} from the portal? They will no longer be able to sign in.`)) return;
+                const { error } = await supabase.from('admin_users').delete().eq('email', u.email);
+                if (error) return toast(error.message, true);
+                toast('Access removed');
+                loadUsers();
+              } })
+            : null,
+        ]),
+      ]));
+    }
+  }
+
+  addForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('nuEmail').value.trim().toLowerCase();
+    const role = document.getElementById('nuRole').value;
+    const { error } = await supabase.from('admin_users').insert({ email, role });
+    if (error) return toast(error.message.includes('policy') ? 'Could not add — run the team-access update (clerk-auth.sql) in Supabase first.' : error.message, true);
+    toast(`${email} can now sign in`);
+    document.getElementById('nuEmail').value = '';
+    loadUsers();
+  });
+
+  await loadUsers();
 </script>

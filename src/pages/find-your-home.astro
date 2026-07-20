@@ -14,11 +14,13 @@
  * for-sale collection is offered with an "upcoming releases" note.
  */
 import Base from '../layouts/Base.astro';
+import CustomSections from '../components/CustomSections.astro';
 import PropertyCard from '../components/PropertyCard.astro';
 import { landLabel } from '../lib/wix.js';
 import { getProperties } from '../lib/db.js';
+import { getContent } from '../lib/content.js';
 
-const all = await getProperties();
+const [{ find_home: fh }, all] = await Promise.all([getContent('find_home'), getProperties()]);
 const forSale = all.filter((p) => p.data.status === 'for-sale');
 
 // Suburb → area group used by the area question.
@@ -66,16 +68,13 @@ const steps = [
   <!-- PAGE HEADER -->
   <section style="padding:clamp(130px,18vw,180px) clamp(22px,5vw,80px) clamp(40px,5vw,64px);background:var(--bg2);border-bottom:1px solid var(--border)">
     <div class="inner-md" style="text-align:center">
-      <div class="slabel reveal" style="justify-content:center">A Guided Beginning</div>
-      <h1 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(40px,7vw,84px);font-weight:300;line-height:.95;letter-spacing:-.03em;color:var(--ink)">
-        Find <em style="font-style:italic;color:var(--gold)">your</em> residence.
-      </h1>
-      <p class="reveal d2" style="font-family:'EB Garamond',Georgia,serif;font-size:15.5px;font-weight:300;line-height:1.85;color:var(--ink3);max-width:480px;margin:20px auto 0">
-        Five short questions — and we'll introduce you to the homes that fit.
-        Prefer the classic route? <a href="/contact/" style="color:var(--gold);border-bottom:1px solid rgba(158,139,106,.4)">Our enquiry form is here</a>.
-      </p>
+      <div class="slabel reveal" style="justify-content:center">{fh.label}</div>
+      <h1 class="reveal d1 fyh-title" style="font-family:var(--font-d);font-size:clamp(40px,7vw,84px);font-weight:300;line-height:.95;letter-spacing:-.03em;color:var(--ink)" set:html={fh.titleHtml} />
+      <p class="reveal d2 fyh-sub" style="font-family:'EB Garamond',Georgia,serif;font-size:15.5px;font-weight:300;line-height:1.85;color:var(--ink3);max-width:480px;margin:20px auto 0" set:html={fh.subHtml} />
     </div>
   </section>
+
+  <CustomSections page="/find-your-home/" position="top" />
 
   <!-- WIZARD -->
   <section class="sp-sm" style="min-height:60vh">
@@ -148,7 +147,11 @@ const steps = [
     </div>
   </section>
 
+  <CustomSections page="/find-your-home/" position="end" />
+
   <style is:inline>
+    .fyh-title em{font-style:italic;color:var(--gold)}
+    .fyh-sub a{color:var(--gold);border-bottom:1px solid rgba(158,139,106,.4)}
     .fyh-progress{display:flex;gap:10px;justify-content:center;margin-bottom:clamp(32px,5vw,56px)}
     .fyh-tick{width:26px;height:1.5px;background:var(--border);transition:background .4s}
     .fyh-tick.on{background:var(--gold)}

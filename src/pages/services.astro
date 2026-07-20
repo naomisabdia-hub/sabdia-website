@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import CustomSections from '../components/CustomSections.astro';
 import { getContent, getServices, getProcessSteps } from '../lib/content.js';
 
 const [{ services_page: page }, services, processSteps] = await Promise.all([
@@ -31,6 +32,8 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
   .svc-detail-list li{font-size:13px;font-weight:300;color:var(--ink3);padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
   .svc-detail-list li::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
   @media(max-width:900px){.svc-detail-grid{grid-template-columns:1fr;gap:36px}.svc-detail-grid:nth-child(even){direction:ltr}}
+  .svc-intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+  @media(max-width:900px){.svc-intro-grid{grid-template-columns:1fr;gap:32px}}
   </style>
 
   <!-- HERO -->
@@ -44,9 +47,11 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
     </div>
   </section>
 
+  <CustomSections page="/services/" position="top" />
+
   <!-- INTRO -->
   <section class="sp-sm" style="border-bottom:1px solid var(--border)">
-    <div class="inner" style="display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center">
+    <div class="inner svc-intro-grid">
       <div>
         <div class="slabel reveal">{page.intro.label}</div>
         <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px)" set:html={page.intro.headingHtml} />
@@ -113,4 +118,6 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
       </div>
     </div>
   </section>
+
+  <CustomSections page="/services/" position="end" />
 </Base>

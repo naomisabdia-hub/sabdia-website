@@ -2,14 +2,49 @@
  * Admin portal browser runtime: Supabase client, auth guard, toasts,
  * uploads, and small DOM helpers. Imported by /admin pages' scripts;
  * bundled by Astro, runs only in the browser.
+ *
+ * Sign-in runs in one of two modes:
+ *  - Clerk mode  — active when PUBLIC_CLERK_PUBLISHABLE_KEY is set.
+ *    Clerk handles the sign-in UI/session; Supabase accepts the Clerk
+ *    token via its third-party-auth integration (see CLERK-SETUP.md),
+ *    and row-level security matches portal users by email.
+ *  - Supabase mode — the original email/password + magic-link flow.
+ *    Used automatically whenever the Clerk key is absent.
  */
 import { createClient } from '@supabase/supabase-js';
 
 const url = import.meta.env.PUBLIC_SUPABASE_URL;
 const anonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+const clerkKey = import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 export const configured = Boolean(url && anonKey);
-export const supabase = configured ? createClient(url, anonKey) : null;
+export const clerkMode = Boolean(clerkKey);
+
+let clerkInstance = null;
+/** Lazily load + initialise ClerkJS (Clerk mode only); cached. */
+export async function getClerk() {
+  if (!clerkMode) return null;
+  if (!clerkInstance) {
+    const { Clerk } = await import('@clerk/clerk-js');
+    clerkInstance = new Clerk(clerkKey);
+    await clerkInstance.load();
+  }
+  return clerkInstance;
+}
+
+export const supabase = configured
+  ? createClient(
+      url,
+      anonKey,
+      clerkMode
+        ? { accessToken: async () => (await getClerk())?.session?.getToken() ?? null }
+        : undefined,
+    )
+  : null;
+
+const toLogin = (query) => {
+  location.href = '/admin/login/' + query;
+};
 
 /** Redirect to login unless a signed-in portal user; returns { user, role }. */
 export async function requireAuth() {
@@ -18,30 +53,48 @@ export async function requireAuth() {
       '<div class="ad-empty" style="padding-top:120px">Supabase is not configured — add PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY.</div>';
     throw new Error('unconfigured');
   }
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    location.href = '/admin/login/?next=' + encodeURIComponent(location.pathname);
-    throw new Error('unauthenticated');
+
+  let email, user, signOut;
+  if (clerkMode) {
+    const clerk = await getClerk();
+    if (!clerk.user) {
+      toLogin('?next=' + encodeURIComponent(location.pathname));
+      throw new Error('unauthenticated');
+    }
+    user = clerk.user;
+    email = clerk.user.primaryEmailAddress?.emailAddress ?? '';
+    signOut = () => clerk.signOut();
+  } else {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toLogin('?next=' + encodeURIComponent(location.pathname));
+      throw new Error('unauthenticated');
+    }
+    user = session.user;
+    email = session.user.email ?? '';
+    signOut = () => supabase.auth.signOut();
   }
-  const { data: row } = await supabase
-    .from('admin_users')
-    .select('role, email')
-    .eq('user_id', session.user.id)
-    .maybeSingle();
+
+  // Portal membership — matched by account id (Supabase) or email (Clerk).
+  const query = clerkMode
+    ? supabase.from('admin_users').select('role, email').ilike('email', email)
+    : supabase.from('admin_users').select('role, email').eq('user_id', user.id);
+  const { data: row } = await query.maybeSingle();
   if (!row) {
-    await supabase.auth.signOut();
-    location.href = '/admin/login/?denied=1';
+    await signOut();
+    toLogin('?denied=1');
     throw new Error('not an admin user');
   }
+
   const el = document.getElementById('adUser');
   if (el) el.textContent = row.email;
   const btn = document.getElementById('adLogout');
   if (btn)
     btn.addEventListener('click', async () => {
-      await supabase.auth.signOut();
-      location.href = '/admin/login/';
+      await signOut();
+      toLogin('');
     });
-  return { user: session.user, role: row.role };
+  return { user, role: row.role };
 }
 
 let toastTimer;

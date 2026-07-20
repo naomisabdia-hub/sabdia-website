@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import CustomSections from '../components/CustomSections.astro';
 import { getContent } from '../lib/content.js';
 
 const { collection_page: page } = await getContent('collection_page');
@@ -9,62 +10,9 @@ const delays = ['', 'd1', 'd2'];
   title="Collection | Sabdia Constructions"
   description="The Sabdia Collection — a portfolio of completed luxury residences across inner Brisbane. Award-winning homes designed, developed, and constructed by Sabdia."
 >
-  <style is:inline slot="head">
-  /* ── PORTFOLIO GRID ── */
-  .portfolio-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:clamp(28px,3vw,48px) clamp(20px,2.5vw,36px);
-  }
-  .port-card{
-    display:block;
-    cursor:none;
-    text-decoration:none;
-  }
-  .port-img-wrap{
-    position:relative;
-    overflow:hidden;
-    aspect-ratio:4/3;
-    margin-bottom:16px;
-    background:var(--bg3);
-  }
-  .port-img-wrap img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    filter:saturate(.88);
-    transition:transform .75s cubic-bezier(0.16,1,0.3,1),filter .5s;
-    display:block;
-  }
-  .port-card:hover .port-img-wrap img{
-    transform:scale(1.04);
-    filter:saturate(1);
-  }
-  .port-name{
-    font-family:var(--font-u);
-    font-size:12px;
-    font-weight:400;
-    letter-spacing:.22em;
-    text-transform:uppercase;
-    color:var(--ink);
-    margin-bottom:5px;
-    transition:color .3s;
-  }
-  .port-card:hover .port-name{color:var(--gold)}
-  .port-loc{
-    font-size:12px;
-    font-weight:300;
-    color:var(--ink3);
-    letter-spacing:.02em;
-  }
-
-  @media(max-width:900px){
-    .portfolio-grid{grid-template-columns:repeat(2,1fr)}
-  }
-  @media(max-width:560px){
-    .portfolio-grid{grid-template-columns:1fr;gap:32px 0}
-  }
-  </style>
+  <!-- Portfolio grid/card styles live in the global stylesheet
+       (style.css → COLLECTION PORTFOLIO GRID) so the collection detail
+       pages can reuse them. -->
 
   <!-- PAGE HEADER -->
   <section style="padding:clamp(130px,18vw,180px) clamp(22px,5vw,80px) clamp(48px,6vw,72px);background:var(--bg);border-bottom:1px solid var(--border)">
@@ -74,6 +22,8 @@ const delays = ['', 'd1', 'd2'];
       <p class="reveal d2" style="font-size:13.5px;font-weight:300;line-height:1.9;color:var(--ink3);max-width:480px;margin-top:28px">{page.text}</p>
     </div>
   </section>
+
+  <CustomSections page="/collection/" position="top" />
 
   <!-- PORTFOLIO GRID -->
   <section style="padding:clamp(52px,7vw,96px) clamp(22px,5vw,80px) clamp(80px,12vw,140px);background:var(--bg)">
@@ -93,6 +43,8 @@ const delays = ['', 'd1', 'd2'];
       </div>
     </div>
   </section>
+
+  <CustomSections page="/collection/" position="end" />
 
   <script is:inline>
   (function () {

@@ -16,6 +16,7 @@ export const prerender = true;
   <div class="ad-login-card">
     <img src="https://static.wixstatic.com/media/1cc2db_f012027bbf0c45ebb4ae6d847309d59f~mv2.png/v1/fill/w_422,h_70,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/DESIGN%20%C2%B7%20DEVELOP%20%C2%B7%20CONSTRUCT.png" alt="Sabdia Constructions">
     <div class="ad-login-sub">Admin Portal</div>
+    <div id="clerkMount" style="display:none"></div>
     <form class="ad-form" id="loginForm">
       <div class="ad-fg">
         <label class="ad-fl" for="email">Email</label>
@@ -32,7 +33,7 @@ export const prerender = true;
   </div>
 </div>
 <script>
-  import { supabase, configured } from '../../lib/admin/client.js';
+  import { supabase, configured, clerkMode, getClerk } from '../../lib/admin/client.js';
 
   const note = document.getElementById('loginNote');
   const params = new URLSearchParams(location.search);
@@ -41,9 +42,29 @@ export const prerender = true;
 
   const next = params.get('next') || '/admin/';
 
-  supabase?.auth.getSession().then(({ data: { session } }) => {
-    if (session && !params.get('denied')) location.href = next;
-  });
+  if (clerkMode) {
+    // Clerk owns sign-in: hide the Supabase form and mount Clerk's UI.
+    document.getElementById('loginForm').style.display = 'none';
+    const mount = document.getElementById('clerkMount');
+    mount.style.display = '';
+    const clerk = await getClerk();
+    if (params.get('denied')) {
+      await clerk.signOut();
+    } else if (clerk.user) {
+      location.href = next;
+    }
+    if (!clerk.user || params.get('denied')) {
+      clerk.mountSignIn(mount, {
+        forceRedirectUrl: next,
+        appearance: { variables: { colorPrimary: '#9E8B6A' } },
+      });
+      if (!params.get('denied')) note.textContent = 'Trouble signing in? Ask an administrator to check your access.';
+    }
+  } else {
+    supabase?.auth.getSession().then(({ data: { session } }) => {
+      if (session && !params.get('denied')) location.href = next;
+    });
+  }
 
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();

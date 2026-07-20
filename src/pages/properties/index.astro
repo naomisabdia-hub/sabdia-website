@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import CustomSections from '../../components/CustomSections.astro';
 import PropertyCard from '../../components/PropertyCard.astro';
 import SoldCard from '../../components/SoldCard.astro';
 import { wixResize, landLabel, countWord } from '../../lib/wix.js';
@@ -65,6 +66,8 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
       <span class="ptool-count" id="fCount"></span>
     </div>
   </div>
+
+  <CustomSections page="/properties/" position="top" />
 
   {featured && (
     <section style="padding:clamp(40px,5vw,64px) clamp(22px,5vw,80px) 0;background:var(--bg)" id="featuredWrap">
@@ -171,6 +174,8 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
       </div>
     </div>
   </section>
+
+  <CustomSections page="/properties/" position="end" />
 
   <script is:inline>
   (function () {

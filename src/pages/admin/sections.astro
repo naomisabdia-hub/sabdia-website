@@ -1,0 +1,237 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Page Sections" active="sections">
+  <!-- LIST VIEW -->
+  <div id="listView">
+    <div class="ad-hdr">
+      <div>
+        <h1 class="ad-h1">Page <em>Sections</em></h1>
+        <p class="ad-sub">Add brand-new sections to any page of the website — text, images, quotes, photo grids, or calls to action — without touching code. Sections appear either just under a page's hero or at the end of the page, and can be reordered, hidden, or deleted at any time.</p>
+      </div>
+      <button class="ad-btn ad-btn-gold" id="newBtn">+ Add Section</button>
+    </div>
+    <div id="groups"></div>
+    <div class="ad-empty" id="listEmpty" style="display:none">
+      No custom sections yet.<br>
+      <span style="font-size:13px;font-style:normal;font-family:var(--font-u)">Press "+ Add Section", choose a page and a layout, and your new section is live the moment you save.</span>
+    </div>
+  </div>
+
+  <!-- PICKER VIEW -->
+  <div id="pickView" style="display:none">
+    <div class="ad-hdr">
+      <div>
+        <h1 class="ad-h1">New section</h1>
+        <p class="ad-sub">Choose where the section lives, then pick a layout. You'll fill in the words and images next.</p>
+      </div>
+      <button class="ad-btn ad-btn-ghost" data-back>← Cancel</button>
+    </div>
+    <div class="ad-card">
+      <div class="ad-frow">
+        <div class="ad-fg">
+          <label class="ad-fl">Page</label>
+          <select class="ad-fsel" id="pickPage"></select>
+        </div>
+        <div class="ad-fg">
+          <label class="ad-fl">Placement</label>
+          <select class="ad-fsel" id="pickPos"></select>
+        </div>
+      </div>
+    </div>
+    <div class="ad-layouts" id="layoutCards"></div>
+  </div>
+
+  <!-- EDITOR VIEW -->
+  <div id="editView" style="display:none">
+    <div class="ad-hdr">
+      <div>
+        <h1 class="ad-h1" id="editTitle">Edit section</h1>
+        <p class="ad-sub" id="editDesc"></p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <a class="ad-btn ad-btn-ghost" id="previewBtn" target="_blank">View page ↗</a>
+        <button class="ad-btn ad-btn-ghost" data-back>← All sections</button>
+      </div>
+    </div>
+    <div class="ad-form" id="sectionForm"></div>
+    <div class="ad-savebar" id="saveBar">
+      <button class="ad-btn ad-btn-gold" data-save>Save &amp; publish</button>
+      <span class="ad-dirty">Unsaved changes</span>
+      <span class="spacer"></span>
+      <button class="ad-btn ad-btn-danger" id="deleteBtn">Delete section</button>
+    </div>
+  </div>
+</AdminShell>
+
+<style is:inline>
+  .ad-layouts{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:8px}
+  .ad-layout-card{background:var(--white);border:1px solid var(--border);padding:22px;text-align:left;font-family:var(--font-u);transition:border-color .2s,transform .2s;cursor:pointer}
+  .ad-layout-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .ad-layout-card b{display:block;font-family:var(--font-d);font-size:18px;font-weight:400;color:var(--ink);margin-bottom:6px}
+  .ad-layout-card span{font-size:11.5px;font-weight:300;color:var(--ink3);line-height:1.6;display:block}
+  .ad-sec-row td:first-child{width:130px}
+  .ad-sec-title{font-weight:400;color:var(--ink)}
+  .ad-sec-snippet{color:var(--taupe);font-size:11.5px;max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
+
+<script>
+  import { supabase, requireAuth, el, toast } from '../../lib/admin/client.js';
+  import { buildForm, readForm, saveBar } from '../../lib/admin/forms.js';
+  import { sectionLayouts, sectionPages, sectionPositions } from '../../lib/admin/schemas.js';
+
+  await requireAuth();
+
+  const views = {
+    list: document.getElementById('listView'),
+    pick: document.getElementById('pickView'),
+    edit: document.getElementById('editView'),
+  };
+  const show = (name) => {
+    for (const [k, v] of Object.entries(views)) v.style.display = k === name ? '' : 'none';
+    window.scrollTo(0, 0);
+  };
+  document.querySelectorAll('[data-back]').forEach((b) => b.addEventListener('click', () => { renderList(); show('list'); }));
+
+  const pageName = (v) => (sectionPages.find(([val]) => val === v) || [])[1] || v;
+  const posName = (v) => v === 'top' ? 'Top of page' : 'End of page';
+  const pageUrl = (v) => (v === 'property-detail' ? '/properties/' : v);
+  const snippet = (s) => {
+    const t = (s.headingHtml || s.quote || s.text || (s.paragraphs || [])[0] || '').replace(/<[^>]+>/g, '');
+    return t.length > 80 ? t.slice(0, 80) + '…' : t || '(no text yet)';
+  };
+
+  // ── data ──
+  let doc = { sections: [] };
+  let current = null; // section being edited
+  async function load() {
+    const { data, error } = await supabase.from('site_content').select('data').eq('key', 'custom_sections').maybeSingle();
+    if (error) toast(error.message, true);
+    doc = data?.data && Array.isArray(data.data.sections) ? data.data : { sections: [] };
+  }
+  async function persist() {
+    const { error } = await supabase.from('site_content').upsert({ key: 'custom_sections', data: doc });
+    if (error) throw error;
+  }
+
+  // ── list ──
+  function renderList() {
+    const box = document.getElementById('groups');
+    box.innerHTML = '';
+    const secs = doc.sections;
+    document.getElementById('listEmpty').style.display = secs.length ? 'none' : '';
+    for (const [pageVal, label] of sectionPages) {
+      const mine = secs.filter((s) => s.page === pageVal);
+      if (!mine.length) continue;
+      const card = el('div', { class: 'ad-card' }, [el('div', { class: 'ad-card-h', text: label })]);
+      const table = el('table', { class: 'ad-table' });
+      const tbody = el('tbody');
+      for (const s of mine) {
+        const layout = sectionLayouts[s.layout] || { name: s.layout };
+        const idx = doc.sections.indexOf(s);
+        const groupIdx = mine.indexOf(s);
+        tbody.appendChild(el('tr', { class: 'clickable ad-sec-row', onclick: () => openEditor(s) }, [
+          el('td', {}, [el('span', { class: 'ad-badge live', text: layout.name })]),
+          el('td', {}, [
+            el('div', { class: 'ad-sec-title', text: posName(s.position ?? 'end') }),
+            el('div', { class: 'ad-sec-snippet', text: snippet(s) }),
+          ]),
+          el('td', {}, [el('span', { class: `ad-badge ${s.published !== false ? 'live' : 'draft'}`, text: s.published !== false ? 'Live' : 'Hidden' })]),
+          el('td', { style: 'text-align:right;white-space:nowrap' }, [
+            el('button', { class: 'ad-btn ad-btn-ghost', text: '↑', title: 'Move up', style: 'padding:6px 12px', onclick: (e) => { e.stopPropagation(); move(s, -1); } }),
+            el('button', { class: 'ad-btn ad-btn-ghost', text: '↓', title: 'Move down', style: 'padding:6px 12px;margin-left:6px', onclick: (e) => { e.stopPropagation(); move(s, 1); } }),
+          ]),
+        ]));
+      }
+      table.appendChild(tbody);
+      card.appendChild(table);
+      box.appendChild(card);
+    }
+  }
+
+  async function move(s, dir) {
+    const group = doc.sections.filter((x) => x.page === s.page && (x.position ?? 'end') === (s.position ?? 'end'));
+    const gi = group.indexOf(s);
+    const target = group[gi + dir];
+    if (!target) return;
+    const a = doc.sections.indexOf(s);
+    const b = doc.sections.indexOf(target);
+    [doc.sections[a], doc.sections[b]] = [doc.sections[b], doc.sections[a]];
+    try {
+      await persist();
+      toast('Order saved');
+    } catch (e) { toast(e.message, true); }
+    renderList();
+  }
+
+  // ── picker ──
+  const pickPage = document.getElementById('pickPage');
+  const pickPos = document.getElementById('pickPos');
+  for (const [v, l] of sectionPages) pickPage.appendChild(el('option', { value: v, text: l }));
+  for (const [v, l] of sectionPositions) pickPos.appendChild(el('option', { value: v, text: l }));
+  const layoutBox = document.getElementById('layoutCards');
+  for (const [key, layout] of Object.entries(sectionLayouts)) {
+    layoutBox.appendChild(el('button', { type: 'button', class: 'ad-layout-card', onclick: () => {
+      const section = {
+        id: crypto.randomUUID(),
+        page: pickPage.value,
+        position: pickPos.value,
+        layout: key,
+        published: true,
+        theme: 'light',
+      };
+      doc.sections.push(section);
+      openEditor(section, true);
+    } }, [
+      el('b', { text: layout.name }),
+      el('span', { text: layout.description }),
+    ]));
+  }
+  document.getElementById('newBtn').addEventListener('click', () => show('pick'));
+
+  // ── editor ──
+  const commonSchema = [
+    { key: 'page', label: 'Page', type: 'select', options: sectionPages },
+    { key: 'position', label: 'Placement', type: 'select', options: sectionPositions },
+    { key: 'published', label: 'Visibility', type: 'checkbox', checkLabel: 'Published — visible on the website' },
+  ];
+  let isNew = false;
+  function schemaFor(s) {
+    return [...commonSchema, ...(sectionLayouts[s.layout]?.fields ?? [])];
+  }
+  function openEditor(s, fresh = false) {
+    current = s;
+    isNew = fresh;
+    const layout = sectionLayouts[s.layout] || { name: s.layout, description: '' };
+    document.getElementById('editTitle').textContent = `${fresh ? 'New' : 'Edit'} — ${layout.name}`;
+    document.getElementById('editDesc').textContent = layout.description;
+    document.getElementById('previewBtn').href = pageUrl(s.page);
+    buildForm(document.getElementById('sectionForm'), schemaFor(s), s);
+    show('edit');
+  }
+
+  saveBar(document.getElementById('sectionForm'), document.getElementById('saveBar'), async () => {
+    const updated = readForm(document.getElementById('sectionForm'), schemaFor(current), current);
+    const i = doc.sections.findIndex((x) => x.id === current.id);
+    if (i >= 0) doc.sections[i] = updated;
+    await persist();
+    current = doc.sections[i];
+    isNew = false;
+    document.getElementById('previewBtn').href = pageUrl(current.page);
+  });
+
+  document.getElementById('deleteBtn').addEventListener('click', async () => {
+    if (!current) return;
+    if (!isNew && !confirm('Delete this section from the website? This cannot be undone.')) return;
+    doc.sections = doc.sections.filter((x) => x.id !== current.id);
+    try {
+      if (!isNew) { await persist(); toast('Section deleted'); }
+    } catch (e) { return toast(e.message, true); }
+    renderList();
+    show('list');
+  });
+
+  await load();
+  renderList();
+</script>

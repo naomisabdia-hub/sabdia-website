@@ -458,6 +458,38 @@ contentSchemas.contact_page = {
   ],
 };
 
+contentSchemas.property_page = {
+  title: 'Property pages — shared text',
+  description: 'Framing text used on every property page (QASR, SOLACE, …). Write {name} wherever the residence\'s name should appear — it is filled in automatically.',
+  schema: [
+    { key: 'galleryLabel', label: 'Gallery — small label', type: 'text' },
+    { key: 'galleryHeadingHtml', label: 'Gallery — heading', type: 'html', help: 'use <em>…</em> for gold italics' },
+    { key: 'soldBadge', label: 'Sold banner — badge text', type: 'text' },
+    { key: 'soldNotice', label: 'Sold banner — notice', type: 'text' },
+    {
+      key: 'cta', label: 'Closing call-to-action band', type: 'object',
+      fields: [
+        { key: 'label', label: 'Small label', type: 'text' },
+        { key: 'headingHtml', label: 'Heading', type: 'html', help: '{name} becomes the residence name' },
+        { key: 'text', label: 'Paragraph', type: 'textarea' },
+        { key: 'button', label: 'Button text', type: 'text', help: '{name} becomes the residence name' },
+      ],
+    },
+    { key: 'relatedHeadingHtml', label: 'Related section heading', type: 'html' },
+    { key: 'relatedHeadingSoldHtml', label: 'Related heading on sold pages', type: 'html' },
+  ],
+};
+
+contentSchemas.find_home = {
+  title: 'Find Your Home page',
+  description: 'The header of the guided residence match. The five questions themselves are part of the matching logic — ask your developer to change those.',
+  schema: [
+    { key: 'label', label: 'Small label', type: 'text' },
+    { key: 'titleHtml', label: 'Heading', type: 'html' },
+    { key: 'subHtml', label: 'Subtext', type: 'html', help: 'links are allowed, e.g. <a href="/contact/">enquiry form</a>' },
+  ],
+};
+
 contentSchemas.notfound = {
   title: '404 page',
   schema: [
@@ -468,10 +500,108 @@ contentSchemas.notfound = {
   ],
 };
 
+/* ── CUSTOM PAGE SECTIONS ────────────────────────────────────
+   Layouts the team can add to any page from /admin/sections/.
+   Each section stored in site_content key `custom_sections` as
+   { sections: [{ id, page, position, layout, published, ...fields }] }.
+   CustomSections.astro renders them on the public site. */
+
+const themeField = { key: 'theme', label: 'Background', type: 'select', options: [['light', 'Light — warm stone'], ['dark', 'Dark — obsidian']] };
+
+export const sectionLayouts = {
+  editorial: {
+    name: 'Editorial text',
+    description: 'Small gold label, large serif heading, and paragraphs. The classic Sabdia section.',
+    fields: [
+      { key: 'label', label: 'Small label', type: 'text' },
+      { key: 'headingHtml', label: 'Heading', type: 'html', help: 'use <em>…</em> for gold italics' },
+      { key: 'paragraphs', label: 'Paragraphs', type: 'list', itemType: 'textarea', itemLabel: 'paragraph' },
+      cta('cta', 'Button (optional — leave text blank for none)'),
+      themeField,
+    ],
+  },
+  'image-text': {
+    name: 'Image + text',
+    description: 'A photo beside a heading and paragraphs — image on the left or right.',
+    fields: [
+      { key: 'label', label: 'Small label', type: 'text' },
+      { key: 'headingHtml', label: 'Heading', type: 'html' },
+      { key: 'paragraphs', label: 'Paragraphs', type: 'list', itemType: 'textarea', itemLabel: 'paragraph' },
+      { key: 'image', label: 'Image', type: 'image', folder: 'sections' },
+      { key: 'alt', label: 'Image alt text', type: 'text' },
+      { key: 'imageSide', label: 'Image position', type: 'select', options: [['left', 'Image left, text right'], ['right', 'Text left, image right']] },
+      cta('cta', 'Button (optional — leave text blank for none)'),
+      themeField,
+    ],
+  },
+  'image-band': {
+    name: 'Full-width image',
+    description: 'An edge-to-edge photograph with small captions beneath — a cinematic pause.',
+    fields: [
+      { key: 'image', label: 'Image', type: 'image', folder: 'sections' },
+      { key: 'alt', label: 'Alt text', type: 'text' },
+      { key: 'captionLeft', label: 'Left caption', type: 'text' },
+      { key: 'captionRight', label: 'Right caption', type: 'text' },
+    ],
+  },
+  quote: {
+    name: 'Quote',
+    description: 'A large italic serif quotation with attribution.',
+    fields: [
+      { key: 'quote', label: 'Quotation', type: 'textarea' },
+      { key: 'attribution', label: 'Attribution', type: 'text', help: 'e.g. PRIVATE CLIENT — ASCOT' },
+      themeField,
+    ],
+  },
+  'cta-band': {
+    name: 'Call to action',
+    description: 'A centred heading, short text, and buttons — invites the visitor to act.',
+    fields: [
+      { key: 'label', label: 'Small label', type: 'text' },
+      { key: 'headingHtml', label: 'Heading', type: 'html' },
+      { key: 'text', label: 'Paragraph', type: 'textarea' },
+      cta('primaryCta', 'Gold button'),
+      cta('secondaryCta', 'Outline button (optional — leave text blank for none)'),
+      themeField,
+    ],
+  },
+  'gallery-strip': {
+    name: 'Photo grid',
+    description: 'A grid of photographs, two to four across.',
+    fields: [
+      { key: 'label', label: 'Small label', type: 'text' },
+      { key: 'headingHtml', label: 'Heading (optional)', type: 'html' },
+      { key: 'columns', label: 'Photos per row', type: 'select', options: [['2', 'Two'], ['3', 'Three'], ['4', 'Four']] },
+      { key: 'images', label: 'Photos', type: 'items', itemLabel: 'photo', fields: [
+        { key: 'image', label: 'Image', type: 'image', folder: 'sections' },
+        { key: 'alt', label: 'Alt text', type: 'text' },
+      ] },
+    ],
+  },
+};
+
+/** Pages sections can be added to, and where on the page they can sit. */
+export const sectionPages = [
+  ['/', 'Homepage'],
+  ['/about/', 'About'],
+  ['/services/', 'Services'],
+  ['/projects/', 'Projects'],
+  ['/properties/', 'For Sale'],
+  ['/collection/', 'Collection'],
+  ['/contact/', 'Contact'],
+  ['/agent-access/', 'Agent Access'],
+  ['/find-your-home/', 'Find Your Home'],
+  ['property-detail', 'Every property page'],
+];
+export const sectionPositions = [
+  ['top', 'Top of page — just under the hero'],
+  ['end', 'End of page — before the footer'],
+];
+
 /** Groups shown on the Content index page. */
 export const contentGroups = [
   { name: 'Homepage', keys: ['home_hero', 'home_stats', 'home_marquee', 'home_about', 'home_properties', 'home_services', 'home_process', 'home_agent', 'home_contact'] },
-  { name: 'Pages', keys: ['properties_page', 'projects_page', 'services_page', 'about_page', 'collection_page', 'agent_page', 'contact_page', 'notfound'] },
+  { name: 'Pages', keys: ['properties_page', 'property_page', 'projects_page', 'services_page', 'about_page', 'collection_page', 'agent_page', 'contact_page', 'find_home', 'notfound'] },
   { name: 'Site-wide', keys: ['films', 'nav', 'footer', 'legal_privacy', 'legal_accessibility'] },
 ];
 

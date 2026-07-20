@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import CustomSections from '../components/CustomSections.astro';
 import JourneySlider from '../components/JourneySlider.astro';
 import { wixResize, landLabel } from '../lib/wix.js';
 import { getProperties } from '../lib/db.js';
@@ -101,6 +102,8 @@ const journeys = [
     </div>
   </div>
 
+  <CustomSections page="/projects/" position="top" />
+
   <!-- CURRENT PROPERTIES -->
   <section class="sp" data-proj-section="current">
     <div class="inner">
@@ -185,6 +188,8 @@ const journeys = [
       </div>
     </div>
   </section>
+
+  <CustomSections page="/projects/" position="end" />
 
   <script is:inline>
   (function () {
