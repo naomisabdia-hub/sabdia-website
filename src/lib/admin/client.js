@@ -21,12 +21,30 @@ export const configured = Boolean(url && anonKey);
 export const clerkMode = Boolean(clerkKey);
 
 let clerkInstance = null;
-/** Lazily load + initialise ClerkJS (Clerk mode only); cached. */
+/**
+ * Lazily load + initialise ClerkJS (Clerk mode only); cached.
+ * Hot-loads the official browser build from the instance's own Clerk
+ * domain (derived from the publishable key) — the self-bundled npm build
+ * ships without the sign-in UI components ("Clerk was not loaded with UI
+ * components"), the hosted build always has them.
+ */
 export async function getClerk() {
   if (!clerkMode) return null;
   if (!clerkInstance) {
-    const { Clerk } = await import('@clerk/clerk-js');
-    clerkInstance = new Clerk(clerkKey);
+    if (!window.Clerk) {
+      const domain = atob(clerkKey.split('_')[2]).replace(/\$$/, '');
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = `https://${domain}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
+        s.async = true;
+        s.crossOrigin = 'anonymous';
+        s.setAttribute('data-clerk-publishable-key', clerkKey);
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('Failed to load Clerk'));
+        document.head.appendChild(s);
+      });
+    }
+    clerkInstance = window.Clerk;
     await clerkInstance.load();
   }
   return clerkInstance;
