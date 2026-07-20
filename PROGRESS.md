@@ -154,3 +154,12 @@
 - Image SEO audit: 206 rendered images across 17 pages — 0 missing alt attributes; the 7
   empty alts are correct (decorative loader logo + lightbox placeholder whose alt is set by JS
   on open — verified). CMS enforces alt fields with help text; AI can now write them.
+
+## Leads Inbox breakdown (2026-07-21)
+- Leads Inbox rebuilt around lead streams: tab strip with live counts + "n new" chips —
+  All / Property enquiries / General contact / Agent applications / Newsletter signups.
+- Property enquiries tab groups leads under a heading per residence (busiest first).
+- "All leads" view shows every stream as its own titled section instead of one mixed feed.
+- Newsletter signups render as compact rows (email · date · status) instead of full cards.
+- Leads with no name now display their email instead of "Anonymous"; status changes update
+  the tab counts immediately; CSV export respects the active tab and names the file after it.

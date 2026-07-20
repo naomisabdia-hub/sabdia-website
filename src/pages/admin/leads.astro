@@ -6,25 +6,21 @@ export const prerender = true;
   <div class="ad-hdr">
     <div>
       <h1 class="ad-h1">Leads <em>Inbox</em></h1>
-      <p class="ad-sub">Every enquiry from every form on the website. Update the status as you work through them — nothing is ever deleted.</p>
+      <p class="ad-sub">Every enquiry from every form on the website, broken down by where it came from. Update the status as you work through them — nothing is ever deleted.</p>
     </div>
     <button class="ad-btn ad-btn-ghost" id="csvBtn">Export CSV</button>
   </div>
 
+  <div class="ad-tabs" id="typeTabs"></div>
+
   <div class="ad-filters">
-    <select class="ad-fsel" id="fType" style="max-width:220px">
-      <option value="">All types</option>
-      <option value="contact">Contact enquiries</option>
-      <option value="property-enquiry">Property enquiries</option>
-      <option value="agent-application">Agent applications</option>
-    </select>
     <select class="ad-fsel" id="fStatus" style="max-width:180px">
       <option value="">All statuses</option>
       <option value="new">New</option>
       <option value="contacted">Contacted</option>
       <option value="closed">Closed</option>
     </select>
-    <input class="ad-fi ad-search" id="fSearch" placeholder="Search name or email…">
+    <input class="ad-fi ad-search" id="fSearch" placeholder="Search name, email, property or agency…">
   </div>
 
   <div id="leadsBox"></div>
@@ -36,21 +32,48 @@ export const prerender = true;
 
   await requireAuth();
 
+  const TYPES = [
+    ['', 'All leads'],
+    ['property-enquiry', 'Property enquiries'],
+    ['contact', 'General contact'],
+    ['agent-application', 'Agent applications'],
+    ['newsletter', 'Newsletter signups'],
+  ];
+
   let all = [];
+  let activeType = '';
+
+  const typeOf = (l) => l.form_name || 'contact';
 
   async function load() {
     const { data, error } = await supabase.from('enquiries').select('*').order('created_at', { ascending: false });
     if (error) return toast(error.message, true);
     all = data;
+    renderTabs();
     render();
   }
 
+  function renderTabs() {
+    const bar = document.getElementById('typeTabs');
+    bar.innerHTML = '';
+    for (const [value, label] of TYPES) {
+      const rows = value ? all.filter((l) => typeOf(l) === value) : all;
+      const fresh = rows.filter((l) => l.status === 'new').length;
+      const btn = el('button', { type: 'button', class: `ad-tab${activeType === value ? ' on' : ''}` }, [
+        el('span', { text: label }),
+        el('span', { class: 'ad-tab-n', text: String(rows.length) }),
+        fresh ? el('span', { class: 'ad-tab-new', text: `${fresh} new` }) : null,
+      ].filter(Boolean));
+      btn.addEventListener('click', () => { activeType = value; renderTabs(); render(); });
+      bar.appendChild(btn);
+    }
+  }
+
   function matches(l) {
-    const type = document.getElementById('fType').value;
+    if (activeType && typeOf(l) !== activeType) return false;
     const status = document.getElementById('fStatus').value;
-    const q = document.getElementById('fSearch').value.toLowerCase();
-    if (type && (l.form_name || 'contact') !== type) return false;
     if (status && l.status !== status) return false;
+    const q = document.getElementById('fSearch').value.toLowerCase();
     if (q) {
       const hay = `${l.first_name} ${l.last_name} ${l.email} ${l.agency} ${l.property}`.toLowerCase();
       if (!hay.includes(q)) return false;
@@ -58,70 +81,140 @@ export const prerender = true;
     return true;
   }
 
+  function statusControl(l, badge) {
+    const statusSel = el('select', { class: 'ad-fsel', style: 'max-width:160px' });
+    for (const s of ['new', 'contacted', 'closed']) {
+      const o = el('option', { value: s, text: s[0].toUpperCase() + s.slice(1) });
+      if (l.status === s) o.selected = true;
+      statusSel.appendChild(o);
+    }
+    statusSel.addEventListener('change', async () => {
+      const { error } = await supabase.from('enquiries').update({ status: statusSel.value }).eq('id', l.id);
+      if (error) return toast(error.message, true);
+      l.status = statusSel.value;
+      if (badge) { badge.className = 'ad-badge ' + l.status; badge.textContent = l.status; }
+      renderTabs();
+      toast('Status updated');
+    });
+    return statusSel;
+  }
+
+  function leadName(l) {
+    return `${l.first_name ?? ''} ${l.last_name ?? ''}`.trim() || l.email || 'Anonymous';
+  }
+
+  /* Full card for contact / property / agent leads. */
+  function leadCard(l, { hideProperty = false } = {}) {
+    const details = [
+      ['Email', l.email && el('a', { href: 'mailto:' + l.email, text: l.email, style: 'color:var(--gold)' })],
+      ['Phone', l.phone && el('a', { href: 'tel:' + l.phone, text: l.phone, style: 'color:var(--gold)' })],
+      ['Property', hideProperty ? null : l.property],
+      ['Enquiry type', l.enquiry_type],
+      ['Agency', l.agency],
+      ['Licence no.', l.licence_number],
+      ['Suburb markets', l.suburb_markets],
+      ['Message', l.message],
+    ].filter(([, v]) => v);
+
+    const badge = el('span', { class: 'ad-badge ' + l.status, text: l.status });
+    const statusSel = statusControl(l, badge);
+
+    const notes = el('textarea', { class: 'ad-fta', placeholder: 'Internal notes…', text: l.notes || '', style: 'min-height:60px' });
+    let notesTimer;
+    notes.addEventListener('input', () => {
+      clearTimeout(notesTimer);
+      notesTimer = setTimeout(async () => {
+        const { error } = await supabase.from('enquiries').update({ notes: notes.value }).eq('id', l.id);
+        if (!error) toast('Notes saved');
+      }, 900);
+    });
+
+    const typeLabel = { 'contact': 'Contact', 'property-enquiry': 'Property enquiry', 'agent-application': 'Agent application', 'newsletter': 'Newsletter' }[typeOf(l)] || l.form_name;
+
+    return el('div', { class: 'ad-card' }, [
+      el('div', { style: 'display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px' }, [
+        el('strong', { text: leadName(l), style: 'font-weight:400;font-size:15px' }),
+        badge,
+        el('span', { text: typeLabel, style: 'font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe-d)' }),
+        el('span', { text: fmtDate(l.created_at), style: 'margin-left:auto;font-size:11px;color:var(--taupe-d)' }),
+      ]),
+      el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 20px;margin-bottom:14px' },
+        details.map(([k, v]) => el('div', { style: 'font-size:12.5px' }, [
+          el('span', { text: k + ': ', style: 'color:var(--taupe-d)' }),
+          typeof v === 'string' ? el('span', { text: v }) : v,
+        ])),
+      ),
+      el('div', { style: 'display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap' }, [statusSel, notes]),
+    ]);
+  }
+
+  /* Compact row for newsletter signups — an address and a date, nothing more. */
+  function newsletterRow(l) {
+    const badge = el('span', { class: 'ad-badge ' + l.status, text: l.status });
+    return el('div', { class: 'ad-card', style: 'display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px' }, [
+      el('a', { href: 'mailto:' + l.email, text: l.email, style: 'color:var(--gold);font-size:13.5px' }),
+      badge,
+      el('span', { text: fmtDate(l.created_at), style: 'font-size:11px;color:var(--taupe-d)' }),
+      el('span', { style: 'margin-left:auto' }, [statusControl(l, badge)]),
+    ]);
+  }
+
+  function sectionHeading(text, count) {
+    return el('div', { class: 'ad-lead-sec' }, [
+      el('span', { text }),
+      el('span', { class: 'ad-tab-n', text: String(count) }),
+    ]);
+  }
+
   function render() {
     const box = document.getElementById('leadsBox');
     box.innerHTML = '';
     const rows = all.filter(matches);
     document.getElementById('leadsEmpty').style.display = rows.length ? 'none' : '';
-    for (const l of rows) {
-      const details = [
-        ['Email', l.email && el('a', { href: 'mailto:' + l.email, text: l.email, style: 'color:var(--gold)' })],
-        ['Phone', l.phone && el('a', { href: 'tel:' + l.phone, text: l.phone, style: 'color:var(--gold)' })],
-        ['Property', l.property],
-        ['Enquiry type', l.enquiry_type],
-        ['Agency', l.agency],
-        ['Licence no.', l.licence_number],
-        ['Suburb markets', l.suburb_markets],
-        ['Message', l.message],
-      ].filter(([, v]) => v);
 
-      const statusSel = el('select', { class: 'ad-fsel', style: 'max-width:160px' });
-      for (const s of ['new', 'contacted', 'closed']) {
-        const o = el('option', { value: s, text: s[0].toUpperCase() + s.slice(1) });
-        if (l.status === s) o.selected = true;
-        statusSel.appendChild(o);
+    if (activeType === 'property-enquiry') {
+      /* Broken down further: one section per residence. */
+      const byProperty = new Map();
+      for (const l of rows) {
+        const key = l.property || 'No property specified';
+        if (!byProperty.has(key)) byProperty.set(key, []);
+        byProperty.get(key).push(l);
       }
-      statusSel.addEventListener('change', async () => {
-        const { error } = await supabase.from('enquiries').update({ status: statusSel.value }).eq('id', l.id);
-        if (error) return toast(error.message, true);
-        l.status = statusSel.value;
-        badge.className = 'ad-badge ' + l.status;
-        badge.textContent = l.status;
-        toast('Status updated');
-      });
-
-      const notes = el('textarea', { class: 'ad-fta', placeholder: 'Internal notes…', text: l.notes || '', style: 'min-height:60px' });
-      let notesTimer;
-      notes.addEventListener('input', () => {
-        clearTimeout(notesTimer);
-        notesTimer = setTimeout(async () => {
-          const { error } = await supabase.from('enquiries').update({ notes: notes.value }).eq('id', l.id);
-          if (!error) toast('Notes saved');
-        }, 900);
-      });
-
-      const badge = el('span', { class: 'ad-badge ' + l.status, text: l.status });
-      const typeLabel = { 'contact': 'Contact', 'property-enquiry': 'Property enquiry', 'agent-application': 'Agent application' }[l.form_name || 'contact'] || l.form_name;
-
-      box.appendChild(el('div', { class: 'ad-card' }, [
-        el('div', { style: 'display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px' }, [
-          el('strong', { text: `${l.first_name ?? ''} ${l.last_name ?? ''}`.trim() || 'Anonymous', style: 'font-weight:400;font-size:15px' }),
-          badge,
-          el('span', { text: typeLabel, style: 'font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe-d)' }),
-          el('span', { text: fmtDate(l.created_at), style: 'margin-left:auto;font-size:11px;color:var(--taupe-d)' }),
-        ]),
-        el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 20px;margin-bottom:14px' },
-          details.map(([k, v]) => el('div', { style: 'font-size:12.5px' }, [
-            el('span', { text: k + ': ', style: 'color:var(--taupe-d)' }),
-            typeof v === 'string' ? el('span', { text: v }) : v,
-          ])),
-        ),
-        el('div', { style: 'display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap' }, [statusSel, notes]),
-      ]));
+      for (const [property, leads] of [...byProperty.entries()].sort((a, b) => b[1].length - a[1].length)) {
+        box.appendChild(sectionHeading(property, leads.length));
+        for (const l of leads) box.appendChild(leadCard(l, { hideProperty: true }));
+      }
+      return;
     }
+
+    if (activeType === 'newsletter') {
+      for (const l of rows) box.appendChild(newsletterRow(l));
+      return;
+    }
+
+    if (activeType === '') {
+      /* The overview: every stream in its own section, newest first inside each. */
+      const order = ['property-enquiry', 'contact', 'agent-application', 'newsletter'];
+      const labels = { 'property-enquiry': 'Property enquiries', 'contact': 'General contact', 'agent-application': 'Agent applications', 'newsletter': 'Newsletter signups' };
+      for (const t of order) {
+        const leads = rows.filter((l) => typeOf(l) === t);
+        if (!leads.length) continue;
+        box.appendChild(sectionHeading(labels[t], leads.length));
+        for (const l of leads) box.appendChild(t === 'newsletter' ? newsletterRow(l) : leadCard(l));
+      }
+      /* Anything with an unrecognised form name still shows. */
+      const other = rows.filter((l) => !order.includes(typeOf(l)));
+      if (other.length) {
+        box.appendChild(sectionHeading('Other', other.length));
+        for (const l of other) box.appendChild(leadCard(l));
+      }
+      return;
+    }
+
+    for (const l of rows) box.appendChild(leadCard(l));
   }
 
-  for (const id of ['fType', 'fStatus', 'fSearch']) {
+  for (const id of ['fStatus', 'fSearch']) {
     document.getElementById(id).addEventListener(id === 'fSearch' ? 'input' : 'change', render);
   }
 
@@ -133,7 +226,7 @@ export const prerender = true;
       licence_number: l.licence_number, suburb_markets: l.suburb_markets,
       message: l.message, notes: l.notes,
     }));
-    csvExport(rows, 'sabdia-leads.csv');
+    csvExport(rows, activeType ? `sabdia-leads-${activeType}.csv` : 'sabdia-leads.csv');
   });
 
   await load();

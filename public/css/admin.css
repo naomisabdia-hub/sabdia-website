@@ -52,6 +52,18 @@ body.admin a,body.admin button,body.admin select,body.admin label{cursor:pointer
 .ad-table tr:last-child td{border-bottom:none}
 .ad-table tr.clickable{transition:background .15s}
 .ad-table tr.clickable:hover{background:var(--bg2)}
+/* Lead-type tabs + section headings (Leads Inbox breakdown). */
+.ad-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.ad-tab{display:flex;align-items:center;gap:8px;font-family:var(--font-u);font-size:11px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);background:var(--white);border:1px solid var(--border);padding:9px 14px;cursor:pointer;border-radius:var(--r-sm);transition:border-color .2s,background .2s}
+.ad-tab:hover{border-color:var(--gold)}
+.ad-tab.on{background:var(--dark);color:var(--white);border-color:var(--dark)}
+.ad-tab-n{font-size:10px;color:var(--taupe);border:1px solid var(--border);border-radius:9px;padding:1px 7px;background:var(--bg2)}
+.ad-tab.on .ad-tab-n{color:var(--gold3);border-color:rgba(224,208,168,.3);background:transparent}
+.ad-tab-new{font-size:9px;letter-spacing:.14em;color:#7a5c22;background:rgba(216,201,174,.35);border-radius:9px;padding:2px 8px}
+.ad-tab.on .ad-tab-new{color:var(--gold3);background:rgba(224,208,168,.14)}
+.ad-lead-sec{display:flex;align-items:center;gap:10px;font-family:var(--font-d);font-size:19px;font-weight:400;color:var(--ink);margin:26px 0 12px}
+.ad-lead-sec:first-child{margin-top:4px}
+
 .ad-badge{display:inline-block;padding:3px 10px;font-size:8.5px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;border:1px solid}
 .ad-badge.new{color:#7a5c22;border-color:rgba(180,155,90,.5);background:rgba(216,201,174,.25)}
 .ad-badge.contacted{color:#3d5a46;border-color:rgba(61,90,70,.35);background:rgba(61,90,70,.08)}
