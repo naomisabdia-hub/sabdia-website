@@ -26,8 +26,9 @@ async function listBucketImages() {
     if (error) throw error;
     for (const entry of data ?? []) {
       const path = prefix ? `${prefix}/${entry.name}` : entry.name;
-      if (entry.id === null) {
-        // a folder
+      if (entry.id == null) {
+        /* Folders come back without an object id (null or absent,
+           depending on the client version); files always carry one. */
         if (depth < 2) await walk(path, depth + 1);
       } else if (IMG_EXT.test(entry.name)) {
         out.push({
