@@ -11,6 +11,9 @@ const json = (body: object, status = 200) =>
 
 const env = (key: string) => import.meta.env[key] ?? process.env[key];
 
+/** ip → recent submission timestamps, for the per-instance rate limit. */
+const rateLog = new Map<string, number[]>();
+
 /**
  * Receives form submissions (contact, property enquiry, agent application),
  * stores them in the Supabase `enquiries` table, and optionally emails a
@@ -30,6 +33,30 @@ export const POST: APIRoute = async ({ request }) => {
 
   // Honeypot: pretend success so bots don't retry
   if (fields['bot-field']) return json({ ok: true });
+
+  /* Server-side validation — the client marks fields required, but the
+     endpoint must not accept an empty or unaddressable record. */
+  const email = (fields['email'] ?? '').trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 254) {
+    return json({ error: 'A valid email address is required' }, 400);
+  }
+  const substance = ['first-name', 'last-name', 'message', 'phone', 'agency'].some(
+    (k) => (fields[k] ?? '').trim().length > 0,
+  );
+  if (!substance) return json({ error: 'Please tell us a little about your enquiry' }, 400);
+  for (const k of Object.keys(fields)) fields[k] = String(fields[k]).slice(0, 5000);
+
+  /* Light per-instance rate limit — a bot that beats the honeypot still
+     can't flood the table from one address. (Serverless instances each
+     keep their own window; that's fine for abuse-dampening.) */
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const now = Date.now();
+  const windowStart = now - 60_000;
+  const recent = (rateLog.get(ip) ?? []).filter((t) => t > windowStart);
+  if (recent.length >= 5) return json({ error: 'Too many submissions — please try again shortly' }, 429);
+  recent.push(now);
+  rateLog.set(ip, recent);
+  if (rateLog.size > 1000) rateLog.clear();
 
   const record = {
     form_name: fields['form-name'] || 'contact',

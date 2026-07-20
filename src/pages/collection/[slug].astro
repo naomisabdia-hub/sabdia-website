@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import FilmBand from '../../components/FilmBand.astro';
 import SeriesStrip from '../../components/SeriesStrip.astro';
 import { getContent } from '../../lib/content.js';
+import { imgVariant } from '../../lib/images.js';
 
 const { collection_page: page, series, films, settings } = await getContent('collection_page', 'series', 'films', 'settings');
 
@@ -16,17 +17,29 @@ const posts = series?.byProject?.[slug] ?? [];
 // Editorial story: stitch the strongest captions into prose.
 const story = [...new Set(posts.map((p) => p.caption).filter((c) => c && c.length > 60))].slice(0, 3);
 const others = (page.items || []).filter((i) => i.name !== item.name).slice(0, 3);
+
+const base = (Astro.site ?? new URL('https://www.sabdiaconstructions.com.au')).origin;
+const breadcrumbLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+    { '@type': 'ListItem', position: 2, name: 'The Collection', item: `${base}/collection/` },
+    { '@type': 'ListItem', position: 3, name: item.name, item: `${base}/collection/${slug}/` },
+  ],
+});
 ---
 <Base
   title={`${item.name} | The Sabdia Collection`}
   description={`${item.name} — ${item.loc}. A completed Sabdia residence: ${story[0] ?? 'designed, developed, and constructed entirely in-house.'}`}
   ogTitle={`${item.name} — The Sabdia Collection`}
   ogDescription={story[0] ?? `${item.name}, ${item.loc}`}
-  ogImage={item.image}
+  ogImage={item.image.startsWith('/images/') ? imgVariant(item.image, { w: 1200, h: 630, q: 85 }) : item.image}
 >
+  <script type="application/ld+json" slot="head" is:inline set:html={breadcrumbLd} />
   <!-- HERO -->
   <section class="cd-hero">
-    <img src={item.image} alt={item.name} loading="eager" fetchpriority="high">
+    <img src={item.image.startsWith('/images/') ? imgVariant(item.image, { w: 1920, h: 1080 }) : item.image} alt={item.name} loading="eager" fetchpriority="high" width="1920" height="1080">
     <div class="cd-hero-ov"></div>
     <div class="cd-hero-content">
       <div class="cd-badge reveal">The Sabdia Collection</div>

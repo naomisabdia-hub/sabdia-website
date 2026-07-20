@@ -11,12 +11,22 @@ const [{ settings, contact_page: page }, all] = await Promise.all([
 ]);
 const forSale = all.filter((p) => p.data.status === 'for-sale');
 const socials = settings.socials;
+
+const base = (Astro.site ?? new URL('https://www.sabdiaconstructions.com.au')).origin;
+const contactLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: 'Contact Sabdia Constructions',
+  url: `${base}/contact/`,
+  about: { '@id': `${settings.domainUrl}/#org` },
+});
 ---
 <Base
   title="Contact | Sabdia Constructions"
   description="Get in touch with Sabdia Constructions. Brisbane's leading boutique luxury home builder and developer. Enquire about properties, custom builds, or development partnerships."
   lightNav
 >
+  <script type="application/ld+json" slot="head" is:inline set:html={contactLd} />
   <style is:inline slot="head">
   .contact-page-grid{display:grid;grid-template-columns:5fr 7fr;gap:96px;align-items:start}
   .contact-info-block{padding:44px;background:var(--dark);color:var(--white);margin-top:44px}

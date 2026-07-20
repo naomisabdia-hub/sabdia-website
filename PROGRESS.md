@@ -67,3 +67,35 @@
   properties-to-seed.mjs regeneration briefly reverted QASR's 3D-viewer config because
   src/content/properties/qasr.md is STALE vs the seed/DB — reverted, flagged for handover:
   don't run that script without syncing the markdown first.
+
+## Phase 4 — Enquiries verified (2026-07-20)
+- api/contact.ts hardened: server-side email validation, substance check, 5000-char caps,
+  per-instance rate limit (5/min/IP). Honeypot verified dropping silently.
+- End-to-end PROVEN: contact + property-enquiry + agent-application test submissions all
+  stored in Supabase `enquiries` (status 'new', email test-golive@sabdia.com.au — safe to
+  delete). Invalid email/empty → 400.
+- /admin leads read path verified by design (Clerk third-party auth + "Admin read access"
+  RLS policy vs admin_users); runtime check with Naomi's login due in Phase 8.
+- Resend: dormant (no key). Activation = RESEND_API_KEY + CONTACT_EMAIL (+CONTACT_FROM) in env.
+
+## Phase 5 — SEO & analytics (2026-07-20)
+- Base.astro: EVERY page now ships a complete share card — og:title/description/type/url/
+  site_name/locale/image + twitter:card/title/description/image, with sensible defaults
+  (page title/description, branded 1200×630 default image) and per-page overrides. 13/13
+  pages verified with absolute og:image URLs.
+- JSON-LD extended: ItemList (properties index), ContactPage (contact), BreadcrumbList
+  (collection detail) — joining LocalBusiness (home) + Breadcrumb/Residence (property pages).
+- Sitemap: now 28 URLs — added /privacy/, /accessibility/, all 11 collection detail pages.
+- GA4: gtag wired behind PUBLIC_GA4_ID (dormant until the Measurement ID is pasted in env).
+- Collection detail hero now serves sized variants (was full master).
+
+## Phase 6 — Newsletter (MailerLite) & social (2026-07-20)
+- "The Sabdia Journal" signup band above the footer on every page — CMS-editable copy
+  (new `newsletter` section in admin schemas + seed), honeypot, aria-live status, on-brand
+  success state. Verified live in-browser.
+- /api/subscribe: MailerLite group subscribe when MAILERLITE_API_KEY + MAILERLITE_GROUP_ID
+  are set; until then every signup stores to `enquiries` (form_name 'newsletter') so no
+  address is lost — import into MailerLite on activation. Verified stored.
+- ShareRow on property pages: Facebook/LinkedIn/X/Email + Copy link (clipboard, no 3rd-party
+  scripts). Social profile links verified (footer, contact, mobile menu).
+- Instagram feed embed: deliberately deferred (needs account token) — documented dormant.

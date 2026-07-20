@@ -21,8 +21,14 @@ interface Props {
 
 const { title, description, ogTitle, ogDescription, ogImage, preloadImage, preloadImageSet, preloadImageSizes, preloadImageMedia, lightNav } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-/* Crawlers need og:image absolute; pages pass site-relative paths. */
-const ogImageAbs = ogImage ? new URL(ogImage, Astro.site).href : undefined;
+/* Every page ships a complete share card: pages may override any part,
+   but nothing renders bare when shared. Crawlers need og:image absolute;
+   pages pass site-relative paths. */
+const ogT = ogTitle ?? title;
+const ogD = ogDescription ?? description;
+const OG_DEFAULT = '/api/img?src=%2Fimages%2Fhome-hero-1.jpg&w=1200&h=630&q=85';
+const ogImageAbs = new URL(ogImage ?? OG_DEFAULT, Astro.site).href;
+const gaId = import.meta.env.PUBLIC_GA4_ID;
 ---
 <!DOCTYPE html>
 <html lang="en-AU">
@@ -47,11 +53,19 @@ try {
   else sessionStorage.setItem('sabdia:seen', '1');
 } catch (e) {}
 </script>
-{ogTitle && <meta property="og:title" content={ogTitle}>}
-{(ogDescription || ogTitle) && <meta property="og:description" content={ogDescription ?? description}>}
-{ogTitle && <meta property="og:type" content="website">}
-{ogImageAbs && <meta property="og:image" content={ogImageAbs}>}
-{ogImageAbs && <meta name="twitter:card" content="summary_large_image">}
+<meta property="og:title" content={ogT}>
+<meta property="og:description" content={ogD}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
+<meta property="og:site_name" content="Sabdia Constructions">
+<meta property="og:locale" content="en_AU">
+<meta property="og:image" content={ogImageAbs}>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content={ogT}>
+<meta name="twitter:description" content={ogD}>
+<meta name="twitter:image" content={ogImageAbs}>
+{gaId && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>}
+{gaId && <script is:inline set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','${gaId}');`}></script>}
 <link rel="preload" as="font" type="font/woff2" href="/fonts/jost-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/cormorant-garamond-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-var-italic.woff2" crossorigin>
