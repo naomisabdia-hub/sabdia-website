@@ -349,6 +349,17 @@ function initPage() {
     };
     onScroll(revealSweep);
     revealSweep();
+
+    /* The sweep above only sees the layout as it stands at wire-up time.
+       Hero imagery, web fonts and the gallery grid all settle after that,
+       and each reflow can push a new element into view without a scroll to
+       announce it. The observer normally catches those; these re-checks
+       mean a page that is never scrolled — someone landing deep-linked on
+       a section, or reading without touching the wheel — cannot be left
+       looking at a clipped, empty container. They only ever reveal what is
+       genuinely in view, so nothing below the fold is spoiled. */
+    [220, 800, 2000].forEach((ms) => setTimeout(revealSweep, ms));
+    window.addEventListener('load', revealSweep, { once: true });
   } else {
     document.querySelectorAll(revealSel).forEach((el) => el.classList.add('vis'));
   }
