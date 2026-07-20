@@ -50,6 +50,42 @@ const walkthroughs = {
 };
 const walkthrough = walkthroughs[entry.id];
 
+/* Gallery — the CMS pads galleries by repeating the hero render with
+   different crops (and occasionally another residence's facade). Collapse
+   to one entry per underlying Wix asset, drop other properties' heroes,
+   then re-crop each image for the slot it will occupy. */
+const mediaKey = (src) => src?.match(/\/media\/([^/~]+)/)?.[1] ?? src;
+const otherHeroKeys = new Set(allProps.filter((p) => p.id !== entry.id).map((p) => mediaKey(p.data.image)));
+const seenKeys = new Set();
+const galleryUnique = (d.gallery ?? []).filter((g) => {
+  const k = mediaKey(g.src);
+  if (seenKeys.has(k) || otherHeroKeys.has(k)) return false;
+  seenKeys.add(k);
+  return true;
+});
+const gcount = Math.min(galleryUnique.length, 6);
+/* slot letter per index: a = lead portrait, b/c = right column, d/e/f = bottom rows */
+const slotFor = (i) => (i < 3 ? 'abc'[i] : 'def'[(i - 3) % 3]);
+const slotCrop = (i) => {
+  if (gcount === 1) return { w: 1800, h: 780 };
+  if (gcount === 2) return { w: 1200, h: 900 };
+  const s = slotFor(i);
+  if (s === 'a') return { w: 1200, h: 1500 };
+  if (s === 'b' || s === 'c') return { w: 1100, h: 900 };
+  if (gcount === 4 && i === 3) return { w: 1800, h: 800 };
+  if (gcount === 5) return { w: 1200, h: 700 };
+  return { w: 900, h: 560 };
+};
+const gallery = galleryUnique.map((g, i) => {
+  const { w, h } = slotCrop(i);
+  return {
+    ...g,
+    slot: slotFor(i),
+    src: wixResize(g.src, { w, h, q: 88 }),
+    full: wixResize(g.src, { w: Math.round(w * 1.5), h: Math.round(h * 1.5), q: 85 }),
+  };
+});
+
 const heroImg = wixResize(d.image, { w: 1920, h: 1080, focus: d.focus, q: sold ? 85 : 90 });
 const ogImg = wixResize(d.image, { w: 1200, h: 630, focus: d.focus });
 
@@ -198,16 +234,19 @@ const jsonLd = JSON.stringify({
   </div>
 
   <!-- GALLERY -->
-  <div class="prop-gallery inner">
-    <div class="slabel reveal" style="margin-bottom:28px">Gallery</div>
-    <div class="prop-gallery-grid" id="galleryGrid">
-      {d.gallery.map((g, i) => (
-        <div class={`gallery-item gallery-${'abcdef'[i] ?? 'f'} reveal-wipe ${['', 'd1', 'd2', 'd1', 'd2', 'd3'][i] ?? 'd3'}`} data-lb-item data-src={g.src} data-alt={g.alt} role="button" tabindex="0" aria-label={`View photo: ${g.alt}`}>
-          <img class="gallery-img" src={g.src} alt={g.alt} loading="lazy">
-        </div>
-      ))}
+  {gallery.length > 0 && (
+    <div class="prop-gallery inner">
+      <div class="slabel reveal">Gallery</div>
+      <h2 class="prop-gallery-h reveal d1">The residence, <em>in stills</em>.</h2>
+      <div class={`prop-gallery-grid gn-${gcount}`} id="galleryGrid">
+        {gallery.map((g, i) => (
+          <div class={`gallery-item gallery-${g.slot} reveal-wipe ${['', 'd1', 'd2', 'd1', 'd2', 'd3'][i] ?? 'd3'}`} data-lb-item data-src={g.full} data-alt={g.alt} role="button" tabindex="0" aria-label={`View photo: ${g.alt}`}>
+            <img class="gallery-img" src={g.src} alt={g.alt} loading="lazy">
+          </div>
+        ))}
+      </div>
     </div>
-  </div>
+  )}
 
   <!-- LIGHTBOX -->
   <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer">
@@ -232,14 +271,26 @@ const jsonLd = JSON.stringify({
     />
   )}
 
-  <!-- CINEMATIC WALKTHROUGH -->
-  {walkthrough && <WalkthroughCinema name={d.name} chapters={walkthrough} />}
-
   <!-- 3D VIEWER -->
   <PropertyViewer property={entry} />
 
+  <!-- CINEMATIC WALKTHROUGH -->
+  {walkthrough && <WalkthroughCinema name={d.name} chapters={walkthrough} />}
+
   <!-- THE SERIES -->
   <SeriesStrip items={seriesPosts} name={d.name} label={series?.label} handle={series?.handle} instagramUrl={settings.socials.instagram.url} />
+
+  <!-- CLOSING ENQUIRY -->
+  {!sold && (
+    <section class="prop-cta">
+      <div class="inner prop-cta-inner">
+        <div class="slabel slabel-dark reveal" style="justify-content:center">Private Viewings</div>
+        <h2 class="prop-cta-h reveal d1">See {d.name} <em>in person</em>.</h2>
+        <p class="prop-cta-p reveal d2">Inspections are by private appointment. Register your interest and our team will be in touch within one business day.</p>
+        <a href="#cform" class="btn-p reveal d3">Enquire About {d.name} &rarr;</a>
+      </div>
+    </section>
+  )}
 
   <script is:inline>
   (function () {
