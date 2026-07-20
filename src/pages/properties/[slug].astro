@@ -124,7 +124,10 @@ const jsonLd = JSON.stringify({
     <div class="prop-hero-content inner">
       <div class="prop-status" style={sold ? 'margin-bottom:14px' : undefined}>
         <div class={`prop-status-dot ${sold ? 'sold' : 'active'}`}></div>
-        <span style="font-size:10.5px;font-weight:400;letter-spacing:.28em;text-transform:uppercase;color:rgba(253,251,246,.8)">{statusLabel}</span>
+        {/* Only the colour is set inline — size, weight, tracking and case
+            all inherit from .prop-status so the label can be sized in one
+            place. An inline font-size here silently outranks the stylesheet. */}
+        <span style="color:rgba(253,251,246,.88)">{statusLabel}</span>
       </div>
       <div class="prop-name">{d.name}</div>
       <div class="prop-loc">{d.suburb}, {d.state}</div>
