@@ -107,6 +107,12 @@ body.admin a,body.admin button,body.admin select,body.admin label{cursor:pointer
 .ad-login .ad-fi:focus{border-color:var(--gold2)}
 .ad-login-note{margin-top:18px;text-align:center;font-size:11.5px;font-weight:300;color:rgba(253,252,248,.4);line-height:1.7}
 .ad-login-note a{color:var(--gold2)}
+/* Clerk mode — drop our card chrome so Clerk's (dark-themed) card stands
+   alone beneath the Sabdia wordmark. */
+.ad-login-card.clerk-on{background:transparent;border:none;padding:0}
+.ad-login-card.clerk-on img{margin-bottom:10px}
+.ad-login-card.clerk-on .ad-login-sub{margin-bottom:26px}
+.ad-login-card.clerk-on #clerkMount{display:flex;justify-content:center}
 
 /* Misc */
 .ad-empty{padding:56px 20px;text-align:center;font-family:var(--font-d);font-size:19px;font-style:italic;font-weight:300;color:var(--taupe)}

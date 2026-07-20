@@ -43,8 +43,10 @@ export const prerender = true;
   const next = params.get('next') || '/admin/';
 
   if (clerkMode) {
-    // Clerk owns sign-in: hide the Supabase form and mount Clerk's UI.
+    // Clerk owns sign-in: hide the Supabase form and mount Clerk's UI,
+    // styled dark so it reads as one piece with the Sabdia portal frame.
     document.getElementById('loginForm').style.display = 'none';
+    document.querySelector('.ad-login-card').classList.add('clerk-on');
     const mount = document.getElementById('clerkMount');
     mount.style.display = '';
     const clerk = await getClerk();
@@ -56,7 +58,25 @@ export const prerender = true;
     if (!clerk.user || params.get('denied')) {
       clerk.mountSignIn(mount, {
         forceRedirectUrl: next,
-        appearance: { variables: { colorPrimary: '#9E8B6A' } },
+        appearance: {
+          variables: {
+            colorPrimary: '#9E8B6A',
+            colorBackground: '#171613',
+            colorInputBackground: '#0E0D0B',
+            colorText: '#FDFCF8',
+            colorInputText: '#FDFCF8',
+            colorTextSecondary: 'rgba(253,252,248,.55)',
+            colorTextOnPrimaryBackground: '#FDFCF8',
+            colorNeutral: '#FDFCF8',
+            colorDanger: '#C4694C',
+            borderRadius: '2px',
+            fontFamily: "'Jost', system-ui, sans-serif",
+          },
+          elements: {
+            card: { boxShadow: 'none', border: '1px solid rgba(255,255,255,.09)' },
+            rootBox: { width: '100%' },
+          },
+        },
       });
       if (!params.get('denied')) note.textContent = 'Trouble signing in? Ask an administrator to check your access.';
     }
