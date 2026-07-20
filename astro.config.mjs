@@ -7,6 +7,12 @@ export default defineConfig({
   // immediately, with no rebuild step.
   output: 'server',
   adapter: vercel(),
+  /* Astro's CSRF origin check compares against the app-perceived origin,
+     which on Vercel is the internal deployment host — so it 403s every
+     legitimate same-origin form POST. Each mutating endpoint carries its
+     own protection instead (honeypot + rate limit on public forms,
+     admin bearer auth on /api/ai). */
+  security: { checkOrigin: false },
   /* Under ClientRouter a click is dead time until the new page's HTML
      arrives, and every page here is rendered on demand against Supabase —
      so that wait is a server render, not a cache hit. Prefetching on hover
