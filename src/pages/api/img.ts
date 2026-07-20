@@ -18,6 +18,8 @@ export const prerender = false;
 const SUPABASE_MEDIA = /^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\//;
 const FP = /^fp_(0(?:\.\d+)?|1(?:\.0+)?)_(0(?:\.\d+)?|1(?:\.0+)?)$/;
 
+const env = (key: string) => import.meta.env[key] ?? process.env[key];
+
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
 
 export const GET: APIRoute = async ({ url, request }) => {
@@ -32,7 +34,14 @@ export const GET: APIRoute = async ({ url, request }) => {
     return new Response('Bad request', { status: 400 });
   }
 
-  const sourceUrl = local ? new URL(src, request.url) : new URL(src);
+  /* Local masters are fetched over HTTP (public/ lives on the CDN, not the
+     function filesystem). request.url inside a Vercel function carries the
+     unique deployment host, which deployment protection intercepts — so on
+     Vercel we fetch via the always-public production alias instead. */
+  const publicHost = env('VERCEL_PROJECT_PRODUCTION_URL');
+  const sourceUrl = local
+    ? new URL(src, publicHost ? `https://${publicHost}` : request.url)
+    : new URL(src);
   const upstream = await fetch(sourceUrl);
   if (!upstream.ok) return new Response('Source not found', { status: 404 });
   const input = Buffer.from(await upstream.arrayBuffer());

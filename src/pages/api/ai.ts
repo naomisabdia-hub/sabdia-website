@@ -121,8 +121,10 @@ export const POST: APIRoute = async ({ request, url }) => {
     const local = src.startsWith('/images/') || src.startsWith('/api/img');
     const remote = /^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\//.test(src);
     if (!local && !remote) return json({ error: 'Set a hero image first, then ask for alt text.' }, 400);
+    const publicHost = env('VERCEL_PROJECT_PRODUCTION_URL');
+    const base = publicHost ? `https://${publicHost}` : url;
     const imgUrl = local
-      ? new URL(`/api/img?src=${encodeURIComponent(src.startsWith('/api/img') ? new URL(src, url).searchParams.get('src')! : src)}&w=800&h=600`, url)
+      ? new URL(`/api/img?src=${encodeURIComponent(src.startsWith('/api/img') ? new URL(src, url).searchParams.get('src')! : src)}&w=800&h=600`, base)
       : new URL(src);
     const resp = await fetch(imgUrl);
     if (!resp.ok) return json({ error: 'Could not load the hero image to describe it.' }, 400);
