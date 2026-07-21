@@ -35,6 +35,7 @@ const { name, base } = Astro.props;
           <span class="sw-cap-label"></span>
         </div>
         <div class="sw-progress" aria-hidden="true"><i></i></div>
+        <nav class="sw-rooms" aria-label="Rooms"></nav>
         <div class="sw-hint" aria-hidden="true">
           <svg width="12" height="18" viewBox="0 0 12 18" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="10" height="16" rx="5"/><path d="M6 4v4"/></svg>
           <span>Scroll to walk</span>
@@ -77,9 +78,32 @@ const { name, base } = Astro.props;
       canvas.height = m.h;
       /* ~15px of scroll per frame so the walk feels unhurried */
       track.style.height = Math.max(320, Math.round((total * 15) / 8)) + 'vh';
+      buildRooms();
       loadFrame(1);
       loadPass();
       update();
+    }
+
+    /* Room menu: selecting a room scrolls the page to that segment, so
+       the camera glides through the house to it. */
+    var rooms = section.querySelector('.sw-rooms');
+    function scrollToChapter(c) {
+      var ch = manifest.chapters[c];
+      var mid = ch.start + Math.min(ch.count - 1, 6);
+      var p = mid / (total - 1);
+      var top = track.getBoundingClientRect().top + window.pageYOffset;
+      var span = track.offsetHeight - window.innerHeight;
+      window.scrollTo({ top: top + p * span, behavior: 'smooth' });
+    }
+    function buildRooms() {
+      manifest.chapters.forEach(function (ch, c) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'sw-room';
+        b.textContent = ch.label;
+        b.addEventListener('click', function () { scrollToChapter(c); });
+        rooms.appendChild(b);
+      });
     }
 
     function url(i) { return base + '/f' + String(i).padStart(4, '0') + '.webp'; }
@@ -165,6 +189,8 @@ const { name, base } = Astro.props;
         capNum.textContent = roman[c] || String(c + 1);
         capLabel.textContent = manifest.chapters[c].label;
         caption.classList.add('sw-cap-show');
+        var btns = rooms.children;
+        for (var b = 0; b < btns.length; b++) btns[b].classList.toggle('sw-room-on', b === c);
       }
     }
 
