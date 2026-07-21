@@ -27,6 +27,16 @@ const isHome = Astro.url.pathname === '/';
      nav's scrolled state the way the scroll-progress hairline is. -->
 <div class="nav-load" id="navLoad" aria-hidden="true"></div>
 
+<!-- Navigation veil — the black SABDIA frame shown over every page change
+     while the next page renders behind it (owner request). The element is
+     replaced with each body; main.js drives it via the html.nav-veil class,
+     which survives the swap. The homepage intro (#loader) stays a separate,
+     longer, once-per-session moment. -->
+<div id="navVeil" aria-hidden="true">
+  <img src={settings.logo} alt="" loading="eager">
+  <div class="nv-rule"></div>
+</div>
+
 {isHome && (
   <div id="loader" aria-hidden="true">
     <div class="ld-logo">

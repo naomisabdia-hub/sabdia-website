@@ -82,6 +82,38 @@ document.addEventListener('astro:after-preparation', () => {
   setTimeout(() => document.documentElement.classList.remove('nav-done'), 600);
 });
 
+/* ── NAVIGATION VEIL — black SABDIA frame over every page change ──
+   Owner request: each navigation shows the wordmark while the next page
+   renders behind it. Raised the instant the fetch starts; on page-load
+   it is held to a minimum on-screen time so it reads as a deliberate
+   frame rather than a flash. The veil element is replaced with each
+   body — the class lives on <html>, which survives the swap. Reduced
+   motion skips the artificial hold but keeps the covering itself. */
+const VEIL_MIN_MS = 1400;
+let veilShownAt = 0;
+let veilTimer = 0;
+document.addEventListener('astro:before-preparation', () => {
+  /* A pending hide from the previous navigation must not strip the veil
+     part-way through this one (two quick clicks in succession). */
+  clearTimeout(veilTimer);
+  veilShownAt = Date.now();
+  document.documentElement.classList.add('nav-veil');
+});
+/* The swap resets <html> attributes to the incoming page's, which wipes
+   the class raised above. after-swap runs synchronously inside the swap —
+   re-asserting here means no frame is ever painted without the veil. */
+document.addEventListener('astro:after-swap', () => {
+  if (veilShownAt) document.documentElement.classList.add('nav-veil');
+});
+document.addEventListener('astro:page-load', () => {
+  if (!veilShownAt) return; // initial full load — the homepage intro owns that moment
+  const hold = reduceMotion ? 0 : Math.max(0, VEIL_MIN_MS - (Date.now() - veilShownAt));
+  veilTimer = setTimeout(() => {
+    veilShownAt = 0;
+    document.documentElement.classList.remove('nav-veil');
+  }, hold);
+});
+
 /* A navigation cancels any open overlay, and body scroll-lock is set
    on the old body — but Astro carries inline style across the swap,
    so a lightbox left open would strand the next page unscrollable. */

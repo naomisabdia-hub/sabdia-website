@@ -21,7 +21,13 @@
 export async function onRequest(context, next) {
   const response = await next();
   const path = context.url.pathname;
+  /* Production only. On Vercel the edge consumes s-maxage/SWR and strips
+     them from the client response; the dev server passes them through,
+     where the BROWSER honours stale-while-revalidate — so during local
+     work, client-side navigations swap in day-old cached HTML and edits
+     seem not to apply. */
   if (
+    import.meta.env.PROD &&
     context.request.method === 'GET' &&
     response.status === 200 &&
     !path.startsWith('/admin') &&
