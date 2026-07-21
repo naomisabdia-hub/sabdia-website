@@ -47,16 +47,15 @@ Plus surgical removals inside files that still exist:
 - `src/lib/seed-properties.json` — QASR's `viewer_type: "model"` + model/poster URLs
 - `package.json` — `three`, `three-mesh-bvh` dependencies
 
-### Data that was NOT in git
+### The models themselves
 
-- The QASR model itself lived in Supabase storage:
-  `media/models/qasr-maquette.glb` (+ `qasr-maquette-poster.jpg`).
-  These are **publicly downloadable** as long as they stay in the bucket —
-  delete them from Supabase (Storage → media → models) to fully withdraw
-  the model, and keep a private copy offline if we ever want it again.
-- The live `properties` table row for QASR may still have
-  `viewer_type = 'model'` — harmless (nothing reads it), but tidy to set
-  to `none` in the admin database.
+The QASR model files (three GLBs + two poster images) originally lived in
+public Supabase storage (`media/models/`). On 22 July 2026 they were
+**deleted from the bucket** so they are no longer downloadable, and are
+archived **privately, outside this repository** (the repo is public while
+the site is being built). Ask Naomi for the private archive if a model is
+ever needed again — then upload it to Supabase storage and point the
+property's model URL at it.
 
 ### How to restore
 

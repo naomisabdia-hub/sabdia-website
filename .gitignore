@@ -6,3 +6,7 @@ dist/
 .env
 .vercel
 .env.backup*
+.DS_Store
+
+# Private archive (QASR 3D models etc.) — NEVER commit while the repo is public
+archive/
