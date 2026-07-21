@@ -46,9 +46,9 @@ const withV = (p) => (assetV ? `${p}?v=${assetV}` : p);
 <title>{title}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonical}>
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href={withV('/favicon-32.png')}>
+<link rel="icon" type="image/png" sizes="16x16" href={withV('/favicon-16.png')}>
+<link rel="apple-touch-icon" href={withV('/apple-touch-icon.png')}>
 <script is:inline>
 document.documentElement.classList.add('js');
 /* Runs before first paint so the loader never flashes on a repeat visit.
