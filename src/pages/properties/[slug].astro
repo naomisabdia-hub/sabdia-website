@@ -2,7 +2,6 @@
 import Base from '../../layouts/Base.astro';
 import CustomSections from '../../components/CustomSections.astro';
 import PropertyCard from '../../components/PropertyCard.astro';
-import PropertyViewer from '../../components/PropertyViewer.astro';
 import FilmBand from '../../components/FilmBand.astro';
 import SeriesStrip from '../../components/SeriesStrip.astro';
 import ShareRow from '../../components/ShareRow.astro';
@@ -279,9 +278,6 @@ const jsonLd = JSON.stringify({
       captionRight={`${d.suburb}, ${d.state}`}
     />
   )}
-
-  <!-- 3D VIEWER -->
-  <PropertyViewer property={entry} />
 
   <!-- CINEMATIC WALKTHROUGH -->
   {scrollwalk

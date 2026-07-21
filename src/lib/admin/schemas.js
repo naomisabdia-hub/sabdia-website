@@ -710,11 +710,4 @@ export const propertySchema = [
   { key: 'enquiry_text', label: 'Enquiry box text', type: 'textarea' },
   { key: 'enquiry_button', label: 'Enquiry button text', type: 'text' },
   { key: 'brochure_url', label: 'Brochure (PDF)', type: 'file', folder: 'brochures', accept: 'application/pdf' },
-  {
-    key: 'viewer_type', label: '3D viewer', type: 'select',
-    options: [['none', 'None'], ['model', '3D model (GLB file)'], ['tour', 'Virtual tour (Matterport / 360°)']],
-  },
-  { key: 'model_url', label: '3D model file (.glb)', type: 'file', folder: 'models', accept: '.glb,.gltf,model/gltf-binary' },
-  { key: 'poster_url', label: '3D viewer poster image', type: 'image', folder: 'models', help: 'shown while the model loads' },
-  { key: 'tour_url', label: 'Virtual tour link', type: 'text', help: 'the embed URL from Matterport or similar' },
 ];
