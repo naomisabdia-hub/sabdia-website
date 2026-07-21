@@ -40,7 +40,7 @@ const intro = page.introTemplate.replace('{count}', countWord(forSale.length));
    key, so the fallback lives here in code, not only in the seed. */
 const heroImage = page.hero?.image || '/images/qasr-hero.jpg';
 ---
-<Base title="Properties For Sale | Sabdia Constructions" description={description}>
+<Base title="Properties For Sale | Sabdia Constructions" description={description} preloadImage={imgVariant(heroImage, { w: 1920, h: 1080 })}>
   <script type="application/ld+json" slot="head" is:inline set:html={itemListLd} />
   <style is:inline slot="head">
   .prop-toolbar{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:18px clamp(22px,5vw,80px);background:var(--bg2);border-bottom:1px solid var(--border)}

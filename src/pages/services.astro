@@ -11,6 +11,7 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
 ]);
 ---
 <Base
+  preloadImage={imgVariant(page.hero.image, { w: 1920, h: 1080 })}
   title="Services | Sabdia Constructions"
   description="Full-spectrum luxury residential development services — design, development management, interior architecture, and expert construction by Sabdia Constructions, Brisbane."
   ogTitle="Services — Sabdia Constructions"

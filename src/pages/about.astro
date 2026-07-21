@@ -7,6 +7,7 @@ import { imgVariant } from '../lib/images.js';
 const { about_page: page } = await getContent('about_page');
 ---
 <Base
+  preloadImage={imgVariant(page.hero.image, { w: 1920, h: 1080 })}
   title="About | Sabdia Constructions"
   description="Boutique luxury home builder and developer in inner Brisbane since 2013. Learn about Sabdia's story, values, and integrated approach to luxury residential development."
   ogTitle="About — Sabdia Constructions"

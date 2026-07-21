@@ -91,11 +91,9 @@ document.addEventListener('astro:after-preparation', () => {
    motion skips the artificial hold but keeps the covering itself. */
 const VEIL_MIN_MS = 1400;
 let veilShownAt = 0;
-let veilTimer = 0;
+let veilNav = 0; // navigation token — a newer navigation invalidates pending hides
 document.addEventListener('astro:before-preparation', () => {
-  /* A pending hide from the previous navigation must not strip the veil
-     part-way through this one (two quick clicks in succession). */
-  clearTimeout(veilTimer);
+  veilNav++;
   veilShownAt = Date.now();
   document.documentElement.classList.add('nav-veil');
 });
@@ -107,11 +105,25 @@ document.addEventListener('astro:after-swap', () => {
 });
 document.addEventListener('astro:page-load', () => {
   if (!veilShownAt) return; // initial full load — the homepage intro owns that moment
+  const nav = veilNav;
   const hold = reduceMotion ? 0 : Math.max(0, VEIL_MIN_MS - (Date.now() - veilShownAt));
-  veilTimer = setTimeout(() => {
+  /* Hold the veil until the incoming page's header image has painted, so
+     the reveal is a composed page, never a bare header band waiting on a
+     cold image render. Capped — a missing or dead hero can't lock the
+     door — and the minimum hold still applies to fast, cached arrivals. */
+  const hero = document.querySelector('.page-hero img, .prop-hero img, .hero img, .h-slides img');
+  const heroReady = new Promise((done) => {
+    if (!hero || hero.complete) return done();
+    hero.addEventListener('load', done, { once: true });
+    hero.addEventListener('error', done, { once: true });
+    setTimeout(done, reduceMotion ? 900 : 2800);
+  });
+  const minHold = new Promise((done) => setTimeout(done, hold));
+  Promise.all([minHold, heroReady]).then(() => {
+    if (nav !== veilNav) return; // a newer navigation owns the veil now
     veilShownAt = 0;
     document.documentElement.classList.remove('nav-veil');
-  }, hold);
+  });
 });
 
 /* A navigation cancels any open overlay, and body scroll-lock is set
