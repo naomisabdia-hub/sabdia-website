@@ -1,0 +1,194 @@
+---
+/**
+ * Scroll-driven cinematic walkthrough.
+ *
+ * As the visitor scrolls, they are carried through the residence — a
+ * sticky 9:16 cinema frame scrubs a pre-rendered WebP frame sequence
+ * (studio render clips + AI aerial opener) in perfect sync with the
+ * scroll position, with chapter captions dissolving in and out.
+ *
+ * Frames live in Supabase storage (media/scrollwalk/<slug>/fNNNN.webp,
+ * numbered globally). A frame sequence — not a <video> — because mobile
+ * Safari cannot seek video smoothly; canvas blitting scrubs at 60fps
+ * everywhere. Frames lazy-load in three passes (every 8th → every 2nd →
+ * all) starting when the section approaches the viewport.
+ *
+ * Props: name (residence), base (frames URL prefix). The manifest
+ * ({ total, w, h, chapters: [{ label, start, count }] }) is fetched from
+ * `${base}/manifest.json` at runtime, so adding a property needs only a
+ * frames folder in storage — no code change.
+ */
+const { name, base } = Astro.props;
+---
+<section class="sw-section" id="scrollwalk" data-base={base}>
+  <div class="sw-intro inner">
+    <div class="slabel reveal">The Walkthrough</div>
+    <h2 class="sw-h reveal d1">Scroll to move <em>through {name}</em>.</h2>
+  </div>
+  <div class="sw-track" style="height:480vh">
+    <div class="sw-sticky">
+      <div class="sw-stage">
+        <canvas class="sw-canvas" width="640" height="1138"></canvas>
+        <div class="sw-vignette" aria-hidden="true"></div>
+        <div class="sw-caption" aria-live="polite">
+          <span class="sw-cap-num"></span>
+          <span class="sw-cap-label"></span>
+        </div>
+        <div class="sw-progress" aria-hidden="true"><i></i></div>
+        <div class="sw-hint" aria-hidden="true">
+          <svg width="12" height="18" viewBox="0 0 12 18" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="10" height="16" rx="5"/><path d="M6 4v4"/></svg>
+          <span>Scroll to walk</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  /* Re-runs per navigation — immediate call + per-element guard, per the
+     site-wide astro:page-load pattern. */
+  function sabdiaScrollWalkInit() {
+    var section = document.querySelector('.sw-section');
+    if (!section || section.dataset.swInit) return;
+    section.dataset.swInit = '1';
+
+    var manifest = null;
+    var base = section.dataset.base;
+    var canvas = section.querySelector('.sw-canvas');
+    var ctx = canvas.getContext('2d');
+    var track = section.querySelector('.sw-track');
+    var capNum = section.querySelector('.sw-cap-num');
+    var capLabel = section.querySelector('.sw-cap-label');
+    var caption = section.querySelector('.sw-caption');
+    var progress = section.querySelector('.sw-progress i');
+    var hint = section.querySelector('.sw-hint');
+
+    var total = 0;
+    var frames = [];
+    var loadedMax = 0;
+    var current = -1;
+    var chapterAt = -1;
+
+    function boot(m) {
+      manifest = m;
+      total = m.total;
+      frames = new Array(total + 1);
+      canvas.width = m.w;
+      canvas.height = m.h;
+      /* ~15px of scroll per frame so the walk feels unhurried */
+      track.style.height = Math.max(320, Math.round((total * 15) / 8)) + 'vh';
+      loadFrame(1);
+      loadPass();
+      update();
+    }
+
+    function url(i) { return base + '/f' + String(i).padStart(4, '0') + '.webp'; }
+
+    function loadFrame(i, cb) {
+      if (frames[i]) { cb && cb(); return; }
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.decoding = 'async';
+      img.onload = function () { frames[i] = img; if (i > loadedMax) loadedMax = i; cb && cb(); draw(); };
+      img.src = url(i);
+    }
+
+    /* coarse → medium → full loading passes */
+    var passes = [8, 2, 1];
+    var passIdx = 0;
+    var started = false;
+    function loadPass() {
+      if (!manifest || passIdx >= passes.length) return;
+      var step = passes[passIdx];
+      var pending = 0;
+      for (var i = 1; i <= total; i += step) {
+        if (!frames[i]) { pending++; loadFrame(i, done); }
+      }
+      passIdx++;
+      if (!pending) loadPass();
+      function done() { if (--pending <= 0) loadPass(); }
+    }
+    function start() {
+      if (started) return;
+      started = true;
+      fetch(base + '/manifest.json')
+        .then(function (r) { return r.json(); })
+        .then(boot)
+        .catch(function (e) { console.error('[scrollwalk] manifest failed', e); });
+    }
+
+    function nearestLoaded(i) {
+      for (var d = 0; d < total; d++) {
+        if (frames[i - d]) return i - d;
+        if (frames[i + d]) return i + d;
+      }
+      return 0;
+    }
+
+    function draw() {
+      var want = targetFrame();
+      var have = nearestLoaded(want);
+      if (!have || have === current) return;
+      current = have;
+      ctx.drawImage(frames[have], 0, 0, canvas.width, canvas.height);
+    }
+
+    var frameF = 0;
+    function targetFrame() {
+      return Math.min(total, Math.max(1, Math.round(frameF)));
+    }
+
+    function chapterFor(i) {
+      for (var c = manifest.chapters.length - 1; c >= 0; c--) {
+        if (i - 1 >= manifest.chapters[c].start) return c;
+      }
+      return 0;
+    }
+
+    var roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+    function update() {
+      if (!manifest) return;
+      var rect = track.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var span = rect.height - vh;
+      var p = span > 0 ? Math.min(1, Math.max(0, -rect.top / span)) : 0;
+      frameF = 1 + p * (total - 1);
+      var want = targetFrame();
+      draw();
+      progress.style.transform = 'scaleY(' + p + ')';
+      if (p > 0.015) hint.classList.add('sw-hidden');
+      var c = chapterFor(want);
+      if (c !== chapterAt) {
+        chapterAt = c;
+        caption.classList.remove('sw-cap-show');
+        void caption.offsetWidth; /* restart transition */
+        capNum.textContent = roman[c] || String(c + 1);
+        capLabel.textContent = manifest.chapters[c].label;
+        caption.classList.add('sw-cap-show');
+      }
+    }
+
+    var ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; update(); });
+    }
+
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { start(); io.disconnect(); }
+        });
+      }, { rootMargin: '1200px 0px' });
+      io.observe(section);
+    } else {
+      start();
+    }
+    window.addEventListener('scroll', function () { start(); onScroll(); }, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+  }
+  sabdiaScrollWalkInit();
+  document.addEventListener('astro:page-load', sabdiaScrollWalkInit);
+</script>

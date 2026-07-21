@@ -7,6 +7,7 @@ import FilmBand from '../../components/FilmBand.astro';
 import SeriesStrip from '../../components/SeriesStrip.astro';
 import ShareRow from '../../components/ShareRow.astro';
 import WalkthroughCinema from '../../components/WalkthroughCinema.astro';
+import ScrollWalk from '../../components/ScrollWalk.astro';
 import { imgVariant, landLabel } from '../../lib/images.js';
 import { getProperties, getProperty } from '../../lib/db.js';
 import { getContent } from '../../lib/content.js';
@@ -54,6 +55,13 @@ const walkthroughs = {
   ],
 };
 const walkthrough = walkthroughs[entry.id];
+
+/* Scroll-driven walkthrough — frame sequences in media/scrollwalk/<slug>/;
+   a property appears here once its frames + manifest.json are uploaded.
+   Replaces the chaptered cinema player for these properties. */
+const SW = 'https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/scrollwalk';
+const scrollwalks = { qasr: `${SW}/qasr` };
+const scrollwalk = scrollwalks[entry.id];
 
 /* Gallery — entries arrive deduped from the data layer (see db.js);
    here each image is re-cropped for the layout slot it will occupy. */
@@ -276,7 +284,9 @@ const jsonLd = JSON.stringify({
   <PropertyViewer property={entry} />
 
   <!-- CINEMATIC WALKTHROUGH -->
-  {walkthrough && <WalkthroughCinema name={d.name} chapters={walkthrough} />}
+  {scrollwalk
+    ? <ScrollWalk name={d.name} base={scrollwalk} />
+    : walkthrough && <WalkthroughCinema name={d.name} chapters={walkthrough} />}
 
   <!-- THE SERIES -->
   <SeriesStrip items={seriesPosts} name={d.name} label={series?.label} handle={series?.handle} instagramUrl={settings.socials.instagram.url} />
