@@ -100,3 +100,27 @@ ever needed; the web-encoded deliverables are safe in Supabase.
   folder page (`a[href*=".mp4"]`) and download individually with retry.
 - n8n is NOT in the company stack (build prompt is wrong about that).
 - Heston/Veridicus no longer engaged — everything is Naomi/company-owned.
+
+---
+
+## UPDATE (later on 2026-07-21): Real model + walk-inside tour
+
+- Muhammad delivered **BVA.obj (860MB) + BVA.mtl + 245 textures** in the same
+  Dropbox share. Converted locally (ZERO Higgsfield credits): Blender 5.2
+  import → mm→m scale → placeholder cleanup → GLB → gltf-transform
+  (draco+webp) = **24.5MB `media/models/qasr-full.glb`**, new poster too.
+  `properties` row already PATCHED — the real model is LIVE in the orbit
+  viewer now. Master .blend survives in session scratchpad `bva/BVA-clean.blend`.
+- Cleanups baked in: purple SketchUp placeholder slabs recolored to concrete
+  grey (Color_J06 garage floor, Color_I07, M_0115_MediumPurple), boundary
+  plane/strip/magenta marker deleted. Decor blues (Navy/Cobalt/etc.) kept.
+- **NEW: "Step inside" walk mode** (commit c320b30, built + locally verified,
+  NOT YET DEPLOYED): three.js first-person tour, code-split (~170KB gz on
+  click only), BVH-accelerated floor-follow (raycast 110ms→0.6ms), spawns on
+  the living level (area-weighted centroid + mid-height slab pick), WASD +
+  pointer-lock desktop / joystick + drag mobile. Draco decoders self-hosted
+  at public/js/vendor/draco/.
+- **BLOCKED, needs Naomi:** `git push origin refine/go-live && git push
+  origin refine/go-live:main` (auto-deploy ships it) — or `vercel deploy
+  --prod`. Both were denied by the session's permission classifier.
+- Verified on production: model-viewer orbit loads the draco GLB fine.
