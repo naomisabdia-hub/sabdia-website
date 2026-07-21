@@ -76,12 +76,13 @@ const { name, base } = Astro.props;
       frames = new Array(total + 1);
       canvas.width = m.w;
       canvas.height = m.h;
-      /* ~15px of scroll per frame so the walk feels unhurried */
-      track.style.height = Math.max(320, Math.round((total * 15) / 8)) + 'vh';
+      /* ~12px of scroll per frame — unhurried but not endless */
+      track.style.height = Math.max(320, Math.round((total * 12) / 8)) + 'vh';
       buildRooms();
       loadFrame(1);
       loadPass();
       update();
+      displayF = frameF; /* start exactly where the scroll sits */
     }
 
     /* Room menu: selecting a room scrolls the page to that segment, so
@@ -149,17 +150,48 @@ const { name, base } = Astro.props;
       return 0;
     }
 
+    /* displayF eases toward the scroll target every animation frame, and
+       adjacent frames are alpha-blended for the fractional part — the
+       scrub glides instead of stepping. */
+    var frameF = 1;
+    var displayF = 1;
+    var lastDrawnA = -1, lastDrawnB = -1, lastAlpha = -1;
     function draw() {
-      var want = targetFrame();
-      var have = nearestLoaded(want);
-      if (!have || have === current) return;
-      current = have;
-      ctx.drawImage(frames[have], 0, 0, canvas.width, canvas.height);
+      if (!total) return;
+      var f = Math.min(total, Math.max(1, displayF));
+      var i0 = nearestLoaded(Math.floor(f));
+      var i1 = nearestLoaded(Math.min(total, Math.floor(f) + 1));
+      var a = i1 > i0 ? f - Math.floor(f) : 0;
+      if (i0 === lastDrawnA && i1 === lastDrawnB && Math.abs(a - lastAlpha) < 0.02) return;
+      lastDrawnA = i0; lastDrawnB = i1; lastAlpha = a;
+      if (!i0) return;
+      ctx.globalAlpha = 1;
+      ctx.drawImage(frames[i0], 0, 0, canvas.width, canvas.height);
+      if (a > 0.02 && frames[i1]) {
+        ctx.globalAlpha = a;
+        ctx.drawImage(frames[i1], 0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1;
+      }
+      current = i0;
     }
 
-    var frameF = 0;
     function targetFrame() {
       return Math.min(total, Math.max(1, Math.round(frameF)));
+    }
+
+    /* glide loop runs while the section is on screen */
+    var looping = false;
+    function loop() {
+      if (!looping) return;
+      displayF += (frameF - displayF) * 0.22;
+      if (Math.abs(frameF - displayF) < 0.01) displayF = frameF;
+      draw();
+      requestAnimationFrame(loop);
+    }
+    function setLooping(on) {
+      if (on === looping) return;
+      looping = on;
+      if (on) requestAnimationFrame(loop);
     }
 
     function chapterFor(i) {
@@ -169,7 +201,7 @@ const { name, base } = Astro.props;
       return 0;
     }
 
-    var roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+    var roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI'];
     function update() {
       if (!manifest) return;
       var rect = track.getBoundingClientRect();
@@ -177,8 +209,8 @@ const { name, base } = Astro.props;
       var span = rect.height - vh;
       var p = span > 0 ? Math.min(1, Math.max(0, -rect.top / span)) : 0;
       frameF = 1 + p * (total - 1);
+      setLooping(rect.bottom > -vh && rect.top < vh * 2);
       var want = targetFrame();
-      draw();
       progress.style.transform = 'scaleY(' + p + ')';
       if (p > 0.015) hint.classList.add('sw-hidden');
       var c = chapterFor(want);
