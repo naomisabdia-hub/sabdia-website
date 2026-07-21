@@ -28,7 +28,8 @@ const EYE = 1.6;            // eye height in metres
 const WALK_SPEED = 2.6;     // m/s
 const RUN_MULT = 2.1;
 const FLOOR_SNAP_MS = 90;   // raycast throttle
-const MAX_STEP = 2.4;       // ignore floors further than this below the ray start
+const STEP_UP = 0.55;       // tallest ledge the feet can climb (stair risers ≪ this)
+const STEP_DOWN = 2.6;      // how far below the feet we look for a floor
 
 let active = null;
 
@@ -76,19 +77,30 @@ export async function startWalk(opts) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.0;
+  renderer.toneMappingExposure = 1.18;
+  // Static scene + static sun: bake the shadow map once instead of every
+  // frame, so shadows cost nothing while walking.
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   state.renderer = renderer;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xd8d2c6);
-  scene.fog = new THREE.Fog(0xd8d2c6, 120, 420);
+  scene.background = new THREE.Color(0xbfd0dd); // soft morning sky
+  scene.fog = new THREE.Fog(0xc9d5de, 140, 460);
+  scene.environmentIntensity = 1.15;
 
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
-  const sun = new THREE.DirectionalLight(0xfff2df, 2.6);
+  const isTouchDevice = 'ontouchstart' in window;
+  const sun = new THREE.DirectionalLight(0xfff0da, 3.1);
   sun.position.set(60, 90, 30);
-  scene.add(sun, new THREE.HemisphereLight(0xfdfbf6, 0x8a8272, 0.75));
+  sun.castShadow = true;
+  sun.shadow.mapSize.setScalar(isTouchDevice ? 2048 : 4096);
+  sun.shadow.bias = -0.0004;
+  sun.shadow.normalBias = 0.06;
+  scene.add(sun, new THREE.HemisphereLight(0xeaf2fb, 0x8a8272, 0.85));
 
   const camera = new THREE.PerspectiveCamera(70, 1, 0.08, 900);
   camera.rotation.order = 'YXZ';
@@ -127,12 +139,29 @@ export async function startWalk(opts) {
   overlay.setStatus('Preparing the walkthrough');
   await new Promise((r) => setTimeout(r, 30)); // let the status paint
   model.traverse((o) => {
-    if (o.isMesh && o.geometry?.attributes?.position) o.geometry.computeBoundsTree();
+    if (o.isMesh && o.geometry?.attributes?.position) {
+      o.geometry.computeBoundsTree();
+      o.castShadow = true;
+      o.receiveShadow = true;
+    }
   });
   if (state.disposed) return;
   scene.add(model);
 
   const bbox = new THREE.Box3().setFromObject(model);
+  // fit the (baked, one-shot) shadow frustum around the whole site
+  {
+    const c = bbox.getCenter(new THREE.Vector3());
+    const r = bbox.getSize(new THREE.Vector3()).length() / 2;
+    sun.position.copy(c).add(new THREE.Vector3(0.55, 0.8, 0.3).multiplyScalar(r * 1.6));
+    sun.target.position.copy(c);
+    scene.add(sun.target);
+    const sc = sun.shadow.camera;
+    sc.left = -r; sc.right = r; sc.top = r; sc.bottom = -r;
+    sc.near = 0.5; sc.far = r * 4;
+    sc.updateProjectionMatrix();
+    renderer.shadowMap.needsUpdate = true;
+  }
   const ray = new THREE.Raycaster();
   ray.far = 500;
 
@@ -158,9 +187,33 @@ export async function startWalk(opts) {
       const mid = (bbox.min.y + bbox.max.y) / 2;
       floorY = slabs.reduce((a, b) => Math.abs(b - mid) < Math.abs(a - mid) ? b : a);
     }
+    state.slabs = slabs.sort((a, b) => a - b);
   }
   camera.position.set(spawn.x, floorY + EYE, spawn.z);
   state.yaw = Math.PI / 2 + 0.3;
+
+  // Level rail: tap a level to be taken there directly — no need to find
+  // the stairs. Labels adapt to how many levels the residence has.
+  if (state.slabs?.length > 1) {
+    const n = state.slabs.length;
+    const label = (i) => {
+      if (n === 2) return i === 0 ? 'Ground floor' : 'Upstairs';
+      if (i === 0) return 'Lower level';
+      if (state.slabs[i] === floorY) return 'Main living';
+      return i === n - 1 ? 'Upstairs' : `Level ${i + 1}`;
+    };
+    overlay.addStops(
+      state.slabs.map((y, i) => ({ y, label: label(i), active: y === floorY })),
+      (stop) => {
+        overlay.fade(() => {
+          camera.position.set(med.x, stop.y + EYE, med.z);
+          state.targetY = stop.y + EYE;
+          state.pitch = 0;
+          window.__walkTele = { label: stop.label, y: +(stop.y + EYE).toFixed(2) };
+        });
+      },
+    );
+  }
   window.__walkSpawn = { x: +spawn.x.toFixed(2), z: +spawn.z.toFixed(2), floorY: +floorY.toFixed(2), hits: hits.length };
   console.info('[walk] spawn', JSON.stringify(window.__walkSpawn));
 
@@ -190,23 +243,36 @@ export async function startWalk(opts) {
     if (k.has('KeyD') || k.has('ArrowRight')) mx += 1;
     if (state.joy.active) { mx += state.joy.dx; mz -= state.joy.dy; }
 
-    const len = Math.hypot(mx, mz);
-    if (len > 0.01) {
-      const speed = WALK_SPEED * (k.has('ShiftLeft') || k.has('ShiftRight') ? RUN_MULT : 1);
-      fwd.set(-Math.sin(state.yaw), 0, -Math.cos(state.yaw));
-      right.set(-fwd.z, 0, fwd.x);
-      const s = speed * dt / Math.max(1, len);
-      camera.position.addScaledVector(fwd, mz * s);
-      camera.position.addScaledVector(right, mx * s);
-    }
+    // smooth acceleration/deceleration so movement doesn't feel twitchy
+    const len = Math.max(1, Math.hypot(mx, mz));
+    const speed = WALK_SPEED * (k.has('ShiftLeft') || k.has('ShiftRight') ? RUN_MULT : 1);
+    fwd.set(-Math.sin(state.yaw), 0, -Math.cos(state.yaw));
+    right.set(-fwd.z, 0, fwd.x);
+    const dvx = (fwd.x * mz + right.x * mx) * speed / len;
+    const dvz = (fwd.z * mz + right.z * mx) * speed / len;
+    const acc = Math.min(1, dt * 9);
+    state.vx = (state.vx || 0) + (dvx - (state.vx || 0)) * acc;
+    state.vz = (state.vz || 0) + (dvz - (state.vz || 0)) * acc;
+    camera.position.x += state.vx * dt;
+    camera.position.z += state.vz * dt;
 
     // floor follow (throttled)
     const now = performance.now();
     if (now - state.lastSnap > FLOOR_SNAP_MS) {
       state.lastSnap = now;
-      ray.set(new THREE.Vector3(camera.position.x, camera.position.y + 0.6, camera.position.z), down);
-      ray.far = MAX_STEP + EYE + 0.6;
-      const h = ray.intersectObject(model, true);
+      // The ray starts just above the FEET, not the head — so stair steps
+      // are caught but floors above (landings, the roof) can never be
+      // grabbed. That was the "jumped onto the roof" bug.
+      const feetY = camera.position.y - EYE;
+      ray.set(new THREE.Vector3(camera.position.x, feetY + STEP_UP, camera.position.z), down);
+      ray.far = STEP_UP + STEP_DOWN;
+      let h = ray.intersectObject(model, true);
+      if (!h.length) {
+        // recovery: walked off an edge — look much further down and glide
+        // back to real ground instead of floating forever
+        ray.far = 120;
+        h = ray.intersectObject(model, true);
+      }
       state.targetY = h.length ? h[0].point.y + EYE : null;
       const rayMs = performance.now() - now;
       const d = (window.__walkStats ||= { rayMax: 0, frames: 0, t0: now });
@@ -387,12 +453,24 @@ function buildOverlay(title, subtitle) {
         z-index:4;pointer-events:none;transform:translate(-50%,-50%);display:none}
       .wv-joy i{position:absolute;left:50%;top:50%;width:34px;height:34px;border-radius:50%;
         background:rgba(195,164,94,.45);transform:translate(-50%,-50%)}
+      .wv-stops{position:absolute;left:20px;bottom:22px;display:flex;flex-direction:column;gap:7px;z-index:5}
+      .wv-stop{background:rgba(31,27,20,.72);border:1px solid rgba(195,164,94,.35);color:#fdfbf6;
+        padding:9px 16px;cursor:pointer;font-size:9.5px;font-weight:300;letter-spacing:.24em;
+        text-transform:uppercase;text-align:left;backdrop-filter:blur(8px);
+        transition:border-color .3s,color .3s}
+      .wv-stop:hover{border-color:#c3a45e;color:#c3a45e}
+      .wv-stop.wv-active{border-color:#c3a45e;color:#c3a45e;background:rgba(31,27,20,.9)}
+      .wv-fade{position:absolute;inset:0;background:#14110c;opacity:0;pointer-events:none;
+        transition:opacity .22s;z-index:2}
+      @media(max-width:700px){.wv-stops{left:auto;right:14px;bottom:80px}}
     </style>
     <canvas></canvas>
     <div class="wv-top">
       <div class="wv-title">Inside <em>${escapeHtml(title)}</em>${subtitle ? ' · ' + escapeHtml(subtitle) : ''}</div>
       <button class="wv-exit" type="button" aria-label="Exit walkthrough">✕</button>
     </div>
+    <div class="wv-fade"></div>
+    <div class="wv-stops"></div>
     <div class="wv-hint">Click to look · WASD to walk · Esc to exit</div>
     <div class="wv-load"><span class="wv-load-txt">Preparing the residence</span><div class="wv-load-bar"><i></i></div></div>
     <div class="wv-joy"><i></i></div>`;
@@ -403,8 +481,28 @@ function buildOverlay(title, subtitle) {
   const loadBar = root.querySelector('.wv-load-bar i');
   const joy = root.querySelector('.wv-joy');
   const joyDot = joy.querySelector('i');
+  const stopsEl = root.querySelector('.wv-stops');
+  const fadeEl = root.querySelector('.wv-fade');
 
   return {
+    addStops: (stops, onSelect) => {
+      stops.forEach((stop) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'wv-stop' + (stop.active ? ' wv-active' : '');
+        b.textContent = stop.label;
+        b.addEventListener('click', () => {
+          stopsEl.querySelectorAll('.wv-stop').forEach((x) => x.classList.remove('wv-active'));
+          b.classList.add('wv-active');
+          onSelect(stop);
+        });
+        stopsEl.appendChild(b);
+      });
+    },
+    fade: (mid) => {
+      fadeEl.style.opacity = '1';
+      setTimeout(() => { mid(); fadeEl.style.opacity = '0'; }, 230);
+    },
     root, canvas,
     exitBtn: root.querySelector('.wv-exit'),
     hint: root.querySelector('.wv-hint'),
