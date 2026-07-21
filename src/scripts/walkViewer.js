@@ -86,21 +86,23 @@ export async function startWalk(opts) {
   state.renderer = renderer;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xbfd0dd); // soft morning sky
-  scene.fog = new THREE.Fog(0xc9d5de, 140, 460);
+  // sky graded from the QASR hero render: deep blue overhead fading to a
+  // pale warm horizon
+  scene.background = makeSkyGradient('#31659e', '#a8c4de', '#e8ddc4');
+  scene.fog = new THREE.Fog(0xc4d3e2, 140, 460);
   scene.environmentIntensity = 1.15;
 
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
   const isTouchDevice = 'ontouchstart' in window;
-  const sun = new THREE.DirectionalLight(0xfff0da, 3.1);
+  const sun = new THREE.DirectionalLight(0xffdca4, 3.4); // golden-hour sun
   sun.position.set(60, 90, 30);
   sun.castShadow = true;
   sun.shadow.mapSize.setScalar(isTouchDevice ? 2048 : 4096);
   sun.shadow.bias = -0.0004;
   sun.shadow.normalBias = 0.06;
-  scene.add(sun, new THREE.HemisphereLight(0xeaf2fb, 0x8a8272, 0.85));
+  scene.add(sun, new THREE.HemisphereLight(0xdcebfa, 0x9a8d76, 0.8));
 
   const camera = new THREE.PerspectiveCamera(70, 1, 0.08, 900);
   camera.rotation.order = 'YXZ';
@@ -153,7 +155,7 @@ export async function startWalk(opts) {
   {
     const c = bbox.getCenter(new THREE.Vector3());
     const r = bbox.getSize(new THREE.Vector3()).length() / 2;
-    sun.position.copy(c).add(new THREE.Vector3(0.55, 0.8, 0.3).multiplyScalar(r * 1.6));
+    sun.position.copy(c).add(new THREE.Vector3(0.6, 0.55, 0.35).multiplyScalar(r * 1.6));
     sun.target.position.copy(c);
     scene.add(sun.target);
     const sc = sun.shadow.camera;
@@ -169,27 +171,37 @@ export async function startWalk(opts) {
   // sits with the walls and floors of the house — unlike a raw vertex
   // median, it can't be dragged into the garage by vertex-dense props.
   const med = surfaceCentroid(model);
-  const spawn = new THREE.Vector3(med.x, bbox.max.y + 2, med.z);
-  ray.set(spawn, new THREE.Vector3(0, -1, 0));
-  const hits = ray.intersectObject(model, true);
-  let floorY = bbox.min.y;
-  if (hits.length) {
-    floorY = hits[hits.length - 1].point.y;
-    // "indoor slab" = a floor with a ceiling 2–6m above it. Of those,
-    // spawn on the one nearest the model's vertical midpoint — in a
-    // multi-level home that's the main living level, not the garage.
-    const slabs = [];
-    for (let i = hits.length - 1; i > 0; i--) {
-      const gap = hits[i - 1].point.y - hits[i].point.y;
-      if (gap > 2 && gap < 6) slabs.push(hits[i].point.y);
+  // "Indoor slab" = a floor with 2–6m of clear headroom above it. A single
+  // ray is fooled by furniture, so cast a small cluster around the centre
+  // and merge: each real floor is clear of clutter under at least one ray.
+  const down1 = new THREE.Vector3(0, -1, 0);
+  const slabCandidates = [];
+  let lowestHit = null;
+  for (const [ox, oz] of [[0, 0], [1.6, 0], [-1.6, 0], [0, 1.6], [0, -1.6]]) {
+    ray.set(new THREE.Vector3(med.x + ox, bbox.max.y + 2, med.z + oz), down1);
+    const hits = ray.intersectObject(model, true);
+    if (!hits.length) continue;
+    const low = hits[hits.length - 1].point.y;
+    if (lowestHit == null || low < lowestHit) lowestHit = low;
+    const ys = [...new Set(hits.map((h) => h.point.y))].sort((a, b) => b - a)
+      .filter((y, i, arr) => i === 0 || arr[i - 1] - y > 0.35);
+    for (let i = ys.length - 1; i > 0; i--) {
+      const gap = ys[i - 1] - ys[i];
+      if (gap > 2 && gap < 6) slabCandidates.push(ys[i]);
     }
-    if (slabs.length) {
-      const mid = (bbox.min.y + bbox.max.y) / 2;
-      floorY = slabs.reduce((a, b) => Math.abs(b - mid) < Math.abs(a - mid) ? b : a);
-    }
-    state.slabs = slabs.sort((a, b) => a - b);
   }
-  camera.position.set(spawn.x, floorY + EYE, spawn.z);
+  // cluster candidates within 0.6m into distinct levels
+  const slabs = [];
+  for (const y of slabCandidates.sort((a, b) => a - b)) {
+    if (!slabs.length || y - slabs[slabs.length - 1] > 0.6) slabs.push(y);
+  }
+  state.slabs = slabs;
+  let floorY = lowestHit ?? bbox.min.y;
+  if (slabs.length) {
+    const mid = (bbox.min.y + bbox.max.y) / 2;
+    floorY = slabs.reduce((a, b) => Math.abs(b - mid) < Math.abs(a - mid) ? b : a);
+  }
+  camera.position.set(med.x, floorY + EYE, med.z);
   state.yaw = Math.PI / 2 + 0.3;
 
   // Level rail: tap a level to be taken there directly — no need to find
@@ -214,7 +226,7 @@ export async function startWalk(opts) {
       },
     );
   }
-  window.__walkSpawn = { x: +spawn.x.toFixed(2), z: +spawn.z.toFixed(2), floorY: +floorY.toFixed(2), hits: hits.length };
+  window.__walkSpawn = { x: +med.x.toFixed(2), z: +med.z.toFixed(2), floorY: +floorY.toFixed(2), slabs: slabs.map((y) => +y.toFixed(2)) };
   console.info('[walk] spawn', JSON.stringify(window.__walkSpawn));
 
   overlay.hideLoading();
@@ -391,6 +403,22 @@ function bindInput(state, overlay, renderer) {
 }
 
 function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+function makeSkyGradient(top, mid, horizon) {
+  const c = document.createElement('canvas');
+  c.width = 2;
+  c.height = 512;
+  const g = c.getContext('2d').createLinearGradient(0, 0, 0, 512);
+  g.addColorStop(0, top);
+  g.addColorStop(0.62, mid);
+  g.addColorStop(1, horizon);
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 2, 512);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
 
 function surfaceCentroid(root) {
   const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
