@@ -78,18 +78,22 @@ function sabdiaFilmInit() {
       document.addEventListener('visibilitychange', function () {
         if (!document.hidden) attempt();
       });
+      /* Hysteresis: start once a third of the frame is visible, but only
+         pause when it has fully left the viewport. A single threshold
+         both ways let every layout nudge (late images reflowing the
+         page) rapid-cycle play/pause — a visibly glitching film. */
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (en) {
-          if (en.isIntersecting) {
+          if (en.intersectionRatio >= 0.35) {
             wantPlay = true;
             retries = 0;
             attempt();
-          } else {
+          } else if (!en.isIntersecting) {
             wantPlay = false;
             video.pause();
           }
         });
-      }, { threshold: 0.35 });
+      }, { threshold: [0, 0.35] });
       io.observe(frame);
     }
 

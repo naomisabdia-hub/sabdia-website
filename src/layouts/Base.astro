@@ -29,6 +29,13 @@ const ogD = ogDescription ?? description;
 const OG_DEFAULT = '/api/img?src=%2Fimages%2Fhome-hero-1.jpg&w=1200&h=630&q=85';
 const ogImageAbs = new URL(ogImage ?? OG_DEFAULT, Astro.site).href;
 const gaId = import.meta.env.PUBLIC_GA4_ID;
+/* Deploy-stamped asset URLs. Without a version, a visitor's browser can
+   keep serving its cached main.js/style.css across deploys — fixes ship
+   but never reach them until a manual hard refresh. The commit sha makes
+   each deploy a new URL; main.js's own init guard makes a mid-session
+   re-execution (head swap after a deploy) harmless. */
+const assetV = (import.meta.env.VERCEL_GIT_COMMIT_SHA ?? process.env.VERCEL_GIT_COMMIT_SHA ?? '').slice(0, 8);
+const withV = (p) => (assetV ? `${p}?v=${assetV}` : p);
 ---
 <!DOCTYPE html>
 <html lang="en-AU">
@@ -70,7 +77,7 @@ try {
 <link rel="preload" as="font" type="font/woff2" href="/fonts/cormorant-garamond-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-var-italic.woff2" crossorigin>
 {preloadImage && <link rel="preload" as="image" href={preloadImage} imagesrcset={preloadImageSet} imagesizes={preloadImageSet ? (preloadImageSizes ?? '100vw') : undefined} media={preloadImageMedia}>}
-<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href={withV('/css/style.css')}>
 <ClientRouter />
 <slot name="head" />
 </head>
@@ -85,6 +92,6 @@ try {
 </main>
 
 <Footer />
-<script src="/js/main.js" is:inline></script>
+<script src={withV('/js/main.js')} is:inline></script>
 </body>
 </html>
