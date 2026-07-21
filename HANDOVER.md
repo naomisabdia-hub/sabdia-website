@@ -68,7 +68,7 @@ To ALSO get an email copy of every enquiry: set up Resend (§7). Until then, che
 
 Every milestone is a named tag on GitHub. To roll the site back: `git checkout <tag>` in the code folder (or ask your developer/assistant), then push.
 
-`v3.5-listing-components` (pre-run baseline on GitHub) · `v3.6-client-routing` · `v3.7-ink-and-gold` · `v3.8-reveal-failsafe` · **`v3.9-baseline`** (state before this go-live run) · `v3.10-images` (Wix eliminated, self-hosted images) · `v3.11-design` (UX/a11y polish) · `v3.12-enquiries-seo` · `v3.13-edm-social` · `v3.14-blog` · `v3.15-cms` · `v3.16-editorial-suite` (AI assistant, toolbar, brand mark) · **`v4.0-live`** (the deployed site).
+`v3.5-listing-components` (pre-run baseline on GitHub) · `v3.6-client-routing` · `v3.7-ink-and-gold` · `v3.8-reveal-failsafe` · **`v3.9-baseline`** (state before this go-live run) · `v3.10-images` (Wix eliminated, self-hosted images) · `v3.11-design` (UX/a11y polish) · `v3.12-enquiries-seo` · `v3.13-edm-social` · `v3.14-blog` · `v3.15-cms` · `v3.16-editorial-suite` (AI assistant, toolbar, brand mark) · **`v4.0-live`** (the deployed site) · **`v4.1-fixes-and-inbox`** (video/nav fixes, truer gold, black intro, For Sale hero, faster navigation; inbox reply/edit/delete, image library, section layout switching).
 
 Database safety nets: `supabase/backups/2026-07-20-pre-image-migration/` (content backups) and the audit log (every admin change is recorded).
 
