@@ -60,11 +60,32 @@ function sabdiaFilmInit() {
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if ('IntersectionObserver' in window && !reduced) {
+      /* play() is one-shot and its rejection used to be swallowed — a
+         transient refusal (power saving, data not buffered, occluded
+         tab) left the film permanently frozen until a manual refresh.
+         Now the intent ("should be playing") is tracked and re-attempted
+         on canplay, on tab visibility, and on a short bounded retry. */
+      var wantPlay = false;
+      var retries = 0;
+      var attempt = function () {
+        if (!wantPlay || !video.isConnected || !video.paused) return;
+        var p = video.play();
+        if (p && p.catch) p.catch(function () {
+          if (wantPlay && retries++ < 12) setTimeout(attempt, 700);
+        });
+      };
+      video.addEventListener('canplay', attempt);
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) attempt();
+      });
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (en) {
           if (en.isIntersecting) {
-            video.play().catch(function () {});
+            wantPlay = true;
+            retries = 0;
+            attempt();
           } else {
+            wantPlay = false;
             video.pause();
           }
         });
