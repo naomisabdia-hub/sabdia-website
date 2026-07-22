@@ -18,6 +18,11 @@ architecture, layout, interiors, or finishes. No exceptions.**
 - For missing transitions in film cuts: use **reversed real footage**
   (a real stair descent played backwards is a real ascent — scroll-scrub
   is direction-agnostic) or a **plain crossfade**. Nothing else.
+- Reversal grammar (Naomi, 2026-07-22): reversed footage is only OK where
+  direction is ambiguous — stairs, lateral pans. Never reverse a walk
+  through rooms: it plays as walking backwards. A return leg must be a
+  real forward walk or a plain crossfade; the walkthrough must move like
+  a human walking the house in order.
 - AI generation (Higgsfield etc.) is permitted only for content that does
   not depict the property itself, and only within budgets Naomi sets.
 - Before concluding footage "doesn't exist", inventory EVERY folder of
