@@ -21,7 +21,9 @@
  * Props: name (residence), base (frames URL prefix). The manifest
  * ({ total, w, h, chapters: [{ label, start, count }] }) is fetched from
  * `${base}/manifest.json` at runtime, so adding a property needs only a
- * frames folder in storage — no code change.
+ * frames folder in storage — no code change. A chapter may carry
+ * `hidden: true` — a transit segment (retraced footage between rooms):
+ * it gets no room button and the caption dissolves out while inside it.
  */
 const { name, base } = Astro.props;
 ---
@@ -103,10 +105,12 @@ const { name, base } = Astro.props;
     }
     function buildRooms() {
       manifest.chapters.forEach(function (ch, c) {
+        if (ch.hidden) return;
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'sw-room';
         b.textContent = ch.label;
+        b.dataset.c = c;
         b.addEventListener('click', function () { scrollToChapter(c); });
         rooms.appendChild(b);
       });
@@ -224,13 +228,20 @@ const { name, base } = Astro.props;
       var c = chapterFor(want);
       if (c !== chapterAt) {
         chapterAt = c;
-        caption.classList.remove('sw-cap-show');
-        void caption.offsetWidth; /* restart transition */
-        capNum.textContent = roman[c] || String(c + 1);
-        capLabel.textContent = manifest.chapters[c].label;
-        caption.classList.add('sw-cap-show');
+        var ch = manifest.chapters[c];
         var btns = rooms.children;
-        for (var b = 0; b < btns.length; b++) btns[b].classList.toggle('sw-room-on', b === c);
+        caption.classList.remove('sw-cap-show');
+        if (ch.hidden) {
+          for (var b = 0; b < btns.length; b++) btns[b].classList.remove('sw-room-on');
+        } else {
+          void caption.offsetWidth; /* restart transition */
+          var vis = 0;
+          for (var k = 0; k < c; k++) if (!manifest.chapters[k].hidden) vis++;
+          capNum.textContent = roman[vis] || String(vis + 1);
+          capLabel.textContent = ch.label;
+          caption.classList.add('sw-cap-show');
+          for (var b = 0; b < btns.length; b++) btns[b].classList.toggle('sw-room-on', +btns[b].dataset.c === c);
+        }
       }
     }
 
