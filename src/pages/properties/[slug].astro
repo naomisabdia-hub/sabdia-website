@@ -57,7 +57,9 @@ const walkthrough = walkthroughs[entry.id];
 
 /* Scroll-driven walkthrough — frame sequences in media/scrollwalk/<slug>/;
    a property appears here once its frames + manifest.json are uploaded.
-   Replaces the chaptered cinema player for these properties. */
+   Replaces the chaptered cinema player for these properties.
+   ⛔ Frame sets must be 100% real visualiser footage — never AI-generated
+   architecture, in any form. See CLAUDE.md before cutting a new set. */
 const SW = 'https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/scrollwalk';
 const scrollwalks = { qasr: `${SW}/qasr-v9` };
 const scrollwalk = scrollwalks[entry.id];

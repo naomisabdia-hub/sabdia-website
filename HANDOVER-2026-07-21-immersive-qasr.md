@@ -124,3 +124,15 @@ ever needed; the web-encoded deliverables are safe in Supabase.
   origin refine/go-live:main` (auto-deploy ships it) — or `vercel deploy
   --prod`. Both were denied by the session's permission classifier.
 - Verified on production: model-viewer orbit loads the draco GLB fine.
+
+---
+
+## ⛔ PERMANENT RULE (2026-07-22, from Naomi — applies to ALL future work)
+
+Never AI-generate any depiction of a Sabdia property's architecture,
+layout, interiors, or finishes — for any property, on any surface.
+"Anchored" start/end-frame generation is equally forbidden (it invents
+the middle; it fabricated wrong stairs twice on QASR). Real visualiser
+footage only; transitions = reversed real footage or plain crossfades.
+Full rule: CLAUDE.md (repo root) + memory file
+qasr-walkthrough-authenticity-rule.md.
