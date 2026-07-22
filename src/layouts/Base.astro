@@ -73,6 +73,7 @@ try {
 <meta name="twitter:image" content={ogImageAbs}>
 {gaId && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>}
 {gaId && <script is:inline set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','${gaId}');`}></script>}
+<link rel="preconnect" href="https://fvczsjcrvwzqtcbforgo.supabase.co" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/jost-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/cormorant-garamond-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/eb-garamond-var-italic.woff2" crossorigin>

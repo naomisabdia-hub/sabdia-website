@@ -191,11 +191,17 @@ const { name, base } = Astro.props;
       return Math.min(total, Math.max(1, Math.round(frameF)));
     }
 
-    /* glide loop runs while the section is on screen */
+    /* glide loop runs while the section is on screen. The scrub eases
+       toward the scroll target; on big jumps (room-menu travel) it
+       catches up to within a short window first so the camera doesn't
+       strobe through half-loaded rooms. */
     var looping = false;
     function loop() {
       if (!looping) return;
-      displayF += (frameF - displayF) * 0.22;
+      var d = frameF - displayF;
+      if (d > 30) displayF = frameF - 30;
+      else if (d < -30) displayF = frameF + 30;
+      displayF += (frameF - displayF) * 0.18;
       if (Math.abs(frameF - displayF) < 0.01) displayF = frameF;
       draw();
       requestAnimationFrame(loop);
