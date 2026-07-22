@@ -25,6 +25,15 @@ architecture, layout, interiors, or finishes. No exceptions.**
   a human walking the house in order.
 - AI generation (Higgsfield etc.) is permitted only for content that does
   not depict the property itself, and only within budgets Naomi sets.
+- **Supervised exception (Naomi, 2026-07-22):** short transition joins
+  (≤5 s) between two REAL anchor frames may be generated — but only by
+  Naomi herself on higgsfield.ai, only reviewed by her frame-by-frame
+  against the fabrication checklist (Desktop/QASR-transition-anchors/
+  README.txt), and integrated only after her explicit per-clip approval.
+  Claude never generates property architecture itself and never
+  integrates an unapproved clip. Full rooms/spaces are still never
+  generated. Real footage, when it exists, always beats a generated join
+  — inventory the masters (w1–w6) first.
 - Before concluding footage "doesn't exist", inventory EVERY folder of
   every Dropbox share completely. The full-house footage existed all along
   in "25.09.10 Walkthroughs".
