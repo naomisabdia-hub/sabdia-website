@@ -165,14 +165,17 @@ const { name, base } = Astro.props;
       if (!total) return;
       var f = Math.min(total, Math.max(1, displayF));
       var i0 = nearestLoaded(Math.floor(f));
-      var i1 = nearestLoaded(Math.min(total, Math.floor(f) + 1));
-      var a = i1 > i0 ? f - Math.floor(f) : 0;
-      if (i0 === lastDrawnA && i1 === lastDrawnB && Math.abs(a - lastAlpha) < 0.02) return;
-      lastDrawnA = i0; lastDrawnB = i1; lastAlpha = a;
+      var i1 = Math.floor(f) + 1;
+      // blend ONLY true neighbours — blending across a loading gap
+      // ghosts two different views and reads as pixelated mush
+      var blendOK = i1 <= total && frames[i1] && i1 - i0 === 1;
+      var a = blendOK ? f - Math.floor(f) : 0;
+      if (i0 === lastDrawnA && (blendOK ? i1 : -1) === lastDrawnB && Math.abs(a - lastAlpha) < 0.02) return;
+      lastDrawnA = i0; lastDrawnB = blendOK ? i1 : -1; lastAlpha = a;
       if (!i0) return;
       ctx.globalAlpha = 1;
       ctx.drawImage(frames[i0], 0, 0, canvas.width, canvas.height);
-      if (a > 0.02 && frames[i1]) {
+      if (a > 0.02) {
         ctx.globalAlpha = a;
         ctx.drawImage(frames[i1], 0, 0, canvas.width, canvas.height);
         ctx.globalAlpha = 1;
