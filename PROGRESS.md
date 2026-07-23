@@ -200,3 +200,22 @@
   values via the Vercel REST API and shipping a verified prebuilt deploy. Live bundle now
   carries the Supabase host + Clerk key; admin sign-in renders correctly on production.
 - Lesson recorded: never trust `vercel env add` via stdin — use the REST API (or dashboard).
+
+## Go-live re-audit + authenticity fix (2026-07-23)
+- Full readiness sweep: source, CMS, Supabase state, storage, build, live QA (16/16 routes
+  200 · sitemap 29 URLs · /api/img 200 webp · favicon versioned · scrollwalk v21 live).
+- Migrations all confirmed applied in production Supabase: enquiries.details ✓,
+  replies table ✓, blog_posts (2 drafts) ✓, admin_users (Naomi ×2, admin) ✓.
+- **Authenticity rule enforced on /projects/**: removed the Construction Journey section —
+  its QASR timeline scrubbed the AI-generated Seedance build time-lapse (anchored to the
+  real facade), forbidden outright by CLAUDE.md; its stage stills were placeholders
+  (finished-home photos captioned as construction stages). JourneySlider.astro kept for
+  when real progress photos (Buildertrend) exist; restore path documented in projects.astro.
+  Also corrected ScrollWalk.astro's stale doc comment ("AI aerial opener" → real clips only).
+- Verified post-fix: build clean, /projects/ 200 with filter/current/sold/stats intact,
+  zero console errors, no dangling #journey links (the removed sample data had CAPRI's
+  suburb wrong too — DB/seed agree on Holland Park West).
+- Open go-live items (see report to Naomi): DNS cutover §9, Clerk still pk_test_ (dev
+  instance) in production, Resend/GA4/MailerLite/Anthropic keys dormant, settings.phone
+  empty, 7 test leads to delete from inbox, 12 obsolete scrollwalk-v* folders in storage,
+  dev@sabdia Supabase access to revoke, Journal has no published entries yet.

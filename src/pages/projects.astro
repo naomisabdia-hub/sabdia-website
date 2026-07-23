@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import CustomSections from '../components/CustomSections.astro';
-import JourneySlider from '../components/JourneySlider.astro';
 import { imgVariant, landLabel } from '../lib/images.js';
 import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
@@ -15,61 +14,21 @@ const sold = all.filter((p) => p.data.status === 'sold');
 
 const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`, landLabel(d.land, d.landOver)].join(' · ');
 
-/* ── CONSTRUCTION JOURNEY DATA ──────────────────────────────────────────
-   Two sample projects for the JourneySlider. The stage `image` values are
-   PLACEHOLDERS — they currently reuse finished-home photography from the
-   property galleries. To go live with real journeys:
-     1. Replace each stage's `image` with an actual progress photo
-        (same camera position per stage reads like a time-lapse).
-     2. Rewrite the captions to describe what actually happened on site.
-     3. `forSale: true` switches on the finale gallery + listing CTA;
-        use `forSale: false` for past-build showcases.
-   Long-term these belong in Supabase alongside the property rows —
-   say the word and the schema/admin form can be added. */
-const bySlug = Object.fromEntries(all.map((e) => [e.id, e]));
-const journeyStage = (slug, gi, w = 1600, h = 1000) => {
-  const e = bySlug[slug];
-  const g = e?.data.gallery?.[gi];
-  return g ? g.src : imgVariant(e.data.image, { w, h, focus: e.data.focus });
-};
-
-const journeys = [
-  {
-    // FOR-SALE example — full journey ending in the listing finale.
-    // `video` switches on scrub mode: dragging the timeline scrubs this
-    // AI-generated build time-lapse (Seedance via Higgsfield, end frame
-    // anchored to the real QASR facade photo) hosted in Supabase storage.
-    name: 'QASR',
-    suburb: 'Coorparoo',
-    forSale: true,
-    listingHref: '/properties/qasr/',
-    video: 'https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/qasr-journey.mp4',
-    poster: 'https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/qasr-journey-poster.jpg',
-    gallery: bySlug.qasr?.data.gallery ?? [],
-    stages: [
-      { label: 'Site & Foundation', caption: 'Every build begins with the land — engineered footings anchor QASR to its Coorparoo ridge.', image: journeyStage('qasr', 3) },
-      { label: 'Frame',             caption: 'The structural skeleton rises, defining double-height voids and arched openings.', image: journeyStage('qasr', 1) },
-      { label: 'Lock-up',           caption: 'Sealed to the weather, the facade takes on its Mediterranean rhythm.', image: journeyStage('qasr', 2) },
-      { label: 'Fit-out',           caption: 'Travertine, brass and European oak — the interiors take their final form.', image: journeyStage('qasr', 4) },
-      { label: 'Completed',         caption: 'A Mediterranean-inspired landmark, ready for its first owners.', image: journeyStage('qasr', 0) },
-    ],
-  },
-  {
-    // PAST-BUILD example — showcase mode, no finale panel.
-    name: 'CAPRI',
-    suburb: 'Hendra',
-    forSale: false,
-    listingHref: '/properties/capri/',
-    gallery: [],
-    stages: [
-      { label: 'Site & Foundation', caption: 'From a quiet Hendra street, the site is cut, retained and made ready.', image: journeyStage('capri', 3) },
-      { label: 'Frame',             caption: 'Steel and timber define the sculpted form to come.', image: journeyStage('capri', 1) },
-      { label: 'Lock-up',           caption: 'Closed to the weather, the render and soft curves emerge.', image: journeyStage('capri', 2) },
-      { label: 'Fit-out',           caption: 'Stone, oak and light — interiors layered by hand.', image: journeyStage('capri', 4) },
-      { label: 'Completed',         caption: 'Sold prior to completion — a Hendra residence delivered in full.', image: journeyStage('capri', 0) },
-    ],
-  },
-];
+/* ── CONSTRUCTION JOURNEY — REMOVED pending real progress photography ──
+   The JourneySlider (src/components/JourneySlider.astro) and its section
+   were retired from this page on 2026-07-23:
+   · The QASR timeline scrubbed an AI-generated build time-lapse
+     (Seedance, anchored to the real facade) — forbidden outright by the
+     authenticity rule in CLAUDE.md: no AI-generated depiction of any
+     Sabdia property, "anchored" included.
+   · The stage stills were placeholders (finished-home photography
+     captioned as construction stages), which the same rule exists to
+     prevent: a build record that never happened as shown.
+   To bring the section back: real progress photos per stage (Buildertrend
+   has daily logs — e.g. 96 Waverley Rd = SOLACE), truthful captions, then
+   restore the section + data from git (tag v4.1-fixes-and-inbox or
+   `git log -- src/pages/projects.astro`). The slider component itself is
+   untouched and ready. */
 ---
 <Base
   preloadImage={imgVariant(page.hero.image, { w: 1920, h: 1080 })}
@@ -144,21 +103,6 @@ const journeys = [
           </a>
         ))}
       </div>
-    </div>
-  </section>
-
-  <!-- CONSTRUCTION JOURNEY -->
-  <section class="sp" id="journey" style="border-top:1px solid var(--border)">
-    <div class="inner">
-      <div class="slabel reveal">The Journey</div>
-      <h2 class="about-h reveal d1" style="margin-bottom:8px">Watch a residence <em>take shape</em>.</h2>
-      <p class="reveal d2" style="font-size:15px;font-weight:300;line-height:1.85;color:var(--ink3);max-width:520px;font-family:'EB Garamond',Georgia,serif">
-        Every Sabdia home passes through five acts — drag the timeline to move through a build,
-        or skip straight to the finished residence.
-      </p>
-      {journeys.map((j) => (
-        <JourneySlider project={j} />
-      ))}
     </div>
   </section>
 
