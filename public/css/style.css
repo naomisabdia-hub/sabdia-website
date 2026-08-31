@@ -354,9 +354,10 @@ html.js .slabel.reveal.vis::before{width:24px}
 .about-p{font-size:13.5px;font-weight:300;line-height:1.95;color:var(--ink3);letter-spacing:.018em;max-width:560px}
 .about-p + .about-p{margin-top:20px}
 .sig{margin-top:40px;padding-top:32px;border-top:1px solid var(--border)}
-/* Set as a name lockup — capitalised serif with air, not lowercase
-   italic (Tamsin, 2026-09-01). */
-.sig-name{font-family:var(--font-d);font-size:18px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--ink)}
+/* Capitalised name lockup (Tamsin, 2026-09-01) — set in Jost caps, the
+   kit's label style, because the brand kit forbids the display serif in
+   all-caps ("Never set in all-caps", brandkit.pdf p.5). */
+.sig-name{font-family:var(--font-u);font-size:12.5px;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--ink)}
 .sig-title{font-size:9px;font-weight:300;letter-spacing:.28em;text-transform:uppercase;color:var(--taupe-d);margin-top:5px}
 .about-img-strip{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:52px}
 .about-img-strip img{width:100%;height:240px;object-fit:cover;filter:saturate(.97)}
