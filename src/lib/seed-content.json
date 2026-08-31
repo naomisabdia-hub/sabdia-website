@@ -280,12 +280,12 @@
       "alt": "Agent Access"
     },
     "features": [
-      "Pre-release access to upcoming developments",
-      "Pre-launch pricing and floor plan information",
-      "Priority communication on new releases",
-      "Exclusive commission structures",
-      "Invitations to private project previews",
-      "Dedicated liaison with the Sabdia team"
+      "Pre-Release Access",
+      "Floor Plans & Pricing",
+      "Priority Communication",
+      "Exclusive Commissions",
+      "Private Previews",
+      "Award-Winning Product"
     ],
     "primaryCta": {
       "label": "Apply for Access",
@@ -365,7 +365,7 @@
   },
   "projects_page": {
     "hero": {
-      "image": "/images/home-hero-2.jpg",
+      "image": "/images/qasr-hero.jpg",
       "label": "Portfolio",
       "titleHtml": "Our<br><em>Projects</em>",
       "sub": "Over 100 residences delivered across inner Brisbane's most prestigious suburbs since 2013."
@@ -387,7 +387,7 @@
   },
   "services_page": {
     "hero": {
-      "image": "/images/home-hero-2.jpg",
+      "image": "/images/aether-hero.jpg",
       "label": "What We Offer",
       "titleHtml": "Our<br><em>Services</em>",
       "sub": "Full-spectrum residential development expertise delivered entirely in-house."
@@ -1312,15 +1312,42 @@
       "qasr": {
         "scrollwalk": "qasr-v21",
         "chapters": [
-          { "label": "Arrival", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip14.mp4" },
-          { "label": "Motor Court", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip18.mp4" },
-          { "label": "Entry Void", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip19.mp4" },
-          { "label": "Lounge", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip22_3.mp4" },
-          { "label": "Fireside", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip25_1.mp4" },
-          { "label": "The Bar", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip21.mp4" },
-          { "label": "Dining", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip27_1.mp4" },
-          { "label": "Pool Courtyard", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip16.mp4" },
-          { "label": "Dusk", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip17_1.mp4" }
+          {
+            "label": "Arrival",
+            "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip14.mp4"
+          },
+          {
+            "label": "Motor Court",
+            "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip18.mp4"
+          },
+          {
+            "label": "Entry Void",
+            "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip19.mp4"
+          },
+          {
+            "label": "Lounge",
+            "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip22_3.mp4"
+          },
+          {
+            "label": "Fireside",
+            "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip25_1.mp4"
+          },
+          {
+            "label": "The Bar",
+            "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip21.mp4"
+          },
+          {
+            "label": "Dining",
+            "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip27_1.mp4"
+          },
+          {
+            "label": "Pool Courtyard",
+            "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip16.mp4"
+          },
+          {
+            "label": "Dusk",
+            "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip17_1.mp4"
+          }
         ]
       }
     }

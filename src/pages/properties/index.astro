@@ -72,16 +72,25 @@ const heroImage = page.hero?.image || '/images/qasr-hero.jpg';
         <option value="">All Suburbs</option>
         {suburbs.map((s) => <option value={s}>{s}</option>)}
       </select>
-      <select class="ptool-sel" id="fBeds" aria-label="Minimum bedrooms">
-        <option value="">Any Bedrooms</option>
-        <option value="4">4+ Bed</option>
-        <option value="5">5+ Bed</option>
-        <option value="6">6+ Bed</option>
+      {/* Bedrooms was dropped as a filter: every residence is 5–6 bed,
+          so it never narrowed anything. Garage count and land size are
+          where the portfolio actually differs (Tamsin, 2026-09-01). */}
+      <select class="ptool-sel" id="fCars" aria-label="Minimum garage spaces">
+        <option value="">Any Garage</option>
+        <option value="4">4+ Cars</option>
+        <option value="6">6+ Cars</option>
+        <option value="8">8+ Cars</option>
+      </select>
+      <select class="ptool-sel" id="fLand" aria-label="Land size">
+        <option value="">Any Land Size</option>
+        <option value="0-600">Up to 600m&sup2;</option>
+        <option value="600-800">600&ndash;800m&sup2;</option>
+        <option value="800-">800m&sup2;+</option>
       </select>
       <select class="ptool-sel" id="fSort" aria-label="Sort properties">
         <option value="featured">Sort — Featured</option>
         <option value="land">Land Size</option>
-        <option value="beds">Bedrooms</option>
+        <option value="cars">Garage Spaces</option>
         <option value="name">Name A–Z</option>
       </select>
       <span class="ptool-count" id="fCount"></span>
@@ -128,7 +137,7 @@ const heroImage = page.hero?.image || '/images/qasr-hero.jpg';
             data-prop-card
             data-featured="1"
             data-suburb={featured.data.suburb}
-            data-beds={featured.data.beds}
+            data-cars={featured.data.cars}
             data-land={featured.data.land}
             data-name={featured.data.name}
             data-order={featured.data.order}
@@ -147,7 +156,7 @@ const heroImage = page.hero?.image || '/images/qasr-hero.jpg';
           <div
             data-prop-card
             data-suburb={p.data.suburb}
-            data-beds={p.data.beds}
+            data-cars={p.data.cars}
             data-land={p.data.land}
             data-name={p.data.name}
             data-order={p.data.order}
@@ -203,7 +212,8 @@ const heroImage = page.hero?.image || '/images/qasr-hero.jpg';
      toolbar dead until a manual refresh. */
   function sabdiaPropFilterInit() {
     var suburb = document.getElementById('fSuburb');
-    var beds = document.getElementById('fBeds');
+    var cars = document.getElementById('fCars');
+    var land = document.getElementById('fLand');
     var sort = document.getElementById('fSort');
     var count = document.getElementById('fCount');
     var empty = document.getElementById('fEmpty');
@@ -214,7 +224,7 @@ const heroImage = page.hero?.image || '/images/qasr-hero.jpg';
     var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-prop-card]'));
 
     function apply() {
-      var isDefault = !suburb.value && !beds.value && sort.value === 'featured';
+      var isDefault = !suburb.value && !cars.value && !land.value && sort.value === 'featured';
       if (featuredWrap) featuredWrap.style.display = isDefault ? '' : 'none';
 
       var visible = 0;
@@ -222,7 +232,14 @@ const heroImage = page.hero?.image || '/images/qasr-hero.jpg';
         var ok = true;
         if (isDefault && c.dataset.featured) ok = false; // featured shown in hero block instead
         if (ok && suburb.value && c.dataset.suburb !== suburb.value) ok = false;
-        if (ok && beds.value && Number(c.dataset.beds) < Number(beds.value)) ok = false;
+        if (ok && cars.value && Number(c.dataset.cars) < Number(cars.value)) ok = false;
+        if (ok && land.value) {
+          var range = land.value.split('-');
+          var lo = Number(range[0] || 0);
+          var hi = range[1] ? Number(range[1]) : Infinity;
+          var sqm = Number(c.dataset.land);
+          if (sqm < lo || sqm >= hi) ok = false;
+        }
         c.style.display = ok ? '' : 'none';
         if (ok) visible++;
         // ensure reveal animations don't hide re-shown cards
@@ -232,7 +249,7 @@ const heroImage = page.hero?.image || '/images/qasr-hero.jpg';
 
       var sorted = cards.slice().sort(function (a, b) {
         if (sort.value === 'land') return Number(b.dataset.land) - Number(a.dataset.land);
-        if (sort.value === 'beds') return Number(b.dataset.beds) - Number(a.dataset.beds);
+        if (sort.value === 'cars') return Number(b.dataset.cars) - Number(a.dataset.cars);
         if (sort.value === 'name') return a.dataset.name.localeCompare(b.dataset.name);
         return Number(a.dataset.order) - Number(b.dataset.order);
       });
@@ -244,7 +261,7 @@ const heroImage = page.hero?.image || '/images/qasr-hero.jpg';
         : visible + (visible === 1 ? ' Residence' : ' Residences');
     }
 
-    [suburb, beds, sort].forEach(function (el) {
+    [suburb, cars, land, sort].forEach(function (el) {
       el.addEventListener('change', apply);
     });
   }
