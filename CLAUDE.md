@@ -50,6 +50,15 @@ architecture, layout, interiors, or finishes. No exceptions.**
 - Admin CMS: `/admin` (Clerk auth). All copy/images/walkthroughs editable;
   ⌘K search over every field, live preview in the content editor, guide at
   `/admin/help/`. Site is SSR — saves are live instantly, no redeploy.
+- Admin can also create standalone Pages (Admin → Pages → rendered by
+  `src/pages/[page].astro` at `/<slug>/`; body composed in Page Sections,
+  which attach by that path; auto-included in the sitemap), manage every
+  image/file at Admin → Media Library (`media` bucket; scrollwalk/archive
+  folders deliberately excluded from listings), and see service health
+  (domain, email alerts, analytics) in Settings via `/api/status`.
+  Enquiry email alerts activate with RESEND_API_KEY + CONTACT_EMAIL in
+  Vercel env; inbox replies additionally need CONTACT_FROM on a
+  Resend-verified domain.
 - The public QASR cut is deliberately curated — mud room, sauna, guest
   suites, powder, dining, cellar etc. are held back pre-sale. Do not add
   rooms without Naomi's sign-off. The full private tour lives on Naomi's

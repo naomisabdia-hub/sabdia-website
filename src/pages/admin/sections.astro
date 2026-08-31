@@ -94,7 +94,7 @@ export const prerender = true;
   };
   document.querySelectorAll('[data-back]').forEach((b) => b.addEventListener('click', () => { renderList(); show('list'); }));
 
-  const pageName = (v) => (sectionPages.find(([val]) => val === v) || [])[1] || v;
+  const pageName = (v) => (allPages.find(([val]) => val === v) || [])[1] || v;
   const posName = (v) => v === 'top' ? 'Top of page' : 'End of page';
   const pageUrl = (v) => (v === 'property-detail' ? '/properties/' : v);
   const snippet = (s) => {
@@ -105,10 +105,18 @@ export const prerender = true;
   // ── data ──
   let doc = { sections: [] };
   let current = null; // section being edited
+  /* Static pages plus every page created at /admin/pages/ — a section
+     attaches to a custom page by its /slug/ path. */
+  let allPages = [...sectionPages];
   async function load() {
-    const { data, error } = await supabase.from('site_content').select('data').eq('key', 'custom_sections').maybeSingle();
-    if (error) toast(error.message, true);
-    doc = data?.data && Array.isArray(data.data.sections) ? data.data : { sections: [] };
+    const [secs, pages] = await Promise.all([
+      supabase.from('site_content').select('data').eq('key', 'custom_sections').maybeSingle(),
+      supabase.from('site_content').select('data').eq('key', 'custom_pages').maybeSingle(),
+    ]);
+    if (secs.error) toast(secs.error.message, true);
+    doc = secs.data?.data && Array.isArray(secs.data.data.sections) ? secs.data.data : { sections: [] };
+    const custom = pages.data?.data?.pages ?? [];
+    allPages = [...sectionPages, ...custom.map((p) => [`/${p.slug}/`, `${p.title || p.slug} — your page`])];
   }
   async function persist() {
     const { error } = await supabase.from('site_content').upsert({ key: 'custom_sections', data: doc });
@@ -121,7 +129,7 @@ export const prerender = true;
     box.innerHTML = '';
     const secs = doc.sections;
     document.getElementById('listEmpty').style.display = secs.length ? 'none' : '';
-    for (const [pageVal, label] of sectionPages) {
+    for (const [pageVal, label] of allPages) {
       const mine = secs.filter((s) => s.page === pageVal);
       if (!mine.length) continue;
       const card = el('div', { class: 'ad-card' }, [el('div', { class: 'ad-card-h', text: label })]);
@@ -168,7 +176,10 @@ export const prerender = true;
   // ── picker ──
   const pickPage = document.getElementById('pickPage');
   const pickPos = document.getElementById('pickPos');
-  for (const [v, l] of sectionPages) pickPage.appendChild(el('option', { value: v, text: l }));
+  function fillPagePicker() {
+    pickPage.innerHTML = '';
+    for (const [v, l] of allPages) pickPage.appendChild(el('option', { value: v, text: l }));
+  }
   for (const [v, l] of sectionPositions) pickPos.appendChild(el('option', { value: v, text: l }));
   const layoutBox = document.getElementById('layoutCards');
   for (const [key, layout] of Object.entries(sectionLayouts)) {
@@ -191,13 +202,13 @@ export const prerender = true;
   document.getElementById('newBtn').addEventListener('click', () => show('pick'));
 
   // ── editor ──
-  const commonSchema = [
-    { key: 'page', label: 'Page', type: 'select', options: sectionPages },
-    { key: 'position', label: 'Placement', type: 'select', options: sectionPositions },
-    { key: 'published', label: 'Visibility', type: 'checkbox', checkLabel: 'Published — visible on the website' },
-  ];
   let isNew = false;
   function schemaFor(s) {
+    const commonSchema = [
+      { key: 'page', label: 'Page', type: 'select', options: allPages },
+      { key: 'position', label: 'Placement', type: 'select', options: sectionPositions },
+      { key: 'published', label: 'Visibility', type: 'checkbox', checkLabel: 'Published — visible on the website' },
+    ];
     /* The layout is switchable after creation: fields shared between
        layouts (label, heading, image, CTA…) carry across, and readForm
        preserves values a layout doesn't show, so switching back loses
@@ -252,5 +263,13 @@ export const prerender = true;
   });
 
   await load();
+  fillPagePicker();
   renderList();
+  /* Deep link from /admin/pages/ — arrive with that page preselected
+     and the layout picker already open. */
+  const startPage = new URLSearchParams(location.search).get('page');
+  if (startPage && allPages.some(([v]) => v === startPage)) {
+    pickPage.value = startPage;
+    show('pick');
+  }
 </script>

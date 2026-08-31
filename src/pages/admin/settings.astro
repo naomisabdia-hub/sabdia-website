@@ -10,6 +10,12 @@ export const prerender = true;
     </div>
   </div>
 
+  <div class="ad-card" id="healthCard" style="margin-bottom:28px">
+    <div class="ad-card-h">Website health</div>
+    <p class="ad-sub" style="margin-bottom:8px">The services around the website — green is on, amber needs a one-time setup. None of these change the website itself.</p>
+    <div id="healthRows"><div class="ad-empty" style="padding:18px 0">Checking…</div></div>
+  </div>
+
   <div class="ad-form" id="settingsForm"></div>
   <div class="ad-savebar" id="saveBar">
     <button class="ad-btn ad-btn-gold" data-save>Save settings</button>
@@ -67,6 +73,54 @@ export const prerender = true;
 
   // Clerk manages passwords when it is active.
   if (clerkMode) document.getElementById('pwCard').style.display = 'none';
+
+  // ── Website health ── live config status from /api/status, plus the
+  // domain check the browser can do itself. Booleans only, no secrets.
+  (async () => {
+    const box = document.getElementById('healthRows');
+    const row = (on, title, detail) =>
+      el('div', { class: 'ad-health-row' }, [
+        el('span', { class: `ad-health-dot ${on ? 'on' : 'off'}` }),
+        el('div', {}, [
+          el('div', { class: 'ad-health-t', text: title }),
+          el('div', { class: 'ad-health-d', html: detail }),
+        ]),
+      ]);
+    const rows = [];
+
+    const host = location.hostname;
+    if (host !== 'localhost' && host !== '127.0.0.1') {
+      const onDomain = host.endsWith('sabdiaconstructions.com.au');
+      rows.push(row(onDomain, 'Custom domain',
+        onDomain
+          ? 'The website is live on <code>sabdiaconstructions.com.au</code>.'
+          : `The website is still on its temporary address (<code>${host}</code>) — until the domain points here, visitors and Google find the old site. Fix: in the domain's DNS (currently at Wix), point <code>www</code> at Vercel per Vercel → Project → Settings → Domains.`));
+    }
+
+    try {
+      const { accessToken } = await import('../../lib/admin/client.js');
+      const res = await fetch('/api/status', { headers: { Authorization: `Bearer ${await accessToken()}` } });
+      if (res.ok) {
+        const s = await res.json();
+        rows.push(row(s.emailAlerts, 'Email alerts for new enquiries',
+          s.emailAlerts
+            ? 'A copy of every enquiry is emailed the moment it arrives.'
+            : 'Enquiries are saved in the Leads Inbox but nobody is emailed. Fix: create a free API key at resend.com, then in Vercel → Project → Settings → Environment Variables add <code>RESEND_API_KEY</code> and <code>CONTACT_EMAIL</code> (where alerts should go) and redeploy.'));
+        rows.push(row(s.replySending, 'Replying to leads from the inbox',
+          s.replySending
+            ? 'Replies send from your verified Sabdia address.'
+            : 'Needs the domain verified at resend.com and <code>CONTACT_FROM</code> set (e.g. <code>Sabdia &lt;hello@sabdiaconstructions.com.au&gt;</code>) — otherwise replies would go out from a generic address and land in spam.'));
+        rows.push(row(s.analytics, 'Visitor analytics',
+          s.analytics
+            ? 'Google Analytics is counting visits.'
+            : 'No visitor counting yet. Fix: create a free GA4 property at analytics.google.com, then add its ID as <code>PUBLIC_GA4_ID</code> in Vercel and redeploy — the website is already wired for it.'));
+      }
+    } catch { /* leave whatever rendered */ }
+
+    box.innerHTML = '';
+    if (rows.length) for (const r of rows) box.appendChild(r);
+    else box.appendChild(el('div', { class: 'ad-health-d', text: 'Health check unavailable right now.' }));
+  })();
 
   const schema = contentSchemas.settings.schema;
   const { data } = await supabase.from('site_content').select('data').eq('key', 'settings').maybeSingle();

@@ -20,8 +20,10 @@ const PLACES = [
   ['Dashboard', '/admin/'],
   ['Properties', '/admin/properties/'],
   ['Journal', '/admin/blog/'],
+  ['Pages', '/admin/pages/'],
   ['Site Content', '/admin/content/'],
   ['Page Sections', '/admin/sections/'],
+  ['Media Library', '/admin/media/'],
   ['Services & More', '/admin/lists/'],
   ['Leads Inbox', '/admin/leads/'],
   ['Settings', '/admin/settings/'],
@@ -69,6 +71,11 @@ async function buildIndex() {
     const fields = [];
     walkFields(meta.schema, docs[key], '', fields);
     for (const f of fields) entries.push({ kind: meta.title, title: f.label, snippet: f.text, href, hay: `${f.label} ${f.text}`.toLowerCase() });
+  }
+
+  /* Team-created pages (custom_pages arrives with the site_content rows). */
+  for (const p of docs.custom_pages?.pages ?? []) {
+    add('Page', p.title || p.slug, `/${p.slug}/`, `/admin/pages/?edit=${encodeURIComponent(p.slug)}`);
   }
 
   if (configured && supabase) {

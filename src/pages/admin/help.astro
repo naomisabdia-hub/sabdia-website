@@ -42,6 +42,8 @@ export const prerender = true;
         <tr><td>The walkthrough on a property page — swap in a new cut, or edit the chapter clips</td><td><a href="/admin/content/?key=walkthroughs" style="color:var(--gold)">Site Content → Walkthroughs</a></td></tr>
         <tr><td>Films — the homepage film and each residence's reel</td><td><a href="/admin/content/?key=films" style="color:var(--gold)">Site Content → Films</a></td></tr>
         <tr><td>Journal stories — write, edit, publish</td><td><a href="/admin/blog/" style="color:var(--gold)">Journal</a></td></tr>
+        <tr><td>A brand-new page — testimonials, an event, a campaign, anything</td><td><a href="/admin/pages/" style="color:var(--gold)">Pages</a>, then build its body in <a href="/admin/sections/" style="color:var(--gold)">Page Sections</a></td></tr>
+        <tr><td>Find, upload, reuse or delete any image or file</td><td><a href="/admin/media/" style="color:var(--gold)">Media Library</a></td></tr>
         <tr><td>The services, process steps and testimonials</td><td><a href="/admin/lists/" style="color:var(--gold)">Services &amp; More</a></td></tr>
         <tr><td>An extra one-off section on a page — an editorial band or a pull quote</td><td><a href="/admin/sections/" style="color:var(--gold)">Page Sections</a></td></tr>
         <tr><td>Enquiries and agent applications — read, reply, track</td><td><a href="/admin/leads/" style="color:var(--gold)">Leads Inbox</a></td></tr>
@@ -68,10 +70,23 @@ export const prerender = true;
   </div>
 
   <div class="ad-card">
+    <div class="ad-card-h">Creating a brand-new page</div>
+    <ol style="font-size:12.5px;font-weight:300;color:var(--ink2);line-height:2;padding-left:18px;margin-bottom:14px">
+      <li>Open <a href="/admin/pages/" style="color:var(--gold)">Pages</a> → <b>+ New Page</b>. Name it (the web address fills itself in), write the hero heading, add a hero image if you want one, tick Published, save.</li>
+      <li>Press <b>+ Add sections</b> and compose the body from any mix of layouts — editorial text, image&nbsp;+&nbsp;text, text columns, photo grids, quotes, calls&nbsp;to&nbsp;action. Reorder, hide, or restyle them any time.</li>
+      <li>Add the page to the menu so visitors can find it — <a href="/admin/content/?key=nav" style="color:var(--gold)">Site Content → Navigation</a> (and the footer, if you like).</li>
+    </ol>
+    <p class="ad-sub" style="max-width:none;margin-bottom:0">
+      The page is live at its own address the moment it's published, and joins the sitemap Google reads automatically. Untick Published to take it down without deleting it.
+    </p>
+  </div>
+
+  <div class="ad-card">
     <div class="ad-card-h">Good to know</div>
     <p class="ad-sub" style="max-width:none;margin-bottom:0">
       <b>Live preview</b> — in Site Content, the page you're editing sits beside the form and refreshes each time you save; switch it between Desktop and Mobile, or hide it.<br>
-      <b>Images &amp; clips</b> — every image field has an Upload button and a <i>Library</i> of everything already uploaded, so nothing needs uploading twice. Files up to 25MB; films work best as portrait (9:16) mp4.<br>
+      <b>Images &amp; clips</b> — every image field has an Upload button and a searchable <i>Library</i> of everything already uploaded, so nothing needs uploading twice; browse and manage it all in <a href="/admin/media/" style="color:var(--gold)">Media Library</a>. Files up to 25MB; films work best as portrait (9:16) mp4.<br>
+      <b>Edit from the website</b> — on any public page, the small <i>✎ Edit this page</i> pill (visible only on browsers signed in here) jumps straight to the screens that edit that page.<br>
       <b>Formatting</b> — long-text fields have a small toolbar (bold, headings, quotes, links) that stays inside the site's design system.<br>
       <b>Leads</b> — new enquiries appear on the Dashboard and in the Inbox with a status (new → contacted → closed), and can be exported to CSV.
     </p>
@@ -80,9 +95,10 @@ export const prerender = true;
   <div class="ad-card">
     <div class="ad-card-h">The short list that still needs a developer</div>
     <p class="ad-sub" style="max-width:none;margin-bottom:0">
-      The Find Your Home quiz questions and matching logic, brand-new page types or layouts, and preparing
-      walkthrough frame sets from the master footage. Everything else on the website — every word, image,
-      film, clip, listing and story — is yours, from here.
+      The Find Your Home quiz questions and matching logic, designing brand-new section layouts (using the
+      existing layouts on a new page needs no developer — see Pages), and preparing walkthrough frame sets
+      from the master footage. Everything else on the website — every word, image, film, clip, page,
+      listing and story — is yours, from here.
     </p>
   </div>
 </AdminShell>

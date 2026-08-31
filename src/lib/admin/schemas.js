@@ -650,6 +650,21 @@ export const sectionLayouts = {
       ] },
     ],
   },
+  columns: {
+    name: 'Text columns',
+    description: 'Two or three titled columns side by side — pillars, offerings, quick facts. Stacks neatly on mobile.',
+    fields: [
+      { key: 'label', label: 'Small label', type: 'text' },
+      { key: 'headingHtml', label: 'Heading (optional)', type: 'html', help: 'use <em>…</em> for gold italics' },
+      { key: 'cols', label: 'Columns per row', type: 'select', options: [['2', 'Two'], ['3', 'Three']] },
+      { key: 'items', label: 'Columns', type: 'items', itemLabel: 'column', fields: [
+        { key: 'title', label: 'Column title', type: 'text' },
+        { key: 'text', label: 'Column text', type: 'textarea', plain: true },
+      ] },
+      cta('cta', 'Button (optional — leave text blank for none)'),
+      themeField,
+    ],
+  },
 };
 
 /** Pages sections can be added to, and where on the page they can sit. */
@@ -668,6 +683,30 @@ export const sectionPages = [
 export const sectionPositions = [
   ['top', 'Top of page — just under the hero'],
   ['end', 'End of page — before the footer'],
+];
+
+/* ── CUSTOM PAGES ────────────────────────────────────────────
+   Brand-new standalone pages created from /admin/pages/ — no code.
+   Stored in site_content key `custom_pages` as { pages: [...] };
+   src/pages/[page].astro renders each at /<slug>/, and Page Sections
+   attach to it by that same path. */
+
+/** Paths the router already owns — a custom page can never take these. */
+export const RESERVED_SLUGS = [
+  'admin', 'api', 'about', 'services', 'projects', 'collection', 'properties',
+  'contact', 'agent-access', 'find-your-home', 'journal', 'privacy',
+  'accessibility', 'images', 'css', 'js', 'fonts', 'models', '404',
+  'sitemap.xml', 'robots.txt',
+];
+
+export const customPageSchema = [
+  { key: 'title', label: 'Page name', type: 'text', help: 'shows in the browser tab and in Google results' },
+  { key: 'slug', label: 'Web address', type: 'text', help: 'lowercase letters and dashes — the page will live at /your-address/' },
+  { key: 'description', label: 'Search-engine description', type: 'textarea', plain: true, help: '1–2 sentences; the text Google shows under the page name' },
+  { key: 'heroTitle', label: 'Hero heading', type: 'html', help: 'the large heading at the top — use <em>…</em> for gold italics' },
+  { key: 'heroText', label: 'Hero intro (optional)', type: 'textarea', plain: true },
+  { key: 'heroImage', label: 'Hero image (optional)', type: 'image', folder: 'pages', help: 'full-width photograph behind the heading; leave empty for a clean text opening' },
+  { key: 'published', label: 'Visibility', type: 'checkbox', checkLabel: 'Published — visible on the website' },
 ];
 
 /** Groups shown on the Content index page. */

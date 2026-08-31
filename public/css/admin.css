@@ -181,3 +181,28 @@ body.admin a,body.admin button,body.admin select,body.admin label{cursor:pointer
 .ad-lib-item img{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;background:var(--bg3)}
 .ad-lib-item span{display:block;font-size:10px;font-weight:300;color:var(--ink3);padding:6px 8px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ad-lib-note{grid-column:1/-1;padding:32px;text-align:center;font-size:12.5px;color:var(--taupe-d)}
+.ad-lib-tools{display:flex;align-items:center;gap:10px;padding:14px 24px 0}
+.ad-lib-tools label{cursor:pointer}
+
+/* ── MEDIA LIBRARY PAGE ── */
+.ad-media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:6px}
+.ad-media-item{background:var(--white);border:1px solid var(--border);display:flex;flex-direction:column;transition:border-color .2s}
+.ad-media-item:hover{border-color:var(--gold)}
+.ad-media-item>img{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;background:var(--bg3)}
+.ad-media-file{aspect-ratio:3/2;display:flex;align-items:center;justify-content:center;font-family:var(--font-u);font-size:11px;font-weight:400;letter-spacing:.22em;color:var(--taupe);background:var(--bg2)}
+.ad-media-meta{padding:10px 12px 2px;font-family:var(--font-u)}
+.ad-media-name{font-size:11.5px;font-weight:400;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ad-media-sub{font-size:10px;font-weight:300;color:var(--taupe-d);margin-top:2px}
+.ad-media-act{display:flex;gap:6px;padding:8px 10px 10px}
+.ad-media-act .ad-btn{padding:5px 10px;font-size:9px}
+.ad-main.ad-drop{outline:2px dashed var(--gold);outline-offset:-10px}
+
+/* ── WEBSITE HEALTH (Settings) ── */
+.ad-health-row{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-top:1px solid var(--border);font-family:var(--font-u)}
+.ad-health-row:first-of-type{border-top:none}
+.ad-health-dot{flex:none;width:9px;height:9px;border-radius:50%;margin-top:4px;background:var(--taupe)}
+.ad-health-dot.on{background:#3d5a46}
+.ad-health-dot.off{background:#a8874a}
+.ad-health-t{font-size:12.5px;font-weight:400;color:var(--ink)}
+.ad-health-d{font-size:11.5px;font-weight:300;color:var(--ink3);line-height:1.7;margin-top:2px;max-width:640px}
+.ad-health-d code{font-size:10.5px;background:var(--bg2);border:1px solid var(--border);padding:1px 5px}

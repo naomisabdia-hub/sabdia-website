@@ -1,0 +1,145 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Media Library" active="media">
+  <div class="ad-hdr">
+    <div>
+      <h1 class="ad-h1">Media <em>Library</em></h1>
+      <p class="ad-sub">Every image and file the website has, in one place. Upload once, reuse anywhere — copy a link, or pick it from the Library button beside any image field. Drag files anywhere on this page to upload.</p>
+    </div>
+    <label class="ad-btn ad-btn-gold" style="cursor:pointer">
+      <span id="upLabel">＋ Upload files</span>
+      <input type="file" id="upInput" multiple style="display:none">
+    </label>
+  </div>
+
+  <div class="ad-tabs" id="tabs"></div>
+  <div class="ad-filters">
+    <input class="ad-fi ad-search" id="q" type="search" placeholder="Search by name or folder…">
+  </div>
+
+  <div class="ad-media-grid" id="grid"></div>
+  <div class="ad-empty" id="empty" style="display:none">Nothing here yet.</div>
+</AdminShell>
+
+<script>
+  import { requireAuth, el, toast } from '../../lib/admin/client.js';
+  import { listBucketAssets, siteImages, deleteAsset, thumb, fmtSize } from '../../lib/admin/library.js';
+  import { uploadFile } from '../../lib/admin/client.js';
+
+  await requireAuth();
+
+  let uploads = [];
+  const builtin = siteImages();
+  let tab = 'uploads';
+  let query = '';
+
+  const TABS = [
+    ['uploads', 'Your uploads'],
+    ['site', 'Site photography'],
+    ['files', 'Films & files'],
+  ];
+
+  const lists = () => ({
+    uploads: uploads.filter((a) => a.kind === 'image'),
+    site: builtin,
+    files: uploads.filter((a) => a.kind === 'file'),
+  });
+
+  function renderTabs() {
+    const all = lists();
+    const bar = document.getElementById('tabs');
+    bar.innerHTML = '';
+    for (const [value, label] of TABS) {
+      bar.appendChild(el('button', {
+        type: 'button',
+        class: `ad-tab${tab === value ? ' on' : ''}`,
+        onclick: () => { tab = value; renderTabs(); render(); },
+      }, [
+        el('span', { text: label }),
+        el('span', { class: 'ad-tab-n', text: String(all[value].length) }),
+      ]));
+    }
+  }
+
+  const when = (t) => (t ? new Date(t).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }) : 'built in');
+
+  function render() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    const q = query.toLowerCase();
+    const list = lists()[tab].filter((a) => !q || `${a.name} ${a.folder}`.toLowerCase().includes(q));
+    document.getElementById('empty').style.display = list.length ? 'none' : '';
+    for (const a of list) {
+      const copyBtn = el('button', { type: 'button', class: 'ad-btn ad-btn-ghost', text: 'Copy link', onclick: async () => {
+        try {
+          await navigator.clipboard.writeText(a.url);
+          toast('Link copied — paste it into any image or file field');
+        } catch { prompt('Copy this link:', a.url); }
+      } });
+      const delBtn = a.path
+        ? el('button', { type: 'button', class: 'ad-btn ad-btn-ghost', text: 'Delete', onclick: async () => {
+            if (!confirm(`Delete “${a.name}” from storage permanently?\n\nAnywhere on the website still using it will lose the file — copy its link and check first if unsure.`)) return;
+            try {
+              await deleteAsset(a.path);
+              uploads = uploads.filter((x) => x.path !== a.path);
+              toast('Deleted');
+              renderTabs();
+              render();
+            } catch (e) { toast(e.message || 'Delete failed', true); }
+          } })
+        : null;
+      grid.appendChild(el('div', { class: 'ad-media-item' }, [
+        a.kind === 'image'
+          ? el('img', { src: thumb(a.url), alt: '', loading: 'lazy' })
+          : el('div', { class: 'ad-media-file', text: (a.name.split('.').pop() || 'file').toUpperCase() }),
+        el('div', { class: 'ad-media-meta' }, [
+          el('div', { class: 'ad-media-name', title: a.name, text: a.name }),
+          el('div', { class: 'ad-media-sub', text: [a.folder, fmtSize(a.size), when(a.when)].filter(Boolean).join(' · ') }),
+        ]),
+        el('div', { class: 'ad-media-act' }, [copyBtn, delBtn].filter(Boolean)),
+      ]));
+    }
+  }
+
+  document.getElementById('q').addEventListener('input', (e) => { query = e.target.value.trim(); render(); });
+
+  // ── uploads: button + drag-and-drop anywhere on the page ──
+  const upLabel = document.getElementById('upLabel');
+  async function handleFiles(files) {
+    const list = [...files];
+    if (!list.length) return;
+    let done = 0;
+    for (const f of list) {
+      upLabel.textContent = `Uploading ${done + 1} of ${list.length}…`;
+      try {
+        await uploadFile(f, 'uploads');
+        done++;
+      } catch (e) {
+        toast(`${f.name}: ${e.message || 'upload failed'}`, true);
+      }
+    }
+    upLabel.textContent = '＋ Upload files';
+    if (done) {
+      toast(done === 1 ? 'Uploaded — ready to use anywhere' : `${done} files uploaded — ready to use anywhere`);
+      await reload();
+    }
+  }
+  document.getElementById('upInput').addEventListener('change', (e) => { handleFiles(e.target.files); e.target.value = ''; });
+  const main = document.querySelector('.ad-main');
+  for (const evt of ['dragover', 'dragenter']) main.addEventListener(evt, (e) => { e.preventDefault(); main.classList.add('ad-drop'); });
+  for (const evt of ['dragleave', 'drop']) main.addEventListener(evt, (e) => { e.preventDefault(); if (evt === 'drop') handleFiles(e.dataTransfer?.files ?? []); main.classList.remove('ad-drop'); });
+
+  async function reload() {
+    try {
+      uploads = await listBucketAssets();
+    } catch (e) {
+      toast('Could not list storage: ' + e.message, true);
+      uploads = [];
+    }
+    renderTabs();
+    render();
+  }
+  await reload();
+</script>

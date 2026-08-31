@@ -1,0 +1,64 @@
+---
+/**
+ * Team-authored standalone pages — created at /admin/pages/, no code.
+ *
+ * Pages live in site_content key `custom_pages` as { pages: [{ slug,
+ * title, description, heroTitle, heroText, heroImage, published }] }.
+ * Each renders at /<slug>/ with the site chrome, and Page Sections
+ * attach to it by that path — so a page is a hero plus any stack of
+ * sections the team composes. Static routes always win over this
+ * catch-all, and the admin refuses reserved slugs, so existing pages
+ * can never be shadowed. Unknown or unpublished slugs fall through to
+ * the site's 404.
+ */
+import Base from '../layouts/Base.astro';
+import CustomSections from '../components/CustomSections.astro';
+import { getContent } from '../lib/content.js';
+import { imgVariant } from '../lib/images.js';
+
+const slug = (Astro.params.page ?? '').toLowerCase();
+const { custom_pages } = await getContent('custom_pages');
+const entry = (custom_pages?.pages ?? []).find((p) => p.slug === slug && p.published !== false);
+if (!entry) return Astro.rewrite('/404');
+
+const path = `/${entry.slug}/`;
+const hero = entry.heroImage ? imgVariant(entry.heroImage, { w: 1920, h: 1080 }) : null;
+---
+<Base
+  title={`${entry.title} | Sabdia Constructions`}
+  description={entry.description || entry.heroText || entry.title}
+  ogTitle={`${entry.title} — Sabdia Constructions`}
+  ogDescription={entry.description || entry.heroText || undefined}
+  ogImage={entry.heroImage ? imgVariant(entry.heroImage, { w: 1200, h: 630 }) : undefined}
+  preloadImage={hero ?? undefined}
+  lightNav={!hero}
+>
+  <style is:inline slot="head">
+  .cp-plain{padding:clamp(150px,20vh,220px) 0 clamp(40px,7vh,72px);border-bottom:1px solid var(--border)}
+  .cp-plain .page-h{color:var(--ink)}
+  .cp-plain .page-h em{color:var(--gold)}
+  .cp-sub{font-family:'EB Garamond',Georgia,serif;font-size:16.5px;font-weight:300;line-height:1.8;color:var(--ink3);max-width:620px;margin-top:20px}
+  .page-hero .cp-sub{color:rgba(253,251,246,.78)}
+  </style>
+
+  {hero ? (
+    <section class="page-hero">
+      <img src={hero} alt={entry.title} loading="eager" width="1920" height="1080">
+      <div class="page-hero-ov"></div>
+      <div class="page-hero-content inner">
+        <h1 class="page-h" set:html={entry.heroTitle || entry.title} />
+        {entry.heroText && <p class="cp-sub">{entry.heroText}</p>}
+      </div>
+    </section>
+  ) : (
+    <section class="cp-plain">
+      <div class="inner">
+        <h1 class="page-h" set:html={entry.heroTitle || entry.title} />
+        {entry.heroText && <p class="cp-sub">{entry.heroText}</p>}
+      </div>
+    </section>
+  )}
+
+  <CustomSections page={path} position="top" />
+  <CustomSections page={path} position="end" />
+</Base>

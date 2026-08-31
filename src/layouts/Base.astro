@@ -93,6 +93,29 @@ try {
 </main>
 
 <Footer />
+<script is:inline>
+/* Staff-only edit shortcut: a browser that has signed in to /admin
+   carries a local flag, and for it every public page shows a small
+   "Edit this page" pill linking to the screen that edits it. Plain
+   visitors never see it; the admin itself still requires sign-in. */
+(() => {
+  const place = () => {
+    let ok = false;
+    try { ok = localStorage.getItem('sabdia:staff') === '1'; } catch {}
+    if (!ok) return;
+    let pill = document.getElementById('sbEditPill');
+    if (!pill) {
+      pill = document.createElement('a');
+      pill.id = 'sbEditPill';
+      pill.textContent = '✎ Edit this page';
+      document.body.appendChild(pill);
+    }
+    pill.href = '/admin/content/?page=' + encodeURIComponent(location.pathname);
+  };
+  place();
+  document.addEventListener('astro:page-load', place);
+})();
+</script>
 <script src={withV('/js/main.js')} is:inline></script>
 </body>
 </html>

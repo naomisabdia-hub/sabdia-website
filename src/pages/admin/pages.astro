@@ -1,0 +1,165 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Pages" active="pages">
+  <!-- LIST VIEW -->
+  <div id="listView">
+    <div class="ad-hdr">
+      <div>
+        <h1 class="ad-h1">Your <em>Pages</em></h1>
+        <p class="ad-sub">Create brand-new pages of the website — a Testimonials page, a Process page, a page for an event — without touching code. Each page gets a heading and an optional hero image here; then build the body from any mix of layouts in Page Sections.</p>
+      </div>
+      <button class="ad-btn ad-btn-gold" id="newBtn">+ New Page</button>
+    </div>
+    <table class="ad-table" id="pageTable">
+      <thead><tr><th>Page</th><th>Web address</th><th>Sections</th><th>Visibility</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="ad-empty" id="pageEmpty" style="display:none">
+      No pages yet.<br>
+      <span style="font-size:13px;font-style:normal;font-family:var(--font-u)">Press "+ New Page", give it a name, and it's live at its own address the moment you publish.</span>
+    </div>
+  </div>
+
+  <!-- EDITOR VIEW -->
+  <div id="editView" style="display:none">
+    <div class="ad-hdr">
+      <div>
+        <h1 class="ad-h1" id="editTitle">New page</h1>
+        <p class="ad-sub">The hero is the page's opening; everything below it is built from Page Sections. Don't forget to add the page to the menu — Site Content → Navigation.</p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <a class="ad-btn ad-btn-ghost" id="sectionsBtn" style="display:none">+ Add sections</a>
+        <a class="ad-btn ad-btn-ghost" id="previewBtn" target="_blank" style="display:none">View page ↗</a>
+        <button class="ad-btn ad-btn-ghost" id="backBtn">← All pages</button>
+      </div>
+    </div>
+    <div class="ad-form" id="pageForm"></div>
+    <div class="ad-savebar" id="saveBar">
+      <button class="ad-btn ad-btn-gold" data-save>Save &amp; publish</button>
+      <span class="ad-dirty">Unsaved changes</span>
+      <span class="spacer"></span>
+      <button class="ad-btn ad-btn-danger" id="deleteBtn">Delete page</button>
+    </div>
+  </div>
+</AdminShell>
+
+<script>
+  import { supabase, requireAuth, el, toast } from '../../lib/admin/client.js';
+  import { buildForm, readForm, saveBar } from '../../lib/admin/forms.js';
+  import { customPageSchema, RESERVED_SLUGS } from '../../lib/admin/schemas.js';
+
+  await requireAuth();
+
+  const listView = document.getElementById('listView');
+  const editView = document.getElementById('editView');
+  let doc = { pages: [] };
+  let sectionsDoc = { sections: [] };
+  let current = null;
+  let isNew = false;
+
+  async function load() {
+    const [pages, sections] = await Promise.all([
+      supabase.from('site_content').select('data').eq('key', 'custom_pages').maybeSingle(),
+      supabase.from('site_content').select('data').eq('key', 'custom_sections').maybeSingle(),
+    ]);
+    doc = pages.data?.data && Array.isArray(pages.data.data.pages) ? pages.data.data : { pages: [] };
+    sectionsDoc = sections.data?.data && Array.isArray(sections.data.data.sections) ? sections.data.data : { sections: [] };
+  }
+  async function persist() {
+    const { error } = await supabase.from('site_content').upsert({ key: 'custom_pages', data: doc });
+    if (error) throw error;
+  }
+
+  const sectionCount = (slug) => sectionsDoc.sections.filter((s) => s.page === `/${slug}/`).length;
+
+  function renderList() {
+    listView.style.display = '';
+    editView.style.display = 'none';
+    const tbody = document.querySelector('#pageTable tbody');
+    tbody.innerHTML = '';
+    document.getElementById('pageEmpty').style.display = doc.pages.length ? 'none' : '';
+    document.getElementById('pageTable').style.display = doc.pages.length ? '' : 'none';
+    for (const p of doc.pages) {
+      const n = sectionCount(p.slug);
+      tbody.appendChild(el('tr', { class: 'clickable', onclick: () => openEditor(p) }, [
+        el('td', { text: p.title || '(untitled)', style: 'font-weight:400' }),
+        el('td', { text: `/${p.slug}/`, style: 'color:var(--taupe-d)' }),
+        el('td', { text: n ? `${n} section${n === 1 ? '' : 's'}` : 'hero only' }),
+        el('td', {}, [el('span', { class: `ad-badge ${p.published !== false ? 'live' : 'draft'}`, text: p.published !== false ? 'Published' : 'Draft' })]),
+      ]));
+    }
+    history.replaceState(null, '', location.pathname);
+  }
+
+  function openEditor(p, fresh = false) {
+    current = p;
+    isNew = fresh;
+    listView.style.display = 'none';
+    editView.style.display = '';
+    document.getElementById('editTitle').textContent = fresh ? 'New page' : `Edit — ${p.title}`;
+    const show = !fresh && p.slug;
+    for (const [id, href] of [['previewBtn', `/${p.slug}/`], ['sectionsBtn', `/admin/sections/?page=${encodeURIComponent(`/${p.slug}/`)}`]]) {
+      const btn = document.getElementById(id);
+      btn.style.display = show ? '' : 'none';
+      btn.href = href;
+    }
+    document.getElementById('deleteBtn').style.display = fresh ? 'none' : '';
+    buildForm(document.getElementById('pageForm'), customPageSchema, p);
+    /* Suggest the address from the name until one is typed by hand. */
+    const titleInput = document.querySelector('#pageForm [data-k="title"]');
+    const slugInput = document.querySelector('#pageForm [data-k="slug"]');
+    let slugTouched = Boolean(p.slug);
+    slugInput.addEventListener('input', () => { slugTouched = slugInput.value.trim() !== ''; });
+    titleInput.addEventListener('input', () => {
+      if (!slugTouched) slugInput.value = slugify(titleInput.value);
+    });
+    window.scrollTo(0, 0);
+  }
+
+  const slugify = (s) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+  document.getElementById('newBtn').addEventListener('click', () =>
+    openEditor({ id: crypto.randomUUID(), title: '', slug: '', published: false }, true),
+  );
+  document.getElementById('backBtn').addEventListener('click', renderList);
+
+  saveBar(document.getElementById('pageForm'), document.getElementById('saveBar'), async () => {
+    const p = readForm(document.getElementById('pageForm'), customPageSchema, current);
+    if (!p.title) throw new Error('Give the page a name first.');
+    p.slug = slugify(p.slug || p.title);
+    if (!p.slug) throw new Error('The web address needs at least one letter or number.');
+    if (RESERVED_SLUGS.includes(p.slug)) throw new Error(`/${p.slug}/ is already a page of the website — choose a different address.`);
+    if (doc.pages.some((x) => x.slug === p.slug && x.id !== p.id)) throw new Error(`Another of your pages already uses /${p.slug}/.`);
+    const i = doc.pages.findIndex((x) => x.id === p.id);
+    if (i >= 0) doc.pages[i] = p; else doc.pages.push(p);
+    await persist();
+    current = p;
+    isNew = false;
+    openEditor(p);
+    if (p.published !== false && !sectionCount(p.slug)) {
+      toast('Page saved — now press “+ Add sections” to build its body.');
+    }
+  });
+
+  document.getElementById('deleteBtn').addEventListener('click', async () => {
+    if (!current?.id || isNew) return;
+    const n = sectionCount(current.slug);
+    if (!confirm(`Delete “${current.title}” (/${current.slug}/)? Untick Published instead if you just want it off the website.${n ? `\n\nIts ${n} section${n === 1 ? '' : 's'} will stay in Page Sections until deleted there.` : ''}`)) return;
+    doc.pages = doc.pages.filter((x) => x.id !== current.id);
+    try {
+      await persist();
+      toast('Page deleted');
+    } catch (e) { return toast(e.message, true); }
+    renderList();
+  });
+
+  await load();
+  renderList();
+  const params = new URLSearchParams(location.search);
+  if (params.get('new')) document.getElementById('newBtn').click();
+  const editSlug = params.get('edit');
+  const hit = editSlug && doc.pages.find((p) => p.slug === editSlug);
+  if (hit) openEditor(hit);
+</script>

@@ -8,9 +8,10 @@
  * component twice — position "top" (under the hero) and "end" (before
  * the footer). Pages with no sections render nothing.
  *
- * Layouts: editorial, image-text, image-band, quote, cta-band,
+ * Layouts: editorial, image-text, image-band, quote, cta-band, columns,
  * gallery-strip — markup reuses the site's global design system classes
- * plus the cs-* helpers in style.css.
+ * plus the cs-* helpers in style.css. Pages created at /admin/pages/
+ * participate too: their sections are keyed by the page's /slug/ path.
  */
 import { getContent } from '../lib/content.js';
 import { getProperties } from '../lib/db.js';
@@ -170,6 +171,28 @@ const propSpecs = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, landLabel(d.land, 
           </section>
         );
       })()}
+
+      {s.layout === 'columns' && (s.items ?? []).length > 0 && (
+        <section class={`sp cs-section ${dark ? 'cs-dark' : ''}`}>
+          <div class="inner">
+            {s.label && <div class={`slabel ${dark ? 'slabel-dark' : ''} reveal`}>{s.label}</div>}
+            {s.headingHtml && <h2 class="cs-h reveal d1" style="margin-bottom:44px" set:html={s.headingHtml} />}
+            <div class="cs-cols" style={`--cs-tcols:${['2', '3'].includes(String(s.cols)) ? s.cols : 3}`}>
+              {(s.items ?? []).map((c, i) => (
+                <div class={`reveal ${['', 'd1', 'd2'][i % 3]}`.trim()}>
+                  {c.title && <h3 class="cs-col-t">{c.title}</h3>}
+                  {c.text && <p class="cs-p" style="max-width:none">{c.text}</p>}
+                </div>
+              ))}
+            </div>
+            {hasBtn(s.cta) && (
+              <div class="reveal d2" style="margin-top:44px">
+                <a href={s.cta.href || '/contact/'} class={dark ? 'btn-g btn-g-light' : 'btn-g btn-g-gold'}>{s.cta.label} &rarr;</a>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {s.layout === 'gallery-strip' && (s.images ?? []).length > 0 && (
         <section class="sp-sm cs-section">

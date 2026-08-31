@@ -78,21 +78,66 @@ export const prerender = true;
   };
 
   const groupsBox = document.getElementById('groups');
+  const groupCards = [];
   for (const group of contentGroups) {
     const card = el('div', { class: 'ad-card' }, [el('div', { class: 'ad-card-h', text: group.name })]);
     const table = el('table', { class: 'ad-table' });
     const tbody = el('tbody');
+    const trs = [];
     for (const key of group.keys) {
       const meta = contentSchemas[key];
       if (!meta) continue;
-      tbody.appendChild(el('tr', { class: 'clickable', onclick: () => openEditor(key) }, [
+      const tr = el('tr', { class: 'clickable', 'data-page': pageFor[key] ?? '', onclick: () => openEditor(key) }, [
         el('td', { text: meta.title, style: 'font-weight:400' }),
         el('td', { text: meta.description || '', style: 'color:var(--taupe-d)' }),
-      ]));
+      ]);
+      tbody.appendChild(tr);
+      trs.push(tr);
     }
     table.appendChild(tbody);
     card.appendChild(table);
     groupsBox.appendChild(card);
+    groupCards.push({ card, trs });
+  }
+
+  /* ?page=/about/ — arriving from the public site's "Edit this page"
+     pill: show only the content screens that build that page. */
+  const pagePath = new URLSearchParams(location.search).get('page');
+  if (pagePath) {
+    const gold = 'style="color:var(--gold)"';
+    /* Detail pages share one editor: any /properties/<x>/ maps to the
+       property-page screens; journal entries live in the Journal. */
+    let lookup = pagePath;
+    let special = null;
+    if (/^\/properties\/[^/]+\/$/.test(pagePath)) lookup = '/properties/qasr/';
+    if (/^\/journal\/[^/]+\/$/.test(pagePath)) special =
+      `Journal entries are written and edited in <a href="/admin/blog/" ${gold}>Journal</a>. <a href="/admin/content/" ${gold}>Show all site content</a>`;
+
+    let any = false;
+    if (!special) {
+      for (const { card, trs } of groupCards) {
+        let visible = 0;
+        for (const tr of trs) {
+          const hit = tr.dataset.page === lookup;
+          tr.style.display = hit ? '' : 'none';
+          if (hit) visible++;
+        }
+        card.style.display = visible ? '' : 'none';
+        if (visible) any = true;
+      }
+    }
+    const sectionsLink = `<a href="/admin/sections/?page=${encodeURIComponent(pagePath)}" ${gold}>Add a section to this page →</a>`;
+    const msg = special
+      ? special
+      : any
+        ? `Showing what builds <b>${pagePath}</b>. <a href="/admin/content/" ${gold}>Show everything</a> · ${sectionsLink}`
+        : `Nothing in Site Content matches <b>${pagePath}</b> — if it's one of your own pages, its hero is edited in <a href="/admin/pages/" ${gold}>Pages</a> and its body in ${sectionsLink.replace(' →', '')}. <a href="/admin/content/" ${gold}>Show all site content</a>`;
+    groupsBox.insertBefore(
+      el('div', { class: 'ad-card', style: 'border-left:3px solid var(--gold)' }, [
+        el('p', { class: 'ad-sub', style: 'max-width:none;margin:0', html: msg }),
+      ]),
+      groupsBox.firstChild,
+    );
   }
 
   async function openEditor(key) {

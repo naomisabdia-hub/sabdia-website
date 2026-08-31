@@ -11,6 +11,13 @@ export const prerender = true;
     <button class="ad-btn ad-btn-ghost" id="csvBtn">Export CSV</button>
   </div>
 
+  <div class="ad-card" id="mailBanner" style="display:none;border-left:3px solid #a8874a;margin-bottom:18px">
+    <p class="ad-sub" style="max-width:none;margin:0">
+      <b>Email alerts are switched off</b> — every enquiry is safely saved here, but nobody is emailed when one arrives.
+      See <a href="/admin/settings/" style="color:var(--gold)">Settings → Website health</a> for the two settings that turn them on.
+    </p>
+  </div>
+
   <div class="ad-tabs" id="typeTabs"></div>
 
   <div class="ad-filters">
@@ -31,6 +38,15 @@ export const prerender = true;
   import { supabase, requireAuth, accessToken, el, toast, csvExport, fmtDate } from '../../lib/admin/client.js';
 
   await requireAuth();
+
+  /* Surface silent misconfiguration: enquiries saved but nobody emailed. */
+  (async () => {
+    try {
+      const res = await fetch('/api/status', { headers: { Authorization: `Bearer ${await accessToken()}` } });
+      if (!res.ok) return;
+      if (!(await res.json()).emailAlerts) document.getElementById('mailBanner').style.display = '';
+    } catch { /* status endpoint unavailable — say nothing */ }
+  })();
 
   const TYPES = [
     ['', 'All leads'],

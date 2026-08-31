@@ -1110,6 +1110,10 @@ h1 em, h2 em, h3 em,
 .cs-p{font-family:'EB Garamond',Georgia,serif;font-size:15.5px;font-weight:300;line-height:1.85;color:var(--ink3);max-width:560px}
 .cs-p+.cs-p{margin-top:18px}
 .cs-dark .cs-p{color:rgba(253,251,246,.6)}
+.cs-cols{display:grid;grid-template-columns:repeat(var(--cs-tcols,3),1fr);gap:clamp(28px,4vw,64px)}
+.cs-col-t{font-family:var(--font-d);font-size:20px;font-weight:300;color:var(--ink);margin-bottom:10px}
+.cs-dark .cs-col-t{color:var(--white)}
+@media(max-width:820px){.cs-cols{grid-template-columns:1fr;gap:32px}}
 .cs-it-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,96px);align-items:center}
 .cs-it-flip .cs-it-img{order:2}
 .cs-it-img{overflow:hidden;aspect-ratio:4/3;background:var(--bg3)}
@@ -1155,3 +1159,10 @@ h1 em, h2 em, h3 em,
   html.js .proc-track .proc-n{transform:none;opacity:1;transition:none}
   .pc,.sc-card{transition:none}
 }
+
+/* ── STAFF EDIT PILL ── shown only on browsers that have signed in to
+   /admin (a local flag set by the portal) — a shortcut from any public
+   page to the screen that edits it. Invisible to visitors. */
+#sbEditPill{position:fixed;right:18px;bottom:18px;z-index:6000;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:var(--dark);color:var(--gold2);border:1px solid rgba(216,196,142,.45);font-family:var(--font-u);font-size:9.5px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;text-decoration:none;opacity:.82;transition:opacity .2s}
+#sbEditPill:hover{opacity:1}
+@media print{#sbEditPill{display:none}}

@@ -22,13 +22,16 @@ const slugify = (n: string) => n.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
 export const GET: APIRoute = async ({ site }) => {
   const base = (site ?? new URL('https://www.sabdiaconstructions.com.au')).origin;
-  const [props, { collection_page }, posts] = await Promise.all([getProperties(), getContent('collection_page'), getPosts()]);
+  const [props, { collection_page, custom_pages }, posts] = await Promise.all([getProperties(), getContent('collection_page', 'custom_pages'), getPosts()]);
 
   const urls = [
     ...STATIC_PATHS.map((p) => ({ loc: `${base}${p}`, priority: p === '/' ? '1.0' : '0.7' })),
     ...props.map((p) => ({ loc: `${base}/properties/${p.id}/`, priority: '0.8' })),
     ...(collection_page?.items ?? []).map((i: { name: string }) => ({ loc: `${base}/collection/${slugify(i.name)}/`, priority: '0.6' })),
     ...posts.map((p: { slug: string }) => ({ loc: `${base}/journal/${p.slug}/`, priority: '0.6' })),
+    ...((custom_pages?.pages ?? []) as { slug: string; published?: boolean }[])
+      .filter((p) => p.published !== false)
+      .map((p) => ({ loc: `${base}/${p.slug}/`, priority: '0.6' })),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

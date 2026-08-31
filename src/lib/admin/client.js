@@ -111,6 +111,11 @@ export async function requireAuth() {
     throw new Error('not an admin user');
   }
 
+  /* Mark this browser as staff so the public site can show its edit
+     shortcut (see Base.astro) — a convenience flag, not a credential:
+     every admin page still verifies the real session above. */
+  try { localStorage.setItem('sabdia:staff', '1'); } catch {}
+
   const el = document.getElementById('adUser');
   if (el) el.textContent = row.email;
   const btn = document.getElementById('adLogout');
