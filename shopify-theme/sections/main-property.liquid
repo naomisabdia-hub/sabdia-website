@@ -12,6 +12,10 @@
 {%- endcomment -%}
 {%- liquid
   assign mf = product.metafields.custom
+  # The {name} token editors write in the shared framing copy. Built with
+  # append because Shopify's Liquid parser rejects literal braces inside
+  # an output tag's string arguments.
+  assign name_token = '{' | append: 'name' | append: '}'
   assign sold = false
   if product.tags contains 'sold'
     assign sold = true
@@ -143,7 +147,7 @@
 {%- if gallery_count > 0 -%}
   <div class="prop-gallery inner">
     <div class="slabel reveal">{{ section.settings.gallery_label }}</div>
-    <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: '{name}', product.title }}</h2>
+    <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, product.title }}</h2>
     <div class="prop-gallery-grid gn-{{ gallery_count }}" id="galleryGrid">
       {%- assign slots = 'a,b,c,d,e,f' | split: ',' -%}
       {%- assign gdelays = ',d1,d2,d1,d2,d3' | split: ',' -%}
@@ -213,9 +217,9 @@
   <section class="prop-cta">
     <div class="inner prop-cta-inner">
       <div class="slabel reveal" style="justify-content:center">{{ section.settings.cta_label }}</div>
-      <h2 class="prop-cta-h reveal d1">{{ section.settings.cta_heading_html | replace: '{name}', product.title }}</h2>
-      <p class="prop-cta-p reveal d2">{{ section.settings.cta_text | replace: '{name}', product.title }}</p>
-      <a href="#cform" class="btn-p reveal d3">{{ section.settings.cta_button | replace: '{name}', product.title }} &rarr;</a>
+      <h2 class="prop-cta-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, product.title }}</h2>
+      <p class="prop-cta-p reveal d2">{{ section.settings.cta_text | replace: name_token, product.title }}</p>
+      <a href="#cform" class="btn-p reveal d3">{{ section.settings.cta_button | replace: name_token, product.title }} &rarr;</a>
     </div>
   </section>
 {%- endunless -%}
