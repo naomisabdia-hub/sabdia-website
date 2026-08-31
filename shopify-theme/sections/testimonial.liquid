@@ -1,0 +1,30 @@
+{%- comment -%} Port of the dark testimonial band. {%- endcomment -%}
+{%- if section.settings.quote != blank -%}
+<section class="testi-dark sp">
+  <div class="inner">
+    <div class="testi-wrap">
+      <div>
+        <span class="testi-q-mark reveal">&ldquo;</span>
+      </div>
+      <div>
+        <blockquote class="testi-text reveal d1">{{ section.settings.quote }}</blockquote>
+        <div class="testi-auth reveal d2">
+          <div class="testi-line"></div>
+          <div class="testi-name">{{ section.settings.attribution }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Testimonial",
+  "settings": [
+    { "type": "textarea", "id": "quote", "label": "Quote" },
+    { "type": "text", "id": "attribution", "label": "Attribution" }
+  ],
+  "presets": [{ "name": "Testimonial" }]
+}
+{% endschema %}

@@ -1,0 +1,52 @@
+{%- comment -%}
+  Sabdia theme shell — a faithful port of the Astro site's Base.astro.
+  Same stylesheet, same fonts, same body structure (skip link → nav →
+  main → footer → main.js), so every page renders identically to the
+  Vercel site. Header/footer live in section groups so they are editable
+  in the theme customizer.
+{%- endcomment -%}
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F7F3EB">
+<title>{{ page_title }}{% unless page_title contains 'Sabdia' or page_title == blank %} | Sabdia Constructions{% endunless %}</title>
+{%- if page_description -%}<meta name="description" content="{{ page_description | escape }}">{%- endif -%}
+<link rel="canonical" href="{{ canonical_url }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ 'favicon-32.png' | asset_url }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ 'favicon-16.png' | asset_url }}">
+<link rel="apple-touch-icon" href="{{ 'apple-touch-icon.png' | asset_url }}">
+<script>
+document.documentElement.classList.add('js');
+/* Runs before first paint so the loader never flashes on a repeat visit.
+   sessionStorage, not localStorage: the opening is worth seeing once per
+   visit, not once per lifetime. Wrapped because Safari private mode throws
+   on storage access — a failure here just means the loader plays. */
+try {
+  if (sessionStorage.getItem('sabdia:seen')) document.documentElement.classList.add('no-loader');
+  else sessionStorage.setItem('sabdia:seen', '1');
+} catch (e) {}
+</script>
+{% render 'meta-tags' %}
+<link rel="preconnect" href="https://fvczsjcrvwzqtcbforgo.supabase.co" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="{{ 'jost-var.woff2' | asset_url }}" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="{{ 'cormorant-garamond-var.woff2' | asset_url }}" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="{{ 'eb-garamond-var-italic.woff2' | asset_url }}" crossorigin>
+{{ 'style.css' | asset_url | stylesheet_tag }}
+{{ content_for_header }}
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+{% sections 'header-group' %}
+
+<main id="main">
+{{ content_for_layout }}
+</main>
+
+{% sections 'footer-group' %}
+<script src="{{ 'main.js' | asset_url }}"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{%- comment -%}
+  Resized/cropped variant of an image that still lives on the Sabdia
+  media pipeline (local /images master or Supabase media) — served via
+  the existing /api/img endpoint so crops and focal points render exactly
+  as on the Vercel site. Shopify-hosted images should use image_url
+  instead; this exists so externally-hosted content renders identically
+  until it is migrated.
+
+  Accepts: src (path or URL), w, h, focus (optional "fp_x_y"), q (optional)
+{%- endcomment -%}
+{%- liquid
+  assign base = settings.forms_endpoint
+  assign is_svg = false
+  if src contains '.svg'
+    assign is_svg = true
+  endif
+  assign is_media = false
+  if src contains '.supabase.co/storage/v1/object/public/'
+    assign is_media = true
+  endif
+  assign first_char = src | slice: 0, 1
+  if first_char == '/'
+    assign is_media = true
+  endif
+-%}
+{%- if src == blank -%}
+{%- elsif is_svg or is_media == false -%}{{ src }}
+{%- else -%}{{ base }}/api/img?src={{ src | url_encode }}&w={{ w }}&h={{ h }}{% if focus != blank %}&fp={{ focus | url_encode }}{% endif %}{% if q != blank %}&q={{ q }}{% endif %}
+{%- endif -%}

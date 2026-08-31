@@ -1,0 +1,38 @@
+{%- comment -%} Port of the homepage stats band — counters count up on reveal. {%- endcomment -%}
+{%- assign delays = ',d1,d2,d3,d4,d5' | split: ',' -%}
+<div class="stats-band sp-sm">
+  <div class="stats-grid inner">
+    {%- for block in section.blocks -%}
+      <div class="stat reveal {{ delays[forloop.index0] }}" {{ block.shopify_attributes }}>
+        <span class="stat-n">
+          {%- if block.settings.count -%}
+            <span class="counter" data-target="{{ block.settings.target }}">{{ block.settings.target }}</span>
+          {%- else -%}
+            {{ block.settings.target }}
+          {%- endif -%}<span class="stat-u">{{ block.settings.suffix }}</span>
+        </span>
+        <div class="stat-l">{{ block.settings.label }}</div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Stats band",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        { "type": "text", "id": "target", "label": "Number", "default": "100" },
+        { "type": "text", "id": "suffix", "label": "Suffix", "default": "+" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Residences Delivered" },
+        { "type": "checkbox", "id": "count", "label": "Count up on reveal", "default": false }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Stats band" }]
+}
+{% endschema %}

@@ -1,0 +1,35 @@
+{%- comment -%}
+  Collection listing — the For Sale grid. Sold residences (tagged
+  "sold") render with the sold treatment.
+{%- endcomment -%}
+<section class="sp" style="padding-top:clamp(140px,18vw,220px)">
+  <div class="inner">
+    <div class="proj-hdr" style="margin-bottom:48px">
+      <div>
+        <div class="slabel reveal">{{ section.settings.label }}</div>
+        <h1 class="proj-h reveal d1">{{ collection.title }}</h1>
+        {%- if collection.description != blank -%}
+          <p class="about-p reveal d2" style="margin-top:18px;max-width:560px">{{ collection.description | strip_html }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+    <div class="proj-grid-3">
+      {%- for product in collection.products -%}
+        {%- if product.tags contains 'sold' -%}
+          {% render 'sold-card', product: product, class: 'reveal-wipe', img_w: 800, img_h: 500, show_suburb: true %}
+        {%- else -%}
+          {% render 'property-card', product: product, class: 'reveal-wipe', style: 'aspect-ratio:16/10', img_w: 900, img_h: 560, show_cars: true %}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collection grid",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "The Portfolio" }
+  ]
+}
+{% endschema %}

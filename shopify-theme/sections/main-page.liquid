@@ -1,0 +1,23 @@
+{%- comment -%}
+  Generic page shell — used while each Sabdia page (About, Services,
+  Projects, …) is ported to its own dedicated template. Renders the
+  page's own content styled inside the site's design system.
+{%- endcomment -%}
+<section class="sp" style="padding-top:clamp(140px,18vw,220px)">
+  <div class="inner" style="max-width:840px">
+    <div class="slabel reveal">{{ section.settings.label }}</div>
+    <h1 class="about-h reveal d1">{{ page.title }}</h1>
+    <div class="reveal d2" style="margin-top:32px">
+      {{ page.content | replace: '<p>', '<p class="about-p">' }}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Page",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Sabdia" }
+  ]
+}
+{% endschema %}

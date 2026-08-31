@@ -1,0 +1,141 @@
+{%- comment -%}
+  Port of Footer.astro — tagline band, newsletter band (posts into the
+  Sabdia leads/subscriber system via the forms endpoint), link grid and
+  the legal row. For Sale links come from the for-sale collection (or a
+  chosen menu); company and legal links from Shopify menus with the
+  original Sabdia links as fallback.
+{%- endcomment -%}
+{%- liquid
+  assign logo_src = 'logo.png' | asset_url
+  if settings.logo
+    assign logo_src = settings.logo | image_url: width: 400
+  endif
+  assign for_sale_menu = linklists[section.settings.for_sale_menu]
+  assign company_menu = linklists[section.settings.company_menu]
+  assign legal_menu = linklists[section.settings.legal_menu]
+  assign for_sale_collection = collections['for-sale']
+-%}
+<footer>
+  <div class="footer-tagline">
+    <div class="footer-tagline-inner">
+      <h2 class="footer-tag-h">{{ section.settings.tagline_html }}</h2>
+      <p class="footer-tag-sub">{{ section.settings.tagline_sub }}</p>
+    </div>
+  </div>
+  <div class="nl-band">
+    <div class="nl-inner">
+      <div class="nl-copy">
+        <div class="nl-h">{{ section.settings.nl_heading }}</div>
+        <p class="nl-t">{{ section.settings.nl_text }}</p>
+      </div>
+      <form class="nl-form" id="nlForm" method="POST" action="{{ settings.forms_endpoint }}/api/subscribe" data-success="{{ section.settings.nl_success | escape }}">
+        <p style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <label class="sr-only" for="nlEmail">Email address</label>
+        <input class="nl-in" id="nlEmail" type="email" name="email" placeholder="{{ section.settings.nl_placeholder | escape }}" autocomplete="email" required>
+        <button class="nl-btn" type="submit">{{ section.settings.nl_button }}</button>
+        <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+      </form>
+    </div>
+  </div>
+  <div class="fg-grid">
+    <div>
+      <a href="/" class="flogo" aria-label="{{ settings.site_name }}">
+        <img src="{{ logo_src }}" alt="{{ settings.site_name }}">
+      </a>
+      <p class="ftag">{{ section.settings.blurb_html }}</p>
+      <div class="fsoc">
+        <a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" class="fsl" aria-label="Instagram">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="{{ settings.facebook_url }}" target="_blank" rel="noopener" class="fsl" aria-label="Facebook">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener" class="fsl" aria-label="LinkedIn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+      </div>
+    </div>
+    <div>
+      <div class="fct">For Sale</div>
+      <ul class="fcl">
+        {%- if for_sale_menu.links.size > 0 -%}
+          {%- for link in for_sale_menu.links -%}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {%- endfor -%}
+        {%- elsif for_sale_collection.products.size > 0 -%}
+          {%- for p in for_sale_collection.products limit: 6 -%}
+            <li><a href="{{ p.url }}">{{ p.title }}{% if p.metafields.custom.suburb.value != blank %} — {{ p.metafields.custom.suburb.value }}{% endif %}</a></li>
+          {%- endfor -%}
+        {%- endif -%}
+        <li><a href="/collections/for-sale">View All Properties</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="fct">Company</div>
+      <ul class="fcl">
+        {%- if company_menu.links.size > 0 -%}
+          {%- for link in company_menu.links -%}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {%- endfor -%}
+        {%- else -%}
+          <li><a href="/pages/about">About Sabdia</a></li>
+          <li><a href="/pages/services">Services</a></li>
+          <li><a href="/pages/projects">Projects</a></li>
+          <li><a href="/pages/collection">Collection</a></li>
+          <li><a href="/pages/agent-access">Agent Access</a></li>
+          <li><a href="/blogs/journal">The Journal</a></li>
+        {%- endif -%}
+      </ul>
+    </div>
+    <div>
+      <div class="fct">Connect</div>
+      <ul class="fcl">
+        <li><a href="/pages/contact">Contact Us</a></li>
+        {%- if settings.contact_phone != blank -%}
+          <li><a href="tel:{{ settings.contact_phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}">{{ settings.contact_phone }}</a></li>
+        {%- endif -%}
+        {%- if settings.contact_email != blank -%}
+          <li><a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a></li>
+        {%- endif -%}
+        <li><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener">Instagram {{ settings.instagram_label }}</a></li>
+        <li><a href="{{ settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a></li>
+        <li><a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="{{ settings.domain_url }}" target="_blank" rel="noopener">{{ settings.domain_display }}</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="fbot">
+    <div class="fcopy">&copy; {{ 'now' | date: '%Y' }} {{ settings.legal_name }}. All rights reserved.</div>
+    <div class="flinks">
+      {%- if legal_menu.links.size > 0 -%}
+        {%- for link in legal_menu.links -%}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {%- endfor -%}
+      {%- else -%}
+        <a href="/pages/accessibility">Accessibility</a>
+        <a href="/pages/privacy">Privacy</a>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    { "type": "html", "id": "tagline_html", "label": "Tagline", "default": "Design. <em>Develop.<\/em><br>Construct." },
+    { "type": "text", "id": "tagline_sub", "label": "Tagline subtitle", "default": "Boutique luxury home builder & developer delivering award-winning residences across inner Brisbane since 2013." },
+    { "type": "html", "id": "blurb_html", "label": "Footer blurb", "default": "Boutique Luxury Home Builder &<br>Developer — Brisbane, QLD" },
+    { "type": "header", "content": "Newsletter band" },
+    { "type": "text", "id": "nl_heading", "label": "Heading", "default": "The Sabdia Journal" },
+    { "type": "textarea", "id": "nl_text", "label": "Text", "default": "Occasional notes from our studio — new releases, completed residences, and ideas in luxury living. No noise, unsubscribe any time." },
+    { "type": "text", "id": "nl_placeholder", "label": "Email placeholder", "default": "Your email address" },
+    { "type": "text", "id": "nl_button", "label": "Button label", "default": "Subscribe" },
+    { "type": "text", "id": "nl_success", "label": "Success message", "default": "Welcome — you're on the list." },
+    { "type": "header", "content": "Link columns" },
+    { "type": "link_list", "id": "for_sale_menu", "label": "For Sale menu", "info": "Leave unset to list the for-sale collection automatically." },
+    { "type": "link_list", "id": "company_menu", "label": "Company menu" },
+    { "type": "link_list", "id": "legal_menu", "label": "Legal menu" }
+  ]
+}
+{% endschema %}

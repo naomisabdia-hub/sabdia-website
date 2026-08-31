@@ -1,0 +1,111 @@
+{%- comment -%}
+  Port of FilmBand.astro — a vertical reel in a framed player beside
+  editorial copy. Autoplays muted in view; tap for sound. The film clips
+  live on the Sabdia media library (Supabase films/…).
+{%- endcomment -%}
+{%- if section.settings.video_url != blank -%}
+<section class="film-band" id="{{ section.settings.anchor | default: 'film' }}">
+  <div class="film-grid">
+    <div class="film-copy">
+      <div class="slabel slabel-dark reveal">{{ section.settings.label }}</div>
+      <h2 class="film-h reveal d1">{{ section.settings.heading_html }}</h2>
+      {%- if section.settings.text != blank -%}<p class="film-p reveal d2">{{ section.settings.text }}</p>{%- endif -%}
+      {%- if section.settings.cta_label != blank -%}
+        <a href="{{ section.settings.cta_link }}" class="btn-g btn-g-light reveal d3">{{ section.settings.cta_label }} &rarr;</a>
+      {%- endif -%}
+    </div>
+    <div class="reveal d2">
+      <div class="film-frame" data-film>
+        <video
+          src="{{ section.settings.video_url }}"
+          {% if section.settings.poster %}poster="{{ section.settings.poster | image_url: width: 900 }}"{% elsif section.settings.poster_ext != blank %}poster="{{ section.settings.poster_ext }}"{% endif %}
+          muted
+          loop
+          playsinline
+          preload="none"
+        ></video>
+        <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+          <span data-sound-label>Sound On</span>
+        </button>
+      </div>
+      {%- if section.settings.caption_left != blank or section.settings.caption_right != blank -%}
+        <div class="film-caption">
+          <span><b>{{ section.settings.caption_left }}</b></span>
+          <span>{{ section.settings.caption_right }}</span>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script>
+/* Port of the FilmBand player — immediate call + per-element guard. */
+function sabdiaFilmInit() {
+  document.querySelectorAll('[data-film]').forEach(function (frame) {
+    if (frame.dataset.filmInit) return;
+    frame.dataset.filmInit = '1';
+    var video = frame.querySelector('video');
+    var btn = frame.querySelector('[data-sound]');
+    var label = frame.querySelector('[data-sound-label]');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if ('IntersectionObserver' in window && !reduced) {
+      var wantPlay = false;
+      var retries = 0;
+      var attempt = function () {
+        if (!wantPlay || !video.isConnected || !video.paused) return;
+        var p = video.play();
+        if (p && p.catch) p.catch(function () {
+          if (wantPlay && retries++ < 12) setTimeout(attempt, 700);
+        });
+      };
+      video.addEventListener('canplay', attempt);
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) attempt();
+      });
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.intersectionRatio >= 0.35) {
+            wantPlay = true;
+            retries = 0;
+            attempt();
+          } else if (!en.isIntersecting) {
+            wantPlay = false;
+            video.pause();
+          }
+        });
+      }, { threshold: [0, 0.35] });
+      io.observe(frame);
+    }
+
+    btn.addEventListener('click', function () {
+      video.muted = !video.muted;
+      if (!video.muted && video.paused) video.play().catch(function () {});
+      label.textContent = video.muted ? 'Sound On' : 'Mute';
+    });
+  });
+}
+sabdiaFilmInit();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Film band",
+  "settings": [
+    { "type": "text", "id": "anchor", "label": "Anchor id", "default": "story" },
+    { "type": "text", "id": "label", "label": "Small label" },
+    { "type": "html", "id": "heading_html", "label": "Heading" },
+    { "type": "textarea", "id": "text", "label": "Paragraph" },
+    { "type": "text", "id": "video_url", "label": "Film URL (mp4)", "info": "From the media library — portrait 9:16 works best." },
+    { "type": "image_picker", "id": "poster", "label": "Poster image" },
+    { "type": "text", "id": "poster_ext", "label": "Poster URL", "info": "Used when no poster image is picked." },
+    { "type": "text", "id": "caption_left", "label": "Caption — left" },
+    { "type": "text", "id": "caption_right", "label": "Caption — right" },
+    { "type": "text", "id": "cta_label", "label": "Button label" },
+    { "type": "text", "id": "cta_link", "label": "Button link" }
+  ],
+  "presets": [{ "name": "Film band" }]
+}
+{% endschema %}

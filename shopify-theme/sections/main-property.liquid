@@ -1,0 +1,239 @@
+{%- comment -%}
+  Port of the property page (properties/[slug].astro) fed by a product:
+  photographic hero, sold notice, specs bar, description + enquiry form,
+  count-adaptive gallery with lightbox, and the residence film. The
+  scroll walkthrough renders from its own section beneath this one.
+
+  Product fields used: title, description (paragraphs), featured image
+  (hero), remaining images (gallery), tag "sold", and metafields
+  custom.suburb / state / beds / baths / cars / land / land_over /
+  headline / features / enquiry_heading / enquiry_text / enquiry_button /
+  brochure_url / film_video / film_poster / scrollwalk_folder.
+{%- endcomment -%}
+{%- liquid
+  assign mf = product.metafields.custom
+  assign sold = false
+  if product.tags contains 'sold'
+    assign sold = true
+  endif
+  assign state = mf.state.value | default: 'QLD'
+  assign gallery_count = product.images.size | minus: 1
+  if gallery_count > 6
+    assign gallery_count = 6
+  endif
+-%}
+
+<section class="prop-hero">
+  {%- if product.featured_image -%}
+    <img src="{{ product.featured_image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="{{ product.title | escape }}" loading="eager" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:{% if sold %}brightness(.72) saturate(.9){% else %}brightness(.78) saturate(.96){% endif %}">
+  {%- endif -%}
+  <div class="prop-hero-ov"></div>
+  <div class="prop-hero-content inner">
+    <div class="prop-status" {% if sold %}style="margin-bottom:14px"{% endif %}>
+      <div class="prop-status-dot {% if sold %}sold{% else %}active{% endif %}"></div>
+      <span style="color:rgba(253,251,246,.88)">{% if sold %}Sold Prior to Completion{% else %}For Sale{% endif %}</span>
+    </div>
+    <div class="prop-name">{{ product.title }}</div>
+    <div class="prop-loc">{{ mf.suburb.value }}, {{ state }}</div>
+  </div>
+</section>
+
+{%- if sold -%}
+  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:22px clamp(22px,5vw,80px)">
+    <div class="inner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="padding:7px 16px;background:rgba(168,135,74,.14);border:1px solid rgba(168,135,74,.4);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--ink)">{{ section.settings.sold_badge }}</div>
+      <span style="font-size:13.5px;font-weight:400;color:var(--ink3)">{{ section.settings.sold_notice }}</span>
+      <a href="/collections/for-sale" class="btn-g btn-g-gold" style="margin-left:auto;padding:9px 20px;font-size:10px">View Available &rarr;</a>
+    </div>
+  </div>
+{%- endif -%}
+
+<div class="prop-specs-bar">
+  <div class="prop-specs-inner">
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">Location</div>
+      <div class="prop-spec-v" style="font-size:16px">{{ mf.suburb.value }}</div>
+    </div>
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">Bedrooms</div>
+      <div class="prop-spec-v">{{ mf.beds.value }}</div>
+    </div>
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">Bathrooms</div>
+      <div class="prop-spec-v">{{ mf.baths.value }}</div>
+    </div>
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">Garages</div>
+      <div class="prop-spec-v">{{ mf.cars.value }}</div>
+    </div>
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">Land Size</div>
+      <div class="prop-spec-v">{{ mf.land.value }}<em>m&sup2;{% if mf.land_over.value %}+{% endif %}</em></div>
+    </div>
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">Status</div>
+      <div class="prop-spec-v" style="font-size:16px;color:{% if sold %}var(--taupe-d){% else %}var(--ink){% endif %}">{% if sold %}Sold{% else %}For Sale{% endif %}</div>
+    </div>
+  </div>
+</div>
+
+<div class="prop-body">
+  <div class="prop-layout inner">
+    <div class="prop-desc">
+      <div class="slabel prop-desc-slabel reveal">About {{ product.title }}</div>
+      <h1 class="prop-body-h reveal d1">{{ mf.headline.value }}</h1>
+      {{ product.description | replace: '<p>', '<p class="prop-body-p reveal d2">' }}
+
+      {%- if mf.features.value.size > 0 -%}
+        <div class="prop-features reveal d3">
+          <div class="prop-features-h">Key Features</div>
+          <div class="prop-feat-grid">
+            {%- for f in mf.features.value -%}
+              <div class="prop-feat">{{ f }}</div>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="reveal d2">
+      <div class="prop-enquire">
+        <div class="prop-enquire-h">{{ mf.enquiry_heading.value | default: 'Enquire Now' }}</div>
+        <p style="font-size:13px;font-weight:300;color:var(--ink3);line-height:1.75;margin-bottom:24px">{{ mf.enquiry_text.value }}</p>
+        <form class="cform" id="cform" name="property-enquiry" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
+          <input type="hidden" name="form-name" value="property-enquiry">
+          <input type="hidden" name="property" value="{{ product.title | escape }}">
+          <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+          <div class="frow">
+            <div class="fg"><label class="fl" for="pe-first">First Name*</label><input type="text" id="pe-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+            <div class="fg"><label class="fl" for="pe-last">Last Name*</label><input type="text" id="pe-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+          </div>
+          <div class="fg"><label class="fl" for="pe-email">Email*</label><input type="email" id="pe-email" name="email" class="fi" placeholder="Email address" autocomplete="email" required></div>
+          <div class="fg"><label class="fl" for="pe-phone">Phone</label><input type="tel" id="pe-phone" name="phone" class="fi" placeholder="Phone number" autocomplete="tel"></div>
+          {%- unless sold -%}
+            <div class="fg">
+              <label class="fl">Enquiry Type</label>
+              <select class="fsel" name="enquiry-type">
+                <option>Register Interest</option>
+                <option>Arrange Private Inspection</option>
+                <option>Request Price Guide</option>
+                <option>General Enquiry</option>
+              </select>
+            </div>
+          {%- endunless -%}
+          <div class="fg"><label class="fl">Message</label><textarea class="fta" name="message" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
+          <p class="form-note">By submitting this form you agree to our privacy policy. Your details will not be shared with third parties.</p>
+          <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
+          <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+        </form>
+      </div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+        {%- if mf.brochure_url.value != blank -%}
+          <a href="{{ mf.brochure_url.value }}" target="_blank" rel="noopener" class="btn-g btn-g-gold" style="justify-content:center" download>Download Brochure &darr;</a>
+        {%- endif -%}
+        {%- if sold -%}
+          <a href="/collections/for-sale" class="btn-p" style="justify-content:center">View Current Properties</a>
+        {%- endif -%}
+        <a href="/pages/contact" class="btn-g {% unless sold %}btn-g-gold{% endunless %}" style="justify-content:center">General Enquiry</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%- if gallery_count > 0 -%}
+  <div class="prop-gallery inner">
+    <div class="slabel reveal">{{ section.settings.gallery_label }}</div>
+    <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: '{name}', product.title }}</h2>
+    <div class="prop-gallery-grid gn-{{ gallery_count }}" id="galleryGrid">
+      {%- assign slots = 'a,b,c,d,e,f' | split: ',' -%}
+      {%- assign gdelays = ',d1,d2,d1,d2,d3' | split: ',' -%}
+      {%- for image in product.images offset: 1 limit: 6 -%}
+        {%- liquid
+          assign i = forloop.index0
+          assign slot = slots[i]
+          if i > 2
+            assign si = i | minus: 3 | modulo: 3 | plus: 3
+            assign slot = slots[si]
+          endif
+          if slot == 'a'
+            assign gw = 1200
+            assign gh = 1500
+          elsif slot == 'b' or slot == 'c'
+            assign gw = 1100
+            assign gh = 900
+          else
+            assign gw = 900
+            assign gh = 560
+          endif
+          assign gw2 = gw | times: 1.5 | round
+          assign gh2 = gh | times: 1.5 | round
+        -%}
+        <div class="gallery-item gallery-{{ slot }} reveal-wipe {{ gdelays[i] | default: 'd3' }}" data-lb-item data-src="{{ image | image_url: width: gw2, height: gh2, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}" role="button" tabindex="0" aria-label="View photo: {{ image.alt | default: product.title | escape }}">
+          <img class="gallery-img" src="{{ image | image_url: width: gw, height: gh, crop: 'center' }}" alt="{{ image.alt | default: product.title | escape }}" loading="lazy">
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <img id="lbImg" src="" alt="">
+  <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&larr;</button>
+  <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&rarr;</button>
+  <button class="lb-close" id="lbClose" aria-label="Close">&#10005;</button>
+  <div class="lb-meta"><span class="lb-cap" id="lbCap"></span><span id="lbCount"></span></div>
+</div>
+
+{%- if mf.film_video.value != blank -%}
+  <section class="film-band" id="film">
+    <div class="film-grid">
+      <div class="film-copy">
+        <div class="slabel slabel-dark reveal">{{ section.settings.film_label }}</div>
+        <h2 class="film-h reveal d1">Experience <em>{{ product.title }}</em>.</h2>
+        <p class="film-p reveal d2">Step inside {{ product.title }} — a cinematic walkthrough of the residence, its materials, and its light.</p>
+      </div>
+      <div class="reveal d2">
+        <div class="film-frame" data-film>
+          <video src="{{ mf.film_video.value }}" {% if mf.film_poster.value != blank %}poster="{{ mf.film_poster.value }}"{% endif %} muted loop playsinline preload="none"></video>
+          <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            <span data-sound-label>Sound On</span>
+          </button>
+        </div>
+        <div class="film-caption">
+          <span><b>{{ product.title }} — On Film</b></span>
+          <span>{{ mf.suburb.value }}, {{ state }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{%- unless sold -%}
+  <section class="prop-cta">
+    <div class="inner prop-cta-inner">
+      <div class="slabel reveal" style="justify-content:center">{{ section.settings.cta_label }}</div>
+      <h2 class="prop-cta-h reveal d1">{{ section.settings.cta_heading_html | replace: '{name}', product.title }}</h2>
+      <p class="prop-cta-p reveal d2">{{ section.settings.cta_text | replace: '{name}', product.title }}</p>
+      <a href="#cform" class="btn-p reveal d3">{{ section.settings.cta_button | replace: '{name}', product.title }} &rarr;</a>
+    </div>
+  </section>
+{%- endunless -%}
+
+{% schema %}
+{
+  "name": "Property page",
+  "settings": [
+    { "type": "paragraph", "content": "Shared framing text for every property page. Write {name} wherever the residence's name should appear." },
+    { "type": "text", "id": "gallery_label", "label": "Gallery label", "default": "The Residence" },
+    { "type": "html", "id": "gallery_heading_html", "label": "Gallery heading", "default": "Inside <em>{name}<\/em>." },
+    { "type": "text", "id": "film_label", "label": "Film label", "default": "The Film" },
+    { "type": "text", "id": "sold_badge", "label": "Sold badge", "default": "Sold Prior to Completion" },
+    { "type": "text", "id": "sold_notice", "label": "Sold notice", "default": "This residence has found its owner. Register your interest for upcoming releases." },
+    { "type": "text", "id": "cta_label", "label": "Closing CTA label", "default": "Private Appointments" },
+    { "type": "html", "id": "cta_heading_html", "label": "Closing CTA heading", "default": "Experience <em>{name}<\/em> in person." },
+    { "type": "textarea", "id": "cta_text", "label": "Closing CTA text", "default": "Private inspections are available by appointment." },
+    { "type": "text", "id": "cta_button", "label": "Closing CTA button", "default": "Enquire About {name}" }
+  ]
+}
+{% endschema %}

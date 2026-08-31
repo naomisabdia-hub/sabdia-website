@@ -1,0 +1,19 @@
+{%- comment -%}
+  Minimal shell for storefront routes the Sabdia site doesn't use
+  (cart, search, account) — keeps them rendering inside the design
+  system instead of erroring.
+{%- endcomment -%}
+<section class="sp" style="padding-top:clamp(160px,20vw,240px);text-align:center;min-height:50vh">
+  <div class="inner">
+    <h1 class="about-h reveal">{{ page_title }}</h1>
+    <p class="about-p reveal d1" style="margin:20px auto 32px;max-width:460px">This part of the store isn't in use — explore the residences instead.</p>
+    <a href="/" class="btn-p reveal d2">Return Home &rarr;</a>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Simple page",
+  "settings": []
+}
+{% endschema %}

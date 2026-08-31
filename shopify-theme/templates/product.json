@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-property"
+    },
+    "walkthrough": {
+      "type": "scroll-walk"
+    }
+  },
+  "order": [
+    "main",
+    "walkthrough"
+  ]
+}

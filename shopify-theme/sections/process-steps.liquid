@@ -1,0 +1,36 @@
+{%- comment -%} Port of the Process track — numbered steps in a horizontal band. {%- endcomment -%}
+{%- assign delays = ',d1,d2,d3,d4,d5' | split: ',' -%}
+<section class="sp">
+  <div class="inner">
+    <div class="slabel reveal" style="margin-bottom:56px">{{ section.settings.label }}</div>
+    <div class="proc-track">
+      {%- for block in section.blocks -%}
+        <div class="proc-step reveal {{ delays[forloop.index0] }}" {{ block.shopify_attributes }}>
+          <div class="proc-n">{{ forloop.index }}</div>
+          <div class="proc-t">{{ block.settings.title }}</div>
+          <div class="proc-d">{{ block.settings.description }}</div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Process steps",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "The Process" }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "textarea", "id": "description", "label": "Description" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Process steps" }]
+}
+{% endschema %}

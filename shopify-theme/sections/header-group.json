@@ -1,0 +1,10 @@
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "main_nav": {
+      "type": "main-nav"
+    }
+  },
+  "order": ["main_nav"]
+}

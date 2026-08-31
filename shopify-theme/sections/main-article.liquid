@@ -1,0 +1,23 @@
+{%- comment -%} A Journal story. {%- endcomment -%}
+<article class="sp" style="padding-top:clamp(140px,18vw,220px)">
+  <div class="inner" style="max-width:760px">
+    <div class="slabel reveal">{{ section.settings.label }}</div>
+    <h1 class="about-h reveal d1">{{ article.title }}</h1>
+    <p class="about-p reveal d2" style="margin-top:10px;color:var(--taupe-d)">{{ article.published_at | date: '%-d %B %Y' }}</p>
+    {%- if article.image -%}
+      <img src="{{ article.image | image_url: width: 1520 }}" alt="{{ article.title | escape }}" style="width:100%;margin:36px 0" loading="eager">
+    {%- endif -%}
+    <div class="reveal d2">
+      {{ article.content | replace: '<p>', '<p class="about-p">' }}
+    </div>
+  </div>
+</article>
+
+{% schema %}
+{
+  "name": "Journal story",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "The Journal" }
+  ]
+}
+{% endschema %}

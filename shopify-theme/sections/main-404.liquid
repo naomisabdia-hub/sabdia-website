@@ -1,0 +1,20 @@
+<section class="sp" style="padding-top:clamp(160px,20vw,240px);text-align:center;min-height:60vh">
+  <div class="inner">
+    <div class="slabel reveal" style="justify-content:center">{{ section.settings.label }}</div>
+    <h1 class="about-h reveal d1">{{ section.settings.heading }}</h1>
+    <p class="about-p reveal d2" style="margin:24px auto 36px;max-width:480px">{{ section.settings.text }}</p>
+    <a href="/" class="btn-p reveal d3">{{ section.settings.button }} &rarr;</a>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "404",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Page Not Found" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "This page has moved on." },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "The page you're looking for doesn't exist or has been moved. Let us guide you home." },
+    { "type": "text", "id": "button", "label": "Button", "default": "Return Home" }
+  ]
+}
+{% endschema %}

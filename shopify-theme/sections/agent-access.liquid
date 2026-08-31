@@ -1,0 +1,55 @@
+{%- comment -%} Port of the Agent Access band — portrait visual + framed badge beside copy, features and CTAs. {%- endcomment -%}
+<div class="agent-grid" id="agents">
+  <div class="agent-vis reveal-wipe-x">
+    {%- if section.settings.image -%}
+      <img src="{{ section.settings.image | image_url: width: 900, height: 1100, crop: 'center' }}" alt="{{ section.settings.image_alt | escape }}" loading="lazy" decoding="async" width="900" height="1100">
+    {%- elsif section.settings.image_ext != blank -%}
+      <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 900, h: 1100 %}" alt="{{ section.settings.image_alt | escape }}" loading="lazy" decoding="async" width="900" height="1100">
+    {%- endif -%}
+    <div class="agent-frame"></div>
+    <div class="agent-badge">{{ section.settings.badge }}</div>
+  </div>
+  <div class="agent-content">
+    <div class="slabel reveal">{{ section.settings.label }}</div>
+    <h2 class="agent-h reveal d1">{{ section.settings.heading_html }}</h2>
+    <p class="agent-p reveal d2">{{ section.settings.text }}</p>
+    <ul class="agent-feats reveal d3">
+      {%- for block in section.blocks -%}
+        <li {{ block.shopify_attributes }}>{{ block.settings.text }}</li>
+      {%- endfor -%}
+    </ul>
+    <div class="agent-btns reveal d4">
+      <a href="{{ section.settings.cta1_link }}" class="btn-p">{{ section.settings.cta1_label }}</a>
+      <a href="{{ section.settings.cta2_link }}" class="btn-g">{{ section.settings.cta2_label }}</a>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Agent access",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "image_ext", "label": "External image URL" },
+    { "type": "text", "id": "image_alt", "label": "Image alt text" },
+    { "type": "text", "id": "badge", "label": "Badge" },
+    { "type": "text", "id": "label", "label": "Small label", "default": "For Agents" },
+    { "type": "html", "id": "heading_html", "label": "Heading" },
+    { "type": "textarea", "id": "text", "label": "Paragraph" },
+    { "type": "text", "id": "cta1_label", "label": "Primary button label", "default": "Request Access" },
+    { "type": "text", "id": "cta1_link", "label": "Primary button link", "default": "/pages/agent-access" },
+    { "type": "text", "id": "cta2_label", "label": "Secondary button label", "default": "Learn More" },
+    { "type": "text", "id": "cta2_link", "label": "Secondary button link", "default": "/pages/agent-access" }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Agent access" }]
+}
+{% endschema %}

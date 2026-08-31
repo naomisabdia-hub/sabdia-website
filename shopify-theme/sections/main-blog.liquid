@@ -1,0 +1,31 @@
+{%- comment -%} The Sabdia Journal — article listing. {%- endcomment -%}
+<section class="sp" style="padding-top:clamp(140px,18vw,220px)">
+  <div class="inner">
+    <div class="slabel reveal">{{ section.settings.label }}</div>
+    <h1 class="about-h reveal d1">{{ blog.title }}</h1>
+    <div class="proj-grid-3" style="margin-top:56px">
+      {%- for article in blog.articles -%}
+        <a href="{{ article.url }}" class="pc reveal-wipe" style="aspect-ratio:16/10">
+          {%- if article.image -%}
+            <img src="{{ article.image | image_url: width: 900, height: 560, crop: 'center' }}" alt="{{ article.title | escape }}" loading="lazy" decoding="async">
+          {%- endif -%}
+          <div class="pc-ov"></div>
+          <div class="pc-info">
+            <div class="pc-name" style="font-size:20px">{{ article.title }}</div>
+            <div class="pc-loc">{{ article.published_at | date: '%-d %B %Y' }}</div>
+          </div>
+          <div class="pc-arrow">&rarr;</div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Journal listing",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "The Journal" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,100 @@
+{%- comment -%}
+  Port of the homepage hero — full-screen slideshow, word-by-word title,
+  description bar, slide dots, award line and CTAs. Slides are blocks:
+  pick a Shopify image, or leave the external URL that carries today's
+  image over from the Sabdia media pipeline.
+{%- endcomment -%}
+<section class="hero" id="hero">
+  <div class="h-slides" id="hSlides">
+    {%- for block in section.blocks -%}
+      <div class="h-slide{% if forloop.first %} active{% endif %}" {{ block.shopify_attributes }}>
+        {%- if block.settings.image -%}
+          <img
+            src="{{ block.settings.image | image_url: width: 1920 }}"
+            srcset="{{ block.settings.image | image_url: width: 768 }} 768w, {{ block.settings.image | image_url: width: 1280 }} 1280w, {{ block.settings.image | image_url: width: 1920 }} 1920w"
+            sizes="100vw"
+            alt="{{ block.settings.alt | escape }}"
+            {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy" decoding="async"{% endif %}>
+        {%- elsif block.settings.ext != blank -%}
+          {%- capture src -%}{% render 'ext-variant', src: block.settings.ext, w: 1920, h: 1080, q: 80 %}{%- endcapture -%}
+          <picture>
+            <source media="(max-width: 767px)" srcset="{% render 'ext-variant', src: block.settings.ext, w: 768, h: 1365, q: 80 %}" sizes="100vw">
+            <img src="{{ src | strip }}" sizes="100vw" alt="{{ block.settings.alt | escape }}"
+              {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy" decoding="async"{% endif %}>
+          </picture>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+  <div class="h-overlay"></div>
+
+  <div class="h-mid">
+    <div class="h-mid-content">
+      <h1 class="h-title">
+        {%- assign words = section.settings.words | split: ',' -%}
+        {%- for word in words -%}
+          {%- assign wi = forloop.index0 | times: 2 -%}
+          {%- unless forloop.first -%}
+            {%- assign di = wi | minus: 1 -%}
+            <span class="h-title-dot h-w"><span class="h-w-in" style="--wi:{{ di }}">&nbsp;&middot;&nbsp;</span></span>
+          {%- endunless -%}
+          <span class="h-w"><span class="h-w-in" style="--wi:{{ wi }}">{{ word | strip }}</span></span>
+        {%- endfor -%}
+      </h1>
+      <p class="h-eyebrow-txt">{{ section.settings.eyebrow }}</p>
+    </div>
+  </div>
+
+  <div class="h-bottom">
+    <div class="h-desc-bar inner">
+      <p class="h-desc">{{ section.settings.description }}</p>
+    </div>
+    <div class="h-bottom-rule"></div>
+    <div class="h-bottom-inner inner">
+      <div class="h-bottom-left">
+        <div class="h-dots" id="hDots">
+          {%- for block in section.blocks -%}
+            <button type="button" class="h-dot{% if forloop.first %} active{% endif %}" aria-label="Show slide {{ forloop.index }} of {{ section.blocks.size }}"></button>
+          {%- endfor -%}
+        </div>
+        <p class="h-award"><em>{{ section.settings.award }}</em></p>
+      </div>
+      <div class="h-actions">
+        <a href="{{ section.settings.cta1_link }}" class="btn-p">{{ section.settings.cta1_label }} &rarr;</a>
+        <a href="{{ section.settings.cta2_link }}" class="btn-g btn-g-light">{{ section.settings.cta2_label }}</a>
+      </div>
+    </div>
+  </div>
+  <div class="h-scroll-wrap">
+    <span class="h-scroll-num">01 / {{ section.blocks.size | prepend: '00' | slice: -2, 2 }}</span>
+    <div class="h-scroll-line"></div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero slideshow",
+  "settings": [
+    { "type": "text", "id": "words", "label": "Title words", "info": "Comma-separated — rendered word · by · word.", "default": "Design, Develop, Construct" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow line" },
+    { "type": "textarea", "id": "description", "label": "Description" },
+    { "type": "text", "id": "award", "label": "Award line" },
+    { "type": "text", "id": "cta1_label", "label": "Primary button label", "default": "View Properties" },
+    { "type": "text", "id": "cta1_link", "label": "Primary button link", "default": "/collections/for-sale" },
+    { "type": "text", "id": "cta2_label", "label": "Secondary button label", "default": "Enquire" },
+    { "type": "text", "id": "cta2_link", "label": "Secondary button link", "default": "/pages/contact" }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "ext", "label": "External image URL", "info": "Used only when no image is picked — carries the current site's image over." },
+        { "type": "text", "id": "alt", "label": "Alt text" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Hero slideshow" }]
+}
+{% endschema %}

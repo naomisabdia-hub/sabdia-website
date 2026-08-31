@@ -1,0 +1,31 @@
+{%- comment -%}
+  Port of SoldCard.astro, fed by a product from the sold collection.
+  Params: product, class, img_w, img_h, show_suburb (default false here)
+{%- endcomment -%}
+{%- liquid
+  assign mf = product.metafields.custom
+  assign img_w2 = img_w | times: 2
+  assign img_h2 = img_h | times: 2
+-%}
+<a href="{{ product.url }}" class="sc-card {{ class }}">
+  {%- if product.featured_image -%}
+    <img
+      src="{{ product.featured_image | image_url: width: img_w, height: img_h, crop: 'center' }}"
+      srcset="{{ product.featured_image | image_url: width: img_w, height: img_h, crop: 'center' }} 1x, {{ product.featured_image | image_url: width: img_w2, height: img_h2, crop: 'center' }} 2x"
+      alt="{{ product.title | escape }}" loading="lazy" decoding="async" width="{{ img_w }}" height="{{ img_h }}">
+  {%- endif -%}
+  <div class="sc-ov"></div>
+  <div class="sc-badge">Sold Prior to Completion</div>
+  <div class="sc-info">
+    <div class="sc-name">{{ product.title }}</div>
+    {%- if show_suburb and mf.suburb.value != blank -%}
+      <div class="pc-loc">{% render 'spec-icon', icon: 'pin' %}{{ mf.suburb.value }}, QLD</div>
+    {%- endif -%}
+    <ul class="pc-specs">
+      {%- if mf.beds.value != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'beds' %}<span>{{ mf.beds.value }} Bed</span></li>{%- endif -%}
+      {%- if mf.baths.value != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'baths' %}<span>{{ mf.baths.value }} Bath</span></li>{%- endif -%}
+      {%- if mf.cars.value != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'cars' %}<span>{{ mf.cars.value }} Garage</span></li>{%- endif -%}
+      {%- if mf.land.value != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'land' %}<span>{{ mf.land.value }}m&sup2;{% if mf.land_over.value %}+{% endif %}</span></li>{%- endif -%}
+    </ul>
+  </div>
+</a>

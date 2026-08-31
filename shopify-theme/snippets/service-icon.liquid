@@ -1,0 +1,11 @@
+{%- comment -%} Small line icons for service list items — port of ServiceIcon.astro. Param: icon {%- endcomment -%}
+{%- case icon -%}
+{%- when 'case' -%}
+<svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="3" width="12" height="10"/><path d="M4 3V1H10V3"/></svg>
+{%- when 'clock' -%}
+<svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="7" cy="7" r="5.5"/><path d="M7 4.5V7L9 9"/></svg>
+{%- when 'grid' -%}
+<svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="12" height="12"/><path d="M4 7h6M7 4v6"/></svg>
+{%- else -%}
+<svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 7L7 1L13 7V13H9V9H5V13H1V7Z"/></svg>
+{%- endcase -%}

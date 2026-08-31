@@ -1,0 +1,59 @@
+{%- comment -%} Port of the dark Services section — sticky copy + numbered service list. {%- endcomment -%}
+{%- assign delays = ',d1,d2,d3,d4,d5' | split: ',' -%}
+<section class="svc-dark sp" id="services">
+  <div class="inner svc-layout">
+    <div class="svc-sticky">
+      <div class="slabel reveal">{{ section.settings.label }}</div>
+      <h2 class="svc-h reveal d1">{{ section.settings.heading_html }}</h2>
+      <p class="svc-p reveal d2">{{ section.settings.text }}</p>
+      <div class="reveal d3" style="margin-top:40px">
+        <a href="{{ section.settings.cta_link }}" class="btn-g" style="margin-top:8px">{{ section.settings.cta_label }} &rarr;</a>
+      </div>
+    </div>
+    <ul class="svc-list">
+      {%- for block in section.blocks -%}
+        <li class="svc-item reveal {{ delays[forloop.index0] }}" {{ block.shopify_attributes }}>
+          <span class="svc-n">{{ block.settings.number }}</span>
+          <div>
+            <div class="svc-t">{{ block.settings.title }}</div>
+            <div class="svc-d">{{ block.settings.description }}</div>
+          </div>
+          <div class="svc-icon">
+            {% render 'service-icon', icon: block.settings.icon %}
+          </div>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Services (dark)",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "What We Do" },
+    { "type": "html", "id": "heading_html", "label": "Heading" },
+    { "type": "textarea", "id": "text", "label": "Paragraph" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Our Services" },
+    { "type": "text", "id": "cta_link", "label": "Button link", "default": "/pages/services" }
+  ],
+  "blocks": [
+    {
+      "type": "service",
+      "name": "Service",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number", "default": "01" },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "textarea", "id": "description", "label": "Description" },
+        { "type": "select", "id": "icon", "label": "Icon", "options": [
+          { "value": "home", "label": "Home" },
+          { "value": "case", "label": "Briefcase" },
+          { "value": "clock", "label": "Clock" },
+          { "value": "grid", "label": "Grid" }
+        ], "default": "home" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Services (dark)" }]
+}
+{% endschema %}

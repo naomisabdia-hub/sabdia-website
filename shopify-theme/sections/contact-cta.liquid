@@ -1,0 +1,60 @@
+{%- comment -%}
+  Port of the homepage contact section — details column + the enquiry
+  form. The form posts into the Sabdia leads inbox via the forms
+  endpoint; main.js handles submission and the status line.
+{%- endcomment -%}
+<section class="sp" id="contact" style="background:var(--bg2);border-top:1px solid var(--border)">
+  <div class="inner contact-grid">
+    <div>
+      <div class="slabel reveal">{{ section.settings.label }}</div>
+      <h2 class="contact-h reveal d1">{{ section.settings.heading_html }}</h2>
+      <p class="about-p reveal d2" style="margin-bottom:36px">{{ section.settings.text }}</p>
+      <ul class="cdet reveal d3">
+        <li class="cd"><span class="cd-l">Location</span><span class="cd-v">{{ settings.location }}</span></li>
+        <li class="cd"><span class="cd-l">Instagram</span><a href="{{ settings.instagram_url }}" target="_blank" class="cd-v">{{ settings.instagram_label }}</a></li>
+        <li class="cd"><span class="cd-l">Facebook</span><a href="{{ settings.facebook_url }}" target="_blank" class="cd-v">Sabdia Constructions</a></li>
+        <li class="cd"><span class="cd-l">LinkedIn</span><a href="{{ settings.linkedin_url }}" target="_blank" class="cd-v">Sabdia Constructions</a></li>
+      </ul>
+    </div>
+    <div>
+      <form class="cform reveal d1" id="cform" name="contact" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
+        <input type="hidden" name="form-name" value="contact">
+        <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <div class="frow">
+          <div class="fg"><label class="fl" for="cf-first">First Name*</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="cf-last">Last Name*</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+        </div>
+        <div class="fg"><label class="fl" for="cf-email">Email*</label><input type="email" id="cf-email" name="email" class="fi" placeholder="Email address" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="cf-phone">Phone</label><input type="tel" id="cf-phone" name="phone" class="fi" placeholder="Phone number" autocomplete="tel"></div>
+        <div class="fg">
+          <label class="fl" for="cf-interest">Interest</label>
+          <select class="fsel" id="cf-interest" name="enquiry-type">
+            {%- assign interests = section.settings.interests | newline_to_br | split: '<br />' -%}
+            {%- for opt in interests -%}
+              {%- assign o = opt | strip -%}
+              {%- if o != blank -%}<option>{{ o }}</option>{%- endif -%}
+            {%- endfor -%}
+          </select>
+        </div>
+        <div class="fg"><label class="fl" for="cf-message">Message*</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest..." required></textarea></div>
+        <button type="submit" class="fsub" id="fsub">Submit &rarr;</button>
+        <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+        <p class="form-note">{{ section.settings.note }}</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Contact",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Get In Touch" },
+    { "type": "html", "id": "heading_html", "label": "Heading" },
+    { "type": "textarea", "id": "text", "label": "Paragraph" },
+    { "type": "textarea", "id": "interests", "label": "Interest options", "info": "One option per line." },
+    { "type": "text", "id": "note", "label": "Note under the button" }
+  ],
+  "presets": [{ "name": "Contact" }]
+}
+{% endschema %}

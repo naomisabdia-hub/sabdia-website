@@ -1,0 +1,28 @@
+{%- comment -%}
+  Complete share card on every page — pages may override parts (product
+  pages share their hero image) but nothing renders bare when shared.
+{%- endcomment -%}
+{%- liquid
+  assign og_title = page_title | default: shop.name
+  assign og_description = page_description | default: shop.description
+  assign og_image = blank
+  if settings.share_image
+    assign og_image = settings.share_image | image_url: width: 1200
+  endif
+  if template.name == 'product' and product.featured_image
+    assign og_image = product.featured_image | image_url: width: 1200
+  endif
+-%}
+<meta property="og:title" content="{{ og_title | escape }}">
+<meta property="og:description" content="{{ og_description | escape }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:site_name" content="Sabdia Constructions">
+<meta property="og:locale" content="en_AU">
+{%- if og_image != blank %}
+<meta property="og:image" content="https:{{ og_image }}">
+<meta name="twitter:image" content="https:{{ og_image }}">
+{%- endif %}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ og_title | escape }}">
+<meta name="twitter:description" content="{{ og_description | escape }}">

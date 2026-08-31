@@ -1,0 +1,6 @@
+{% layout none %}
+<!DOCTYPE html>
+<html lang="en-AU">
+<head><meta charset="utf-8"><title>Gift card</title></head>
+<body><p>Gift card: {{ gift_card.initial_value | money }} — code {{ gift_card.code | format_code }}</p></body>
+</html>

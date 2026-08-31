@@ -1,0 +1,110 @@
+{%- comment -%}
+  Port of Nav.astro — cursor dots, nav progress, the black SABDIA
+  navigation veil, the once-per-session homepage loader, mobile menu and
+  the fixed primary nav. Menu links come from a Shopify navigation menu;
+  until one is chosen the original Sabdia items render as the fallback.
+{%- endcomment -%}
+{%- liquid
+  assign logo_src = 'logo.png' | asset_url
+  if settings.logo
+    assign logo_src = settings.logo | image_url: width: 400
+  endif
+
+  assign tkey = template.name
+  if template.suffix != blank
+    assign tkey = template.name | append: '.' | append: template.suffix
+  endif
+  assign on_light = false
+  assign light_list = section.settings.light_templates | split: ','
+  for t in light_list
+    assign tt = t | strip
+    if tt == tkey
+      assign on_light = true
+    endif
+  endfor
+
+  assign menu = linklists[section.settings.menu]
+-%}
+<div id="cur" aria-hidden="true"></div>
+<div id="cur-r" aria-hidden="true"></div>
+
+<div class="nav-load" id="navLoad" aria-hidden="true"></div>
+
+<div id="navVeil" aria-hidden="true">
+  <img src="{{ logo_src }}" alt="" loading="eager">
+  <div class="nv-rule"></div>
+</div>
+
+{%- if template.name == 'index' -%}
+  <div id="loader" aria-hidden="true">
+    <div class="ld-logo">
+      <img src="{{ logo_src }}" alt="" loading="eager">
+    </div>
+    <div class="ld-rule"></div>
+    <div class="ld-meta">{{ section.settings.loader_meta }}</div>
+  </div>
+{%- endif -%}
+
+<div class="mob-nav" id="mobNav" aria-hidden="true">
+  <nav class="mob-nav-links" aria-label="Mobile">
+    {%- if menu.links.size > 0 -%}
+      {%- for link in menu.links -%}
+        <a href="{{ link.url }}">{{ link.title }}</a>
+      {%- endfor -%}
+    {%- else -%}
+      <a href="/collections/for-sale">For Sale</a>
+      <a href="/pages/services">Services</a>
+      <a href="/pages/about">About</a>
+      <a href="/pages/projects">Projects</a>
+      <a href="/pages/collection">Collection</a>
+      <a href="/pages/agent-access">Agent Access</a>
+    {%- endif -%}
+    <a href="{{ section.settings.cta_link }}">{{ section.settings.mobile_contact_label }}</a>
+  </nav>
+  <div class="mob-nav-rule"></div>
+  <div class="mob-nav-sub">
+    <a href="{{ settings.instagram_url }}" target="_blank" rel="noopener">Instagram</a>
+    <a href="{{ settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a>
+    <a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+</div>
+
+<nav id="mainNav" {% if on_light %}class="on-light"{% endif %} aria-label="Primary">
+  <a href="/" class="nav-logo" aria-label="{{ settings.site_name }} — Home">
+    <img class="logo-light" src="{{ logo_src }}" alt="{{ settings.site_name }} — Design Develop Construct" style="filter:invert(1) brightness(10)">
+    <img class="logo-dark" src="{{ logo_src }}" alt="{{ settings.site_name }} — Design Develop Construct">
+  </a>
+  <ul class="nav-center">
+    {%- if menu.links.size > 0 -%}
+      {%- for link in menu.links -%}
+        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+      {%- endfor -%}
+    {%- else -%}
+      <li><a href="/collections/for-sale">For Sale</a></li>
+      <li><a href="/pages/services">Services</a></li>
+      <li><a href="/pages/about">About</a></li>
+      <li><a href="/pages/projects">Projects</a></li>
+      <li><a href="/pages/collection">Collection</a></li>
+      <li><a href="/pages/agent-access">Agent Access</a></li>
+    {%- endif -%}
+  </ul>
+  <div class="nav-right">
+    <a href="{{ section.settings.cta_link }}" class="nav-cta">{{ section.settings.cta_label }}</a>
+    <button class="mob-btn" id="mobBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobNav"><span></span><span></span></button>
+  </div>
+  <div class="nav-progress" id="navProgress" aria-hidden="true"></div>
+</nav>
+
+{% schema %}
+{
+  "name": "Navigation",
+  "settings": [
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Enquire" },
+    { "type": "text", "id": "cta_link", "label": "Button link", "default": "/pages/contact" },
+    { "type": "text", "id": "mobile_contact_label", "label": "Mobile menu — final link label", "default": "Contact" },
+    { "type": "text", "id": "loader_meta", "label": "Homepage loader caption", "default": "Sabdia · Est. 2013" },
+    { "type": "text", "id": "light_templates", "label": "Light-top templates", "default": "blog, article, page.contact, page.find-your-home, page.collection", "info": "Comma-separated template names whose first section is a light surface — the nav renders dark-on-light there from the top." }
+  ]
+}
+{% endschema %}
