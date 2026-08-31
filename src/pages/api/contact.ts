@@ -19,7 +19,31 @@ const rateLog = new Map<string, number[]>();
  * stores them in the Supabase `enquiries` table, and optionally emails a
  * copy via Resend when RESEND_API_KEY / CONTACT_EMAIL are configured.
  */
-export const POST: APIRoute = async ({ request }) => {
+/* The same forms also run on the Shopify storefront (shopify-theme/),
+   posting here cross-origin so leads keep landing in the Sabdia inbox. */
+const ALLOWED_ORIGINS = new Set([
+  'https://b91p0j-f4.myshopify.com',
+  'https://www.sabdiaconstructions.com.au',
+  'https://sabdiaconstructions.com.au',
+]);
+const cors = (request: Request): Record<string, string> => {
+  const origin = request.headers.get('origin') ?? '';
+  return ALLOWED_ORIGINS.has(origin)
+    ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' }
+    : {};
+};
+
+export const OPTIONS: APIRoute = async ({ request }) =>
+  new Response(null, {
+    status: 204,
+    headers: {
+      ...cors(request),
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+
+const handlePost: APIRoute = async ({ request }) => {
   let fields: Record<string, string> = {};
   const contentType = request.headers.get('content-type') || '';
   if (contentType.includes('application/json')) {
@@ -144,4 +168,10 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: 'Enquiry could not be delivered — form backend not configured' }, 500);
   }
   return json({ ok: true });
+};
+
+export const POST: APIRoute = async (ctx) => {
+  const res = await handlePost(ctx);
+  for (const [k, v] of Object.entries(cors(ctx.request))) res.headers.set(k, v);
+  return res;
 };

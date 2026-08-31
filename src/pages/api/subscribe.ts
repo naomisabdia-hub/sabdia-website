@@ -22,7 +22,30 @@ const rateLog = new Map<string, number[]>();
  * signup is stored in Supabase `enquiries` as form_name 'newsletter' so
  * no address is ever lost — they can be imported into MailerLite later.
  */
-export const POST: APIRoute = async ({ request }) => {
+/* Also called cross-origin from the Shopify storefront (shopify-theme/). */
+const ALLOWED_ORIGINS = new Set([
+  'https://b91p0j-f4.myshopify.com',
+  'https://www.sabdiaconstructions.com.au',
+  'https://sabdiaconstructions.com.au',
+]);
+const cors = (request: Request): Record<string, string> => {
+  const origin = request.headers.get('origin') ?? '';
+  return ALLOWED_ORIGINS.has(origin)
+    ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' }
+    : {};
+};
+
+export const OPTIONS: APIRoute = async ({ request }) =>
+  new Response(null, {
+    status: 204,
+    headers: {
+      ...cors(request),
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+
+const handlePost: APIRoute = async ({ request }) => {
   let fields: Record<string, string> = {};
   const contentType = request.headers.get('content-type') || '';
   if (contentType.includes('application/json')) {
@@ -81,4 +104,10 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   return json({ error: 'Signup could not be delivered — backend not configured' }, 500);
+};
+
+export const POST: APIRoute = async (ctx) => {
+  const res = await handlePost(ctx);
+  for (const [k, v] of Object.entries(cors(ctx.request))) res.headers.set(k, v);
+  return res;
 };
