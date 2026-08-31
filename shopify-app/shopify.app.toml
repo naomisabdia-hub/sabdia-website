@@ -1,0 +1,15 @@
+# Sabdia content-setup app — exists only to grant Admin API access for
+# populating the store (products, collections, pages, menus, blog).
+client_id = "bc41f9eb28418059a9a4816abec3a5b9"
+name = "Sabdia"
+application_url = "https://sabdia-website.vercel.app"
+embedded = false
+
+[access_scopes]
+scopes = "read_products,write_products,read_publications,write_publications,read_content,write_content,read_online_store_pages,write_online_store_pages,read_online_store_navigation,write_online_store_navigation"
+
+[auth]
+redirect_urls = ["http://localhost:3456/callback"]
+
+[webhooks]
+api_version = "2026-07"

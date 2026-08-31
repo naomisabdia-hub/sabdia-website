@@ -10,3 +10,5 @@ dist/
 
 # Private archive (QASR 3D models etc.) — NEVER commit while the repo is public
 archive/
+
+shopify-app/.shopify/

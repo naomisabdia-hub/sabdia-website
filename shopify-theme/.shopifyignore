@@ -1,0 +1,4 @@
+# JSON templates hold Naomi's customizer edits on the store — never
+# overwrite them from local pushes. Section/layout/asset code still syncs.
+templates/*.json
+templates/customers/*.json
