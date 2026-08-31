@@ -1,0 +1,93 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Help & Guide" active="help">
+  <div class="ad-hdr">
+    <div>
+      <h1 class="ad-h1">Your website, <em>in your hands</em>.</h1>
+      <p class="ad-sub">Everything a visitor sees is managed from this portal. This page is the map — keep it handy, nothing on it requires a developer.</p>
+    </div>
+  </div>
+
+  <div class="ad-card">
+    <div class="ad-card-h">How it works</div>
+    <p class="ad-sub" style="max-width:none;margin-bottom:0">
+      The website reads its words, images and clips from this portal's database every time a page loads —
+      so the moment you press <b>Save</b>, the change is live. There is no "deploy" and no developer step.
+      (The public site keeps a small speed cache, so visitors may see the previous version for up to a
+      minute — the editor's own preview always shows the fresh page straight away.)
+      You are editing content inside a fixed design system, which means you cannot break the layout or styling —
+      and every section has a <b>Reset to original</b> button if you ever want the launch version back.
+      Every save is recorded on the Dashboard under <i>Recent changes</i>, so you can always see who changed what, and when.
+    </p>
+  </div>
+
+  <div class="ad-card">
+    <div class="ad-card-h">Find anything with Search — ⌘K</div>
+    <p class="ad-sub" style="max-width:none;margin-bottom:0">
+      The fastest way to change something: press <b>⌘K</b> (or the Search button in the sidebar), then type —
+      a page name, a property, or simply <i>paste a sentence from the website</i>. The result takes you straight
+      to the exact section that edits it.
+    </p>
+  </div>
+
+  <div class="ad-card">
+    <div class="ad-card-h">Where everything lives</div>
+    <table class="ad-table" style="margin-top:14px">
+      <thead><tr><th>You want to change…</th><th>Go to</th></tr></thead>
+      <tbody>
+        <tr><td>Words or images on any page — headings, paragraphs, hero images, the nav, the footer, legal pages</td><td><a href="/admin/content/" style="color:var(--gold)">Site Content</a> (or ⌘K)</td></tr>
+        <tr><td>A residence — details, description, gallery, status (for&nbsp;sale&nbsp;/&nbsp;sold), brochure, enquiry text</td><td><a href="/admin/properties/" style="color:var(--gold)">Properties</a></td></tr>
+        <tr><td>The walkthrough on a property page — swap in a new cut, or edit the chapter clips</td><td><a href="/admin/content/?key=walkthroughs" style="color:var(--gold)">Site Content → Walkthroughs</a></td></tr>
+        <tr><td>Films — the homepage film and each residence's reel</td><td><a href="/admin/content/?key=films" style="color:var(--gold)">Site Content → Films</a></td></tr>
+        <tr><td>Journal stories — write, edit, publish</td><td><a href="/admin/blog/" style="color:var(--gold)">Journal</a></td></tr>
+        <tr><td>The services, process steps and testimonials</td><td><a href="/admin/lists/" style="color:var(--gold)">Services &amp; More</a></td></tr>
+        <tr><td>An extra one-off section on a page — an editorial band or a pull quote</td><td><a href="/admin/sections/" style="color:var(--gold)">Page Sections</a></td></tr>
+        <tr><td>Enquiries and agent applications — read, reply, track</td><td><a href="/admin/leads/" style="color:var(--gold)">Leads Inbox</a></td></tr>
+        <tr><td>Company details, social links, search-engine text, team access, your password</td><td><a href="/admin/settings/" style="color:var(--gold)">Settings</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ad-card">
+    <div class="ad-card-h">Publishing a new walkthrough cut</div>
+    <p class="ad-sub" style="max-width:none">
+      The scroll walkthrough plays a folder of frames from storage. Swapping the live cut is a one-field change:
+    </p>
+    <ol style="font-size:12.5px;font-weight:300;color:var(--ink2);line-height:2;padding-left:18px;margin-bottom:14px">
+      <li>Upload the new frame folder (frames + <code>manifest.json</code>) to Supabase Storage under <code>media/scrollwalk/</code> — always a <b>new folder name</b>, e.g. <code>qasr-v22</code>, never overwriting an old one.</li>
+      <li>Open <a href="/admin/content/?key=walkthroughs" style="color:var(--gold)">Site Content → Walkthroughs</a> and type the new folder name for that residence.</li>
+      <li>Save. The site swaps to the new cut immediately — and typing the old folder name back is an instant rollback.</li>
+    </ol>
+    <p class="ad-sub" style="max-width:none;margin-bottom:0">
+      <b style="color:#8f3b2e">⛔ The one absolute rule:</b> every frame and clip must be the visualiser's <b>real</b> footage.
+      No AI-generated architecture, ever — in any form. Missing transitions are covered with reversed real footage
+      (only where direction is ambiguous, like stairs) or a plain crossfade. Nothing else.
+    </p>
+  </div>
+
+  <div class="ad-card">
+    <div class="ad-card-h">Good to know</div>
+    <p class="ad-sub" style="max-width:none;margin-bottom:0">
+      <b>Live preview</b> — in Site Content, the page you're editing sits beside the form and refreshes each time you save; switch it between Desktop and Mobile, or hide it.<br>
+      <b>Images &amp; clips</b> — every image field has an Upload button and a <i>Library</i> of everything already uploaded, so nothing needs uploading twice. Files up to 25MB; films work best as portrait (9:16) mp4.<br>
+      <b>Formatting</b> — long-text fields have a small toolbar (bold, headings, quotes, links) that stays inside the site's design system.<br>
+      <b>Leads</b> — new enquiries appear on the Dashboard and in the Inbox with a status (new → contacted → closed), and can be exported to CSV.
+    </p>
+  </div>
+
+  <div class="ad-card">
+    <div class="ad-card-h">The short list that still needs a developer</div>
+    <p class="ad-sub" style="max-width:none;margin-bottom:0">
+      The Find Your Home quiz questions and matching logic, brand-new page types or layouts, and preparing
+      walkthrough frame sets from the master footage. Everything else on the website — every word, image,
+      film, clip, listing and story — is yours, from here.
+    </p>
+  </div>
+</AdminShell>
+
+<script>
+  import { requireAuth } from '../../lib/admin/client.js';
+  await requireAuth();
+</script>

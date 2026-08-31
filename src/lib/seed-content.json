@@ -1306,5 +1306,23 @@
     "placeholder": "Your email address",
     "button": "Subscribe",
     "success": "Welcome — you're on the list."
+  },
+  "walkthroughs": {
+    "byProperty": {
+      "qasr": {
+        "scrollwalk": "qasr-v21",
+        "chapters": [
+          { "label": "Arrival", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip14.mp4" },
+          { "label": "Motor Court", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip18.mp4" },
+          { "label": "Entry Void", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip19.mp4" },
+          { "label": "Lounge", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip22_3.mp4" },
+          { "label": "Fireside", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip25_1.mp4" },
+          { "label": "The Bar", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip21.mp4" },
+          { "label": "Dining", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip27_1.mp4" },
+          { "label": "Pool Courtyard", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip16.mp4" },
+          { "label": "Dusk", "src": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/walkthrough/qasr/web-clip17_1.mp4" }
+        ]
+      }
+    }
   }
 }

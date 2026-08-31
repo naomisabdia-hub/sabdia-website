@@ -44,7 +44,12 @@ architecture, layout, interiors, or finishes. No exceptions.**
   cannot push; Naomi runs the push.
 - Scroll walkthrough: `src/components/ScrollWalk.astro`; frame sets live in
   Supabase `media/scrollwalk/<slug>-vN/` (versioned folders — files are
-  cached immutable, so every new cut needs a new folder + page reference).
+  cached immutable, so every new cut needs a new folder). The live folder
+  per property is set in Admin → Site Content → Walkthroughs (`site_content`
+  key `walkthroughs`, seeded in `src/lib/seed-content.json`) — no code edit.
+- Admin CMS: `/admin` (Clerk auth). All copy/images/walkthroughs editable;
+  ⌘K search over every field, live preview in the content editor, guide at
+  `/admin/help/`. Site is SSR — saves are live instantly, no redeploy.
 - The public QASR cut is deliberately curated — mud room, sauna, guest
   suites, powder, dining, cellar etc. are held back pre-sale. Do not add
   rooms without Naomi's sign-off. The full private tour lives on Naomi's

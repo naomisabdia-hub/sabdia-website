@@ -20,6 +20,9 @@ const img = (key, label, folder) => ({
   ],
 });
 
+/** Residence slugs offered wherever content is configured per property. */
+export const PROPERTY_SLUGS = ['qasr', 'solace', 'sierra', 'capri', 'aether'];
+
 export const contentSchemas = {
   series: {
     title: 'Instagram series strip',
@@ -274,11 +277,32 @@ export const contentSchemas = {
       { key: 'sectionLabel', label: 'Property page section label', type: 'text' },
       {
         key: 'byProperty', label: 'Property films', type: 'object',
-        fields: ['qasr', 'solace', 'sierra', 'capri', 'aether'].map((slug) => ({
+        fields: PROPERTY_SLUGS.map((slug) => ({
           key: slug, label: slug.toUpperCase(), type: 'object',
           fields: [
             { key: 'video', label: 'Video (mp4)', type: 'file', folder: 'films', accept: 'video/mp4' },
             { key: 'poster', label: 'Poster image', type: 'image', folder: 'films' },
+          ],
+        })),
+      },
+    ],
+  },
+
+  walkthroughs: {
+    title: 'Walkthroughs',
+    description:
+      'The cinematic walkthrough on each property page. A residence with a scroll walkthrough (frame folder) shows that; otherwise its chapter clips play in the cinema player. ⛔ Real visualiser footage only — AI-generated architecture is never permitted, in any form.',
+    schema: [
+      {
+        key: 'byProperty', label: 'Property walkthroughs', type: 'object',
+        fields: PROPERTY_SLUGS.map((slug) => ({
+          key: slug, label: slug.toUpperCase(), type: 'object',
+          fields: [
+            { key: 'scrollwalk', label: 'Scroll walkthrough — frame folder', type: 'text', help: 'folder name inside media/scrollwalk, e.g. qasr-v21 — publishing a new cut is just typing the new folder name here and saving. Leave blank for none.' },
+            { key: 'chapters', label: 'Cinema chapters (used when no frame folder is set)', type: 'items', itemLabel: 'chapter', fields: [
+              { key: 'label', label: 'Room label', type: 'text' },
+              { key: 'src', label: 'Clip (mp4)', type: 'file', folder: 'walkthrough', accept: 'video/mp4' },
+            ] },
           ],
         })),
       },
@@ -650,7 +674,7 @@ export const sectionPositions = [
 export const contentGroups = [
   { name: 'Homepage', keys: ['home_hero', 'home_stats', 'home_marquee', 'home_about', 'home_properties', 'home_services', 'home_process', 'home_agent', 'home_contact'] },
   { name: 'Pages', keys: ['properties_page', 'property_page', 'projects_page', 'services_page', 'about_page', 'collection_page', 'agent_page', 'contact_page', 'find_home', 'notfound'] },
-  { name: 'Site-wide', keys: ['films', 'nav', 'footer', 'newsletter', 'series', 'legal_privacy', 'legal_accessibility'] },
+  { name: 'Site-wide', keys: ['films', 'walkthroughs', 'nav', 'footer', 'newsletter', 'series', 'legal_privacy', 'legal_accessibility'] },
 ];
 
 /** Property editor schema (columns of the properties table). */

@@ -22,16 +22,33 @@ export const prerender = true;
         <p class="ad-sub" id="editDesc"></p>
       </div>
       <div style="display:flex;gap:10px">
+        <button class="ad-btn ad-btn-ghost" id="prevBtn" type="button">Hide preview</button>
         <a class="ad-btn ad-btn-ghost" id="viewBtn" target="_blank" style="display:none">View page ↗</a>
         <button class="ad-btn ad-btn-ghost" id="backBtn">← All content</button>
       </div>
     </div>
-    <div class="ad-form" id="contentForm"></div>
-    <div class="ad-savebar" id="saveBar">
-      <button class="ad-btn ad-btn-gold" data-save>Save &amp; publish</button>
-      <span class="ad-dirty">Unsaved changes</span>
-      <span class="spacer"></span>
-      <button class="ad-btn ad-btn-danger" id="resetBtn">Reset to original</button>
+    <div class="ad-editwrap" id="editWrap">
+      <div>
+        <div class="ad-form" id="contentForm"></div>
+        <div class="ad-savebar" id="saveBar">
+          <button class="ad-btn ad-btn-gold" data-save>Save &amp; publish</button>
+          <span class="ad-dirty">Unsaved changes</span>
+          <span class="spacer"></span>
+          <button class="ad-btn ad-btn-danger" id="resetBtn">Reset to original</button>
+        </div>
+      </div>
+      <aside class="ad-prev" id="prevPane">
+        <div class="ad-prev-bar">
+          <span class="ad-prev-t">Live preview</span>
+          <span class="spacer"></span>
+          <button type="button" class="ad-prev-mode on" data-pw="desktop">Desktop</button>
+          <button type="button" class="ad-prev-mode" data-pw="mobile">Mobile</button>
+          <button type="button" class="ad-prev-mode" id="prevReload" title="Refresh preview">↻</button>
+        </div>
+        <div class="ad-prev-frame" id="prevFrame">
+          <iframe id="prevIfr" title="Page preview" loading="lazy"></iframe>
+        </div>
+      </aside>
     </div>
   </div>
 </AdminShell>
@@ -53,7 +70,7 @@ export const prerender = true;
   const pageFor = {
     settings: '/', home_hero: '/', home_stats: '/', home_marquee: '/', home_about: '/',
     home_properties: '/', home_services: '/', home_process: '/', home_agent: '/', home_contact: '/',
-    nav: '/', footer: '/', films: '/', newsletter: '/', series: '/properties/qasr/',
+    nav: '/', footer: '/', films: '/', newsletter: '/', series: '/properties/qasr/', walkthroughs: '/properties/qasr/',
     properties_page: '/properties/', property_page: '/properties/qasr/', projects_page: '/projects/',
     services_page: '/services/', about_page: '/about/', collection_page: '/collection/',
     agent_page: '/agent-access/', contact_page: '/contact/', find_home: '/find-your-home/',
@@ -94,7 +111,72 @@ export const prerender = true;
     editView.style.display = '';
     window.scrollTo(0, 0);
     history.replaceState(null, '', '?key=' + key);
+    setPreview(pageFor[key] || '/');
   }
+
+  /* ── Live preview ── the page itself sits beside the form and refreshes
+     the moment a save lands (the site is server-rendered, so a refresh IS
+     the live site). Desktop is scaled to fit; mobile renders true-width. */
+  const editWrap = document.getElementById('editWrap');
+  const prevBtn = document.getElementById('prevBtn');
+  const prevFrame = document.getElementById('prevFrame');
+  const prevIfr = document.getElementById('prevIfr');
+  let prevUrl = '';
+  let prevMode = 'desktop';
+
+  function fitPreview() {
+    if (!editWrap.classList.contains('show-prev')) return;
+    const target = prevMode === 'mobile' ? 390 : 1280;
+    const box = prevFrame.getBoundingClientRect();
+    if (!box.width) return;
+    const s = Math.min(1, box.width / target);
+    prevIfr.style.width = target + 'px';
+    prevIfr.style.height = Math.round(box.height / s) + 'px';
+    prevIfr.style.transform = `scale(${s})`;
+    prevIfr.style.left = Math.max(0, Math.round((box.width - target * s) / 2)) + 'px';
+  }
+
+  /* The edge caches public pages (s-maxage=60 + SWR, see middleware.js),
+     so a plain reload right after a save can show the stale version. A
+     unique query per load makes every preview an edge miss — the editor
+     always sees the fresh render, ahead of the public cache. */
+  const bust = (url) => url + (url.includes('?') ? '&' : '?') + '_preview=' + Date.now();
+
+  function setPreview(url) {
+    prevUrl = url;
+    if (!editWrap.classList.contains('show-prev')) return;
+    fitPreview();
+    prevIfr.src = bust(url);
+  }
+
+  function reloadPreview() {
+    if (!editWrap.classList.contains('show-prev') || !prevUrl) return;
+    prevIfr.src = bust(prevUrl);
+  }
+
+  function applyPreviewState(on) {
+    editWrap.classList.toggle('show-prev', on);
+    prevBtn.textContent = on ? 'Hide preview' : 'Show preview';
+    try { localStorage.setItem('adPrev', on ? '1' : '0'); } catch {}
+    if (on && prevUrl) {
+      fitPreview();
+      if (!prevIfr.getAttribute('src')) prevIfr.src = bust(prevUrl);
+    }
+  }
+
+  prevBtn.addEventListener('click', () => applyPreviewState(!editWrap.classList.contains('show-prev')));
+  document.getElementById('prevReload').addEventListener('click', reloadPreview);
+  for (const btn of document.querySelectorAll('.ad-prev-mode[data-pw]')) {
+    btn.addEventListener('click', () => {
+      prevMode = btn.dataset.pw;
+      document.querySelectorAll('.ad-prev-mode[data-pw]').forEach((b) => b.classList.toggle('on', b === btn));
+      fitPreview();
+    });
+  }
+  window.addEventListener('resize', fitPreview);
+  let wantPrev = true;
+  try { wantPrev = localStorage.getItem('adPrev') !== '0'; } catch {}
+  applyPreviewState(wantPrev);
 
   document.getElementById('backBtn').addEventListener('click', () => {
     editView.style.display = 'none';
@@ -107,6 +189,7 @@ export const prerender = true;
     const { error } = await supabase.from('site_content').upsert({ key: currentKey, data });
     if (error) throw error;
     currentData = data;
+    reloadPreview();
   });
 
   document.getElementById('resetBtn').addEventListener('click', async () => {

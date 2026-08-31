@@ -11,6 +11,7 @@ const nav = [
   ['lists', '/admin/lists/', 'Services & More'],
   ['leads', '/admin/leads/', 'Leads Inbox'],
   ['settings', '/admin/settings/', 'Settings'],
+  ['help', '/admin/help/', 'Help & Guide'],
 ];
 ---
 <!DOCTYPE html>
@@ -30,6 +31,11 @@ const nav = [
       <img src="/images/logo.png" alt="Sabdia">
       <span>Admin Portal</span>
     </div>
+    <button type="button" class="ad-cmd-open" id="adCmdOpen" title="Search everything — ⌘K">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+      <span>Search</span>
+      <kbd>⌘K</kbd>
+    </button>
     <nav class="ad-nav">
       {nav.map(([key, href, label]) => (
         <a href={href} class={active === key ? 'on' : ''}>{label}</a>
@@ -45,5 +51,9 @@ const nav = [
     <slot />
   </main>
 </div>
+<script>
+  import { initAdminSearch } from '../lib/admin/search.js';
+  initAdminSearch();
+</script>
 </body>
 </html>
