@@ -128,6 +128,39 @@ function inputFor(field, value, container) {
 }
 
 function renderField(field, value, container) {
+  /* 'bands' — a page's sections as a fixed list: reorder with ↑↓ and
+     show/hide with the checkbox. Value shape merges into the page's
+     layout object: { order: ['stats', …], stats: true, … }. Pages whose
+     band positions are structural set `fixed: true` (toggles only). */
+  if (field.type === 'bands') {
+    const wrap = el('div', { class: 'ad-group', 'data-bands': field.key }, [
+      el('div', { class: 'ad-group-h', text: field.label }),
+    ]);
+    if (field.help) wrap.appendChild(el('p', { class: 'ad-sub', text: field.help, style: 'margin:0 0 10px' }));
+    const listBox = el('div', { style: 'display:flex;flex-direction:column;gap:6px' });
+    const saved = Array.isArray(value?.order) ? value.order : [];
+    const keys = [
+      ...saved.filter((k) => field.bands.some((b) => b.key === k)),
+      ...field.bands.map((b) => b.key).filter((k) => !saved.includes(k)),
+    ];
+    for (const key of keys) {
+      const band = field.bands.find((b) => b.key === key);
+      const box = el('input', { type: 'checkbox', 'data-band': key, title: 'Show this band' });
+      box.checked = value?.[key] !== false;
+      const row = el('div', { class: 'ad-item', 'data-band-row': key, style: 'display:flex;align-items:center;gap:10px;padding:9px 12px' }, [
+        ...(field.fixed ? [] : [
+          el('button', { type: 'button', text: '↑', title: 'Move up', onclick: (e) => { const r = e.target.closest('[data-band-row]'); const p = r.previousElementSibling; if (p) listBox.insertBefore(r, p); markDirty(container); } }),
+          el('button', { type: 'button', text: '↓', title: 'Move down', onclick: (e) => { const r = e.target.closest('[data-band-row]'); const n = r.nextElementSibling; if (n) listBox.insertBefore(n, r); markDirty(container); } }),
+        ]),
+        el('label', { class: 'ad-check', style: 'margin-left:auto;order:2' }, [box, el('span', { text: 'Show' })]),
+        el('span', { text: band.label, style: 'font-weight:400' }),
+      ]);
+      listBox.appendChild(row);
+    }
+    wrap.appendChild(listBox);
+    return wrap;
+  }
+
   if (field.type === 'object') {
     const group = el('div', { class: 'ad-group', 'data-obj': field.key }, [
       el('div', { class: 'ad-group-h', text: field.label }),
@@ -200,6 +233,17 @@ function directChild(scope, selector, key) {
 }
 
 function readValue(scope, field) {
+  if (field.type === 'bands') {
+    const wrap = scope.querySelector(`[data-bands="${field.key}"]`);
+    if (!wrap) return undefined;
+    const out = { order: [] };
+    for (const row of wrap.querySelectorAll('[data-band-row]')) {
+      const key = row.getAttribute('data-band-row');
+      out.order.push(key);
+      out[key] = row.querySelector('[data-band]').checked;
+    }
+    return out;
+  }
   if (field.type === 'object') {
     const group = scope.querySelector(`[data-obj="${field.key}"]`);
     return group ? readScope(group, field.fields) : undefined;

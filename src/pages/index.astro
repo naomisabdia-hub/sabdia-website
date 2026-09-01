@@ -30,6 +30,10 @@ const [all, content, services, processSteps, testimonials] = await Promise.all([
   getTestimonials(),
 ]);
 const L = content.page_layout?.home ?? {};
+const BAND_ORDER = ['stats', 'marquee', 'about', 'film', 'properties', 'services', 'process', 'testimonial', 'agent', 'contact'];
+const bandSeq = Array.isArray(L.order) && L.order.length ? L.order.filter((k) => BAND_ORDER.includes(k)) : BAND_ORDER;
+const ord = (k) => { const i = bandSeq.indexOf(k); return (i === -1 ? BAND_ORDER.indexOf(k) : i) * 10 + 10; };
+
 const {
   settings,
   home_hero: heroC,
@@ -88,6 +92,7 @@ const jsonLd = JSON.stringify({
   preloadImageSet={heroC.slides[0] ? heroSet(heroC.slides[0].image) : undefined}
   preloadImageMedia="(min-width: 768px)"
 >
+  <style is:inline slot="head">#main{display:flex;flex-direction:column}</style>
   {heroC.slides[0] && (
     <link
       slot="head"
@@ -166,7 +171,7 @@ const jsonLd = JSON.stringify({
 
 {L.stats !== false && (
   <!-- STATS -->
-  <div class="stats-band sp-sm">
+  <div style={`order:${ord('stats')}`} class="stats-band sp-sm">
     <div class="stats-grid inner">
       {stats.items.map((s, i) => (
         <div class={`stat reveal ${delays[i]}`.trim()}>
@@ -184,7 +189,7 @@ const jsonLd = JSON.stringify({
 
 {L.marquee !== false && (
   <!-- MARQUEE -->
-  <div class="mq-band">
+  <div style={`order:${ord('marquee')}`} class="mq-band">
     <div class="mq-track">
       {[false, true].map((dup) => (
         <div class="mq-group" aria-hidden={dup ? 'true' : undefined}>
@@ -201,11 +206,11 @@ const jsonLd = JSON.stringify({
   </div>
 )}
 
-  <CustomSections page="/" position="top" />
+  <div style="order:5"><CustomSections page="/" position="top" /></div>
 
 {L.about !== false && (
   <!-- ABOUT -->
-  <section class="sp" id="about">
+  <section style={`order:${ord('about')}`} class="sp" id="about">
     <div class="inner about-grid">
       <div class="about-sticky">
         <div class="slabel reveal">{about.label}</div>
@@ -242,7 +247,7 @@ const jsonLd = JSON.stringify({
 
   <!-- BRAND FILM -->
   {L.film !== false && films?.brand?.video && (
-    <FilmBand
+    <div style={`order:${ord('film')}`}><FilmBand
       id="story"
       label={films.brand.label}
       headingHtml={films.brand.headingHtml}
@@ -253,12 +258,12 @@ const jsonLd = JSON.stringify({
       captionRight="Brisbane, QLD"
     >
       <a href="/collection/" class="btn-g btn-g-light reveal d3">Explore the Collection &rarr;</a>
-    </FilmBand>
+    </FilmBand></div>
   )}
 
 {L.properties !== false && (
   <!-- PROPERTIES -->
-  <section id="properties" style="padding:0 0 clamp(80px,12vw,160px)">
+  <section id="properties" style={`padding:0 0 clamp(80px,12vw,160px);order:${ord('properties')}`}>
     <div class="inner" style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px) clamp(44px,5vw,60px)">
       <div class="proj-hdr">
         <div>
@@ -323,7 +328,7 @@ const jsonLd = JSON.stringify({
 
 {L.services !== false && (
   <!-- SERVICES (dark section) -->
-  <section class="svc-dark sp" id="services">
+  <section style={`order:${ord('services')}`} class="svc-dark sp" id="services">
     <div class="inner svc-layout">
       <div class="svc-sticky">
         <div class="slabel reveal">{servicesC.label}</div>
@@ -353,7 +358,7 @@ const jsonLd = JSON.stringify({
 
 {L.process !== false && (
   <!-- PROCESS -->
-  <section class="sp">
+  <section style={`order:${ord('process')}`} class="sp">
     <div class="inner">
       <div class="slabel reveal" style="margin-bottom:56px">{processC.label}</div>
       <div class="proc-track">
@@ -371,7 +376,7 @@ const jsonLd = JSON.stringify({
 
   <!-- TESTIMONIAL (dark) -->
   {L.testimonial !== false && testimonial && (
-    <section class="testi-dark sp">
+    <section style={`order:${ord('testimonial')}`} class="testi-dark sp">
       <div class="inner">
         <div class="testi-wrap">
           <div>
@@ -391,7 +396,7 @@ const jsonLd = JSON.stringify({
 
 {L.agent !== false && (
   <!-- AGENT ACCESS -->
-  <div class="agent-grid" id="agents">
+  <div style={`order:${ord('agent')}`} class="agent-grid" id="agents">
     <div class="agent-vis reveal-wipe-x">
       <img src={imgVariant(agent.image.image, { w: 900, h: 1100 })} alt={agent.image.alt} loading="lazy" decoding="async" width="900" height="1100">
       <div class="agent-frame"></div>
@@ -416,7 +421,7 @@ const jsonLd = JSON.stringify({
 
 {L.contact !== false && (
   <!-- CONTACT CTA -->
-  <section class="sp" id="contact" style="background:var(--bg2);border-top:1px solid var(--border)">
+  <section class="sp" id="contact" style={`background:var(--bg2);border-top:1px solid var(--border);order:${ord('contact')}`}>
     <div class="inner contact-grid">
       <div>
         <div class="slabel reveal">{contactC.label}</div>
@@ -457,5 +462,5 @@ const jsonLd = JSON.stringify({
   </section>
 )}
 
-  <CustomSections page="/" position="end" />
+  <div style="order:9000"><CustomSections page="/" position="end" /></div>
 </Base>

@@ -10,6 +10,9 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
   getProcessSteps(),
 ]);
 const L = (await getContent('page_layout')).page_layout?.services ?? {};
+const BAND_ORDER = ['intro', 'details', 'process', 'cta'];
+const bandSeq = Array.isArray(L.order) && L.order.length ? L.order.filter((k) => BAND_ORDER.includes(k)) : BAND_ORDER;
+const ord = (k) => { const i = bandSeq.indexOf(k); return (i === -1 ? BAND_ORDER.indexOf(k) : i) * 10 + 10; };
 ---
 <Base
   preloadImage={imgVariant(page.hero.image, { w: 1920, h: 1080 })}
@@ -20,6 +23,7 @@ const L = (await getContent('page_layout')).page_layout?.services ?? {};
   ogImage="/api/img?src=%2Fimages%2Fhome-hero-2.jpg&w=1200&h=630"
 >
   <style is:inline slot="head">
+  #main{display:flex;flex-direction:column}
   .svc-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:center;padding:clamp(72px,10vw,140px) 0}
   .svc-detail-grid:nth-child(even){direction:rtl}
   .svc-detail-grid:nth-child(even)>*{direction:ltr}
@@ -50,11 +54,11 @@ const L = (await getContent('page_layout')).page_layout?.services ?? {};
     </div>
   </section>
 
-  <CustomSections page="/services/" position="top" />
+  <div style="order:5"><CustomSections page="/services/" position="top" /></div>
 
 {L.intro !== false && (
   <!-- INTRO -->
-  <section class="sp-sm" style="border-bottom:1px solid var(--border)">
+  <section class="sp-sm" style={`border-bottom:1px solid var(--border);order:${ord('intro')}`}>
     <div class="inner svc-intro-grid">
       <div>
         <div class="slabel reveal">{page.intro.label}</div>
@@ -71,7 +75,7 @@ const L = (await getContent('page_layout')).page_layout?.services ?? {};
 
 {L.details !== false && (
   <!-- SERVICE DETAILS -->
-  <section class="sp">
+  <section style={`order:${ord('details')}`} class="sp">
     <div class="inner">
       {services.map((s, i) => (
         <div class="svc-detail-grid">
@@ -99,7 +103,7 @@ const L = (await getContent('page_layout')).page_layout?.services ?? {};
 
 {L.process !== false && (
   <!-- PROCESS RECAP -->
-  <section class="sp" style="background:var(--bg2);border-top:1px solid var(--border)">
+  <section class="sp" style={`background:var(--bg2);border-top:1px solid var(--border);order:${ord('process')}`}>
     <div class="inner">
       <div class="slabel reveal" style="margin-bottom:56px">{page.processLabel}</div>
       <div class="proc-track">
@@ -117,7 +121,7 @@ const L = (await getContent('page_layout')).page_layout?.services ?? {};
 
 {L.cta !== false && (
   <!-- CTA -->
-  <section class="sp" style="background:var(--dark)">
+  <section class="sp" style={`background:var(--dark);order:${ord('cta')}`}>
     <div class="inner" style="text-align:center">
       <div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">{page.cta.label}</div>
       <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(36px,5vw,68px);font-weight:300;color:var(--white);margin-bottom:24px;letter-spacing:-.02em" set:html={page.cta.headingHtml} />
@@ -130,5 +134,5 @@ const L = (await getContent('page_layout')).page_layout?.services ?? {};
   </section>
 )}
 
-  <CustomSections page="/services/" position="end" />
+  <div style="order:9000"><CustomSections page="/services/" position="end" /></div>
 </Base>

@@ -22,6 +22,7 @@ export const prerender = true;
         <p class="ad-sub" id="editDesc"></p>
       </div>
       <div style="display:flex;gap:10px">
+        <button class="ad-btn ad-btn-ghost" id="histBtn" type="button">History</button>
         <button class="ad-btn ad-btn-ghost" id="prevBtn" type="button">Hide preview</button>
         <a class="ad-btn ad-btn-ghost" id="viewBtn" target="_blank" style="display:none">View page ↗</a>
         <button class="ad-btn ad-btn-ghost" id="backBtn">← All content</button>
@@ -29,6 +30,10 @@ export const prerender = true;
     </div>
     <div class="ad-editwrap" id="editWrap">
       <div>
+        <div class="ad-card" id="histPanel" style="display:none">
+          <div class="ad-card-h">Version history — every save is kept</div>
+          <div id="histRows"></div>
+        </div>
         <div class="ad-form" id="contentForm"></div>
         <div class="ad-savebar" id="saveBar">
           <button class="ad-btn ad-btn-gold" data-save>Save &amp; publish</button>
@@ -229,8 +234,73 @@ export const prerender = true;
     history.replaceState(null, '', location.pathname);
   });
 
+  /* ── Version history ── every save snapshots the outgoing version into
+     rows keyed `_history:<key>:<iso>` (same table, same admin-only RLS;
+     the public site fetches exact keys so history rows never leak).
+     Fifteen versions are kept per section. */
+  async function editorEmail() {
+    try {
+      const { getClerk } = await import('../../lib/admin/client.js');
+      const clerk = await getClerk();
+      return clerk?.user?.primaryEmailAddress?.emailAddress || 'admin';
+    } catch { return 'admin'; }
+  }
+
+  async function snapshot(key, data) {
+    if (!data || !Object.keys(data).length) return;
+    const stamp = new Date().toISOString();
+    await supabase.from('site_content').upsert({
+      key: `_history:${key}:${stamp}`,
+      data: { data, saved_at: stamp, by: await editorEmail() },
+    });
+    const { data: rows } = await supabase.from('site_content').select('key')
+      .like('key', `_history:${key}:%`).order('key', { ascending: false });
+    const stale = (rows ?? []).slice(15).map((r) => r.key);
+    if (stale.length) await supabase.from('site_content').delete().in('key', stale);
+  }
+
+  const histPanel = document.getElementById('histPanel');
+  const histRows = document.getElementById('histRows');
+  document.getElementById('histBtn').addEventListener('click', async () => {
+    const open = histPanel.style.display !== 'none';
+    histPanel.style.display = open ? 'none' : '';
+    if (open) return;
+    histRows.textContent = 'Loading…';
+    const { data: rows, error } = await supabase.from('site_content').select('key, data')
+      .like('key', `_history:${currentKey}:%`).order('key', { ascending: false });
+    if (error) { histRows.textContent = error.message; return; }
+    histRows.textContent = '';
+    if (!rows?.length) {
+      histRows.appendChild(el('p', { class: 'ad-sub', style: 'margin:0', text: 'No earlier versions yet — they appear here after your next save.' }));
+      return;
+    }
+    const table = el('table', { class: 'ad-table' });
+    const tbody = el('tbody');
+    for (const row of rows) {
+      const when = new Date(row.data.saved_at).toLocaleString('en-AU', { dateStyle: 'medium', timeStyle: 'short' });
+      tbody.appendChild(el('tr', {}, [
+        el('td', { text: when, style: 'white-space:nowrap' }),
+        el('td', { text: row.data.by || '', style: 'color:var(--taupe-d)' }),
+        el('td', { style: 'text-align:right' }, [
+          el('button', { class: 'ad-btn ad-btn-ghost', type: 'button', text: 'Restore', onclick: async () => {
+            if (!confirm(`Restore the version from ${when}? The current version is kept in history.`)) return;
+            await snapshot(currentKey, currentData);
+            const { error: e2 } = await supabase.from('site_content').upsert({ key: currentKey, data: row.data.data });
+            if (e2) return toast(e2.message, true);
+            toast('Restored — live on the website now');
+            histPanel.style.display = 'none';
+            openEditor(currentKey);
+          } }),
+        ]),
+      ]));
+    }
+    table.appendChild(tbody);
+    histRows.appendChild(table);
+  });
+
   saveBar(document.getElementById('contentForm'), document.getElementById('saveBar'), async () => {
     const data = readForm(document.getElementById('contentForm'), contentSchemas[currentKey].schema, currentData);
+    await snapshot(currentKey, currentData);
     const { error } = await supabase.from('site_content').upsert({ key: currentKey, data });
     if (error) throw error;
     currentData = data;

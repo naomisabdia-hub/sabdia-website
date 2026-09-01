@@ -6,6 +6,9 @@ import { imgVariant } from '../lib/images.js';
 
 const { about_page: page, page_layout } = await getContent('about_page', 'page_layout');
 const L = page_layout?.about ?? {};
+const BAND_ORDER = ['mission', 'values', 'journey', 'awards', 'cta'];
+const bandSeq = Array.isArray(L.order) && L.order.length ? L.order.filter((k) => BAND_ORDER.includes(k)) : BAND_ORDER;
+const ord = (k) => { const i = bandSeq.indexOf(k); return (i === -1 ? BAND_ORDER.indexOf(k) : i) * 10 + 10; };
 ---
 <Base
   preloadImage={imgVariant(page.hero.image, { w: 1920, h: 1080 })}
@@ -16,6 +19,7 @@ const L = page_layout?.about ?? {};
   ogImage="/api/img?src=%2Fimages%2Fhome-hero-1.jpg&w=1200&h=630"
 >
   <style is:inline slot="head">
+  #main{display:flex;flex-direction:column}
   .timeline{position:relative;padding-left:40px;margin-top:0}
   .timeline::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--gold),transparent)}
   .tl-item{position:relative;margin-bottom:44px}
@@ -54,11 +58,11 @@ const L = page_layout?.about ?? {};
     </div>
   </section>
 
-  <CustomSections page="/about/" position="top" />
+  <div style="order:5"><CustomSections page="/about/" position="top" /></div>
 
 {L.mission !== false && (
   <!-- MISSION -->
-  <section class="sp">
+  <section style={`order:${ord('mission')}`} class="sp">
     <div class="inner about-grid">
       <div class="about-sticky">
         <div class="slabel reveal">{page.mission.label}</div>
@@ -79,7 +83,7 @@ const L = page_layout?.about ?? {};
 
 {L.values !== false && (
   <!-- VALUES -->
-  <section style="background:var(--dark)">
+  <section style={`background:var(--dark);order:${ord('values')}`}>
     <div style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px)">
       <div class="inner">
         <div class="slabel slabel-dark reveal" style="margin-bottom:52px">{page.values.label}</div>
@@ -101,7 +105,7 @@ const L = page_layout?.about ?? {};
 
 {L.journey !== false && (
   <!-- TIMELINE -->
-  <section class="sp">
+  <section style={`order:${ord('journey')}`} class="sp">
     <div class="inner">
       <div class="journey-grid">
         <div>
@@ -126,7 +130,7 @@ const L = page_layout?.about ?? {};
 
 {L.awards !== false && (
   <!-- AWARDS -->
-  <section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <section class="sp-sm" style={`background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);order:${ord('awards')}`}>
     <div class="inner">
       <div class="slabel reveal">{page.awards.label}</div>
       <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px)" set:html={page.awards.headingHtml} />
@@ -145,7 +149,7 @@ const L = page_layout?.about ?? {};
 
 {L.cta !== false && (
   <!-- CTA -->
-  <section class="sp" style="text-align:center">
+  <section class="sp" style={`text-align:center;order:${ord('cta')}`}>
     <div class="inner-sm">
       <div class="slabel reveal" style="justify-content:center;margin-bottom:20px">{page.cta.label}</div>
       <h2 class="about-h reveal d1" style="text-align:center;font-size:clamp(36px,5vw,68px)" set:html={page.cta.headingHtml} />
@@ -158,5 +162,5 @@ const L = page_layout?.about ?? {};
   </section>
 )}
 
-  <CustomSections page="/about/" position="end" />
+  <div style="order:9000"><CustomSections page="/about/" position="end" /></div>
 </Base>

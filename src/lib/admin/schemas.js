@@ -334,6 +334,62 @@ export const contentSchemas = {
       ] },
     ],
   },
+  seo_pages: {
+    title: 'Search engine listings',
+    description: 'The title and description each page shows in Google. Leave a field blank to keep the built-in default.',
+    schema: [
+      { key: 'home', label: 'Homepage', type: 'object', fields: [
+        { key: 'title', label: 'Search title', type: 'text', help: 'the blue headline in Google' },
+        { key: 'description', label: 'Search description', type: 'textarea', plain: true, help: 'one or two sentences, ~155 characters' },
+      ] },
+      { key: 'properties', label: 'For Sale', type: 'object', fields: [
+        { key: 'title', label: 'Search title', type: 'text', help: 'the blue headline in Google' },
+        { key: 'description', label: 'Search description', type: 'textarea', plain: true, help: 'one or two sentences, ~155 characters' },
+      ] },
+      { key: 'about', label: 'About', type: 'object', fields: [
+        { key: 'title', label: 'Search title', type: 'text', help: 'the blue headline in Google' },
+        { key: 'description', label: 'Search description', type: 'textarea', plain: true, help: 'one or two sentences, ~155 characters' },
+      ] },
+      { key: 'services', label: 'Services', type: 'object', fields: [
+        { key: 'title', label: 'Search title', type: 'text', help: 'the blue headline in Google' },
+        { key: 'description', label: 'Search description', type: 'textarea', plain: true, help: 'one or two sentences, ~155 characters' },
+      ] },
+      { key: 'projects', label: 'Projects', type: 'object', fields: [
+        { key: 'title', label: 'Search title', type: 'text', help: 'the blue headline in Google' },
+        { key: 'description', label: 'Search description', type: 'textarea', plain: true, help: 'one or two sentences, ~155 characters' },
+      ] },
+      { key: 'collection', label: 'Collection', type: 'object', fields: [
+        { key: 'title', label: 'Search title', type: 'text', help: 'the blue headline in Google' },
+        { key: 'description', label: 'Search description', type: 'textarea', plain: true, help: 'one or two sentences, ~155 characters' },
+      ] },
+      { key: 'contact', label: 'Contact', type: 'object', fields: [
+        { key: 'title', label: 'Search title', type: 'text', help: 'the blue headline in Google' },
+        { key: 'description', label: 'Search description', type: 'textarea', plain: true, help: 'one or two sentences, ~155 characters' },
+      ] },
+      { key: 'agent_access', label: 'Agent Access', type: 'object', fields: [
+        { key: 'title', label: 'Search title', type: 'text', help: 'the blue headline in Google' },
+        { key: 'description', label: 'Search description', type: 'textarea', plain: true, help: 'one or two sentences, ~155 characters' },
+      ] },
+      { key: 'find_your_home', label: 'Find Your Home', type: 'object', fields: [
+        { key: 'title', label: 'Search title', type: 'text', help: 'the blue headline in Google' },
+        { key: 'description', label: 'Search description', type: 'textarea', plain: true, help: 'one or two sentences, ~155 characters' },
+      ] },
+    ],
+  },
+  page_layout: {
+    title: 'Page layout — order & visibility',
+    description: "Arrange each page like Shopify's theme editor: move bands with the arrows, untick to hide. Heroes and core content always stay on.",
+    schema: [
+      { key: 'home', label: 'Homepage', type: 'bands', bands: [{ key: 'stats', label: 'Stats band' }, { key: 'marquee', label: 'Scrolling marquee' }, { key: 'about', label: 'About band' }, { key: 'film', label: 'Film band' }, { key: 'properties', label: 'Current properties' }, { key: 'services', label: 'Services band' }, { key: 'process', label: 'Process steps' }, { key: 'testimonial', label: 'Testimonial' }, { key: 'agent', label: 'Agent access band' }, { key: 'contact', label: 'Contact band' }] },
+      { key: 'about', label: 'About page', type: 'bands', bands: [{ key: 'mission', label: 'Mission' }, { key: 'values', label: 'Values' }, { key: 'journey', label: 'Journey timeline' }, { key: 'awards', label: 'Awards' }, { key: 'cta', label: 'Closing CTA' }] },
+      { key: 'services', label: 'Services page', type: 'bands', bands: [{ key: 'intro', label: 'Intro' }, { key: 'details', label: 'Service details' }, { key: 'process', label: 'Process recap' }, { key: 'cta', label: 'Closing CTA' }] },
+      { key: 'projects', label: 'Projects page', type: 'bands', bands: [{ key: 'filter', label: 'Filter bar' }, { key: 'current', label: 'Current properties' }, { key: 'sold', label: 'Sold prior' }, { key: 'stats', label: 'Stats band' }, { key: 'cta', label: 'Closing CTA' }] },
+      { key: 'agent', label: 'Agent Access page', type: 'bands', bands: [{ key: 'benefits', label: 'Benefits' }, { key: 'listings', label: 'Current listings' }, { key: 'apply', label: 'Application form' }] },
+      { key: 'properties', label: 'For Sale page', type: 'bands', fixed: true, bands: [{ key: 'featured', label: 'Featured residence banner' }, { key: 'sold', label: 'Sold prior band' }, { key: 'cta', label: 'Enquiry CTA' }] },
+      { key: 'contact', label: 'Contact page', type: 'bands', fixed: true, bands: [{ key: 'quicklinks', label: 'Quick links' }] },
+      { key: 'property', label: 'Property pages (all residences)', type: 'bands', fixed: true, bands: [{ key: 'gallery', label: 'Photo gallery' }, { key: 'film', label: 'Residence film' }, { key: 'series', label: 'Instagram series strip' }, { key: 'cta', label: 'Closing CTA' }, { key: 'related', label: 'Related residences' }] },
+    ],
+  },
 };
 
 // Page-document keys that also exist but are edited rarely; they reuse the

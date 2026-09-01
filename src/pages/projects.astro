@@ -14,6 +14,9 @@ const sold = all.filter((p) => p.data.status === 'sold');
 
 const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`, landLabel(d.land, d.landOver)].join(' · ');
 const L = (await getContent('page_layout')).page_layout?.projects ?? {};
+const BAND_ORDER = ['filter', 'current', 'sold', 'stats', 'cta'];
+const bandSeq = Array.isArray(L.order) && L.order.length ? L.order.filter((k) => BAND_ORDER.includes(k)) : BAND_ORDER;
+const ord = (k) => { const i = bandSeq.indexOf(k); return (i === -1 ? BAND_ORDER.indexOf(k) : i) * 10 + 10; };
 
 /* ── CONSTRUCTION JOURNEY — REMOVED pending real progress photography ──
    The JourneySlider (src/components/JourneySlider.astro) and its section
@@ -37,6 +40,7 @@ const L = (await getContent('page_layout')).page_layout?.projects ?? {};
   description="Browse Sabdia Constructions' portfolio of completed luxury residential developments across inner Brisbane. 100+ residences since 2013."
 >
   <style is:inline slot="head">
+  #main{display:flex;flex-direction:column}
   .pfilter{font-size:11px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--taupe-d);transition:color .3s;background:none;border:none;cursor:pointer;padding:0 0 1px;border-bottom:1px solid transparent;font-family:var(--font-u)}
   .pfilter:hover{color:var(--ink)}
   .pfilter.on{color:var(--ink);border-bottom-color:var(--ink)}
@@ -55,7 +59,7 @@ const L = (await getContent('page_layout')).page_layout?.projects ?? {};
 
 {L.filter !== false && (
   <!-- FILTER BAR -->
-  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px clamp(22px,5vw,80px)">
+  <div style={`background:var(--bg2);border-bottom:1px solid var(--border);padding:20px clamp(22px,5vw,80px);order:${ord('filter')}`}>
     <div class="inner" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
       <span style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)">Filter:</span>
       <button class="pfilter on" data-filter="all">All</button>
@@ -65,11 +69,11 @@ const L = (await getContent('page_layout')).page_layout?.projects ?? {};
   </div>
 )}
 
-  <CustomSections page="/projects/" position="top" />
+  <div style="order:5"><CustomSections page="/projects/" position="top" /></div>
 
 {L.current !== false && (
   <!-- CURRENT PROPERTIES -->
-  <section class="sp" data-proj-section="current">
+  <section style={`order:${ord('current')}`} class="sp" data-proj-section="current">
     <div class="inner">
       <div class="slabel reveal" style="margin-bottom:32px">{page.currentLabel}</div>
       <div class="projects-grid">
@@ -92,7 +96,7 @@ const L = (await getContent('page_layout')).page_layout?.projects ?? {};
 
 {L.sold !== false && (
   <!-- SOLD PRIOR -->
-  <section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border)" data-proj-section="sold">
+  <section class="sp-sm" style={`background:var(--bg2);border-top:1px solid var(--border);order:${ord('sold')}`} data-proj-section="sold">
     <div class="inner">
       <div class="slabel reveal" style="margin-bottom:32px">{page.soldLabel}</div>
       <div class="projects-grid">
@@ -115,7 +119,7 @@ const L = (await getContent('page_layout')).page_layout?.projects ?? {};
 
 {L.stats !== false && (
   <!-- STATS BAND -->
-  <div class="stats-band sp-sm">
+  <div style={`order:${ord('stats')}`} class="stats-band sp-sm">
     <div class="stats-grid inner">
       {stats.items.map((s, i) => (
         <div class={`stat reveal ${['', 'd1', 'd2', 'd3'][i % 4]}`.trim()}>
@@ -133,7 +137,7 @@ const L = (await getContent('page_layout')).page_layout?.projects ?? {};
 
 {L.cta !== false && (
   <!-- CTA -->
-  <section class="sp" style="text-align:center">
+  <section class="sp" style={`text-align:center;order:${ord('cta')}`}>
     <div class="inner-sm">
       <div class="slabel reveal" style="justify-content:center;margin-bottom:20px">{page.cta.label}</div>
       <h2 class="about-h reveal d1" style="text-align:center;font-size:clamp(32px,5vw,60px)" set:html={page.cta.headingHtml} />
@@ -145,7 +149,7 @@ const L = (await getContent('page_layout')).page_layout?.projects ?? {};
   </section>
 )}
 
-  <CustomSections page="/projects/" position="end" />
+  <div style="order:9000"><CustomSections page="/projects/" position="end" /></div>
 
   <script is:inline>
   /* Re-runs per navigation — see main.js for why. Also called immediately:

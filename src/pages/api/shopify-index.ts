@@ -122,32 +122,68 @@ export const GET: APIRoute = async ({ request }) => {
   const num = (gid: string) => gid.split('/').pop();
   const strip = (html: string) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-  /* ── Customizer copy: template JSON + theme settings ── */
+  /* ── Customizer copy: template JSON (fetched once, reused below) ── */
   const templateNames = Object.keys(TEMPLATE_PATH);
+  const templateDocs: Record<string, any> = {};
   await Promise.all(
     templateNames.map(async (name) => {
       const raw = await themeAsset(`templates/${name}.json`);
       if (!raw) return;
-      let doc: any;
-      try { doc = JSON.parse(raw.replace(/^\s*\/\*[\s\S]*?\*\/\s*/, '')); } catch { return; }
-      const editor = `${adminBase}/themes/${THEME_ID}/editor?previewPath=${encodeURIComponent(TEMPLATE_PATH[name])}`;
-      for (const [sid, section] of Object.entries<any>(doc.sections ?? {})) {
-        const found: { text: string; where: string }[] = [];
-        harvest(section.settings ?? {}, [], found);
-        for (const [, block] of Object.entries<any>(section.blocks ?? {})) {
-          harvest(block.settings ?? {}, ['item'], found);
-        }
-        for (const f of found) {
-          entries.push({
-            text: f.text,
-            where: `${TEMPLATE_PATH[name]} › ${section.type.replace(/-/g, ' ')}${f.where ? ' › ' + f.where : ''}`,
-            url: editor,
-            group: 'Customizer copy',
-          });
-        }
-      }
+      try { templateDocs[name] = JSON.parse(raw.replace(/^\s*\/\*[\s\S]*?\*\/\s*/, '')); } catch { /* not JSON */ }
     }),
   );
+  const sectionTypes = new Set<string>();
+  for (const [name, doc] of Object.entries(templateDocs)) {
+    const editor = `${adminBase}/themes/${THEME_ID}/editor?previewPath=${encodeURIComponent(TEMPLATE_PATH[name])}`;
+    for (const section of Object.values<any>(doc.sections ?? {})) {
+      sectionTypes.add(section.type);
+      const found: { text: string; where: string }[] = [];
+      harvest(section.settings ?? {}, [], found);
+      for (const block of Object.values<any>(section.blocks ?? {})) {
+        harvest(block.settings ?? {}, ['item'], found);
+      }
+      for (const f of found) {
+        entries.push({
+          text: f.text,
+          where: `${TEMPLATE_PATH[name]} › ${section.type.replace(/-/g, ' ')}${f.where ? ' › ' + f.where : ''}`,
+          url: editor,
+          group: 'Customizer copy',
+        });
+      }
+    }
+  }
+  /* ── Built-in default copy: the {% schema %} defaults of every section
+     a template uses — searchable even before its first customizer edit. ── */
+  const editedTexts = new Set(entries.map((e) => e.text));
+  await Promise.all(
+    [...sectionTypes].map(async (type) => {
+      const raw = await themeAsset(`sections/${type}.liquid`);
+      if (!raw) return;
+      const m = raw.match(/{%\s*schema\s*%}([\s\S]*?){%\s*endschema\s*%}/);
+      if (!m) return;
+      let schema: any;
+      try { schema = JSON.parse(m[1]); } catch { return; }
+      const tpl = Object.keys(templateDocs).find((n) =>
+        Object.values<any>(templateDocs[n].sections ?? {}).some((s) => s.type === type));
+      const editor = `${adminBase}/themes/${THEME_ID}/editor${tpl ? `?previewPath=${encodeURIComponent(TEMPLATE_PATH[tpl])}` : ''}`;
+      const pull = (settings: any[], scope: string) => {
+        for (const st of settings ?? []) {
+          const d = st.default;
+          if (typeof d === 'string' && looksLikeCopy(d) && !editedTexts.has(d)) {
+            entries.push({
+              text: d,
+              where: `${tpl ? TEMPLATE_PATH[tpl] + ' › ' : ''}${type.replace(/-/g, ' ')}${scope} › ${(st.label || st.id || '').toString().toLowerCase()}`,
+              url: editor,
+              group: 'Customizer copy',
+            });
+          }
+        }
+      };
+      pull(schema.settings, '');
+      for (const b of schema.blocks ?? []) pull(b.settings, ' › ' + (b.name || b.type));
+    }),
+  );
+
   const settingsRaw = await themeAsset('config/settings_data.json');
   if (settingsRaw) {
     try {
