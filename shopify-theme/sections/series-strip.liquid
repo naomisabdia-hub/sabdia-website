@@ -6,13 +6,22 @@
   captures of the published posts, edited per product in the admin.
   Renders nothing when the residence has no posts.
 {%- endcomment -%}
-{%- assign posts = product.metafields.custom.series_posts.value -%}
+{%- liquid
+  # Works on product pages AND on collection-item pages: the posts and
+  # the residence name come from whichever the template provides.
+  assign posts = product.metafields.custom.series_posts.value
+  assign series_name = product.title
+  if posts == blank and page
+    assign posts = page.metafields.custom.series_posts.value
+    assign series_name = page.title
+  endif
+-%}
 {%- if posts.size > 0 -%}
 <section class="series-band{% if section.settings.dark %} on-dark{% endif %}" data-series>
   <div class="series-hdr">
     <div>
       <div class="slabel {% if section.settings.dark %}slabel-dark {% endif %}reveal">{{ section.settings.label }}</div>
-      <h2 class="series-h reveal d1">{{ section.settings.heading_prefix }} <em>{{ product.title }}</em>.</h2>
+      <h2 class="series-h reveal d1">{{ section.settings.heading_prefix }} <em>{{ series_name }}</em>.</h2>
       <a href="{{ section.settings.instagram_url | default: settings.instagram_url }}" target="_blank" rel="noopener" class="series-handle reveal d2">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
         {{ section.settings.handle_line }} {{ section.settings.handle | default: settings.instagram_label }}
@@ -32,7 +41,7 @@
           data-caption="{{ item.caption | escape }}"
           {% if item.video %}role="button" tabindex="0" aria-label="Play film: {{ item.caption | escape }}"{% endif %}
         >
-          <img src="{{ item.thumb }}" alt="{{ item.caption | default: product.title | escape }}" loading="lazy">
+          <img src="{{ item.thumb }}" alt="{{ item.caption | default: series_name | escape }}" loading="lazy">
           <div class="series-card-ov"></div>
           {%- if item.video -%}
             <div class="series-play" aria-hidden="true">

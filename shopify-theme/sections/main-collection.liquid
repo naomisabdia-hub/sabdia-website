@@ -1,35 +1,279 @@
 {%- comment -%}
-  Collection listing — the For Sale grid. Sold residences (tagged
-  "sold") render with the sold treatment.
+  For Sale — faithful port of properties/index.astro: photographic hero,
+  refine/sort toolbar, the featured-residence banner, the residence grid,
+  the sold-prior band, and the enquiry CTA. Filters read each residence's
+  metafields; sort order follows the collection's manual order.
 {%- endcomment -%}
-<section class="sp" style="padding-top:clamp(140px,18vw,220px)">
-  <div class="inner">
-    <div class="proj-hdr" style="margin-bottom:48px">
-      <div>
-        <div class="slabel reveal">{{ section.settings.label }}</div>
-        <h1 class="proj-h reveal d1">{{ collection.title }}</h1>
-        {%- if collection.description != blank -%}
-          <p class="about-p reveal d2" style="margin-top:18px;max-width:560px">{{ collection.description | strip_html }}</p>
+{%- liquid
+  assign prods = collection.products
+  assign count = prods.size
+  case count
+    when 1
+      assign count_word = 'One'
+    when 2
+      assign count_word = 'Two'
+    when 3
+      assign count_word = 'Three'
+    when 4
+      assign count_word = 'Four'
+    when 5
+      assign count_word = 'Five'
+    when 6
+      assign count_word = 'Six'
+    when 7
+      assign count_word = 'Seven'
+    when 8
+      assign count_word = 'Eight'
+    when 9
+      assign count_word = 'Nine'
+    else
+      assign count_word = count
+  endcase
+  assign count_token = '{' | append: 'count' | append: '}'
+  assign intro = section.settings.intro_template | replace: count_token, count_word
+  assign show_rich = true
+  if collection.handle == 'sold'
+    assign show_rich = false
+  endif
+  assign featured = prods.first
+  assign sold_col = collections['sold']
+-%}
+
+<section class="page-hero">
+  {%- if section.settings.image -%}
+    <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
+  {%- elsif section.settings.image_ext != blank -%}
+    <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}" alt="" loading="eager" width="1920" height="1080">
+  {%- endif -%}
+  <div class="page-hero-ov"></div>
+  <div class="page-hero-content inner">
+    <div class="slabel slabel-dark">{{ section.settings.label | default: collection.title }}</div>
+    <h1 class="page-h">{{ section.settings.heading_html | default: collection.title }}</h1>
+    <p class="page-hero-sub">{{ intro }}</p>
+  </div>
+</section>
+
+{%- if show_rich -%}
+<div class="prop-toolbar">
+  <div class="prop-toolbar-inner">
+    <span class="ptool-l">{{ section.settings.refine_label }}</span>
+    <select class="ptool-sel" id="fSuburb" aria-label="Filter by suburb">
+      <option value="">{{ section.settings.all_suburbs }}</option>
+      {%- capture suburb_list -%}
+        {%- for product in prods -%}{{ product.metafields.custom.suburb.value }}¦{%- endfor -%}
+      {%- endcapture -%}
+      {%- assign suburbs = suburb_list | strip | split: '¦' | uniq | sort -%}
+      {%- for s in suburbs -%}
+        {%- assign st = s | strip -%}
+        {%- if st != blank -%}<option value="{{ st | escape }}">{{ st }}</option>{%- endif -%}
+      {%- endfor -%}
+    </select>
+    <select class="ptool-sel" id="fCars" aria-label="Minimum garage spaces">
+      <option value="">Any Garage</option>
+      <option value="4">4+ Cars</option>
+      <option value="6">6+ Cars</option>
+      <option value="8">8+ Cars</option>
+    </select>
+    <select class="ptool-sel" id="fLand" aria-label="Land size">
+      <option value="">Any Land Size</option>
+      <option value="0-600">Up to 600m&sup2;</option>
+      <option value="600-800">600&ndash;800m&sup2;</option>
+      <option value="800-">800m&sup2;+</option>
+    </select>
+    <select class="ptool-sel" id="fSort" aria-label="Sort properties">
+      <option value="featured">Sort &mdash; Featured</option>
+      <option value="land">Land Size</option>
+      <option value="cars">Garage Spaces</option>
+      <option value="name">Name A&ndash;Z</option>
+    </select>
+    <span class="ptool-count" id="fCount"></span>
+  </div>
+</div>
+
+{%- if featured -%}
+  {%- assign fmf = featured.metafields.custom -%}
+  <section style="padding:clamp(40px,5vw,64px) clamp(22px,5vw,80px) 0;background:var(--bg)" id="featuredWrap">
+    <div class="inner">
+      <a href="{{ featured.url }}" class="reveal" style="display:block;position:relative;overflow:hidden;height:clamp(400px,52vw,680px);cursor:pointer;text-decoration:none">
+        {%- if featured.featured_image -%}
+          <img src="{{ featured.featured_image | image_url: width: 1600, height: 900, crop: 'center' }}" alt="{{ featured.title | escape }}" loading="eager"
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.98) saturate(.96);transition:filter .7s,transform .7s">
         {%- endif -%}
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(31,27,20,.88) 0%,rgba(31,27,20,.1) 50%,transparent 100%);transition:opacity .4s"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:clamp(28px,4vw,52px)">
+          <div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
+            <div style="width:5px;height:5px;border-radius:50%;background:var(--gold2);animation:pulse 2s ease-in-out infinite;flex-shrink:0"></div>
+            <span style="font-size:10.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2)">For Sale</span>
+          </div>
+          <div style="font-family:var(--font-d);font-size:clamp(44px,8vw,110px);font-weight:300;line-height:.88;letter-spacing:-.04em;color:var(--white);margin-bottom:10px">{{ featured.title }}</div>
+          <div style="font-size:11.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(253,251,246,.78);margin-bottom:18px">{{ fmf.suburb.value }}, {{ fmf.state.value | default: 'QLD' }}</div>
+          <div style="display:flex;gap:18px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(253,251,246,.82)">{{ fmf.beds.value }} Bed</span>
+            <span style="font-size:11px;color:rgba(253,251,246,.45)">&middot;</span>
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(253,251,246,.82)">{{ fmf.baths.value }} Bath</span>
+            <span style="font-size:11px;color:rgba(253,251,246,.45)">&middot;</span>
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(253,251,246,.82)">{{ fmf.cars.value }} Garage</span>
+            <span style="font-size:11px;color:rgba(253,251,246,.45)">&middot;</span>
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(253,251,246,.82)">{{ fmf.land.value }}m&sup2;{% if fmf.land_over.value %}+{% endif %}</span>
+          </div>
+        </div>
+        <div style="position:absolute;top:clamp(18px,3vw,32px);right:clamp(18px,3vw,32px);width:44px;height:44px;border:1px solid rgba(195,164,94,.45);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);font-size:16px">&rarr;</div>
+      </a>
+    </div>
+  </section>
+{%- endif -%}
+{%- endif -%}
+
+<section style="padding:clamp(8px,1vw,10px) clamp(22px,5vw,80px) 0;background:var(--bg)">
+  <div class="inner">
+    <div class="proj-grid-3" id="propGrid" {% unless show_rich %}style="padding-top:clamp(32px,4vw,56px)"{% endunless %}>
+      {%- for product in prods -%}
+        {%- assign mfp = product.metafields.custom -%}
+        {%- assign delay = forloop.index0 | modulo: 3 -%}
+        <div
+          data-prop-card
+          {% if show_rich and forloop.first %}data-featured="1" style="display:none"{% endif %}
+          data-suburb="{{ mfp.suburb.value | escape }}"
+          data-cars="{{ mfp.cars.value }}"
+          data-land="{{ mfp.land.value }}"
+          data-name="{{ product.title | escape }}"
+          data-order="{{ forloop.index }}"
+        >
+          {%- if product.tags contains 'sold' -%}
+            {% render 'sold-card', product: product, class: 'reveal-wipe', img_w: 800, img_h: 500, show_suburb: true %}
+          {%- elsif delay == 1 -%}
+            {% render 'property-card', product: product, class: 'reveal d1', style: 'aspect-ratio:16/10', img_w: 900, img_h: 562, show_cars: true %}
+          {%- elsif delay == 2 -%}
+            {% render 'property-card', product: product, class: 'reveal d2', style: 'aspect-ratio:16/10', img_w: 900, img_h: 562, show_cars: true %}
+          {%- else -%}
+            {% render 'property-card', product: product, class: 'reveal', style: 'aspect-ratio:16/10', img_w: 900, img_h: 562, show_cars: true %}
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+    <p id="fEmpty" style="display:none;padding:56px 0;text-align:center;font-family:var(--font-d);font-size:22px;font-weight:300;font-style:italic;color:var(--taupe-d)">{{ section.settings.empty_text }}</p>
+  </div>
+</section>
+
+{%- if show_rich and sold_col.products.size > 0 -%}
+  <section style="padding:clamp(64px,8vw,100px) clamp(22px,5vw,80px) clamp(80px,10vw,120px);background:var(--bg)">
+    <div class="inner">
+      <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.sold_label }}</div>
+      <div class="proj-grid-sold" style="margin-top:0">
+        {%- for product in sold_col.products -%}
+          {%- assign sdelay = forloop.index0 | modulo: 2 -%}
+          {%- if sdelay == 1 -%}
+            {% render 'sold-card', product: product, class: 'reveal d1', img_w: 900, img_h: 560 %}
+          {%- else -%}
+            {% render 'sold-card', product: product, class: 'reveal', img_w: 900, img_h: 560 %}
+          {%- endif -%}
+        {%- endfor -%}
       </div>
     </div>
-    <div class="proj-grid-3">
-      {%- for product in collection.products -%}
-        {%- if product.tags contains 'sold' -%}
-          {% render 'sold-card', product: product, class: 'reveal-wipe', img_w: 800, img_h: 500, show_suburb: true %}
-        {%- else -%}
-          {% render 'property-card', product: product, class: 'reveal-wipe', style: 'aspect-ratio:16/10', img_w: 900, img_h: 560, show_cars: true %}
-        {%- endif -%}
-      {%- endfor -%}
+  </section>
+{%- endif -%}
+
+<section class="sp" style="background:var(--bg2);border-top:1px solid var(--border);text-align:center">
+  <div class="inner-sm">
+    <div class="slabel reveal" style="justify-content:center;margin-bottom:20px">{{ section.settings.cta_label }}</div>
+    <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(32px,5vw,64px);font-weight:300;color:var(--ink);margin-bottom:20px;letter-spacing:-.02em">{{ section.settings.cta_heading_html }}</h2>
+    <p class="reveal d2" style="font-size:13px;font-weight:300;color:var(--ink3);max-width:420px;margin:0 auto 36px;line-height:1.85">{{ section.settings.cta_text }}</p>
+    <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="{{ section.settings.cta1_link | default: '/pages/contact' }}" class="btn-p">{{ section.settings.cta1_label }} &rarr;</a>
+      <a href="{{ section.settings.cta2_link | default: '/pages/agent-access' }}" class="btn-g">{{ section.settings.cta2_label }}</a>
+      <a href="{{ section.settings.cta3_link | default: '/pages/find-your-home' }}" class="btn-g btn-g-gold">{{ section.settings.cta3_label }}</a>
     </div>
   </div>
 </section>
+
+<style>
+  .prop-toolbar{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:18px clamp(22px,5vw,80px);background:var(--bg2);border-bottom:1px solid var(--border)}
+  .prop-toolbar-inner{display:flex;gap:28px;align-items:center;flex-wrap:wrap;max-width:1400px;margin:0 auto;width:100%}
+  .ptool-l{font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)}
+  .ptool-sel{font-family:var(--font-u);font-size:10.5px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;border:none;border-bottom:1px solid var(--border);padding:4px 22px 4px 0;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23A8874A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center}
+  .ptool-sel:focus{outline:none;border-bottom-color:var(--gold)}
+  .ptool-count{margin-left:auto;font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe-d)}
+</style>
+
+<script>
+  (function () {
+    var suburb = document.getElementById('fSuburb');
+    var cars = document.getElementById('fCars');
+    var land = document.getElementById('fLand');
+    var sort = document.getElementById('fSort');
+    var count = document.getElementById('fCount');
+    var empty = document.getElementById('fEmpty');
+    var grid = document.getElementById('propGrid');
+    var featuredWrap = document.getElementById('featuredWrap');
+    if (!grid || !suburb || grid.dataset.filterInit) return;
+    grid.dataset.filterInit = '1';
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-prop-card]'));
+
+    function apply() {
+      var isDefault = !suburb.value && !cars.value && !land.value && sort.value === 'featured';
+      if (featuredWrap) featuredWrap.style.display = isDefault ? '' : 'none';
+
+      var visible = 0;
+      cards.forEach(function (c) {
+        var ok = true;
+        if (isDefault && c.dataset.featured) ok = false; // featured shown in hero block instead
+        if (ok && suburb.value && c.dataset.suburb !== suburb.value) ok = false;
+        if (ok && cars.value && Number(c.dataset.cars) < Number(cars.value)) ok = false;
+        if (ok && land.value) {
+          var range = land.value.split('-');
+          var lo = Number(range[0] || 0);
+          var hi = range[1] ? Number(range[1]) : Infinity;
+          var sqm = Number(c.dataset.land);
+          if (sqm < lo || sqm >= hi) ok = false;
+        }
+        c.style.display = ok ? '' : 'none';
+        if (ok) visible++;
+        var r = c.querySelector('.reveal');
+        if (r) r.classList.add('vis');
+      });
+
+      var sorted = cards.slice().sort(function (a, b) {
+        if (sort.value === 'land') return Number(b.dataset.land) - Number(a.dataset.land);
+        if (sort.value === 'cars') return Number(b.dataset.cars) - Number(a.dataset.cars);
+        if (sort.value === 'name') return a.dataset.name.localeCompare(b.dataset.name);
+        return Number(a.dataset.order) - Number(b.dataset.order);
+      });
+      sorted.forEach(function (c) { grid.appendChild(c); });
+
+      empty.style.display = visible === 0 ? '' : 'none';
+      count.textContent = isDefault
+        ? ''
+        : visible + (visible === 1 ? ' Residence' : ' Residences');
+    }
+
+    [suburb, cars, land, sort].forEach(function (el) {
+      el.addEventListener('change', apply);
+    });
+  })();
+</script>
 
 {% schema %}
 {
   "name": "Collection grid",
   "settings": [
-    { "type": "text", "id": "label", "label": "Small label", "default": "The Portfolio" }
+    { "type": "text", "id": "label", "label": "Small label", "default": "For Sale" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)", "default": "<em>Current<\/em><br>Properties." },
+    { "type": "textarea", "id": "intro_template", "label": "Intro line", "info": "{count} becomes the number of residences", "default": "{count} extraordinary residences across Brisbane's most sought-after inner suburbs — each designed, developed, and built entirely in-house by Sabdia." },
+    { "type": "image_picker", "id": "image", "label": "Hero image" },
+    { "type": "text", "id": "image_ext", "label": "…or external image path/URL", "default": "/images/qasr-hero.jpg" },
+    { "type": "text", "id": "refine_label", "label": "Toolbar label", "default": "Refine:" },
+    { "type": "text", "id": "all_suburbs", "label": "All-suburbs option", "default": "All Suburbs" },
+    { "type": "text", "id": "empty_text", "label": "No-matches text", "default": "No residences match your criteria — try widening your search." },
+    { "type": "text", "id": "sold_label", "label": "Sold band label", "default": "Sold Prior to Completion" },
+    { "type": "text", "id": "cta_label", "label": "CTA label", "default": "Private Enquiry" },
+    { "type": "html", "id": "cta_heading_html", "label": "CTA heading (HTML)", "default": "Interested in a<br><em>private viewing<\/em>?" },
+    { "type": "textarea", "id": "cta_text", "label": "CTA text", "default": "We offer private, exclusive viewings for serious buyers. Contact us to arrange an inspection at a time that suits you." },
+    { "type": "text", "id": "cta1_label", "label": "Primary button", "default": "Request a Viewing" },
+    { "type": "url", "id": "cta1_link", "label": "Primary link" },
+    { "type": "text", "id": "cta2_label", "label": "Secondary button", "default": "Agent Enquiries" },
+    { "type": "url", "id": "cta2_link", "label": "Secondary link" },
+    { "type": "text", "id": "cta3_label", "label": "Gold button", "default": "Guided Match" },
+    { "type": "url", "id": "cta3_link", "label": "Gold button link" }
   ]
 }
 {% endschema %}

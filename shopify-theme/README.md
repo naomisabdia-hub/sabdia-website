@@ -64,10 +64,9 @@ customizer edits) from pushes; it lists them one by one so brand-new
 templates still reach the store on their first push — after that first
 push, add the new template to `.shopifyignore` too.
 
-Because `templates/product.json` is protected, the two new property-page
-sections are added on the store in the customizer instead: open a
-property page in the theme editor → **Add section** → "The Series", then
-"Related residences" (below the walkthrough).
+`templates/product.json` (with The Series + Related residences) was
+pushed on 2026-09-01 while the store copy carried no customizer edits;
+it is protected from pushes again now.
 
 Never publish without Naomi's explicit sign-off.
 
@@ -86,8 +85,16 @@ Never publish without Naomi's explicit sign-off.
 - ✅ Vercel side: CORS on `/api/contact`, `/api/subscribe`, `/api/img`
   (the img route allows any origin — public immutable images drawn onto
   the walkthrough canvas).
-- 🚧 Collection portfolio cards are unlinked (the site's per-residence
-  collection detail pages have no Shopify counterpart yet); each card
-  has an optional Link setting for when they do.
+- ✅ Collection residence pages: `/pages/collection-<name>` for all 11
+  completed residences (`templates/page.collection-item.json` +
+  `sections/main-collection-item.liquid`), fed by PAGE metafields
+  (custom.loc / image / video / series_posts) — the editorial story is
+  stitched from the strongest Series captions, film + series strip +
+  more-from-the-collection included. Portfolio cards on /pages/collection
+  link through.
+- ✅ For Sale (`/collections/for-sale`) is the full properties-page port:
+  photographic hero, refine/sort toolbar, featured-residence banner,
+  sold-prior band, private-viewing CTA. Property pages also carry the
+  share row and the sticky mobile enquire bar.
 - 🚧 The projects-page stats band duplicates the homepage figures —
   editing one in the customizer does not update the other.

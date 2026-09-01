@@ -225,6 +225,51 @@
   </section>
 {%- endunless -%}
 
+<section style="padding:0 clamp(22px,5vw,80px) clamp(48px,6vw,72px)">
+  <div class="inner" style="display:flex;justify-content:center">
+    {%- assign share_url = shop.url | append: product.url -%}
+    {%- assign share_title = product.title | append: ' — ' | append: mf.suburb.value | append: ' | Sabdia Constructions' -%}
+    {%- assign eu = share_url | url_encode -%}
+    {%- assign et = share_title | url_encode -%}
+    <div class="share-row" aria-label="Share this page">
+      <span class="share-l">{{ section.settings.share_label }}</span>
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{ eu }}" target="_blank" rel="noopener" class="share-a">Facebook</a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ eu }}" target="_blank" rel="noopener" class="share-a">LinkedIn</a>
+      <a href="https://twitter.com/intent/tweet?url={{ eu }}&text={{ et }}" target="_blank" rel="noopener" class="share-a">X</a>
+      <a href="mailto:?subject={{ et }}&body={{ et }}%0A{{ eu }}" class="share-a">Email</a>
+      <button type="button" class="share-a share-copy" data-share-url="{{ share_url }}">Copy link</button>
+    </div>
+  </div>
+</section>
+
+{%- unless sold -%}
+  <div class="prop-sticky-bar" id="stickyEnquire">
+    <div class="psb-name">{{ product.title }} <span class="psb-loc">&mdash; {{ mf.suburb.value }}</span></div>
+    <a href="#cform" class="psb-btn">{{ section.settings.sticky_label }} &rarr;</a>
+  </div>
+  <script>
+    (function () {
+      var bar = document.getElementById('stickyEnquire');
+      var form = document.getElementById('cform');
+      if (!bar || bar.dataset.stickyInit || !form || !('IntersectionObserver' in window)) return;
+      bar.dataset.stickyInit = '1';
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          bar.classList.toggle('psb-hidden', e.isIntersecting);
+        });
+      }, { threshold: 0.15 });
+      obs.observe(form);
+    })();
+  </script>
+{%- endunless -%}
+
+<style>
+  .share-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:36px}
+  .share-l{font-size:10px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}
+  .share-a{background:none;border:none;cursor:pointer;padding:4px 0;font-family:var(--font-u);font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(168,135,74,.35);transition:color .25s,border-color .25s;text-decoration:none}
+  .share-a:hover{color:var(--ink);border-color:var(--gold)}
+</style>
+
 {% schema %}
 {
   "name": "Property page",
@@ -240,6 +285,8 @@
     { "type": "text", "id": "sold_banner_label", "label": "Sold banner button", "default": "View Available" },
     { "type": "url", "id": "sold_banner_link", "label": "Sold banner link" },
     { "type": "text", "id": "sold_cta_label", "label": "Sold sidebar button", "default": "View Current Properties" },
+    { "type": "text", "id": "share_label", "label": "Share row label", "default": "Share" },
+    { "type": "text", "id": "sticky_label", "label": "Sticky bar button", "default": "Enquire" },
     { "type": "text", "id": "gallery_label", "label": "Gallery label", "default": "The Residence" },
     { "type": "html", "id": "gallery_heading_html", "label": "Gallery heading", "default": "Inside <em>{name}<\/em>." },
     { "type": "text", "id": "film_label", "label": "Film label", "default": "The Film" },

@@ -1,16 +1,7 @@
 {
   "sections": {
-    "header": {
-      "type": "page-header",
-      "settings": {
-        "style": "collection",
-        "label": "Our Work",
-        "title_html": "The Sabdia<br><em>Collection</em>.",
-        "text": "A portfolio of completed luxury residences across inner Brisbane \u2014 each one designed, developed, and constructed entirely in-house by Sabdia."
-      }
-    },
-    "grid": {
-      "type": "portfolio-grid",
+    "main": {
+      "type": "main-collection-item",
       "settings": {},
       "blocks": {
         "residence-1": {
@@ -19,7 +10,6 @@
             "name": "MILOS",
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos-poster.jpg",
-            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos.mp4",
             "link": "/pages/collection-milos"
           }
         },
@@ -29,7 +19,6 @@
             "name": "AMMOS",
             "loc": "Taringa QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos-poster.jpg",
-            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos.mp4",
             "link": "/pages/collection-ammos"
           }
         },
@@ -39,7 +28,6 @@
             "name": "CALLE",
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "/images/collection-calle.jpg",
-            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/calle.mp4",
             "link": "/pages/collection-calle"
           }
         },
@@ -49,7 +37,6 @@
             "name": "ELYSIUM",
             "loc": "Holland Park QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium-poster.jpg",
-            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium.mp4",
             "link": "/pages/collection-elysium"
           }
         },
@@ -59,7 +46,6 @@
             "name": "ALHAMBRA",
             "loc": "Brisbane QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra-poster.jpg",
-            "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra.mp4",
             "link": "/pages/collection-alhambra"
           }
         },
@@ -69,7 +55,6 @@
             "name": "ENCANTO",
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "/images/collection-encanto.jpg",
-            "video": "",
             "link": "/pages/collection-encanto"
           }
         },
@@ -79,7 +64,6 @@
             "name": "NERO",
             "loc": "Rochedale QLD, Australia",
             "image_ext": "/images/collection-nero.jpg",
-            "video": "",
             "link": "/pages/collection-nero"
           }
         },
@@ -89,7 +73,6 @@
             "name": "HERMOSA",
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "/images/collection-hermosa.jpg",
-            "video": "",
             "link": "/pages/collection-hermosa"
           }
         },
@@ -99,7 +82,6 @@
             "name": "FRASER",
             "loc": "Graceville QLD, Australia",
             "image_ext": "/images/collection-fraser.jpg",
-            "video": "",
             "link": "/pages/collection-fraser"
           }
         },
@@ -109,7 +91,6 @@
             "name": "PETRA",
             "loc": "Taringa QLD, Australia",
             "image_ext": "/images/collection-petra.jpg",
-            "video": "",
             "link": "/pages/collection-petra"
           }
         },
@@ -119,7 +100,6 @@
             "name": "KIRRA",
             "loc": "Brisbane QLD, Australia",
             "image_ext": "/images/caspian-hero.jpg",
-            "video": "",
             "link": "/pages/collection-kirra"
           }
         }
@@ -137,10 +117,14 @@
         "residence-10",
         "residence-11"
       ]
+    },
+    "series": {
+      "type": "series-strip",
+      "settings": {}
     }
   },
   "order": [
-    "header",
-    "grid"
+    "main",
+    "series"
   ]
 }

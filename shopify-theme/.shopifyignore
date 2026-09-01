@@ -23,3 +23,4 @@ templates/page.collection.json
 templates/page.contact.json
 templates/page.agent-access.json
 templates/page.find-your-home.json
+templates/page.collection-item.json

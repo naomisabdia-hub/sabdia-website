@@ -1,0 +1,147 @@
+{%- comment -%}
+  Collection residence page — port of collection/[slug].astro, shared by
+  every completed residence via templates/page.collection-item.json.
+  The residence itself comes from PAGE metafields (namespace custom):
+    loc            single line   — "Camp Hill QLD, Australia"
+    image          single line   — hero/poster URL or /images/… path
+    video          single line   — film URL (optional)
+    series_posts   json          — the residence's real Instagram posts
+  The editorial story is stitched from the strongest Series captions,
+  exactly like the live site. "More from the Collection" renders from
+  this section's blocks (the full portfolio list; the residence being
+  viewed is skipped).
+{%- endcomment -%}
+{%- liquid
+  assign mf = page.metafields.custom
+  assign posts = mf.series_posts.value
+-%}
+
+<section class="cd-hero">
+  {%- if mf.image.value != blank -%}
+    <img src="{% render 'ext-variant', src: mf.image.value, w: 1920, h: 1080 %}" alt="{{ page.title | escape }}" loading="eager" fetchpriority="high" width="1920" height="1080">
+  {%- endif -%}
+  <div class="cd-hero-ov"></div>
+  <div class="cd-hero-content">
+    <div class="cd-badge reveal">{{ section.settings.badge }}</div>
+    <h1 class="cd-name reveal d1">{{ page.title }}</h1>
+    <div class="cd-loc reveal d2">{{ mf.loc.value }}</div>
+  </div>
+</section>
+
+{%- liquid
+  # Editorial story — the strongest captions (over 60 characters),
+  # deduplicated, first three, each closed with a full stop.
+  capture story_raw
+    for p in posts
+      if p.caption.size > 60
+        echo p.caption | strip | append: '¦'
+      endif
+    endfor
+  endcapture
+  assign story = story_raw | split: '¦' | uniq
+-%}
+{%- if story.size > 0 -%}
+  <div class="cd-story">
+    {%- for p in story limit: 3 -%}
+      {%- assign last = p | slice: -1, 1 -%}
+      <p class="reveal">{{ p }}{% unless last == '.' or last == '!' or last == '?' %}.{% endunless %}</p>
+    {%- endfor -%}
+  </div>
+{%- endif -%}
+
+{%- if mf.video.value != blank -%}
+  {%- assign film_token = '{' | append: 'name' | append: '}' -%}
+  <section class="film-band" id="film">
+    <div class="film-grid">
+      <div class="film-copy">
+        <div class="slabel slabel-dark reveal">{{ section.settings.film_label }}</div>
+        <h2 class="film-h reveal d1">{{ section.settings.film_heading_html | replace: film_token, page.title }}</h2>
+        <p class="film-p reveal d2">{{ section.settings.film_text | replace: film_token, page.title }}</p>
+      </div>
+      <div class="reveal d2">
+        <div class="film-frame" data-film>
+          <video src="{{ mf.video.value }}" {% if mf.image.value != blank %}poster="{% render 'ext-variant', src: mf.image.value, w: 1200, h: 675 %}"{% endif %} muted loop playsinline preload="none"></video>
+          <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            <span data-sound-label>Sound On</span>
+          </button>
+        </div>
+        <div class="film-caption">
+          <span><b>{{ page.title }} — On Film</b></span>
+          <span>{{ mf.loc.value }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{%- capture more_cards -%}
+  {%- assign shown = 0 -%}
+  {%- for block in section.blocks -%}
+    {%- if block.settings.name == page.title or shown >= 3 -%}{%- continue -%}{%- endif -%}
+    {%- assign shown = shown | plus: 1 -%}
+    <a href="{{ block.settings.link }}" class="port-card reveal" {{ block.shopify_attributes }}>
+      <div class="port-img-wrap">
+        {%- if block.settings.image_ext != blank -%}
+          <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 800, h: 600 %}" alt="{{ block.settings.name | escape }}" loading="lazy">
+        {%- endif -%}
+      </div>
+      <div class="port-name">{{ block.settings.name }}</div>
+      <div class="port-loc">{{ block.settings.loc }}</div>
+    </a>
+  {%- endfor -%}
+{%- endcapture -%}
+{%- assign more_stripped = more_cards | strip -%}
+{%- if more_stripped != blank -%}
+  <section class="sp" style="border-top:1px solid var(--border)">
+    <div class="inner">
+      <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.more_label }}</div>
+      <div class="portfolio-grid">{{ more_cards }}</div>
+    </div>
+  </section>
+{%- endif -%}
+
+<section class="sp" style="background:var(--dark);text-align:center">
+  <div class="inner-sm">
+    <div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">{{ section.settings.cta_label }}</div>
+    {%- assign cta_token = '{' | append: 'name' | append: '}' -%}
+    <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(34px,5vw,64px);font-weight:300;color:var(--white);letter-spacing:-.02em;margin-bottom:22px">{{ section.settings.cta_heading_html | replace: cta_token, page.title }}</h2>
+    <p class="reveal d2" style="font-size:13px;font-weight:300;color:rgba(253,251,246,.45);max-width:440px;margin:0 auto 38px;line-height:1.85">{{ section.settings.cta_text }}</p>
+    <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="{{ section.settings.cta1_link | default: '/pages/contact' }}" class="btn-p">{{ section.settings.cta1_label }}</a>
+      <a href="{{ section.settings.cta2_link | default: '/collections/for-sale' }}" class="btn-g btn-g-light">{{ section.settings.cta2_label }}</a>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collection residence",
+  "settings": [
+    { "type": "text", "id": "badge", "label": "Hero badge", "default": "The Sabdia Collection" },
+    { "type": "text", "id": "film_label", "label": "Film label", "default": "The Film" },
+    { "type": "html", "id": "film_heading_html", "label": "Film heading (HTML — {name})", "default": "Experience <em>{name}<\/em>." },
+    { "type": "textarea", "id": "film_text", "label": "Film text ({name})", "default": "A cinematic walkthrough of {name} — its materials, its light, and the craft within." },
+    { "type": "text", "id": "more_label", "label": "More label", "default": "More from the Collection" },
+    { "type": "text", "id": "cta_label", "label": "CTA label", "default": "Commission Your Own" },
+    { "type": "html", "id": "cta_heading_html", "label": "CTA heading (HTML — {name})", "default": "Inspired by <em style=\"font-style:italic;color:var(--gold2)\">{name}<\/em>?" },
+    { "type": "textarea", "id": "cta_text", "label": "CTA text", "default": "Every Sabdia residence begins as a conversation. Tell us about your site, your vision, or simply the way you want to live." },
+    { "type": "text", "id": "cta1_label", "label": "Primary button", "default": "Begin a Conversation" },
+    { "type": "url", "id": "cta1_link", "label": "Primary link" },
+    { "type": "text", "id": "cta2_label", "label": "Secondary button", "default": "View Current Properties" },
+    { "type": "url", "id": "cta2_link", "label": "Secondary link" }
+  ],
+  "blocks": [
+    {
+      "type": "residence",
+      "name": "Portfolio residence",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Name" },
+        { "type": "text", "id": "loc", "label": "Location line" },
+        { "type": "text", "id": "image_ext", "label": "Image path/URL" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ]
+}
+{% endschema %}
