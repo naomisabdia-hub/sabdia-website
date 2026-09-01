@@ -617,12 +617,78 @@ function initPage() {
    client-side navigation, so this is the only entry point needed. */
 document.addEventListener('astro:page-load', initPage);
 
+/* ── Film bands ───────────────────────────────────────────────
+   Port of FilmBand.astro's inline script — on Astro it ships with the
+   component, so the theme has to carry it here. Drives every
+   [data-film] frame: play once a third is visible, pause when fully
+   out of view, retry transient play() refusals, and the sound toggle. */
+function filmInit() {
+  document.querySelectorAll('[data-film]').forEach(function (frame) {
+    if (frame.dataset.filmInit) return;
+    frame.dataset.filmInit = '1';
+    var video = frame.querySelector('video');
+    var btn = frame.querySelector('[data-sound]');
+    var label = frame.querySelector('[data-sound-label]');
+    if (!video) return;
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if ('IntersectionObserver' in window && !reduced) {
+      /* play() is one-shot and its rejection used to be swallowed — a
+         transient refusal (power saving, data not buffered, occluded
+         tab) left the film permanently frozen until a manual refresh.
+         The intent ("should be playing") is tracked and re-attempted
+         on canplay, on tab visibility, and on a short bounded retry. */
+      var wantPlay = false;
+      var retries = 0;
+      var attempt = function () {
+        if (!wantPlay || !video.isConnected || !video.paused) return;
+        var p = video.play();
+        if (p && p.catch) p.catch(function () {
+          if (wantPlay && retries++ < 12) setTimeout(attempt, 700);
+        });
+      };
+      video.addEventListener('canplay', attempt);
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) attempt();
+      });
+      /* Hysteresis: start at a third visible, pause only once fully
+         gone — a single threshold both ways rapid-cycles play/pause
+         on every layout nudge: a visibly glitching film. */
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.intersectionRatio >= 0.35) {
+            wantPlay = true;
+            retries = 0;
+            attempt();
+          } else if (!en.isIntersecting) {
+            wantPlay = false;
+            video.pause();
+          }
+        });
+      }, { threshold: [0, 0.35] });
+      io.observe(frame);
+    }
+
+    if (btn && label) {
+      btn.addEventListener('click', function () {
+        video.muted = !video.muted;
+        if (!video.muted && video.paused) video.play().catch(function () {});
+        label.textContent = video.muted ? 'Sound On' : 'Mute';
+      });
+    }
+  });
+}
+
 /* ── Shopify port ─────────────────────────────────────────────
    No Astro ClientRouter here, so astro:page-load never fires. Run the
    per-page init on plain document loads instead; the astro:* listeners
    above simply never fire and stay harmless. Lives INSIDE the module
    closure — initPage is not a global. */
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPage);
-else initPage();
+function shopifyBoot() {
+  initPage();
+  filmInit();
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', shopifyBoot);
+else shopifyBoot();
 
 })();

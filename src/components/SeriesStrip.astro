@@ -27,29 +27,40 @@ const fmt = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-AU', { m
       <button class="series-nav series-prev" type="button" aria-label="Scroll back" data-series-prev>&larr;</button>
       <button class="series-nav series-next" type="button" aria-label="Scroll forward" data-series-next>&rarr;</button>
       <div class="series-track" data-series-track>
-        {items.map((item) => (
-          <div
-            class="series-card"
-            data-series-card
-            data-video={item.video || undefined}
-            data-caption={item.caption}
-            role={item.video ? 'button' : undefined}
-            tabindex={item.video ? 0 : undefined}
-            aria-label={item.video ? `Play film: ${item.caption}` : undefined}
-          >
-            <img src={item.thumb} alt={item.caption || `${name} — ${fmt(item.date)}`} loading="lazy">
-            <div class="series-card-ov"></div>
-            {item.video && (
-              <div class="series-play" aria-hidden="true">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+        {items.map((item) => {
+          /* A post with its Instagram permalink links straight to the real
+             post — the view (and any like/follow) lands where it counts.
+             Posts without a url keep the in-site player. */
+          const El = item.url ? 'a' : 'div';
+          const linkProps = item.url
+            ? { href: item.url, target: '_blank', rel: 'noopener', 'aria-label': `View on Instagram: ${item.caption || name}` }
+            : {
+                'data-video': item.video || undefined,
+                'data-caption': item.caption,
+                role: item.video ? 'button' : undefined,
+                tabindex: item.video ? 0 : undefined,
+                'aria-label': item.video ? `Play film: ${item.caption}` : undefined,
+              };
+          return (
+            <El class="series-card" data-series-card={item.url ? undefined : ''} {...linkProps}>
+              <img src={item.thumb} alt={item.caption || `${name} — ${fmt(item.date)}`} loading="lazy">
+              <div class="series-card-ov"></div>
+              {item.url ? (
+                <div class="series-play" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                </div>
+              ) : item.video && (
+                <div class="series-play" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </div>
+              )}
+              <div class="series-card-meta">
+                <div class="series-card-date">{fmt(item.date)}</div>
+                {item.caption && <div class="series-card-cap">{item.caption}</div>}
               </div>
-            )}
-            <div class="series-card-meta">
-              <div class="series-card-date">{fmt(item.date)}</div>
-              {item.caption && <div class="series-card-cap">{item.caption}</div>}
-            </div>
-          </div>
-        ))}
+            </El>
+          );
+        })}
       </div>
     </div>
   </section>

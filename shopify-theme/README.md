@@ -40,7 +40,7 @@ leads keep landing in the Sabdia leads inbox.
 | `brochure_url`, `film_video`, `film_poster` | Single line text (URL) |
 | `scrollwalk_folder` | Single line text |
 | `year` | Integer |
-| `series_posts` | JSON — `[{ "date", "thumb", "caption", "video"? }, …]`, the residence's real Instagram posts, rendered by the series strip |
+| `series_posts` | JSON — `[{ "date", "thumb", "caption", "video"?, "url"? }, …]`, the residence's real Instagram posts, rendered by the series strip. A post with a `url` (its Instagram permalink) becomes a click-through to the real post — the view and any engagement land on Instagram; without one, videos play in the site's own player. |
 
 First product image = page hero; images 2–7 = the gallery grid.
 

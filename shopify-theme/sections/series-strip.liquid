@@ -34,16 +34,13 @@
     <button class="series-nav series-next" type="button" aria-label="Scroll forward" data-series-next>&rarr;</button>
     <div class="series-track" data-series-track>
       {%- for item in posts -%}
-        <div
-          class="series-card"
-          data-series-card
-          {% if item.video %}data-video="{{ item.video }}"{% endif %}
-          data-caption="{{ item.caption | escape }}"
-          {% if item.video %}role="button" tabindex="0" aria-label="Play film: {{ item.caption | escape }}"{% endif %}
-        >
-          <img src="{{ item.thumb }}" alt="{{ item.caption | default: series_name | escape }}" loading="lazy">
+        {%- capture card_meta -%}
           <div class="series-card-ov"></div>
-          {%- if item.video -%}
+          {%- if item.url -%}
+            <div class="series-play" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+            </div>
+          {%- elsif item.video -%}
             <div class="series-play" aria-hidden="true">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
             </div>
@@ -52,7 +49,27 @@
             <div class="series-card-date">{{ item.date | date: "%b %Y" }}</div>
             {%- if item.caption != blank -%}<div class="series-card-cap">{{ item.caption }}</div>{%- endif -%}
           </div>
-        </div>
+        {%- endcapture -%}
+        {%- if item.url -%}
+          {%- comment -%} The play is the click-through: the post opens on
+              Instagram itself, where the view and any engagement count. {%- endcomment -%}
+          <a class="series-card" href="{{ item.url }}" target="_blank" rel="noopener"
+             aria-label="View on Instagram: {{ item.caption | default: series_name | escape }}">
+            <img src="{{ item.thumb }}" alt="{{ item.caption | default: series_name | escape }}" loading="lazy">
+            {{ card_meta }}
+          </a>
+        {%- else -%}
+          <div
+            class="series-card"
+            data-series-card
+            {% if item.video %}data-video="{{ item.video }}"{% endif %}
+            data-caption="{{ item.caption | escape }}"
+            {% if item.video %}role="button" tabindex="0" aria-label="Play film: {{ item.caption | escape }}"{% endif %}
+          >
+            <img src="{{ item.thumb }}" alt="{{ item.caption | default: series_name | escape }}" loading="lazy">
+            {{ card_meta }}
+          </div>
+        {%- endif -%}
       {%- endfor -%}
     </div>
   </div>
