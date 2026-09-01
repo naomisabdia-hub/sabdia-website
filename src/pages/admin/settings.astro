@@ -61,6 +61,19 @@ export const prerender = true;
       </div>
     </form>
   </div>
+  <div class="ad-card" style="margin-top:28px" id="auditCard">
+    <div class="ad-card-h">Full site audit</div>
+    <p class="ad-sub" style="margin-bottom:14px">Crawls the live website and reports broken pages and images, missing image descriptions, and weak search listings.</p>
+    <button class="ad-btn ad-btn-gold" id="auditBtn" type="button">Run audit</button>
+    <div id="auditOut" style="margin-top:14px"></div>
+  </div>
+
+  <div class="ad-card" style="margin-top:28px" id="trashCard">
+    <div class="ad-card-h">Trash</div>
+    <p class="ad-sub" style="margin-bottom:16px">Deleted properties and pages rest here — restore them any time, or empty them for good.</p>
+    <div id="trashRows"><div class="ad-empty" style="padding:12px 0">Loading…</div></div>
+  </div>
+
 </AdminShell>
 
 <script>
@@ -187,4 +200,90 @@ export const prerender = true;
   });
 
   await loadUsers();
+  // ── Trash ── deleted properties/pages live as `_trash:` rows.
+  async function loadTrash() {
+    const box = document.getElementById('trashRows');
+    const { data: rows, error } = await supabase.from('site_content').select('key, data')
+      .like('key', '_trash:%').order('key', { ascending: false });
+    box.textContent = '';
+    if (error) { box.textContent = error.message; return; }
+    if (!rows?.length) {
+      box.appendChild(el('div', { class: 'ad-empty', style: 'padding:12px 0', text: 'Trash is empty.' }));
+      return;
+    }
+    const table = el('table', { class: 'ad-table' });
+    const tbody = el('tbody');
+    for (const row of rows) {
+      const d = row.data;
+      tbody.appendChild(el('tr', {}, [
+        el('td', { text: d.kind === 'property' ? 'Property' : 'Page', style: 'white-space:nowrap;color:var(--taupe-d)' }),
+        el('td', { text: d.label, style: 'font-weight:400' }),
+        el('td', { text: new Date(d.deleted_at).toLocaleString('en-AU', { dateStyle: 'medium', timeStyle: 'short' }), style: 'white-space:nowrap' }),
+        el('td', { style: 'text-align:right;white-space:nowrap' }, [
+          el('button', { class: 'ad-btn ad-btn-ghost', type: 'button', text: 'Restore', onclick: async () => {
+            try {
+              if (d.kind === 'property') {
+                const copy = { ...d.row };
+                delete copy.id; delete copy.created_at; delete copy.updated_at;
+                copy.published = false; // restored as a draft, never straight onto the site
+                const { error: e } = await supabase.from('properties').insert(copy);
+                if (e) throw e;
+              } else {
+                const { data: cur } = await supabase.from('site_content').select('data').eq('key', 'custom_pages').maybeSingle();
+                const doc = cur?.data ?? { pages: [] };
+                doc.pages = [...(doc.pages ?? []).filter((x) => x.slug !== d.row.slug), { ...d.row, published: false }];
+                const { error: e } = await supabase.from('site_content').upsert({ key: 'custom_pages', data: doc });
+                if (e) throw e;
+              }
+              await supabase.from('site_content').delete().eq('key', row.key);
+              toast(`Restored as a draft — tick Published when ready`);
+              loadTrash();
+            } catch (e) { toast(e.message, true); }
+          } }),
+          el('button', { class: 'ad-btn ad-btn-danger', type: 'button', text: 'Delete forever', onclick: async () => {
+            if (!confirm(`Permanently delete “${d.label}”? This really cannot be undone.`)) return;
+            await supabase.from('site_content').delete().eq('key', row.key);
+            loadTrash();
+          } }),
+        ]),
+      ]));
+    }
+    table.appendChild(tbody);
+    box.appendChild(table);
+  }
+
+  // ── Full site audit ──
+  document.getElementById('auditBtn').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const out = document.getElementById('auditOut');
+    btn.disabled = true; btn.textContent = 'Auditing… (about a minute)';
+    out.textContent = '';
+    try {
+      const { accessToken } = await import('../../lib/admin/client.js');
+      const res = await fetch('/api/site-audit', { headers: { Authorization: `Bearer ${await accessToken()}` } });
+      const r = await res.json();
+      if (!res.ok) throw new Error(r.error || `HTTP ${res.status}`);
+      out.appendChild(el('p', { class: 'ad-sub', style: 'margin:0 0 10px', text:
+        `${r.pagesChecked} pages and ${r.assetsChecked} images checked on ${r.base}` }));
+      if (!r.issues.length) {
+        out.appendChild(el('div', { class: 'ad-empty', style: 'padding:10px 0', text: 'No issues found — the site is clean. ✨' }));
+      } else {
+        const table = el('table', { class: 'ad-table' });
+        const tbody = el('tbody');
+        for (const i of r.issues.slice(0, 120)) {
+          tbody.appendChild(el('tr', {}, [
+            el('td', { text: i.kind, style: 'white-space:nowrap;color:var(--taupe-d)' }),
+            el('td', { text: i.page, style: 'white-space:nowrap' }),
+            el('td', { text: i.detail }),
+          ]));
+        }
+        table.appendChild(tbody);
+        out.appendChild(table);
+        if (r.issues.length > 120) out.appendChild(el('p', { class: 'ad-sub', text: `…and ${r.issues.length - 120} more.` }));
+      }
+    } catch (err) { toast(err.message, true); }
+    btn.disabled = false; btn.textContent = 'Run audit';
+  });
+
+  loadTrash();
 </script>

@@ -17,6 +17,13 @@ export const prerender = true;
   </div>
 
   <div id="results"></div>
+
+  <div class="ad-card" style="margin-top:28px">
+    <div class="ad-card-h">Parity — Shopify vs the Astro site</div>
+    <p class="ad-sub" style="margin-bottom:14px">While both sites run side by side, their copy can drift apart. This compares every sentence and lists what differs.</p>
+    <button class="ad-btn ad-btn-gold" id="parityBtn" type="button">Compare the two sites</button>
+    <div id="parityOut" style="margin-top:14px"></div>
+  </div>
 </AdminShell>
 
 <script>
@@ -98,4 +105,47 @@ export const prerender = true;
 
   let t;
   q.addEventListener('input', () => { clearTimeout(t); t = setTimeout(render, 120); });
+
+  // ── Parity: which sentences exist on one site but not the other ──
+  const norm = (s) => s.toLowerCase().replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;/g, ' ')
+    .replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
+    .replace(/\s+/g, ' ').replace(/[.\s]+$/, '').trim();
+  document.getElementById('parityBtn').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const out = document.getElementById('parityOut');
+    btn.disabled = true; btn.textContent = 'Comparing…';
+    out.textContent = '';
+    try {
+      const res = await fetch('/api/shopify-index?parity=1', { headers: { Authorization: `Bearer ${await accessToken()}` } });
+      const r = await res.json();
+      if (!res.ok) throw new Error(r.error || `HTTP ${res.status}`);
+      const meaningful = (x) => norm(x.text).length >= 12;
+      const shopSet = new Set(r.entries.filter(meaningful).map((x) => norm(x.text)));
+      const astroSet = new Set(r.astro.filter(meaningful).map((x) => norm(x.text)));
+      const onlyAstro = r.astro.filter((x) => meaningful(x) && !shopSet.has(norm(x.text)));
+      const onlyShop = r.entries.filter((x) => meaningful(x) && !astroSet.has(norm(x.text)))
+        .filter((x) => x.group === 'Customizer copy');
+      const shared = [...astroSet].filter((n) => shopSet.has(n)).length;
+      out.appendChild(el('p', { class: 'ad-sub', style: 'margin:0 0 12px', text:
+        `${shared} sentences match on both sites. ${onlyAstro.length} exist only on the Astro site; ${onlyShop.length} only on Shopify.` }));
+      const section = (title, rows, whereLabel) => {
+        if (!rows.length) return;
+        out.appendChild(el('div', { class: 'ad-card-h', text: title, style: 'margin-top:14px' }));
+        const table = el('table', { class: 'ad-table' });
+        const tbody = el('tbody');
+        for (const x of rows.slice(0, 40)) {
+          tbody.appendChild(el('tr', {}, [
+            el('td', { text: x.text.length > 140 ? x.text.slice(0, 140) + '…' : x.text, style: 'font-weight:400' }),
+            el('td', { text: x.where, style: 'color:var(--taupe-d);font-size:11.5px' }),
+          ]));
+        }
+        table.appendChild(tbody);
+        out.appendChild(table);
+        if (rows.length > 40) out.appendChild(el('p', { class: 'ad-sub', text: `…and ${rows.length - 40} more.` }));
+      };
+      section('Only on the Astro site (missing or different on Shopify)', onlyAstro);
+      section('Only on Shopify (missing or different on Astro)', onlyShop);
+    } catch (err) { out.appendChild(el('p', { class: 'ad-sub', text: err.message })); }
+    btn.disabled = false; btn.textContent = 'Compare the two sites';
+  });
 </script>

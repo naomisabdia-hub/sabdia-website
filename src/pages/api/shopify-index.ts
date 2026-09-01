@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import seedContent from '../../lib/seed-content.json';
 
 export const prerender = false;
 
@@ -244,5 +245,30 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   cache = { at: Date.now(), entries };
+
+  /* ── Parity mode: also return the ASTRO site's strings so the admin
+     can show where the two copies of the site have drifted apart. ── */
+  if (new URL(request.url).searchParams.get('parity') === '1') {
+    const astro: { text: string; where: string }[] = [];
+    const content: Record<string, any> = { ...(seedContent as any) };
+    try {
+      const su = env('SUPABASE_URL');
+      const sk = env('SUPABASE_ANON_KEY') ?? env('PUBLIC_SUPABASE_ANON_KEY');
+      if (su && sk) {
+        const r = await fetch(`${su}/rest/v1/site_content?select=key,data&key=not.like.${encodeURIComponent('\\_%')}`,
+          { headers: { apikey: sk, Authorization: `Bearer ${sk}` } });
+        if (r.ok) for (const row of await r.json()) content[row.key] = row.data;
+      }
+    } catch { /* seed-only comparison */ }
+    const SKIP = new Set(['walkthroughs', 'custom_sections', 'page_layout', 'seo_pages', 'series']);
+    for (const [key, doc] of Object.entries(content)) {
+      if (SKIP.has(key)) continue;
+      const found: { text: string; where: string }[] = [];
+      harvest(doc, [], found);
+      for (const f of found) astro.push({ text: f.text, where: `${key.replace(/_/g, ' ')}${f.where ? ' › ' + f.where : ''}` });
+    }
+    return json({ entries, astro });
+  }
+
   return json({ entries });
 };

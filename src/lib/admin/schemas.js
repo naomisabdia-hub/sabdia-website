@@ -787,6 +787,7 @@ export const BLOG_STARTER = [
 ].join('\n\n');
 
 export const blogSchema = [
+  { key: 'published_at', label: 'Publish date', type: 'text', help: 'leave blank to publish immediately; a future date-time (e.g. 2026-09-10T09:00) schedules it' },
   { key: 'title', label: 'Title', type: 'text', help: 'the headline readers and Google see' },
   { key: 'slug', label: 'Web address', type: 'text', help: 'lowercase, no spaces — becomes /journal/<this>/' },
   { key: 'published', label: 'Visibility', type: 'checkbox', checkLabel: 'Published — visible on the website' },
@@ -816,7 +817,8 @@ export const propertySchema = [
   { key: 'cars', label: 'Garage spaces', type: 'number' },
   { key: 'land', label: 'Land size (m²)', type: 'number' },
   { key: 'land_over', label: 'Land size is a minimum', type: 'checkbox', checkLabel: 'Show as e.g. 1000m²+' },
-  { key: 'image', label: 'Hero image', type: 'image', folder: 'properties' },
+  { key: 'image', label: 'Hero image', type: 'image', folder: 'properties', focusKey: 'focus' },
+  { key: 'focus', label: 'Hero focal point', type: 'text', help: 'click the image preview above to set — keeps the important part of the photo centred in every crop' },
   { key: 'headline', label: 'Page headline', type: 'html', help: 'use <em>…</em> for gold italics and <br> for a line break' },
   { key: 'description', label: 'Description', type: 'textarea', help: 'blank line between paragraphs' },
   { key: 'seo_description', label: 'Search engine description', type: 'textarea' },

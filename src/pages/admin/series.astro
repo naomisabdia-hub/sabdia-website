@@ -1,0 +1,82 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Instagram Series" active="series">
+  <div class="ad-hdr">
+    <div>
+      <h1 class="ad-h1">Instagram Series</h1>
+      <p class="ad-sub">The "story of the build" strips on property and Collection pages. One save updates <b>both</b> websites — the Shopify strip and this site's — so they can never drift apart. Add each post's Instagram link and its tile becomes a click-through to the real post, where views and likes count.</p>
+    </div>
+  </div>
+
+  <div class="ad-card">
+    <label class="ad-fl" for="resSel">Residence</label>
+    <select class="ad-fsel" id="resSel" style="max-width:420px"><option>Loading…</option></select>
+  </div>
+
+  <div class="ad-form" id="seriesForm"></div>
+  <div class="ad-savebar" id="saveBar" style="display:none">
+    <button class="ad-btn ad-btn-gold" data-save>Save to both sites</button>
+    <span class="ad-dirty">Unsaved changes</span>
+  </div>
+</AdminShell>
+
+<script>
+  import { requireAuth, accessToken, el, toast } from '../../lib/admin/client.js';
+  import { buildForm, readForm, saveBar } from '../../lib/admin/forms.js';
+  await requireAuth();
+
+  const postSchema = [
+    { key: 'posts', label: 'Posts — newest first, exactly as on Instagram', type: 'items', itemLabel: 'post', fields: [
+      { key: 'date', label: 'Post date', type: 'text', help: 'YYYY-MM-DD — shown as e.g. “Jul 2026”' },
+      { key: 'thumb', label: 'Tile image', type: 'image', folder: 'series' },
+      { key: 'caption', label: 'Caption', type: 'textarea', plain: true },
+      { key: 'video', label: 'Film URL (optional)', type: 'text', help: 'plays in the on-site player when there is no Instagram link' },
+      { key: 'url', label: 'Instagram post link (optional)', type: 'text', help: 'e.g. https://www.instagram.com/reel/… — the tile then opens the real post' },
+    ] },
+  ];
+
+  const sel = document.getElementById('resSel');
+  const form = document.getElementById('seriesForm');
+  const bar = document.getElementById('saveBar');
+  let residences = [];
+  let current = null;
+
+  const authed = async (url, opts = {}) =>
+    fetch(url, { ...opts, headers: { ...(opts.headers ?? {}), Authorization: `Bearer ${await accessToken()}` } });
+
+  try {
+    const res = await authed('/api/shopify-series');
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    residences = data.residences;
+    sel.innerHTML = '';
+    sel.appendChild(el('option', { value: '', text: 'Choose a residence…' }));
+    for (const r of residences) sel.appendChild(el('option', { value: `${r.kind}:${r.slug}`, text: `${r.title} — ${r.posts.length} post${r.posts.length === 1 ? '' : 's'}` }));
+  } catch (e) {
+    sel.innerHTML = '';
+    sel.appendChild(el('option', { text: 'Unavailable: ' + e.message }));
+  }
+
+  sel.addEventListener('change', () => {
+    current = residences.find((r) => `${r.kind}:${r.slug}` === sel.value) ?? null;
+    form.innerHTML = '';
+    bar.style.display = current ? '' : 'none';
+    if (current) buildForm(form, postSchema, { posts: current.posts });
+  });
+
+  saveBar(form, bar, async () => {
+    if (!current) return;
+    const { posts } = readForm(form, postSchema, { posts: current.posts });
+    const res = await authed('/api/shopify-series', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kind: current.kind, id: current.id, slug: current.slug, posts }),
+    });
+    const r = await res.json();
+    if (!res.ok) throw new Error(r.error || `HTTP ${res.status}`);
+    current.posts = posts;
+    toast(`Saved ${r.saved} posts — Shopify updated, Astro site ${r.astro}`);
+  });
+</script>

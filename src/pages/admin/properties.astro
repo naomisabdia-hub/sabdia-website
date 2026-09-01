@@ -27,6 +27,7 @@ export const prerender = true;
         <p class="ad-sub">Changes go live when you press Save. Use Preview to check the page first — even for unpublished drafts.</p>
       </div>
       <div style="display:flex;gap:10px">
+        <button class="ad-btn ad-btn-ghost" id="dupBtn" type="button">Duplicate</button>
         <a class="ad-btn ad-btn-ghost" id="previewBtn" target="_blank">Preview ↗</a>
         <button class="ad-btn ad-btn-ghost" id="backBtn">← All properties</button>
       </div>
@@ -89,6 +90,21 @@ export const prerender = true;
   );
   document.getElementById('backBtn').addEventListener('click', loadList);
 
+  document.getElementById('dupBtn').addEventListener('click', async () => {
+    if (!current?.id) return toast('Save the property first, then duplicate.', true);
+    const copy = { ...current };
+    delete copy.id; delete copy.created_at; delete copy.updated_at;
+    copy.slug = `${current.slug}-copy`;
+    copy.name = `${current.name} (copy)`;
+    copy.published = false; // drafts never show on the website
+    copy.display_order = (current.display_order ?? 100) + 1;
+    const { data, error } = await supabase.from('properties').insert(copy).select().single();
+    if (error) return toast(error.message, true);
+    toast('Duplicated as a draft — rename it and tick Published when ready');
+    openEditor(data);
+  });
+
+
   saveBar(document.getElementById('propForm'), document.getElementById('saveBar'), async () => {
     const row = readForm(document.getElementById('propForm'), propertySchema, current);
     if (!row.name || !row.slug) throw new Error('Name and web address are both required.');
@@ -106,11 +122,14 @@ export const prerender = true;
 
   document.getElementById('deleteBtn').addEventListener('click', async () => {
     if (!current?.id) return;
-    if (!confirm(`Delete ${current.name}? This cannot be undone from the portal — consider unticking "Published" instead if you just want it off the website.`)) return;
-    if (!confirm('Really delete permanently?')) return;
+    if (!confirm(`Delete ${current.name}? It moves to the Trash (Settings → Trash) and can be restored from there.`)) return;
+    await supabase.from('site_content').upsert({
+      key: `_trash:property:${current.slug}:${new Date().toISOString()}`,
+      data: { kind: 'property', label: current.name, row: current, deleted_at: new Date().toISOString() },
+    });
     const { error } = await supabase.from('properties').delete().eq('id', current.id);
     if (error) return toast(error.message, true);
-    toast('Property deleted');
+    toast('Moved to Trash — restore any time from Settings');
     loadList();
   });
 

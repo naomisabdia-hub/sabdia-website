@@ -88,10 +88,36 @@ function inputFor(field, value, container) {
     case 'image':
     case 'file': {
       const input = el('input', { class: 'ad-fi', type: 'url', 'data-k': field.key, value: v, placeholder: 'https://… or upload →' });
-      const prev = field.type === 'image'
+      const imgEl = field.type === 'image'
         ? el('img', { class: 'ad-img-prev', src: v || undefined, alt: '' })
         : null;
-      if (prev) input.addEventListener('input', () => { prev.src = input.value; });
+      let prev = imgEl;
+      if (imgEl) input.addEventListener('input', () => { imgEl.src = input.value; });
+      /* Focal point picker: clicking the preview stores fp_x_y in the
+         sibling field named by focusKey — the image pipeline centres
+         every crop on that spot. */
+      if (imgEl && field.focusKey) {
+        const dot = el('span', { style: 'position:absolute;width:14px;height:14px;border:2px solid #fff;border-radius:50%;background:rgba(168,135,74,.85);transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 0 0 1px rgba(0,0,0,.35);display:none' });
+        const wrapPrev = el('div', { style: 'position:relative;display:inline-block;cursor:crosshair', title: 'Click to set the focal point' }, [imgEl, dot]);
+        const placeDot = (fp) => {
+          const m = /^fp_([\d.]+)_([\d.]+)$/.exec(fp || '');
+          if (!m) { dot.style.display = 'none'; return; }
+          dot.style.display = '';
+          dot.style.left = m[1] * 100 + '%';
+          dot.style.top = m[2] * 100 + '%';
+        };
+        wrapPrev.addEventListener('click', (e) => {
+          const r = imgEl.getBoundingClientRect();
+          if (!r.width || !r.height) return;
+          const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)).toFixed(2);
+          const y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)).toFixed(2);
+          const target = container.querySelector(`[data-k="${field.focusKey}"]`);
+          if (target) { target.value = `fp_${x}_${y}`; markDirty(container); }
+          placeDot(`fp_${x}_${y}`);
+        });
+        queueMicrotask(() => placeDot(container.querySelector(`[data-k="${field.focusKey}"]`)?.value));
+        prev = wrapPrev;
+      }
       const fileInput = el('input', { type: 'file', accept: field.accept || (field.type === 'image' ? 'image/*' : undefined) });
       const label = el('span', { class: 'ad-btn ad-btn-ghost', text: 'Upload' });
       const wrap = el('label', { class: 'ad-upload' }, [label, fileInput]);
@@ -101,7 +127,7 @@ function inputFor(field, value, container) {
         label.textContent = 'Uploading…';
         try {
           input.value = await uploadFile(f, field.folder || 'uploads');
-          if (prev) prev.src = input.value;
+          if (imgEl) imgEl.src = input.value;
           markDirty(container);
           toast('Uploaded');
         } catch (e) {
@@ -115,7 +141,7 @@ function inputFor(field, value, container) {
         ? el('button', { type: 'button', class: 'ad-btn ad-btn-ghost', text: 'Library', onclick: () =>
             openImageLibrary((url) => {
               input.value = url;
-              if (prev) prev.src = url;
+              if (imgEl) imgEl.src = url;
               markDirty(container);
             }) })
         : null;

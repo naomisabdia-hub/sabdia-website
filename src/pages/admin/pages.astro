@@ -147,10 +147,14 @@ export const prerender = true;
     if (!current?.id || isNew) return;
     const n = sectionCount(current.slug);
     if (!confirm(`Delete “${current.title}” (/${current.slug}/)? Untick Published instead if you just want it off the website.${n ? `\n\nIts ${n} section${n === 1 ? '' : 's'} will stay in Page Sections until deleted there.` : ''}`)) return;
+    await supabase.from('site_content').upsert({
+      key: `_trash:page:${current.slug}:${new Date().toISOString()}`,
+      data: { kind: 'page', label: current.title, row: current, deleted_at: new Date().toISOString() },
+    });
     doc.pages = doc.pages.filter((x) => x.id !== current.id);
     try {
       await persist();
-      toast('Page deleted');
+      toast('Moved to Trash — restore any time from Settings');
     } catch (e) { return toast(e.message, true); }
     renderList();
   });

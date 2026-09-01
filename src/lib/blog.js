@@ -20,6 +20,9 @@ export async function getPosts() {
     .from('blog_posts')
     .select('*')
     .eq('published', true)
+    /* Scheduling: a future publish date keeps a published post hidden
+       until its moment arrives. */
+    .or(`published_at.is.null,published_at.lte.${new Date().toISOString()}`)
     .order('published_at', { ascending: false, nullsFirst: false });
   if (error) {
     console.error('Supabase blog_posts query failed:', error.message);
@@ -36,6 +39,7 @@ export async function getPost(slug) {
     .select('*')
     .eq('slug', slug)
     .eq('published', true)
+    .or(`published_at.is.null,published_at.lte.${new Date().toISOString()}`)
     .maybeSingle();
   if (error) {
     console.error('Supabase blog_posts query failed:', error.message);
