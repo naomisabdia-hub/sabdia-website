@@ -12,7 +12,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#F7F3EB">
 <title>{{ page_title }}{% unless page_title contains 'Sabdia' or page_title == blank %} | Sabdia Constructions{% endunless %}</title>
-{%- if page_description -%}<meta name="description" content="{{ page_description | escape }}">{%- endif -%}
+{%- liquid
+  # The homepage has no page-level SEO fields of its own, so its meta
+  # description is a theme setting (Search & sharing) — editable in the
+  # customizer like everything else.
+  assign meta_description = page_description
+  if template.name == 'index' and settings.seo_home_description != blank
+    assign meta_description = settings.seo_home_description
+  endif
+-%}
+{%- if meta_description -%}<meta name="description" content="{{ meta_description | escape }}">{%- endif -%}
 <link rel="canonical" href="{{ canonical_url }}">
 <link rel="icon" type="image/png" sizes="32x32" href="{{ 'favicon-32.png' | asset_url }}">
 <link rel="icon" type="image/png" sizes="16x16" href="{{ 'favicon-16.png' | asset_url }}">

@@ -617,11 +617,12 @@ function initPage() {
    client-side navigation, so this is the only entry point needed. */
 document.addEventListener('astro:page-load', initPage);
 
-})();
-
 /* ── Shopify port ─────────────────────────────────────────────
    No Astro ClientRouter here, so astro:page-load never fires. Run the
    per-page init on plain document loads instead; the astro:* listeners
-   above simply never fire and stay harmless. */
+   above simply never fire and stay harmless. Lives INSIDE the module
+   closure — initPage is not a global. */
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPage);
 else initPage();
+
+})();

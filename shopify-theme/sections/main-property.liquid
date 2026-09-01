@@ -47,7 +47,7 @@
     <div class="inner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <div style="padding:7px 16px;background:rgba(168,135,74,.14);border:1px solid rgba(168,135,74,.4);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--ink)">{{ section.settings.sold_badge }}</div>
       <span style="font-size:13.5px;font-weight:400;color:var(--ink3)">{{ section.settings.sold_notice }}</span>
-      <a href="/collections/for-sale" class="btn-g btn-g-gold" style="margin-left:auto;padding:9px 20px;font-size:10px">View Available &rarr;</a>
+      <a href="{{ section.settings.sold_banner_link | default: '/collections/for-sale' }}" class="btn-g btn-g-gold" style="margin-left:auto;padding:9px 20px;font-size:10px">{{ section.settings.sold_banner_label }} &rarr;</a>
     </div>
   </div>
 {%- endif -%}
@@ -84,13 +84,13 @@
 <div class="prop-body">
   <div class="prop-layout inner">
     <div class="prop-desc">
-      <div class="slabel prop-desc-slabel reveal">About {{ product.title }}</div>
+      <div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, product.title }}</div>
       <h1 class="prop-body-h reveal d1">{{ mf.headline.value }}</h1>
       {{ product.description | replace: '<p>', '<p class="prop-body-p reveal d2">' }}
 
       {%- if mf.features.value.size > 0 -%}
         <div class="prop-features reveal d3">
-          <div class="prop-features-h">Key Features</div>
+          <div class="prop-features-h">{{ section.settings.features_heading }}</div>
           <div class="prop-feat-grid">
             {%- for f in mf.features.value -%}
               <div class="prop-feat">{{ f }}</div>
@@ -118,27 +118,28 @@
             <div class="fg">
               <label class="fl">Enquiry Type</label>
               <select class="fsel" name="enquiry-type">
-                <option>Register Interest</option>
-                <option>Arrange Private Inspection</option>
-                <option>Request Price Guide</option>
-                <option>General Enquiry</option>
+                {%- assign etypes = section.settings.enquiry_types | newline_to_br | split: '<br />' -%}
+                {%- for t in etypes -%}
+                  {%- assign tt = t | strip -%}
+                  {%- if tt != blank -%}<option>{{ tt }}</option>{%- endif -%}
+                {%- endfor -%}
               </select>
             </div>
           {%- endunless -%}
           <div class="fg"><label class="fl">Message</label><textarea class="fta" name="message" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
-          <p class="form-note">By submitting this form you agree to our privacy policy. Your details will not be shared with third parties.</p>
+          <p class="form-note">{{ section.settings.privacy_note }}</p>
           <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
           <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
         </form>
       </div>
       <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
         {%- if mf.brochure_url.value != blank -%}
-          <a href="{{ mf.brochure_url.value }}" target="_blank" rel="noopener" class="btn-g btn-g-gold" style="justify-content:center" download>Download Brochure &darr;</a>
+          <a href="{{ mf.brochure_url.value }}" target="_blank" rel="noopener" class="btn-g btn-g-gold" style="justify-content:center" download>{{ section.settings.brochure_label }} &darr;</a>
         {%- endif -%}
         {%- if sold -%}
-          <a href="/collections/for-sale" class="btn-p" style="justify-content:center">View Current Properties</a>
+          <a href="{{ section.settings.sold_banner_link | default: '/collections/for-sale' }}" class="btn-p" style="justify-content:center">{{ section.settings.sold_cta_label }}</a>
         {%- endif -%}
-        <a href="/pages/contact" class="btn-g {% unless sold %}btn-g-gold{% endunless %}" style="justify-content:center">General Enquiry</a>
+        <a href="{{ section.settings.general_link | default: '/pages/contact' }}" class="btn-g {% unless sold %}btn-g-gold{% endunless %}" style="justify-content:center">{{ section.settings.general_label }}</a>
       </div>
     </div>
   </div>
@@ -229,6 +230,16 @@
   "name": "Property page",
   "settings": [
     { "type": "paragraph", "content": "Shared framing text for every property page. Write {name} wherever the residence's name should appear." },
+    { "type": "text", "id": "about_label", "label": "Description label", "default": "About {name}" },
+    { "type": "text", "id": "features_heading", "label": "Features heading", "default": "Key Features" },
+    { "type": "textarea", "id": "enquiry_types", "label": "Enquiry types (one per line)", "default": "Register Interest\nArrange Private Inspection\nRequest Price Guide\nGeneral Enquiry" },
+    { "type": "textarea", "id": "privacy_note", "label": "Privacy note", "default": "By submitting this form you agree to our privacy policy. Your details will not be shared with third parties." },
+    { "type": "text", "id": "brochure_label", "label": "Brochure button", "default": "Download Brochure" },
+    { "type": "text", "id": "general_label", "label": "General enquiry button", "default": "General Enquiry" },
+    { "type": "url", "id": "general_link", "label": "General enquiry link" },
+    { "type": "text", "id": "sold_banner_label", "label": "Sold banner button", "default": "View Available" },
+    { "type": "url", "id": "sold_banner_link", "label": "Sold banner link" },
+    { "type": "text", "id": "sold_cta_label", "label": "Sold sidebar button", "default": "View Current Properties" },
     { "type": "text", "id": "gallery_label", "label": "Gallery label", "default": "The Residence" },
     { "type": "html", "id": "gallery_heading_html", "label": "Gallery heading", "default": "Inside <em>{name}<\/em>." },
     { "type": "text", "id": "film_label", "label": "Film label", "default": "The Film" },

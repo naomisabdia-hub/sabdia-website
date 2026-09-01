@@ -5,6 +5,9 @@
 {%- liquid
   assign og_title = page_title | default: shop.name
   assign og_description = page_description | default: shop.description
+  if template.name == 'index' and settings.seo_home_description != blank
+    assign og_description = settings.seo_home_description
+  endif
   assign og_image = blank
   if settings.share_image
     assign og_image = settings.share_image | image_url: width: 1200

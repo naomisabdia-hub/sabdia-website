@@ -16,3 +16,10 @@ templates/search.json
 templates/password.json
 templates/cart.json
 templates/customers/*.json
+templates/page.about.json
+templates/page.services.json
+templates/page.projects.json
+templates/page.collection.json
+templates/page.contact.json
+templates/page.agent-access.json
+templates/page.find-your-home.json

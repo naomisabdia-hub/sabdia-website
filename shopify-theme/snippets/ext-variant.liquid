@@ -7,6 +7,9 @@
   until it is migrated.
 
   Accepts: src (path or URL), w, h, focus (optional "fp_x_y"), q (optional)
+
+  Built entirely inside one liquid block with echo — a stray newline in
+  the template would land inside the src="…" attribute.
 {%- endcomment -%}
 {%- liquid
   assign base = settings.forms_endpoint
@@ -22,8 +25,20 @@
   if first_char == '/'
     assign is_media = true
   endif
+  if src == blank
+    # nothing to output
+  elsif is_svg or is_media == false
+    echo src
+  else
+    assign enc = src | url_encode
+    assign out = base | append: '/api/img?src=' | append: enc | append: '&w=' | append: w | append: '&h=' | append: h
+    if focus != blank
+      assign fenc = focus | url_encode
+      assign out = out | append: '&fp=' | append: fenc
+    endif
+    if q != blank
+      assign out = out | append: '&q=' | append: q
+    endif
+    echo out
+  endif
 -%}
-{%- if src == blank -%}
-{%- elsif is_svg or is_media == false -%}{{ src }}
-{%- else -%}{{ base }}/api/img?src={{ src | url_encode }}&w={{ w }}&h={{ h }}{% if focus != blank %}&fp={{ focus | url_encode }}{% endif %}{% if q != blank %}&q={{ q }}{% endif %}
-{%- endif -%}

@@ -10,42 +10,130 @@
   {
     "name": "Brand",
     "settings": [
-      { "type": "image_picker", "id": "logo", "label": "Logo", "info": "The wordmark used in the nav, loader and footer. Leave empty to use the built-in logo." },
-      { "type": "text", "id": "site_name", "label": "Site name", "default": "Sabdia Constructions" },
-      { "type": "text", "id": "legal_name", "label": "Legal name", "default": "Sabdia Constructions Pty Ltd", "info": "Shown in the footer copyright." },
-      { "type": "text", "id": "location", "label": "Location line", "default": "Brisbane, Queensland, Australia" }
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo",
+        "info": "The wordmark used in the nav, loader and footer. Leave empty to use the built-in logo."
+      },
+      {
+        "type": "text",
+        "id": "site_name",
+        "label": "Site name",
+        "default": "Sabdia Constructions"
+      },
+      {
+        "type": "text",
+        "id": "legal_name",
+        "label": "Legal name",
+        "default": "Sabdia Constructions Pty Ltd",
+        "info": "Shown in the footer copyright."
+      },
+      {
+        "type": "text",
+        "id": "location",
+        "label": "Location line",
+        "default": "Brisbane, Queensland, Australia"
+      }
     ]
   },
   {
     "name": "Contact",
     "settings": [
-      { "type": "text", "id": "contact_email", "label": "Contact email", "default": "sales@sabdia.com.au" },
-      { "type": "text", "id": "contact_phone", "label": "Phone", "info": "Leave empty to hide." }
+      {
+        "type": "text",
+        "id": "contact_email",
+        "label": "Contact email",
+        "default": "sales@sabdia.com.au"
+      },
+      {
+        "type": "text",
+        "id": "contact_phone",
+        "label": "Phone",
+        "info": "Leave empty to hide."
+      }
     ]
   },
   {
     "name": "Social links",
     "settings": [
-      { "type": "text", "id": "instagram_url", "label": "Instagram URL", "default": "https://www.instagram.com/_sabdia/" },
-      { "type": "text", "id": "instagram_label", "label": "Instagram display name", "default": "@_sabdia" },
-      { "type": "text", "id": "facebook_url", "label": "Facebook URL", "default": "https://www.facebook.com/sabdiaconstructions/" },
-      { "type": "text", "id": "linkedin_url", "label": "LinkedIn URL", "default": "https://www.linkedin.com/company/sabdia-constructions/" }
+      {
+        "type": "text",
+        "id": "instagram_url",
+        "label": "Instagram URL",
+        "default": "https://www.instagram.com/_sabdia/"
+      },
+      {
+        "type": "text",
+        "id": "instagram_label",
+        "label": "Instagram display name",
+        "default": "@_sabdia"
+      },
+      {
+        "type": "text",
+        "id": "facebook_url",
+        "label": "Facebook URL",
+        "default": "https://www.facebook.com/sabdiaconstructions/"
+      },
+      {
+        "type": "text",
+        "id": "linkedin_url",
+        "label": "LinkedIn URL",
+        "default": "https://www.linkedin.com/company/sabdia-constructions/"
+      }
     ]
   },
   {
     "name": "Search & sharing",
     "settings": [
-      { "type": "image_picker", "id": "share_image", "label": "Social share image", "info": "Shown when pages are shared — 1200×630 works best." }
+      {
+        "type": "image_picker",
+        "id": "share_image",
+        "label": "Social share image",
+        "info": "Shown when pages are shared \u2014 1200\u00d7630 works best."
+      },
+      {
+        "type": "textarea",
+        "id": "seo_home_description",
+        "label": "Homepage meta description",
+        "default": "Boutique luxury home builder and developer delivering award-winning residences across inner Brisbane since 2013. Design. Develop. Construct.",
+        "info": "Shown in search results for the homepage."
+      }
     ]
   },
   {
     "name": "Site plumbing",
     "settings": [
-      { "type": "paragraph", "content": "Advanced — these keep the enquiry forms and walkthroughs working. Only change them with your developer." },
-      { "type": "text", "id": "forms_endpoint", "label": "Forms endpoint", "default": "https://sabdia-website.vercel.app", "info": "Enquiries and subscriptions post here, into the Sabdia leads inbox." },
-      { "type": "text", "id": "media_base", "label": "Media library base URL", "default": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media", "info": "Where walkthrough frames and clips are stored." },
-      { "type": "text", "id": "domain_display", "label": "Domain display text", "default": "sabdiaconstructions.com.au" },
-      { "type": "text", "id": "domain_url", "label": "Domain URL", "default": "https://www.sabdiaconstructions.com.au" }
+      {
+        "type": "paragraph",
+        "content": "Advanced \u2014 these keep the enquiry forms and walkthroughs working. Only change them with your developer."
+      },
+      {
+        "type": "text",
+        "id": "forms_endpoint",
+        "label": "Forms endpoint",
+        "default": "https://sabdia-website.vercel.app",
+        "info": "Enquiries and subscriptions post here, into the Sabdia leads inbox."
+      },
+      {
+        "type": "text",
+        "id": "media_base",
+        "label": "Media library base URL",
+        "default": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media",
+        "info": "Where walkthrough frames and clips are stored."
+      },
+      {
+        "type": "text",
+        "id": "domain_display",
+        "label": "Domain display text",
+        "default": "sabdiaconstructions.com.au"
+      },
+      {
+        "type": "text",
+        "id": "domain_url",
+        "label": "Domain URL",
+        "default": "https://www.sabdiaconstructions.com.au"
+      }
     ]
   }
 ]
