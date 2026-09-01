@@ -2,6 +2,7 @@
 import { ClientRouter } from 'astro:transitions';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import { getContent } from '../lib/content.js';
 
 interface Props {
   title: string;
@@ -19,8 +20,24 @@ interface Props {
   lightNav?: boolean;
 }
 
-const { title, description, ogTitle, ogDescription, ogImage, preloadImage, preloadImageSet, preloadImageSizes, preloadImageMedia, lightNav } = Astro.props;
+const { title: titleProp, description: descriptionProp, ogTitle, ogDescription, ogImage, preloadImage, preloadImageSet, preloadImageSizes, preloadImageMedia, lightNav } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+/* Per-page search listings, editable in the admin (Site Content →
+   Search engine listings). A non-empty override wins over the title
+   and description baked into the page component. */
+const SEO_KEY: Record<string, string> = {
+  '/': 'home', '/properties/': 'properties', '/about/': 'about',
+  '/services/': 'services', '/projects/': 'projects', '/collection/': 'collection',
+  '/contact/': 'contact', '/agent-access/': 'agent_access', '/find-your-home/': 'find_your_home',
+};
+let seoOverride: { title?: string; description?: string } = {};
+const seoKey = SEO_KEY[Astro.url.pathname];
+if (seoKey) {
+  const { seo_pages } = await getContent('seo_pages');
+  seoOverride = seo_pages?.[seoKey] ?? {};
+}
+const title = seoOverride.title?.trim() || titleProp;
+const description = seoOverride.description?.trim() || descriptionProp;
 /* Every page ships a complete share card: pages may override any part,
    but nothing renders bare when shared. Crawlers need og:image absolute;
    pages pass site-relative paths. */

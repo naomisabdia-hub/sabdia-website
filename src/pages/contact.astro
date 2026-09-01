@@ -5,12 +5,13 @@ import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
 import { imgVariant } from '../lib/images.js';
 
-const [{ settings, contact_page: page }, all] = await Promise.all([
-  getContent('settings', 'contact_page'),
+const [{ settings, contact_page: page, page_layout }, all] = await Promise.all([
+  getContent('settings', 'contact_page', 'page_layout'),
   getProperties(),
 ]);
 const forSale = all.filter((p) => p.data.status === 'for-sale');
 const socials = settings.socials;
+const L = page_layout?.contact ?? {};
 
 const base = (Astro.site ?? new URL('https://www.sabdiaconstructions.com.au')).origin;
 const contactLd = JSON.stringify({
@@ -115,6 +116,7 @@ const contactLd = JSON.stringify({
     </div>
   </section>
 
+{L.quicklinks !== false && (
   <!-- QUICK LINKS -->
   <section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border)">
     <div class="inner">
@@ -130,6 +132,7 @@ const contactLd = JSON.stringify({
       </div>
     </div>
   </section>
+)}
 
   <CustomSections page="/contact/" position="end" />
 </Base>

@@ -9,6 +9,7 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
   getServices(),
   getProcessSteps(),
 ]);
+const L = (await getContent('page_layout')).page_layout?.services ?? {};
 ---
 <Base
   preloadImage={imgVariant(page.hero.image, { w: 1920, h: 1080 })}
@@ -51,6 +52,7 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
 
   <CustomSections page="/services/" position="top" />
 
+{L.intro !== false && (
   <!-- INTRO -->
   <section class="sp-sm" style="border-bottom:1px solid var(--border)">
     <div class="inner svc-intro-grid">
@@ -65,7 +67,9 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
       </div>
     </div>
   </section>
+)}
 
+{L.details !== false && (
   <!-- SERVICE DETAILS -->
   <section class="sp">
     <div class="inner">
@@ -91,7 +95,9 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
       ))}
     </div>
   </section>
+)}
 
+{L.process !== false && (
   <!-- PROCESS RECAP -->
   <section class="sp" style="background:var(--bg2);border-top:1px solid var(--border)">
     <div class="inner">
@@ -107,7 +113,9 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
       </div>
     </div>
   </section>
+)}
 
+{L.cta !== false && (
   <!-- CTA -->
   <section class="sp" style="background:var(--dark)">
     <div class="inner" style="text-align:center">
@@ -120,6 +128,7 @@ const [{ services_page: page }, services, processSteps] = await Promise.all([
       </div>
     </div>
   </section>
+)}
 
   <CustomSections page="/services/" position="end" />
 </Base>

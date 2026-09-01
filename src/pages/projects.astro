@@ -13,6 +13,7 @@ const forSale = all.filter((p) => p.data.status === 'for-sale');
 const sold = all.filter((p) => p.data.status === 'sold');
 
 const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`, landLabel(d.land, d.landOver)].join(' · ');
+const L = (await getContent('page_layout')).page_layout?.projects ?? {};
 
 /* ── CONSTRUCTION JOURNEY — REMOVED pending real progress photography ──
    The JourneySlider (src/components/JourneySlider.astro) and its section
@@ -52,6 +53,7 @@ const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`
     </div>
   </section>
 
+{L.filter !== false && (
   <!-- FILTER BAR -->
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px clamp(22px,5vw,80px)">
     <div class="inner" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
@@ -61,9 +63,11 @@ const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`
       <button class="pfilter" data-filter="sold">Sold</button>
     </div>
   </div>
+)}
 
   <CustomSections page="/projects/" position="top" />
 
+{L.current !== false && (
   <!-- CURRENT PROPERTIES -->
   <section class="sp" data-proj-section="current">
     <div class="inner">
@@ -84,7 +88,9 @@ const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`
       </div>
     </div>
   </section>
+)}
 
+{L.sold !== false && (
   <!-- SOLD PRIOR -->
   <section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border)" data-proj-section="sold">
     <div class="inner">
@@ -105,7 +111,9 @@ const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`
       </div>
     </div>
   </section>
+)}
 
+{L.stats !== false && (
   <!-- STATS BAND -->
   <div class="stats-band sp-sm">
     <div class="stats-grid inner">
@@ -121,7 +129,9 @@ const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`
       ))}
     </div>
   </div>
+)}
 
+{L.cta !== false && (
   <!-- CTA -->
   <section class="sp" style="text-align:center">
     <div class="inner-sm">
@@ -133,6 +143,7 @@ const specsLine = (d) => [`${d.beds} Bed`, `${d.baths} Bath`, `${d.cars} Garage`
       </div>
     </div>
   </section>
+)}
 
   <CustomSections page="/projects/" position="end" />
 

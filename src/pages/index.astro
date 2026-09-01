@@ -23,11 +23,13 @@ const [all, content, services, processSteps, testimonials] = await Promise.all([
     'home_agent',
     'home_contact',
     'films',
+    'page_layout',
   ),
   getServices(),
   getProcessSteps(),
   getTestimonials(),
 ]);
+const L = content.page_layout?.home ?? {};
 const {
   settings,
   home_hero: heroC,
@@ -162,6 +164,7 @@ const jsonLd = JSON.stringify({
     </div>
   </section>
 
+{L.stats !== false && (
   <!-- STATS -->
   <div class="stats-band sp-sm">
     <div class="stats-grid inner">
@@ -177,7 +180,9 @@ const jsonLd = JSON.stringify({
       ))}
     </div>
   </div>
+)}
 
+{L.marquee !== false && (
   <!-- MARQUEE -->
   <div class="mq-band">
     <div class="mq-track">
@@ -194,9 +199,11 @@ const jsonLd = JSON.stringify({
       ))}
     </div>
   </div>
+)}
 
   <CustomSections page="/" position="top" />
 
+{L.about !== false && (
   <!-- ABOUT -->
   <section class="sp" id="about">
     <div class="inner about-grid">
@@ -231,9 +238,10 @@ const jsonLd = JSON.stringify({
       </div>
     </div>
   </section>
+)}
 
   <!-- BRAND FILM -->
-  {films?.brand?.video && (
+  {L.film !== false && films?.brand?.video && (
     <FilmBand
       id="story"
       label={films.brand.label}
@@ -248,6 +256,7 @@ const jsonLd = JSON.stringify({
     </FilmBand>
   )}
 
+{L.properties !== false && (
   <!-- PROPERTIES -->
   <section id="properties" style="padding:0 0 clamp(80px,12vw,160px)">
     <div class="inner" style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px) clamp(44px,5vw,60px)">
@@ -310,7 +319,9 @@ const jsonLd = JSON.stringify({
       )}
     </div>
   </section>
+)}
 
+{L.services !== false && (
   <!-- SERVICES (dark section) -->
   <section class="svc-dark sp" id="services">
     <div class="inner svc-layout">
@@ -338,7 +349,9 @@ const jsonLd = JSON.stringify({
       </ul>
     </div>
   </section>
+)}
 
+{L.process !== false && (
   <!-- PROCESS -->
   <section class="sp">
     <div class="inner">
@@ -354,9 +367,10 @@ const jsonLd = JSON.stringify({
       </div>
     </div>
   </section>
+)}
 
   <!-- TESTIMONIAL (dark) -->
-  {testimonial && (
+  {L.testimonial !== false && testimonial && (
     <section class="testi-dark sp">
       <div class="inner">
         <div class="testi-wrap">
@@ -375,6 +389,7 @@ const jsonLd = JSON.stringify({
     </section>
   )}
 
+{L.agent !== false && (
   <!-- AGENT ACCESS -->
   <div class="agent-grid" id="agents">
     <div class="agent-vis reveal-wipe-x">
@@ -397,7 +412,9 @@ const jsonLd = JSON.stringify({
       </div>
     </div>
   </div>
+)}
 
+{L.contact !== false && (
   <!-- CONTACT CTA -->
   <section class="sp" id="contact" style="background:var(--bg2);border-top:1px solid var(--border)">
     <div class="inner contact-grid">
@@ -438,6 +455,7 @@ const jsonLd = JSON.stringify({
       </div>
     </div>
   </section>
+)}
 
   <CustomSections page="/" position="end" />
 </Base>

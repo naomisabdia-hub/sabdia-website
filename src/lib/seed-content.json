@@ -1351,5 +1351,97 @@
         ]
       }
     }
+  },
+  "seo_pages": {
+    "home": {
+      "title": "",
+      "description": ""
+    },
+    "properties": {
+      "title": "",
+      "description": ""
+    },
+    "about": {
+      "title": "",
+      "description": ""
+    },
+    "services": {
+      "title": "",
+      "description": ""
+    },
+    "projects": {
+      "title": "",
+      "description": ""
+    },
+    "collection": {
+      "title": "",
+      "description": ""
+    },
+    "contact": {
+      "title": "",
+      "description": ""
+    },
+    "agent_access": {
+      "title": "",
+      "description": ""
+    },
+    "find_your_home": {
+      "title": "",
+      "description": ""
+    }
+  },
+  "page_layout": {
+    "home": {
+      "stats": true,
+      "marquee": true,
+      "about": true,
+      "film": true,
+      "properties": true,
+      "services": true,
+      "process": true,
+      "testimonial": true,
+      "agent": true,
+      "contact": true
+    },
+    "about": {
+      "mission": true,
+      "values": true,
+      "journey": true,
+      "awards": true,
+      "cta": true
+    },
+    "services": {
+      "intro": true,
+      "details": true,
+      "process": true,
+      "cta": true
+    },
+    "projects": {
+      "filter": true,
+      "current": true,
+      "sold": true,
+      "stats": true,
+      "cta": true
+    },
+    "properties": {
+      "featured": true,
+      "sold": true,
+      "cta": true
+    },
+    "contact": {
+      "quicklinks": true
+    },
+    "agent": {
+      "benefits": true,
+      "listings": true,
+      "apply": true
+    },
+    "property": {
+      "gallery": true,
+      "film": true,
+      "series": true,
+      "cta": true,
+      "related": true
+    }
   }
 }

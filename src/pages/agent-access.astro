@@ -7,11 +7,12 @@ import { imgVariant, landLabel } from '../lib/images.js';
 import { getProperties } from '../lib/db.js';
 import { getContent } from '../lib/content.js';
 
-const [{ agent_page: page }, all] = await Promise.all([
-  getContent('agent_page'),
+const [{ agent_page: page, page_layout }, all] = await Promise.all([
+  getContent('agent_page', 'page_layout'),
   getProperties(),
 ]);
 const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
+const L = page_layout?.agent ?? {};
 ---
 <Base
   title="Agent Access | Sabdia Constructions"
@@ -45,6 +46,7 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
 
   <CustomSections page="/agent-access/" position="top" />
 
+{L.benefits !== false && (
   <!-- BENEFITS -->
   <section style="background:var(--dark2);padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px)">
     <div class="inner">
@@ -63,7 +65,9 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
       </div>
     </div>
   </section>
+)}
 
+{L.listings !== false && (
   <!-- CURRENT LISTINGS PREVIEW -->
   <section class="sp" style="border-top:1px solid var(--border)">
     <div class="inner">
@@ -86,7 +90,9 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
       </div>
     </div>
   </section>
+)}
 
+{L.apply !== false && (
   <!-- APPLICATION FORM -->
   <section class="sp" style="background:var(--bg2);border-top:1px solid var(--border)" id="apply">
     <div class="inner agent-apply-grid">
@@ -122,6 +128,7 @@ const forSale = all.filter((p) => p.data.status === 'for-sale').slice(0, 2);
       </div>
     </div>
   </section>
+)}
 
   <CustomSections page="/agent-access/" position="end" />
 </Base>

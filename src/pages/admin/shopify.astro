@@ -1,0 +1,101 @@
+---
+import AdminShell from '../../layouts/AdminShell.astro';
+export const prerender = true;
+---
+<AdminShell title="Shopify" active="shopify">
+  <div class="ad-hdr">
+    <div>
+      <h1 class="ad-h1">Search the Shopify site</h1>
+      <p class="ad-sub">Every sentence on the Shopify copy of the website — type a few words from anywhere on the site and jump straight to the screen that edits it. (The thing Shopify's own admin doesn't have.)</p>
+    </div>
+  </div>
+
+  <div class="ad-card" style="position:sticky;top:0;z-index:5">
+    <input id="q" class="ad-fi" type="search" placeholder="Search any wording — e.g. 'built on vision', 'private inspection', 'Coorparoo'…"
+           autocomplete="off" style="width:100%;font-size:15px;padding:14px 16px">
+    <p class="ad-sub" id="qMeta" style="margin:10px 0 0"></p>
+  </div>
+
+  <div id="results"></div>
+</AdminShell>
+
+<script>
+  import { requireAuth, accessToken, el } from '../../lib/admin/client.js';
+  await requireAuth();
+
+  const q = document.getElementById('q');
+  const meta = document.getElementById('qMeta');
+  const box = document.getElementById('results');
+  let entries = [];
+
+  meta.textContent = 'Loading the site copy from Shopify…';
+  try {
+    const res = await fetch('/api/shopify-index', { headers: { Authorization: `Bearer ${await accessToken()}` } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    entries = data.entries;
+    meta.textContent = `${entries.length.toLocaleString()} pieces of copy indexed — start typing. Copy still on a section's built-in default appears here after its first edit in the customizer.`;
+    q.focus();
+  } catch (err) {
+    meta.textContent = '';
+    box.appendChild(el('div', { class: 'ad-card', style: 'border-left:3px solid #A8552F' }, [
+      el('p', { class: 'ad-sub', style: 'margin:0;max-width:none', text:
+        'Could not reach Shopify: ' + err.message + ' — on Vercel this needs SHOPIFY_STORE, SHOPIFY_ADMIN_TOKEN and SHOPIFY_CLI_THEME_TOKEN in the project environment.' }),
+    ]));
+  }
+
+  const GROUPS = ['Customizer copy', 'Properties', 'Pages', 'Journal', 'Menus'];
+  const mark = (text, terms) => {
+    /* show a window around the first hit for long strings */
+    const lower = text.toLowerCase();
+    const idx = Math.min(...terms.map((t) => { const i = lower.indexOf(t); return i === -1 ? Infinity : i; }));
+    if (text.length > 160 && idx !== Infinity) {
+      const start = Math.max(0, idx - 40);
+      return (start ? '…' : '') + text.slice(start, start + 180) + (start + 180 < text.length ? '…' : '');
+    }
+    return text.length > 200 ? text.slice(0, 200) + '…' : text;
+  };
+
+  function render() {
+    const terms = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    box.textContent = '';
+    if (!terms.length) return;
+    const hits = entries
+      .map((e) => {
+        const hay = (e.text + ' ' + e.where).toLowerCase();
+        if (!terms.every((t) => hay.includes(t))) return null;
+        return { e, rank: e.text.toLowerCase().indexOf(terms[0]) === -1 ? 500 : e.text.toLowerCase().indexOf(terms[0]) };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.rank - b.rank);
+
+    meta.textContent = hits.length
+      ? `${hits.length} match${hits.length === 1 ? '' : 'es'}`
+      : 'No matches — the copy may still be on its built-in default (edit it once in the customizer and it becomes searchable).';
+
+    for (const group of GROUPS) {
+      const rows = hits.filter((h) => h.e.group === group).slice(0, 40);
+      if (!rows.length) continue;
+      const card = el('div', { class: 'ad-card' }, [el('div', { class: 'ad-card-h', text: group })]);
+      const tbody = el('tbody');
+      for (const { e } of rows) {
+        tbody.appendChild(el('tr', {}, [
+          el('td', {}, [
+            el('div', { text: mark(e.text, terms), style: 'font-weight:400' }),
+            el('div', { text: e.where, style: 'color:var(--taupe-d);font-size:11.5px;letter-spacing:.04em;margin-top:3px' }),
+          ]),
+          el('td', { style: 'text-align:right;white-space:nowrap;vertical-align:middle' }, [
+            el('a', { class: 'ad-btn ad-btn-ghost', href: e.url, target: '_blank', text: 'Edit ↗' }),
+          ]),
+        ]));
+      }
+      const table = el('table', { class: 'ad-table' });
+      table.appendChild(tbody);
+      card.appendChild(table);
+      box.appendChild(card);
+    }
+  }
+
+  let t;
+  q.addEventListener('input', () => { clearTimeout(t); t = setTimeout(render, 120); });
+</script>

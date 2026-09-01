@@ -713,7 +713,7 @@ export const customPageSchema = [
 export const contentGroups = [
   { name: 'Homepage', keys: ['home_hero', 'home_stats', 'home_marquee', 'home_about', 'home_properties', 'home_services', 'home_process', 'home_agent', 'home_contact'] },
   { name: 'Pages', keys: ['properties_page', 'property_page', 'projects_page', 'services_page', 'about_page', 'collection_page', 'agent_page', 'contact_page', 'find_home', 'notfound'] },
-  { name: 'Site-wide', keys: ['films', 'walkthroughs', 'nav', 'footer', 'newsletter', 'series', 'legal_privacy', 'legal_accessibility'] },
+  { name: 'Site-wide', keys: ['seo_pages', 'page_layout', 'films', 'walkthroughs', 'nav', 'footer', 'newsletter', 'series', 'legal_privacy', 'legal_accessibility'] },
 ];
 
 /** Property editor schema (columns of the properties table). */

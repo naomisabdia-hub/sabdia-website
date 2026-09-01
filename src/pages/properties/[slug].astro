@@ -21,10 +21,11 @@ const statusLabel = sold ? 'Sold Prior to Completion' : 'For Sale';
 
 const paragraphs = entry.body.trim().split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 
-const [allProps, { films, series, settings, property_page: pp, walkthroughs }] = await Promise.all([
+const [allProps, { films, series, settings, property_page: pp, walkthroughs, page_layout }] = await Promise.all([
   getProperties(),
-  getContent('films', 'series', 'settings', 'property_page', 'walkthroughs'),
+  getContent('films', 'series', 'settings', 'property_page', 'walkthroughs', 'page_layout'),
 ]);
+const L = page_layout?.property ?? {};
 /* Shared framing copy, editable in the admin (Site Content → Property
    pages); {name} tokens become this residence's name. */
 const N = (s) => (s ?? '').replaceAll('{name}', d.name);
@@ -229,7 +230,7 @@ const jsonLd = JSON.stringify({
   </div>
 
   <!-- GALLERY -->
-  {gallery.length > 0 && (
+  {L.gallery !== false && gallery.length > 0 && (
     <div class="prop-gallery inner">
       <div class="slabel reveal">{pp.galleryLabel}</div>
       <h2 class="prop-gallery-h reveal d1" set:html={N(pp.galleryHeadingHtml)} />
@@ -253,7 +254,7 @@ const jsonLd = JSON.stringify({
   </div>
 
   <!-- FILM -->
-  {film?.video && (
+  {L.film !== false && film?.video && (
     <FilmBand
       id="film"
       label={films.sectionLabel || 'The Film'}
@@ -272,10 +273,10 @@ const jsonLd = JSON.stringify({
     : walkthrough.length > 0 && <WalkthroughCinema name={d.name} chapters={walkthrough} />}
 
   <!-- THE SERIES -->
-  <SeriesStrip items={seriesPosts} name={d.name} label={series?.label} handle={series?.handle} instagramUrl={settings.socials.instagram.url} />
+  {L.series !== false && <SeriesStrip items={seriesPosts} name={d.name} label={series?.label} handle={series?.handle} instagramUrl={settings.socials.instagram.url} />}
 
   <!-- CLOSING ENQUIRY -->
-  {!sold && (
+  {L.cta !== false && !sold && (
     <section class="prop-cta">
       <div class="inner prop-cta-inner">
         <div class="slabel reveal" style="justify-content:center">{pp.cta.label}</div>
@@ -352,6 +353,7 @@ const jsonLd = JSON.stringify({
   document.addEventListener('astro:page-load', sabdiaLightboxInit);
   </script>
 
+{L.related !== false && (
   <!-- RELATED -->
   <div class="prop-related inner">
     <h2 class="prop-related-h reveal" set:html={sold ? pp.relatedHeadingSoldHtml : pp.relatedHeadingHtml} />
@@ -368,6 +370,7 @@ const jsonLd = JSON.stringify({
       ))}
     </div>
   </div>
+)}
 
   <CustomSections page="property-detail" position="end" />
 
