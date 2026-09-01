@@ -27,7 +27,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogT = ogTitle ?? title;
 const ogD = ogDescription ?? description;
 const OG_DEFAULT = '/api/img?src=%2Fimages%2Fhome-hero-1.jpg&w=1200&h=630&q=85';
-const ogImageAbs = new URL(ogImage ?? OG_DEFAULT, Astro.site).href;
+/* og:image must actually RESOLVE for share cards to render, so it is
+   built on the host that serves this deployment — not Astro.site, which
+   is the canonical domain and still points at Wix until the DNS move
+   (every share card 404'd). VERCEL_PROJECT_PRODUCTION_URL follows the
+   project's production alias, so this heals itself when the domain
+   lands. canonical/og:url stay on Astro.site deliberately. */
+const publicHost = import.meta.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const ogBase = publicHost ? `https://${publicHost}` : Astro.site;
+const ogImageAbs = new URL(ogImage ?? OG_DEFAULT, ogBase).href;
 const gaId = import.meta.env.PUBLIC_GA4_ID;
 /* Deploy-stamped asset URLs. Without a version, a visitor's browser can
    keep serving its cached main.js/style.css across deploys — fixes ship
