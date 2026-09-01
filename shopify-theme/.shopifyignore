@@ -1,4 +1,18 @@
-# JSON templates hold Naomi's customizer edits on the store — never
+# Store-side JSON templates hold Naomi's customizer edits — never
 # overwrite them from local pushes. Section/layout/asset code still syncs.
-templates/*.json
+# Listed one by one (not templates/*.json) so BRAND-NEW templates — the
+# dedicated page ports — still reach the store on their first push.
+# After a new template's first push, add it here: from then on the store
+# copy is the source of truth.
+templates/index.json
+templates/product.json
+templates/collection.json
+templates/list-collections.json
+templates/blog.json
+templates/article.json
+templates/page.json
+templates/404.json
+templates/search.json
+templates/password.json
+templates/cart.json
 templates/customers/*.json

@@ -1,0 +1,59 @@
+{%- comment -%}
+  Agent Access — the application band: copy and licence note on the left,
+  the agent application form on the right. Posts to the existing Vercel
+  API as form-name "agent-application".
+{%- endcomment -%}
+<section class="sp" style="background:var(--bg2);border-top:1px solid var(--border)" id="apply">
+  <div class="inner agent-apply-grid">
+    <div>
+      <div class="slabel reveal">{{ section.settings.label }}</div>
+      <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px)">{{ section.settings.heading_html }}</h2>
+      <p class="about-p reveal d2">{{ section.settings.text }}</p>
+      <div class="reveal d3" style="margin-top:36px;padding:28px;background:var(--dark);border-left:2px solid var(--gold)">
+        <div style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--gold3);margin-bottom:10px">{{ section.settings.note_label }}</div>
+        <div style="font-size:14px;font-weight:400;color:rgba(253,251,246,.78);line-height:1.75">{{ section.settings.note_text }}</div>
+      </div>
+    </div>
+    <div>
+      <form class="cform reveal d1" id="cform" name="agent-application" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
+        <input type="hidden" name="form-name" value="agent-application">
+        <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <div class="frow">
+          <div class="fg"><label class="fl" for="aa-first">First Name*</label><input type="text" id="aa-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="aa-last">Last Name*</label><input type="text" id="aa-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+        </div>
+        <div class="fg"><label class="fl" for="aa-agency">Agency / Company*</label><input type="text" id="aa-agency" name="agency" class="fi" placeholder="Agency or company name" autocomplete="organization" required></div>
+        <div class="fg"><label class="fl" for="aa-email">Email Address*</label><input type="email" id="aa-email" name="email" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="aa-phone">Phone Number*</label><input type="tel" id="aa-phone" name="phone" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel" required></div>
+        <div class="fg"><label class="fl" for="aa-licence">Real Estate Licence No.*</label><input type="text" id="aa-licence" name="licence-number" class="fi" placeholder="Your licence number" autocomplete="off" required></div>
+        <div class="fg">
+          <label class="fl" for="aa-suburbs">Primary Suburb Markets</label>
+          <input type="text" id="aa-suburbs" name="suburb-markets" class="fi" placeholder="e.g. Coorparoo, Camp Hill, New Farm…">
+        </div>
+        <div class="fg"><label class="fl" for="aa-message">Additional Information</label><textarea class="fta" id="aa-message" name="message" placeholder="Tell us about your client base, experience with luxury property, or any other relevant information…"></textarea></div>
+        <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
+        <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<style>
+  .agent-apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start}
+  @media(max-width:1024px){.agent-apply-grid{grid-template-columns:1fr;gap:52px}}
+</style>
+
+{% schema %}
+{
+  "name": "Agent application",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Apply for Access" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)" },
+    { "type": "textarea", "id": "text", "label": "Text" },
+    { "type": "text", "id": "note_label", "label": "Note label", "default": "Please note" },
+    { "type": "textarea", "id": "note_text", "label": "Note text" },
+    { "type": "text", "id": "submit_label", "label": "Submit button", "default": "Submit Application" }
+  ],
+  "presets": [{ "name": "Agent application" }]
+}
+{% endschema %}

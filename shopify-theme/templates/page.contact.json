@@ -1,0 +1,113 @@
+{
+  "sections": {
+    "header": {
+      "type": "page-header",
+      "settings": {
+        "style": "contact",
+        "label": "Get In Touch",
+        "title_html": "Let's start<br>a <em style=\"font-style:italic;color:var(--gold2)\">conversation</em>.",
+        "text": "We're always keen to hear from potential clients, real estate professionals, and development partners. Submit your details and we'll be in touch shortly."
+      }
+    },
+    "body": {
+      "type": "main-contact",
+      "settings": {
+        "direct_label": "Direct Contact",
+        "facebook_label": "Sabdia Constructions",
+        "linkedin_label": "Sabdia Constructions",
+        "agent_heading": "Agent Enquiries",
+        "agent_body_html": "Real estate professionals seeking exclusive agent access \u2014 pre-launch information, priority access and commission structures \u2014 please visit our <a href=\"/pages/agent-access\" style=\"color:var(--gold2);text-decoration:underline;text-underline-offset:3px\">Agent Access page</a>.",
+        "map_image_ext": "/images/home-hero-1.jpg",
+        "map_label": "Brisbane, Queensland",
+        "form_label": "Send a Message",
+        "guided_line_html": "Looking to buy? Try our <a href=\"/pages/find-your-home\" style=\"color:var(--ink);border-bottom:1px solid rgba(41,35,25,.45)\">guided residence match</a> \u2014 five questions, tailored suggestions.",
+        "submit_label": "Submit Enquiry",
+        "form_note": "We respond within one business day."
+      },
+      "blocks": {
+        "interest-1": {
+          "type": "interest",
+          "settings": {
+            "text": "Custom Home / Bespoke Build"
+          }
+        },
+        "interest-2": {
+          "type": "interest",
+          "settings": {
+            "text": "Development Partnership"
+          }
+        },
+        "interest-3": {
+          "type": "interest",
+          "settings": {
+            "text": "Agent Access"
+          }
+        },
+        "interest-4": {
+          "type": "interest",
+          "settings": {
+            "text": "Media & Press"
+          }
+        },
+        "interest-5": {
+          "type": "interest",
+          "settings": {
+            "text": "General Enquiry"
+          }
+        }
+      },
+      "block_order": [
+        "interest-1",
+        "interest-2",
+        "interest-3",
+        "interest-4",
+        "interest-5"
+      ]
+    },
+    "links": {
+      "type": "quick-links",
+      "settings": {
+        "label": "You May Also Be Interested In"
+      },
+      "blocks": {
+        "link-1": {
+          "type": "link",
+          "settings": {
+            "tag": "For Sale",
+            "title": "Current Properties",
+            "desc": "View our current portfolio of luxury residences available for sale across Brisbane.",
+            "link": "/collections/for-sale"
+          }
+        },
+        "link-2": {
+          "type": "link",
+          "settings": {
+            "tag": "Professionals",
+            "title": "Agent Access",
+            "desc": "Exclusive pre-launch information, priority access, and commission structures for real estate professionals.",
+            "link": "/pages/agent-access"
+          }
+        },
+        "link-3": {
+          "type": "link",
+          "settings": {
+            "tag": "Company",
+            "title": "About Sabdia",
+            "desc": "Learn about our story, values, and integrated approach to boutique luxury development.",
+            "link": "/pages/about"
+          }
+        }
+      },
+      "block_order": [
+        "link-1",
+        "link-2",
+        "link-3"
+      ]
+    }
+  },
+  "order": [
+    "header",
+    "body",
+    "links"
+  ]
+}

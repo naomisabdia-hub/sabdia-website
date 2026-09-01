@@ -1,0 +1,79 @@
+{%- comment -%}
+  Services — the alternating image/copy service spreads. One block per
+  service; paragraphs and bullet lists are written one per line.
+{%- endcomment -%}
+<section class="sp">
+  <div class="inner">
+    {%- for block in section.blocks -%}
+      <div class="svc-detail-grid" {{ block.shopify_attributes }}>
+        <div class="svc-detail-img {% cycle 'reveal-x', 'reveal-r' %}">
+          {%- if block.settings.image -%}
+            <img src="{{ block.settings.image | image_url: width: 1200, height: 906, crop: 'center' }}" alt="{{ block.settings.image_alt | default: block.settings.title | escape }}" loading="lazy" width="1200" height="906">
+          {%- elsif block.settings.image_ext != blank -%}
+            <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 1200, h: 906 %}" alt="{{ block.settings.image_alt | default: block.settings.title | escape }}" loading="lazy" width="1200" height="906">
+          {%- endif -%}
+        </div>
+        <div class="reveal">
+          <span class="svc-num">{{ block.settings.number }}</span>
+          <div class="slabel">{{ block.settings.label }}</div>
+          <h2 class="svc-detail-h">{{ block.settings.heading_html }}</h2>
+          {%- assign paras = block.settings.paragraphs | newline_to_br | split: '<br />' -%}
+          {%- for p in paras -%}
+            {%- assign pt = p | strip -%}
+            {%- if pt != blank -%}<p class="svc-detail-p">{{ pt }}</p>{%- endif -%}
+          {%- endfor -%}
+          {%- assign bullets = block.settings.bullets | newline_to_br | split: '<br />' -%}
+          <ul class="svc-detail-list">
+            {%- for b in bullets -%}
+              {%- assign bt = b | strip -%}
+              {%- if bt != blank -%}<li>{{ bt }}</li>{%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+<style>
+  .svc-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:center;padding:clamp(72px,10vw,140px) 0}
+  .svc-detail-grid:nth-child(even){direction:rtl}
+  .svc-detail-grid:nth-child(even)>*{direction:ltr}
+  .svc-detail-grid+.svc-detail-grid{border-top:1px solid var(--border)}
+  .svc-detail-img{overflow:hidden;aspect-ratio:4/3}
+  .svc-detail-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.85);transition:transform .8s var(--ease)}
+  .svc-detail-grid:hover .svc-detail-img img{transform:scale(1.04)}
+  .svc-num{font-family:var(--font-d);font-size:clamp(80px,12vw,160px);font-weight:300;font-style:italic;color:rgba(168,135,74,.1);line-height:1;margin-bottom:-20px;display:block}
+  .svc-detail-h{font-family:var(--font-d);font-size:clamp(30px,4vw,52px);font-weight:300;color:var(--ink);margin-bottom:20px;letter-spacing:-.02em}
+  .svc-detail-h em{font-style:italic;color:var(--ink)}
+  .svc-detail-p{font-size:13.5px;font-weight:300;line-height:1.9;color:var(--ink3);margin-bottom:16px}
+  .svc-detail-list{list-style:none;margin-top:24px;border-top:1px solid var(--border);padding-top:24px}
+  .svc-detail-list li{font-size:13px;font-weight:300;color:var(--ink3);padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .svc-detail-list li::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
+  @media(max-width:900px){.svc-detail-grid{grid-template-columns:1fr;gap:36px}.svc-detail-grid:nth-child(even){direction:ltr}}
+</style>
+
+{% schema %}
+{
+  "name": "Services — details",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "service",
+      "name": "Service",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number", "default": "01" },
+        { "type": "text", "id": "label", "label": "Small label" },
+        { "type": "text", "id": "title", "label": "Title (for image alt)" },
+        { "type": "html", "id": "heading_html", "label": "Heading (HTML)" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_ext", "label": "…or external image path/URL" },
+        { "type": "text", "id": "image_alt", "label": "Image alt text" },
+        { "type": "textarea", "id": "paragraphs", "label": "Paragraphs (one per line)" },
+        { "type": "textarea", "id": "bullets", "label": "Bullet points (one per line)" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Services — details" }]
+}
+{% endschema %}

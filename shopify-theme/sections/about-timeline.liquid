@@ -1,0 +1,60 @@
+{%- comment -%}
+  About — journey: heading/text beside the gold-threaded year timeline.
+{%- endcomment -%}
+<section class="sp">
+  <div class="inner">
+    <div class="journey-grid">
+      <div>
+        <div class="slabel reveal">{{ section.settings.label }}</div>
+        <h2 class="about-h reveal d1">{{ section.settings.heading_html }}</h2>
+        <p class="about-p reveal d2" style="margin-top:0">{{ section.settings.text }}</p>
+      </div>
+      <div class="timeline reveal d2">
+        {%- for block in section.blocks -%}
+          <div class="tl-item" {{ block.shopify_attributes }}>
+            <div class="tl-dot"></div>
+            <div class="tl-year">{{ block.settings.year }}</div>
+            <div class="tl-title">{{ block.settings.title }}</div>
+            <div class="tl-desc">{{ block.settings.desc }}</div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .timeline{position:relative;padding-left:40px;margin-top:0}
+  .timeline::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--gold),transparent)}
+  .tl-item{position:relative;margin-bottom:44px}
+  .tl-item:last-child{margin-bottom:0}
+  .tl-dot{position:absolute;left:-44px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px var(--bg)}
+  .tl-year{font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--ink);margin-bottom:8px}
+  .tl-title{font-family:var(--font-d);font-size:20px;font-weight:300;color:var(--ink);margin-bottom:6px}
+  .tl-desc{font-size:13px;font-weight:300;line-height:1.75;color:var(--ink3)}
+  .journey-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start}
+  @media(max-width:900px){.journey-grid{grid-template-columns:1fr;gap:48px}}
+</style>
+
+{% schema %}
+{
+  "name": "About — journey",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Our Journey" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)" },
+    { "type": "textarea", "id": "text", "label": "Intro text" }
+  ],
+  "blocks": [
+    {
+      "type": "milestone",
+      "name": "Milestone",
+      "settings": [
+        { "type": "text", "id": "year", "label": "Year" },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "textarea", "id": "desc", "label": "Description" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "About — journey" }]
+}
+{% endschema %}

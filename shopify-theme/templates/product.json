@@ -5,10 +5,18 @@
     },
     "walkthrough": {
       "type": "scroll-walk"
+    },
+    "series": {
+      "type": "series-strip"
+    },
+    "related": {
+      "type": "related-properties"
     }
   },
   "order": [
     "main",
-    "walkthrough"
+    "walkthrough",
+    "series",
+    "related"
   ]
 }

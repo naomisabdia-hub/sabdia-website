@@ -1,0 +1,65 @@
+{%- comment -%}
+  Agent Access — the benefit cards on the deep band. One block per
+  benefit, icon keyed to the benefit-icon snippet.
+{%- endcomment -%}
+<section style="background:var(--dark2);padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px)">
+  <div class="inner">
+    <div class="slabel slabel-dark reveal" style="margin-bottom:20px">{{ section.settings.label }}</div>
+    <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(36px,5vw,64px);font-weight:300;color:var(--white);letter-spacing:-.02em;max-width:700px">{{ section.settings.heading_html }}</h2>
+    <div class="agent-bens">
+      {%- assign bdelays = ',d1,d2,d1,d2,d3' | split: ',' -%}
+      {%- for block in section.blocks -%}
+        {%- assign di = forloop.index0 | modulo: 6 -%}
+        <div class="agent-ben reveal {{ bdelays[di] }}" {{ block.shopify_attributes }}>
+          <div class="agent-ben-icon">{% render 'benefit-icon', icon: block.settings.icon %}</div>
+          <div class="agent-ben-t">{{ block.settings.title }}</div>
+          <div class="agent-ben-d">{{ block.settings.desc }}</div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .agent-bens{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:64px}
+  .agent-ben{padding:40px 32px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:background .3s,border-color .3s}
+  .agent-ben:hover{background:rgba(168,135,74,.06);border-color:rgba(168,135,74,.2)}
+  .agent-ben-icon{width:44px;height:44px;border:1px solid rgba(195,164,94,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);margin-bottom:20px}
+  .agent-ben-t{font-family:var(--font-d);font-size:20px;font-weight:300;color:var(--white);margin-bottom:10px}
+  .agent-ben-d{font-size:14px;font-weight:400;line-height:1.78;color:rgba(253,251,246,.72)}
+  @media(max-width:1024px){.agent-bens{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:640px){.agent-bens{grid-template-columns:1fr}}
+</style>
+
+{% schema %}
+{
+  "name": "Agent benefits",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Why Join" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)" }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        {
+          "type": "select", "id": "icon", "label": "Icon",
+          "options": [
+            { "value": "layers", "label": "Layers" },
+            { "value": "plan", "label": "Floor plan" },
+            { "value": "phone", "label": "Phone" },
+            { "value": "dollar", "label": "Dollar" },
+            { "value": "users", "label": "People" },
+            { "value": "star", "label": "Star" }
+          ],
+          "default": "star"
+        },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "textarea", "id": "desc", "label": "Description" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Agent benefits" }]
+}
+{% endschema %}

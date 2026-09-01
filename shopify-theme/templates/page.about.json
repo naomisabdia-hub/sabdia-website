@@ -1,0 +1,236 @@
+{
+  "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "label": "Our Story",
+        "title_html": "About<br><em>Sabdia</em>",
+        "sub": "A decade of redefining luxury residential development in inner Brisbane.",
+        "image_ext": "/images/home-hero-1.jpg",
+        "image_alt": "Sabdia Constructions"
+      }
+    },
+    "mission": {
+      "type": "about-mission",
+      "settings": {
+        "label": "Mission",
+        "heading_html": "Built on <em>vision</em>,<br>delivered with<br>precision.",
+        "sig_name": "Sabdia",
+        "sig_title": "Founder & Principal"
+      },
+      "blocks": {
+        "paragraph-1": {
+          "type": "paragraph",
+          "settings": {
+            "text": "Founded in 2013, Sabdia Constructions was born from a singular conviction: that the residential development industry in Brisbane deserved a boutique operator who refused to compromise. One that would bring together exceptional design, rigorous development management, and master-level construction under a single, unified vision."
+          }
+        },
+        "paragraph-2": {
+          "type": "paragraph",
+          "settings": {
+            "text": "Over a decade later, that conviction has been validated more than 100 times \u2014 in every residence we have delivered, in every client who has trusted us with their most significant investment, and in every award that has recognised our commitment to excellence."
+          }
+        },
+        "paragraph-3": {
+          "type": "paragraph",
+          "settings": {
+            "text": "We remain boutique by choice. By limiting the number of projects we undertake each year, we ensure that every development receives the full force of our attention, creativity, and craftsmanship. We do not build in volume. We build in detail."
+          }
+        }
+      },
+      "block_order": [
+        "paragraph-1",
+        "paragraph-2",
+        "paragraph-3"
+      ]
+    },
+    "values": {
+      "type": "about-values",
+      "settings": {
+        "label": "Our Values"
+      },
+      "blocks": {
+        "value-1": {
+          "type": "value",
+          "settings": {
+            "numeral": "i.",
+            "title": "Integrity",
+            "desc": "We say what we do, and we do what we say. Transparency with our clients is non-negotiable at every stage of the journey."
+          }
+        },
+        "value-2": {
+          "type": "value",
+          "settings": {
+            "numeral": "ii.",
+            "title": "Innovation",
+            "desc": "We push the boundaries of design and construction, constantly seeking better ways to create residences that will stand the test of time."
+          }
+        },
+        "value-3": {
+          "type": "value",
+          "settings": {
+            "numeral": "iii.",
+            "title": "Excellence",
+            "desc": "We do not accept 'good enough'. Every detail, from the grandest architectural gesture to the smallest finishing touch, must be exceptional."
+          }
+        }
+      },
+      "block_order": [
+        "value-1",
+        "value-2",
+        "value-3"
+      ]
+    },
+    "journey": {
+      "type": "about-timeline",
+      "settings": {
+        "label": "Our Journey",
+        "heading_html": "A decade of<br><em>milestones</em>.",
+        "text": "From a single vision to over 100 delivered residences, each year has brought new achievements and raised the bar for what luxury living in Brisbane can be."
+      },
+      "blocks": {
+        "milestone-1": {
+          "type": "milestone",
+          "settings": {
+            "year": "2013",
+            "title": "Founded",
+            "desc": "Sabdia Constructions established with a vision to redefine boutique luxury residential development in inner Brisbane."
+          }
+        },
+        "milestone-2": {
+          "type": "milestone",
+          "settings": {
+            "year": "2015",
+            "title": "First Award",
+            "desc": "Recognised with our first industry award for design excellence, validating the Sabdia approach to integrated development."
+          }
+        },
+        "milestone-3": {
+          "type": "milestone",
+          "settings": {
+            "year": "2017",
+            "title": "50 Residences Delivered",
+            "desc": "A major milestone \u2014 50 homes delivered to satisfied clients across inner Brisbane's most prestigious suburbs."
+          }
+        },
+        "milestone-4": {
+          "type": "milestone",
+          "settings": {
+            "year": "2020",
+            "title": "Interior Architecture Division",
+            "desc": "Expanded in-house capabilities to include a dedicated interior architecture team, deepening creative integration across all projects."
+          }
+        },
+        "milestone-5": {
+          "type": "milestone",
+          "settings": {
+            "year": "2023",
+            "title": "100+ Residences",
+            "desc": "Surpassed 100 completed residences \u2014 a testament to a decade of consistency, quality, and unwavering commitment to excellence."
+          }
+        },
+        "milestone-6": {
+          "type": "milestone",
+          "settings": {
+            "year": "2025",
+            "title": "QASR \u2014 Flagship Release",
+            "desc": "The launch of QASR, Coorparoo \u2014 Sabdia's most ambitious and extraordinary residence to date, representing a new pinnacle of Brisbane luxury."
+          }
+        }
+      },
+      "block_order": [
+        "milestone-1",
+        "milestone-2",
+        "milestone-3",
+        "milestone-4",
+        "milestone-5",
+        "milestone-6"
+      ]
+    },
+    "awards": {
+      "type": "about-awards",
+      "settings": {
+        "label": "Recognition",
+        "heading_html": "Award-winning<br><em>excellence</em>."
+      },
+      "blocks": {
+        "award-1": {
+          "type": "award",
+          "settings": {
+            "year": "2024",
+            "title": "Best Luxury Residential Development",
+            "org": "UDIA Queensland Awards"
+          }
+        },
+        "award-2": {
+          "type": "award",
+          "settings": {
+            "year": "2023",
+            "title": "Excellence in Design",
+            "org": "HIA Australian Housing Awards"
+          }
+        },
+        "award-3": {
+          "type": "award",
+          "settings": {
+            "year": "2022",
+            "title": "Best New Residential Development",
+            "org": "Property Council of Australia"
+          }
+        },
+        "award-4": {
+          "type": "award",
+          "settings": {
+            "year": "2021",
+            "title": "Residential Interior Design \u2014 Luxury",
+            "org": "IDEA Awards"
+          }
+        },
+        "award-5": {
+          "type": "award",
+          "settings": {
+            "year": "2020",
+            "title": "Custom Home of the Year \u2014 QLD",
+            "org": "Master Builders Queensland"
+          }
+        },
+        "award-6": {
+          "type": "award",
+          "settings": {
+            "year": "2019",
+            "title": "Best Luxury Home Builder \u2014 Brisbane",
+            "org": "REIQ Awards for Excellence"
+          }
+        }
+      },
+      "block_order": [
+        "award-1",
+        "award-2",
+        "award-3",
+        "award-4",
+        "award-5",
+        "award-6"
+      ]
+    },
+    "cta": {
+      "type": "cta-centered",
+      "settings": {
+        "label": "Begin Your Journey",
+        "heading_html": "Ready to create something <em>extraordinary</em>?",
+        "text": "Whether you're seeking a current property for sale or have a vision for a bespoke home, we'd love to begin a conversation.",
+        "cta1_label": "View Properties",
+        "cta1_link": "/collections/for-sale",
+        "cta2_label": "Get In Touch",
+        "cta2_link": "/pages/contact"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "mission",
+    "values",
+    "journey",
+    "awards",
+    "cta"
+  ]
+}

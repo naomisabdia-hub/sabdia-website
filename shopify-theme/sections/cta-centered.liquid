@@ -1,0 +1,55 @@
+{%- comment -%}
+  Centred closing CTA used by About / Services / Projects — label, display
+  heading, optional text, two buttons. Light by default; the dark variant
+  is the obsidian band Services closes on.
+{%- endcomment -%}
+{%- liquid
+  assign dark = section.settings.dark
+  assign hsize = 'clamp(36px,5vw,68px)'
+  if section.settings.compact
+    assign hsize = 'clamp(32px,5vw,60px)'
+  endif
+-%}
+<section class="sp" style="text-align:center{% if dark %};background:var(--dark){% endif %}">
+  <div class="{% if dark %}inner{% else %}inner-sm{% endif %}">
+    <div class="slabel {% if dark %}slabel-dark {% endif %}reveal" style="justify-content:center;margin-bottom:20px">{{ section.settings.label }}</div>
+    {%- if dark -%}
+      <h2 class="reveal d1" style="font-family:var(--font-d);font-size:{{ hsize }};font-weight:300;color:var(--white);margin-bottom:24px;letter-spacing:-.02em">{{ section.settings.heading_html }}</h2>
+    {%- else -%}
+      <h2 class="about-h reveal d1" style="text-align:center;font-size:{{ hsize }}">{{ section.settings.heading_html }}</h2>
+    {%- endif -%}
+    {%- if section.settings.text != blank -%}
+      {%- if dark -%}
+        <p class="reveal d2" style="font-size:13px;font-weight:300;color:rgba(253,251,246,.45);max-width:440px;margin:0 auto 40px;line-height:1.8">{{ section.settings.text }}</p>
+      {%- else -%}
+        <p class="about-p reveal d2" style="text-align:center;margin:24px auto 40px;max-width:480px">{{ section.settings.text }}</p>
+      {%- endif -%}
+    {%- endif -%}
+    <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap{% if section.settings.text == blank %};margin-top:36px{% endif %}">
+      {%- if section.settings.cta1_label != blank -%}
+        <a href="{{ section.settings.cta1_link }}" class="btn-p">{{ section.settings.cta1_label }}</a>
+      {%- endif -%}
+      {%- if section.settings.cta2_label != blank -%}
+        <a href="{{ section.settings.cta2_link }}" class="btn-g{% if dark %} btn-g-light{% endif %}">{{ section.settings.cta2_label }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Closing CTA",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)" },
+    { "type": "textarea", "id": "text", "label": "Text (optional)" },
+    { "type": "text", "id": "cta1_label", "label": "Primary button label" },
+    { "type": "url", "id": "cta1_link", "label": "Primary button link" },
+    { "type": "text", "id": "cta2_label", "label": "Secondary button label" },
+    { "type": "url", "id": "cta2_link", "label": "Secondary button link" },
+    { "type": "checkbox", "id": "dark", "label": "Dark (obsidian) band", "default": false },
+    { "type": "checkbox", "id": "compact", "label": "Slightly smaller heading", "default": false }
+  ],
+  "presets": [{ "name": "Closing CTA" }]
+}
+{% endschema %}

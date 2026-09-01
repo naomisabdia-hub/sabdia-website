@@ -1,0 +1,43 @@
+{%- comment -%}
+  Property page — the "Explore more Sabdia residences" row: up to three
+  other for-sale residences (never the one being viewed). The heading
+  switches when this residence is sold.
+{%- endcomment -%}
+{%- liquid
+  assign col = section.settings.related_collection | default: collections['for-sale']
+  assign sold = false
+  if product.tags contains 'sold'
+    assign sold = true
+  endif
+-%}
+{%- capture cards -%}
+  {%- assign shown = 0 -%}
+  {%- for p in col.products -%}
+    {%- if p.id == product.id or shown >= 3 -%}{%- continue -%}{%- endif -%}
+    {%- assign shown = shown | plus: 1 -%}
+    {%- case shown -%}
+      {%- when 1 -%}{% render 'property-card', product: p, class: 'reveal', style: 'aspect-ratio:4/3', img_w: 600, img_h: 400, show_cars: true, show_land: false %}
+      {%- when 2 -%}{% render 'property-card', product: p, class: 'reveal d1', style: 'aspect-ratio:4/3', img_w: 600, img_h: 400, show_cars: true, show_land: false %}
+      {%- else -%}{% render 'property-card', product: p, class: 'reveal d2', style: 'aspect-ratio:4/3', img_w: 600, img_h: 400, show_cars: true, show_land: false %}
+    {%- endcase -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- assign cards_stripped = cards | strip -%}
+{%- if cards_stripped != blank -%}
+<div class="prop-related inner">
+  <h2 class="prop-related-h reveal">{% if sold %}{{ section.settings.heading_sold_html }}{% else %}{{ section.settings.heading_html }}{% endif %}</h2>
+  <div class="prop-related-grid">{{ cards }}</div>
+</div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Related residences",
+  "settings": [
+    { "type": "collection", "id": "related_collection", "label": "Collection", "info": "Defaults to for-sale; the residence being viewed is never shown" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)", "default": "Explore more <em>Sabdia residences<\/em>" },
+    { "type": "html", "id": "heading_sold_html", "label": "Heading when sold (HTML)", "default": "Properties <em>for sale now<\/em>" }
+  ],
+  "presets": [{ "name": "Related residences" }]
+}
+{% endschema %}

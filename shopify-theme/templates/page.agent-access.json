@@ -1,0 +1,105 @@
+{
+  "sections": {
+    "hero": {
+      "type": "agent-hero",
+      "settings": {
+        "label": "For Real Estate Professionals",
+        "title_html": "Exclusive<br><em style=\"color:var(--gold2)\">Agent</em><br>Access.",
+        "text": "Join Sabdia's exclusive agent network and be the first to know about our next landmark development before it reaches the market.",
+        "image_ext": "/images/agent-portrait.jpg",
+        "image_alt": "Agent Access"
+      }
+    },
+    "benefits": {
+      "type": "agent-benefits",
+      "settings": {
+        "label": "Why Join",
+        "heading_html": "The Sabdia agent program gives you <em style=\"color:var(--gold2)\">a genuine edge</em>."
+      },
+      "blocks": {
+        "benefit-1": {
+          "type": "benefit",
+          "settings": {
+            "icon": "layers",
+            "title": "Pre-Release Access",
+            "desc": "Be first to know about upcoming developments before they reach the public market. Give your clients a genuine first-mover advantage."
+          }
+        },
+        "benefit-2": {
+          "type": "benefit",
+          "settings": {
+            "icon": "plan",
+            "title": "Floor Plans & Pricing",
+            "desc": "Access pre-launch floor plans and indicative pricing information exclusively \u2014 everything you need to prepare your clients before public release."
+          }
+        },
+        "benefit-3": {
+          "type": "benefit",
+          "settings": {
+            "icon": "phone",
+            "title": "Priority Communication",
+            "desc": "A dedicated Sabdia liaison to keep you informed, respond to questions, and support you throughout the sales process."
+          }
+        },
+        "benefit-4": {
+          "type": "benefit",
+          "settings": {
+            "icon": "dollar",
+            "title": "Exclusive Commissions",
+            "desc": "Competitive and exclusive commission structures for agent network members \u2014 recognising the value of your relationships and referrals."
+          }
+        },
+        "benefit-5": {
+          "type": "benefit",
+          "settings": {
+            "icon": "users",
+            "title": "Private Previews",
+            "desc": "Invitations to exclusive agent-only preview events \u2014 an opportunity to walk through completed or near-complete residences before public launch."
+          }
+        },
+        "benefit-6": {
+          "type": "benefit",
+          "settings": {
+            "icon": "star",
+            "title": "Award-Winning Product",
+            "desc": "Represent Brisbane's most acclaimed boutique luxury developer \u2014 a brand that your clients will immediately recognise as a hallmark of quality."
+          }
+        }
+      },
+      "block_order": [
+        "benefit-1",
+        "benefit-2",
+        "benefit-3",
+        "benefit-4",
+        "benefit-5",
+        "benefit-6"
+      ]
+    },
+    "listings": {
+      "type": "agent-listings",
+      "settings": {
+        "label": "Current Opportunities",
+        "heading_html": "Properties available <em>now</em>.",
+        "cta_label": "View All Properties",
+        "cta_link": "/collections/for-sale"
+      }
+    },
+    "apply": {
+      "type": "agent-apply",
+      "settings": {
+        "label": "Apply for Access",
+        "heading_html": "Join the <em>network</em>.",
+        "text": "Complete the form and a member of the Sabdia team will be in touch within one business day to discuss your application and confirm your access to our exclusive agent program.",
+        "note_label": "Please note",
+        "note_text": "The Sabdia agent program is available to licensed real estate professionals only. We may request verification of your licence at the time of application approval.",
+        "submit_label": "Submit Application"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "benefits",
+    "listings",
+    "apply"
+  ]
+}

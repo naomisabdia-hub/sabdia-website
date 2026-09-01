@@ -1,0 +1,54 @@
+{%- comment -%}
+  About — values: the obsidian band of numbered values.
+{%- endcomment -%}
+<section style="background:var(--dark)">
+  <div style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px)">
+    <div class="inner">
+      <div class="slabel slabel-dark reveal" style="margin-bottom:52px">{{ section.settings.label }}</div>
+      <div class="vals-grid">
+        {%- assign vdelays = ',d1,d2' | split: ',' -%}
+        {%- for block in section.blocks -%}
+          {%- assign di = forloop.index0 | modulo: 3 -%}
+          <div class="reveal {{ vdelays[di] }}" {{ block.shopify_attributes }}>
+            <div style="font-family:var(--font-d);font-size:56px;font-weight:300;font-style:italic;color:rgba(195,164,94,.34);line-height:1;margin-bottom:20px">{{ block.settings.numeral }}</div>
+            <div style="font-family:var(--font-d);font-size:24px;font-weight:300;color:var(--white);margin-bottom:12px">{{ block.settings.title }}</div>
+            {%- comment -%} .72, not .4 — at .4 the descriptions were near-invisible on the obsidian band (Tamsin, 2026-09-01). {%- endcomment -%}
+            <div style="font-size:13px;font-weight:300;line-height:1.8;color:rgba(253,251,246,.72)">{{ block.settings.desc }}</div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .vals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+  .vals-grid>div{padding:44px 36px;border-right:1px solid rgba(255,255,255,.07)}
+  .vals-grid>div:last-child{border-right:none}
+  @media(max-width:900px){
+    .vals-grid{grid-template-columns:1fr}
+    .vals-grid>div{padding:32px 0;border-right:none;border-bottom:1px solid rgba(255,255,255,.07)}
+    .vals-grid>div:last-child{border-bottom:none}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "About — values",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Our Values" }
+  ],
+  "blocks": [
+    {
+      "type": "value",
+      "name": "Value",
+      "settings": [
+        { "type": "text", "id": "numeral", "label": "Numeral", "default": "i.", "info": "e.g. i. / ii. / iii." },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "textarea", "id": "desc", "label": "Description" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "About — values" }]
+}
+{% endschema %}

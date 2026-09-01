@@ -1,0 +1,39 @@
+{%- comment -%}
+  Services — intro: label/heading beside the integrated-approach paragraphs.
+{%- endcomment -%}
+<section class="sp-sm" style="border-bottom:1px solid var(--border)">
+  <div class="inner svc-intro-grid">
+    <div>
+      <div class="slabel reveal">{{ section.settings.label }}</div>
+      <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px)">{{ section.settings.heading_html }}</h2>
+    </div>
+    <div>
+      {%- for block in section.blocks -%}
+        <p class="about-p reveal d2" {{ block.shopify_attributes }}>{{ block.settings.text }}</p>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .svc-intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+  @media(max-width:900px){.svc-intro-grid{grid-template-columns:1fr;gap:32px}}
+</style>
+
+{% schema %}
+{
+  "name": "Services — intro",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Integrated Approach" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)" }
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "name": "Paragraph",
+      "settings": [{ "type": "textarea", "id": "text", "label": "Text" }]
+    }
+  ],
+  "presets": [{ "name": "Services — intro" }]
+}
+{% endschema %}

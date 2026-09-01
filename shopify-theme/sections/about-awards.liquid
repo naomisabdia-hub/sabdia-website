@@ -1,0 +1,52 @@
+{%- comment -%}
+  About — recognition: the gold-topped award cards on the soft band.
+{%- endcomment -%}
+<section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="inner">
+    <div class="slabel reveal">{{ section.settings.label }}</div>
+    <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px)">{{ section.settings.heading_html }}</h2>
+    <div class="awards-grid">
+      {%- assign adelays = ',d1,d2,d1,d2,d3' | split: ',' -%}
+      {%- for block in section.blocks -%}
+        {%- assign di = forloop.index0 | modulo: 6 -%}
+        <div class="award-item reveal {{ adelays[di] }}" {{ block.shopify_attributes }}>
+          <div class="award-year">{{ block.settings.year }}</div>
+          <div class="award-title">{{ block.settings.title }}</div>
+          <div class="award-org">{{ block.settings.org }}</div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .awards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:52px}
+  .award-item{padding:28px 24px;background:var(--bg2);border:1px solid var(--border);border-top:2px solid var(--gold)}
+  .award-year{font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--ink);margin-bottom:10px}
+  .award-title{font-family:var(--font-d);font-size:17px;font-weight:300;color:var(--ink);line-height:1.3;margin-bottom:6px}
+  .award-org{font-size:11px;font-weight:300;color:var(--taupe-d);letter-spacing:.06em}
+  @media(max-width:1024px){.awards-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:768px){.awards-grid{grid-template-columns:1fr}}
+</style>
+
+{% schema %}
+{
+  "name": "About — recognition",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Recognition" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)" }
+  ],
+  "blocks": [
+    {
+      "type": "award",
+      "name": "Award",
+      "settings": [
+        { "type": "text", "id": "year", "label": "Year" },
+        { "type": "text", "id": "title", "label": "Award title" },
+        { "type": "text", "id": "org", "label": "Awarding body" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "About — recognition" }]
+}
+{% endschema %}

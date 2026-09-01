@@ -1,0 +1,133 @@
+{%- comment -%}
+  "The Series" — the horizontally scrolling strip of Instagram posts
+  documenting this residence, from first render to final reveal (port of
+  SeriesStrip.astro). Posts come from the product's custom.series_posts
+  JSON metafield: [{ "date", "thumb", "caption", "video"? }, …] — real
+  captures of the published posts, edited per product in the admin.
+  Renders nothing when the residence has no posts.
+{%- endcomment -%}
+{%- assign posts = product.metafields.custom.series_posts.value -%}
+{%- if posts.size > 0 -%}
+<section class="series-band{% if section.settings.dark %} on-dark{% endif %}" data-series>
+  <div class="series-hdr">
+    <div>
+      <div class="slabel {% if section.settings.dark %}slabel-dark {% endif %}reveal">{{ section.settings.label }}</div>
+      <h2 class="series-h reveal d1">{{ section.settings.heading_prefix }} <em>{{ product.title }}</em>.</h2>
+      <a href="{{ section.settings.instagram_url | default: settings.instagram_url }}" target="_blank" rel="noopener" class="series-handle reveal d2">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+        {{ section.settings.handle_line }} {{ section.settings.handle | default: settings.instagram_label }}
+      </a>
+    </div>
+    <p class="series-sub reveal d2">{{ section.settings.sub }}</p>
+  </div>
+  <div class="series-track-wrap">
+    <button class="series-nav series-prev" type="button" aria-label="Scroll back" data-series-prev>&larr;</button>
+    <button class="series-nav series-next" type="button" aria-label="Scroll forward" data-series-next>&rarr;</button>
+    <div class="series-track" data-series-track>
+      {%- for item in posts -%}
+        <div
+          class="series-card"
+          data-series-card
+          {% if item.video %}data-video="{{ item.video }}"{% endif %}
+          data-caption="{{ item.caption | escape }}"
+          {% if item.video %}role="button" tabindex="0" aria-label="Play film: {{ item.caption | escape }}"{% endif %}
+        >
+          <img src="{{ item.thumb }}" alt="{{ item.caption | default: product.title | escape }}" loading="lazy">
+          <div class="series-card-ov"></div>
+          {%- if item.video -%}
+            <div class="series-play" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            </div>
+          {%- endif -%}
+          <div class="series-card-meta">
+            <div class="series-card-date">{{ item.date | date: "%b %Y" }}</div>
+            {%- if item.caption != blank -%}<div class="series-card-cap">{{ item.caption }}</div>{%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<div class="lbv" id="lbv" role="dialog" aria-modal="true" aria-label="Film player">
+  <video id="lbvVideo" controls playsinline preload="none"></video>
+  <button class="lb-close" id="lbvClose" aria-label="Close">&#10005;</button>
+  <div class="lbv-cap" id="lbvCap"></div>
+</div>
+
+<script>
+  (function () {
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var lbv = document.getElementById('lbv');
+      if (lbv && lbv.classList.contains('open')) closeSeriesFilm(lbv);
+    });
+
+    function closeSeriesFilm(lbv) {
+      var video = document.getElementById('lbvVideo');
+      lbv.classList.remove('open');
+      document.body.style.overflow = '';
+      if (video) {
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+      }
+    }
+
+    document.querySelectorAll('[data-series]').forEach(function (band) {
+      if (band.dataset.init) return;
+      band.dataset.init = '1';
+      var track = band.querySelector('[data-series-track]');
+      var prev = band.querySelector('[data-series-prev]');
+      var next = band.querySelector('[data-series-next]');
+
+      function step() { return Math.min(track.clientWidth * 0.7, 560); }
+      function update() {
+        prev.disabled = track.scrollLeft < 40;
+        next.disabled = track.scrollLeft > track.scrollWidth - track.clientWidth - 40;
+      }
+      prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+      next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+      track.addEventListener('scroll', update, { passive: true });
+      update();
+    });
+
+    var lbv = document.getElementById('lbv');
+    if (lbv && !lbv.dataset.init) {
+      lbv.dataset.init = '1';
+      var video = document.getElementById('lbvVideo');
+      var cap = document.getElementById('lbvCap');
+      function openV(src, caption) {
+        video.src = src;
+        cap.textContent = caption || '';
+        lbv.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        video.play().catch(function () {});
+      }
+      function closeV() { closeSeriesFilm(lbv); }
+      document.querySelectorAll('[data-series-card][data-video]').forEach(function (card) {
+        card.addEventListener('click', function () { openV(card.dataset.video, card.dataset.caption); });
+        card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openV(card.dataset.video, card.dataset.caption); } });
+      });
+      document.getElementById('lbvClose').addEventListener('click', closeV);
+      lbv.addEventListener('click', function (e) { if (e.target === lbv) closeV(); });
+    }
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "The Series",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "The Series" },
+    { "type": "text", "id": "heading_prefix", "label": "Heading before the name", "default": "The story of", "info": "Renders as “The story of <name>.”" },
+    { "type": "text", "id": "handle_line", "label": "Handle line prefix", "default": "As documented on" },
+    { "type": "text", "id": "handle", "label": "Instagram handle", "info": "Defaults to the theme's Instagram label" },
+    { "type": "url", "id": "instagram_url", "label": "Instagram URL", "info": "Defaults to the theme's Instagram URL" },
+    { "type": "text", "id": "sub", "label": "Sub-line", "default": "From first render to final reveal — swipe through the journey as it was shared." },
+    { "type": "checkbox", "id": "dark", "label": "Dark band", "default": false }
+  ],
+  "presets": [{ "name": "The Series" }]
+}
+{% endschema %}

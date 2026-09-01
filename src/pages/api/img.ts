@@ -22,6 +22,11 @@ const env = (key: string) => import.meta.env[key] ?? process.env[key];
 
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
 
+/* Public immutable images, no credentials — a wildcard lets the Shopify
+   storefront (and any future origin) draw them onto a canvas, which the
+   scroll walkthrough does with crossOrigin="anonymous". */
+const CORS = { 'Access-Control-Allow-Origin': '*' };
+
 export const GET: APIRoute = async ({ url, request }) => {
   const src = url.searchParams.get('src') ?? '';
   const w = clamp(parseInt(url.searchParams.get('w') ?? '0', 10) || 0, 16, 3200);
@@ -31,7 +36,7 @@ export const GET: APIRoute = async ({ url, request }) => {
 
   const local = src.startsWith('/images/') && !src.includes('..');
   if ((!local && !SUPABASE_MEDIA.test(src)) || !w || !h) {
-    return new Response('Bad request', { status: 400 });
+    return new Response('Bad request', { status: 400, headers: CORS });
   }
 
   /* Local masters are fetched over HTTP (public/ lives on the CDN, not the
@@ -43,7 +48,7 @@ export const GET: APIRoute = async ({ url, request }) => {
     ? new URL(src, publicHost ? `https://${publicHost}` : request.url)
     : new URL(src);
   const upstream = await fetch(sourceUrl);
-  if (!upstream.ok) return new Response('Source not found', { status: 404 });
+  if (!upstream.ok) return new Response('Source not found', { status: 404, headers: CORS });
   const input = Buffer.from(await upstream.arrayBuffer());
 
   let img = sharp(input);
@@ -75,6 +80,7 @@ export const GET: APIRoute = async ({ url, request }) => {
     headers: {
       'Content-Type': 'image/webp',
       'Cache-Control': 'public, max-age=31536000, s-maxage=31536000, immutable',
+      ...CORS,
     },
   });
 };

@@ -1,0 +1,32 @@
+{%- comment -%}
+  Photographic page hero shared by About / Services / Projects — the
+  full-bleed image with a label, display title and sub-line at the base.
+{%- endcomment -%}
+<section class="page-hero">
+  {%- if section.settings.image -%}
+    <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="{{ section.settings.image_alt | default: page.title | escape }}" loading="eager" width="1920" height="1080">
+  {%- elsif section.settings.image_ext != blank -%}
+    <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}" alt="{{ section.settings.image_alt | default: page.title | escape }}" loading="eager" width="1920" height="1080">
+  {%- endif -%}
+  <div class="page-hero-ov"></div>
+  <div class="page-hero-content inner">
+    <div class="slabel slabel-dark">{{ section.settings.label }}</div>
+    <h1 class="page-h">{{ section.settings.title_html }}</h1>
+    <p class="page-hero-sub">{{ section.settings.sub }}</p>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Page hero (photo)",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label" },
+    { "type": "html", "id": "title_html", "label": "Title (HTML — <em> and <br> allowed)" },
+    { "type": "textarea", "id": "sub", "label": "Sub-line" },
+    { "type": "image_picker", "id": "image", "label": "Hero image" },
+    { "type": "text", "id": "image_ext", "label": "…or external image path/URL", "info": "A /images/… path or Supabase URL served through the media pipeline. Ignored when a hero image is picked above." },
+    { "type": "text", "id": "image_alt", "label": "Image alt text" }
+  ],
+  "presets": [{ "name": "Page hero (photo)" }]
+}
+{% endschema %}

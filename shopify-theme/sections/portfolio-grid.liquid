@@ -1,0 +1,77 @@
+{%- comment -%}
+  Collection — the portfolio grid of completed residences. Cards play
+  their film on hover; a card with a link navigates, one without stays
+  a still/film card (the site's collection detail pages have no Shopify
+  counterpart yet).
+{%- endcomment -%}
+<section style="padding:clamp(52px,7vw,96px) clamp(22px,5vw,80px) clamp(80px,12vw,140px);background:var(--bg)">
+  <div class="inner">
+    <div class="portfolio-grid">
+      {%- assign pdelays = ',d1,d2' | split: ',' -%}
+      {%- for block in section.blocks -%}
+        {%- assign di = forloop.index0 | modulo: 3 -%}
+        {%- capture card_inner -%}
+          <div class="port-img-wrap">
+            {%- if block.settings.image -%}
+              <img src="{{ block.settings.image | image_url: width: 800, height: 600, crop: 'center' }}" alt="{{ block.settings.name | escape }}" loading="lazy">
+            {%- elsif block.settings.image_ext != blank -%}
+              <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 800, h: 600 %}" alt="{{ block.settings.name | escape }}" loading="lazy">
+            {%- endif -%}
+            {%- if block.settings.video != blank -%}
+              <video src="{{ block.settings.video }}" muted loop playsinline preload="none" data-port-video></video>
+              <span class="port-film-tag">Film</span>
+            {%- endif -%}
+          </div>
+          <div class="port-name">{{ block.settings.name }}{% if block.settings.link != blank %} <span style="color:var(--ink);font-weight:400">&rarr;</span>{% endif %}</div>
+          <div class="port-loc">{{ block.settings.loc }}</div>
+        {%- endcapture -%}
+        {%- if block.settings.link != blank -%}
+          <a href="{{ block.settings.link }}" class="port-card reveal {{ pdelays[di] }}" data-port-card {{ block.shopify_attributes }}>{{ card_inner }}</a>
+        {%- else -%}
+          <div class="port-card reveal {{ pdelays[di] }}" data-port-card {{ block.shopify_attributes }}>{{ card_inner }}</div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll('[data-port-card]').forEach(function (card) {
+      if (card.dataset.portInit) return;
+      card.dataset.portInit = '1';
+      var video = card.querySelector('[data-port-video]');
+      if (!video) return;
+      card.addEventListener('mouseenter', function () {
+        video.play().then(function () { video.classList.add('playing'); }).catch(function () {});
+      });
+      card.addEventListener('mouseleave', function () {
+        video.pause();
+        video.classList.remove('playing');
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Portfolio grid",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "residence",
+      "name": "Residence",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Name" },
+        { "type": "text", "id": "loc", "label": "Location line" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_ext", "label": "…or external image path/URL" },
+        { "type": "text", "id": "video", "label": "Hover film URL (optional)" },
+        { "type": "url", "id": "link", "label": "Link (optional)" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Portfolio grid" }]
+}
+{% endschema %}

@@ -1,0 +1,117 @@
+{%- comment -%}
+  Contact — the two-column body: direct-contact details (from theme
+  settings), the dark agent-enquiries block and map card on the left;
+  the enquiry form on the right. The form posts to the existing Vercel
+  API so leads keep landing in the Sabdia inbox. The enquiry-type select
+  lists each for-sale residence, then the editable interest options.
+{%- endcomment -%}
+{%- assign fs = section.settings.listings_collection | default: collections['for-sale'] -%}
+<section class="sp">
+  <div class="inner contact-page-grid">
+    <div>
+      <div class="slabel reveal">{{ section.settings.direct_label }}</div>
+      <ul class="cdet reveal d1" style="margin-top:12px">
+        <li class="cd"><span class="cd-l">Location</span><span class="cd-v">{{ settings.location }}</span></li>
+        {%- if settings.contact_phone != blank -%}
+          <li class="cd"><span class="cd-l">Phone</span><a href="tel:{{ settings.contact_phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}" class="cd-v">{{ settings.contact_phone }}</a></li>
+        {%- endif -%}
+        {%- if settings.contact_email != blank -%}
+          <li class="cd"><span class="cd-l">Email</span><a href="mailto:{{ settings.contact_email }}" class="cd-v">{{ settings.contact_email }}</a></li>
+        {%- endif -%}
+        <li class="cd"><span class="cd-l">Instagram</span><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.instagram_label }}</a></li>
+        <li class="cd"><span class="cd-l">Facebook</span><a href="{{ settings.facebook_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.facebook_label | default: settings.site_name }}</a></li>
+        <li class="cd"><span class="cd-l">LinkedIn</span><a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.linkedin_label | default: settings.site_name }}</a></li>
+        <li class="cd"><span class="cd-l">Website</span><a href="{{ settings.domain_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.domain_display }}</a></li>
+      </ul>
+
+      <div class="contact-info-block reveal d2">
+        <div class="contact-info-h">{{ section.settings.agent_heading }}</div>
+        <p style="font-size:14px;font-weight:400;color:rgba(253,251,246,.78);line-height:1.8">{{ section.settings.agent_body_html }}</p>
+      </div>
+
+      <div class="contact-map-placeholder reveal d3" style="margin-top:32px">
+        {%- if section.settings.map_image -%}
+          <img src="{{ section.settings.map_image | image_url: width: 900, height: 500, crop: 'center' }}" alt="{{ section.settings.map_label | escape }}" loading="lazy" width="900" height="500">
+        {%- elsif section.settings.map_image_ext != blank -%}
+          <img src="{% render 'ext-variant', src: section.settings.map_image_ext, w: 900, h: 500 %}" alt="{{ section.settings.map_label | escape }}" loading="lazy" width="900" height="500">
+        {%- endif -%}
+        <div class="contact-map-placeholder-label">{{ section.settings.map_label }}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="slabel reveal">{{ section.settings.form_label }}</div>
+      {%- if section.settings.guided_line_html != blank -%}
+        <p class="reveal d1" style="font-family:'EB Garamond',Georgia,serif;font-size:14px;font-style:italic;color:var(--ink3);margin:10px 0 6px">{{ section.settings.guided_line_html }}</p>
+      {%- endif -%}
+      <form class="cform reveal d1" id="cform" style="margin-top:12px" name="contact" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
+        <input type="hidden" name="form-name" value="contact">
+        <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <div class="frow">
+          <div class="fg"><label class="fl" for="cf-first">First Name*</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="cf-last">Last Name*</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+        </div>
+        <div class="fg"><label class="fl" for="cf-email">Email Address*</label><input type="email" id="cf-email" name="email" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="cf-phone">Phone Number</label><input type="tel" id="cf-phone" name="phone" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
+        <div class="fg">
+          <label class="fl" for="cf-interest">How can we help?*</label>
+          <select class="fsel" id="cf-interest" name="enquiry-type" required>
+            <option value="">Select an enquiry type…</option>
+            <option>For Sale — Current Properties</option>
+            {%- for product in fs.products -%}
+              <option>{{ product.title }} — {{ product.metafields.custom.suburb.value }}</option>
+            {%- endfor -%}
+            {%- for block in section.blocks -%}
+              <option {{ block.shopify_attributes }}>{{ block.settings.text }}</option>
+            {%- endfor -%}
+          </select>
+        </div>
+        <div class="fg"><label class="fl" for="cf-message">Your Message*</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
+          <p class="form-note" style="margin:0">{{ section.settings.form_note }}</p>
+        </div>
+        <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-page-grid{display:grid;grid-template-columns:5fr 7fr;gap:96px;align-items:start}
+  .contact-info-block{padding:44px;background:var(--dark);color:var(--white);margin-top:44px}
+  .contact-info-h{font-family:var(--font-d);font-size:18px;font-weight:300;color:var(--white);margin-bottom:20px}
+  .contact-map-placeholder{width:100%;aspect-ratio:16/9;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-top:44px;position:relative;overflow:hidden}
+  .contact-map-placeholder img{width:100%;height:100%;object-fit:cover;filter:saturate(.75) brightness(.98)}
+  .contact-map-placeholder-label{position:absolute;bottom:20px;left:20px;padding:8px 16px;background:rgba(31,27,20,.8);backdrop-filter:blur(8px);font-size:10px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:rgba(253,251,246,.7)}
+  @media(max-width:1000px){.contact-page-grid{grid-template-columns:1fr;gap:52px}}
+</style>
+
+{% schema %}
+{
+  "name": "Contact body",
+  "settings": [
+    { "type": "text", "id": "direct_label", "label": "Direct-contact label", "default": "Direct Contact" },
+    { "type": "text", "id": "facebook_label", "label": "Facebook display name" },
+    { "type": "text", "id": "linkedin_label", "label": "LinkedIn display name" },
+    { "type": "text", "id": "agent_heading", "label": "Agent block heading", "default": "Agent Enquiries" },
+    { "type": "html", "id": "agent_body_html", "label": "Agent block text (HTML links allowed)" },
+    { "type": "image_picker", "id": "map_image", "label": "Map card image" },
+    { "type": "text", "id": "map_image_ext", "label": "…or external image path/URL" },
+    { "type": "text", "id": "map_label", "label": "Map card label", "default": "Brisbane, Queensland" },
+    { "type": "text", "id": "form_label", "label": "Form label", "default": "Send a Message" },
+    { "type": "html", "id": "guided_line_html", "label": "Guided-match pointer line (HTML)" },
+    { "type": "collection", "id": "listings_collection", "label": "Residences in the enquiry list", "info": "Defaults to for-sale" },
+    { "type": "text", "id": "submit_label", "label": "Submit button", "default": "Submit Enquiry" },
+    { "type": "text", "id": "form_note", "label": "Note beside the button", "default": "We respond within one business day." }
+  ],
+  "blocks": [
+    {
+      "type": "interest",
+      "name": "Enquiry option",
+      "settings": [{ "type": "text", "id": "text", "label": "Option" }]
+    }
+  ],
+  "presets": [{ "name": "Contact body" }]
+}
+{% endschema %}

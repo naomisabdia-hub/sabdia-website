@@ -89,13 +89,14 @@ for r in rows:
 
 films_by = (seed.get("films") or {}).get("byProperty") or {}
 wt_by = (seed.get("walkthroughs") or {}).get("byProperty") or {}
+series_by = (seed.get("series") or {}).get("byProject") or {}
 
 def mf(key, type_, value):
     if value in (None, "", []):
         return None
     if type_ == "boolean":
         value = "true" if value else "false"
-    elif type_ == "list.single_line_text_field":
+    elif type_ in ("list.single_line_text_field", "json"):
         value = json.dumps(value)
     else:
         value = str(value)
@@ -122,6 +123,10 @@ def product_metafields(r):
         mf("film_video", "single_line_text_field", film.get("video")),
         mf("film_poster", "single_line_text_field", film.get("poster")),
         mf("scrollwalk_folder", "single_line_text_field", wt.get("scrollwalk")),
+        mf("year", "number_integer", r.get("year")),
+        # The Series — real captures of the residence's Instagram posts
+        # (date/thumb/caption/video), rendered by sections/series-strip.
+        mf("series_posts", "json", series_by.get(slug)),
     ]
     return [f for f in fields if f]
 
@@ -143,6 +148,8 @@ DEFS = [
     ("Film video URL", "film_video", "single_line_text_field"),
     ("Film poster URL", "film_poster", "single_line_text_field"),
     ("Scroll walkthrough folder", "scrollwalk_folder", "single_line_text_field"),
+    ("Year", "year", "number_integer"),
+    ("The Series posts", "series_posts", "json"),
 ]
 for name, key, type_ in DEFS:
     d = gql("""mutation($def: MetafieldDefinitionInput!) {
@@ -275,22 +282,39 @@ def page_html(doc_key):
         text = " ".join(doc["paragraphs"][:1])
     return f"<p>{text}</p>" if text else "<p></p>"
 
+# Fourth field: the page template suffix (templates/page.<suffix>.json in
+# the theme) — the dedicated port each page renders through. None falls
+# back to the generic page shell (privacy, accessibility).
 PAGES = [
-    ("About", "about", "about_page"), ("Services", "services", "services_page"),
-    ("Projects", "projects", "projects_page"), ("Collection", "collection", "collection_page"),
-    ("Contact", "contact", "contact_page"), ("Agent Access", "agent-access", "agent_page"),
-    ("Find Your Home", "find-your-home", "find_home"),
-    ("Privacy Policy", "privacy", "legal_privacy"), ("Accessibility", "accessibility", "legal_accessibility"),
+    ("About", "about", "about_page", "about"),
+    ("Services", "services", "services_page", "services"),
+    ("Projects", "projects", "projects_page", "projects"),
+    ("Collection", "collection", "collection_page", "collection"),
+    ("Contact", "contact", "contact_page", "contact"),
+    ("Agent Access", "agent-access", "agent_page", "agent-access"),
+    ("Find Your Home", "find-your-home", "find_home", "find-your-home"),
+    ("Privacy Policy", "privacy", "legal_privacy", None),
+    ("Accessibility", "accessibility", "legal_accessibility", None),
 ]
-have = gql("query { pages(first: 50) { nodes { handle } } }")["pages"]["nodes"]
-have = {p["handle"] for p in have}
-for title, handle, key in PAGES:
+have = gql("query { pages(first: 50) { nodes { id handle templateSuffix } } }")["pages"]["nodes"]
+have = {p["handle"]: p for p in have}
+for title, handle, key, suffix in PAGES:
     if handle in have:
-        print(f"  {handle}: exists")
+        if suffix and have[handle].get("templateSuffix") != suffix:
+            d = gql("""mutation($id: ID!, $page: PageUpdateInput!) {
+                pageUpdate(id: $id, page: $page) { page { id } userErrors { field message } } }""",
+                {"id": have[handle]["id"], "page": {"templateSuffix": suffix}})
+            ue = errs(d["pageUpdate"])
+            print(f"  {handle}: {'ERROR ' + json.dumps(ue)[:150] if ue else 'template set to page.' + suffix}")
+        else:
+            print(f"  {handle}: exists")
         continue
+    page = {"title": title, "handle": handle, "body": page_html(key), "isPublished": True}
+    if suffix:
+        page["templateSuffix"] = suffix
     d = gql("""mutation($page: PageCreateInput!) {
         pageCreate(page: $page) { page { id } userErrors { field message } } }""",
-        {"page": {"title": title, "handle": handle, "body": page_html(key), "isPublished": True}})
+        {"page": page})
     ue = errs(d["pageCreate"])
     print(f"  {handle}: {'ERROR ' + json.dumps(ue)[:150] if ue else 'created'}")
 

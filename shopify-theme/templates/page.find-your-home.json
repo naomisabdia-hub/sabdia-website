@@ -1,0 +1,21 @@
+{
+  "sections": {
+    "header": {
+      "type": "page-header",
+      "settings": {
+        "style": "guided",
+        "label": "A Guided Beginning",
+        "title_html": "Find <em>your</em> residence.",
+        "text": "Five short questions \u2014 and we'll introduce you to the homes that fit. Prefer the classic route? <a href=\"/pages/contact\">Our enquiry form is here</a>."
+      }
+    },
+    "wizard": {
+      "type": "find-your-home",
+      "settings": {}
+    }
+  },
+  "order": [
+    "header",
+    "wizard"
+  ]
+}

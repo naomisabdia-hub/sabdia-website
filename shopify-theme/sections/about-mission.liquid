@@ -1,0 +1,41 @@
+{%- comment -%}
+  About — mission: sticky label/heading beside the founding paragraphs
+  and the signature block.
+{%- endcomment -%}
+<section class="sp">
+  <div class="inner about-grid">
+    <div class="about-sticky">
+      <div class="slabel reveal">{{ section.settings.label }}</div>
+      <h2 class="about-h reveal d1">{{ section.settings.heading_html }}</h2>
+    </div>
+    <div>
+      {%- for block in section.blocks -%}
+        <p class="about-p reveal d2" {{ block.shopify_attributes }}>{{ block.settings.text }}</p>
+      {%- endfor -%}
+      <div class="sig reveal d3">
+        <div class="sig-name">{{ section.settings.sig_name }}</div>
+        <div class="sig-title">{{ section.settings.sig_title }}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "About — mission",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Mission" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)" },
+    { "type": "text", "id": "sig_name", "label": "Signature name", "default": "Sabdia" },
+    { "type": "text", "id": "sig_title", "label": "Signature title", "default": "Founder & Principal" }
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "name": "Paragraph",
+      "settings": [{ "type": "textarea", "id": "text", "label": "Text" }]
+    }
+  ],
+  "presets": [{ "name": "About — mission" }]
+}
+{% endschema %}

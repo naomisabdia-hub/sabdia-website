@@ -1,0 +1,43 @@
+{%- comment -%}
+  Agent Access — current-opportunities preview: the first two for-sale
+  residences as property cards, with a view-all button.
+{%- endcomment -%}
+{%- assign col = section.settings.listings_collection | default: collections['for-sale'] -%}
+<section class="sp" style="border-top:1px solid var(--border)">
+  <div class="inner">
+    <div class="slabel reveal" style="margin-bottom:20px">{{ section.settings.label }}</div>
+    <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px);margin-bottom:48px">{{ section.settings.heading_html }}</h2>
+    <div class="agent-listings-grid">
+      {%- for product in col.products limit: 2 -%}
+        {%- assign odd = forloop.index0 | modulo: 2 -%}
+        {%- if odd == 1 -%}
+          {% render 'property-card', product: product, class: 'reveal d1', style: 'aspect-ratio:16/10', img_w: 900, img_h: 560, show_cars: false %}
+        {%- else -%}
+          {% render 'property-card', product: product, class: 'reveal', style: 'aspect-ratio:16/10', img_w: 900, img_h: 560, show_cars: false %}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+    <div style="text-align:center;margin-top:28px">
+      <a href="{{ section.settings.cta_link | default: '/collections/for-sale' }}" class="btn-g">{{ section.settings.cta_label }} &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .agent-listings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media(max-width:768px){.agent-listings-grid{grid-template-columns:1fr}}
+</style>
+
+{% schema %}
+{
+  "name": "Agent listings",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Current Opportunities" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)" },
+    { "type": "collection", "id": "listings_collection", "label": "Collection", "info": "Defaults to for-sale" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "View All Properties" },
+    { "type": "url", "id": "cta_link", "label": "Button link" }
+  ],
+  "presets": [{ "name": "Agent listings" }]
+}
+{% endschema %}

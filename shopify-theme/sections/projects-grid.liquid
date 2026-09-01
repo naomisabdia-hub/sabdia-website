@@ -1,0 +1,109 @@
+{%- comment -%}
+  Projects — filter bar plus the Current / Sold Prior groups, fed by the
+  for-sale and sold collections. Year comes from custom.year; specs line
+  mirrors the site's "4 Bed · 4 Bath · 2 Garage · 716m²+".
+{%- endcomment -%}
+{%- liquid
+  assign current_col = section.settings.current_collection | default: collections['for-sale']
+  assign sold_col = section.settings.sold_collection | default: collections['sold']
+-%}
+
+<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px clamp(22px,5vw,80px)">
+  <div class="inner" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+    <span style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)">{{ section.settings.filter_label }}</span>
+    <button class="pfilter on" data-filter="all">{{ section.settings.filter_all }}</button>
+    <button class="pfilter" data-filter="current">{{ section.settings.filter_current }}</button>
+    <button class="pfilter" data-filter="sold">{{ section.settings.filter_sold }}</button>
+  </div>
+</div>
+
+<section class="sp" data-proj-section="current">
+  <div class="inner">
+    <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.current_label }}</div>
+    <div class="projects-grid">
+      {%- for product in current_col.products -%}
+        {%- assign mfp = product.metafields.custom -%}
+        {%- assign odd = forloop.index0 | modulo: 2 -%}
+        <a href="{{ product.url }}" class="proj-card reveal {% if odd == 1 %}d1{% endif %}">
+          {%- if product.featured_image -%}
+            <img src="{{ product.featured_image | image_url: width: 1200, height: 750, crop: 'center' }}" alt="{{ product.title | escape }}" loading="lazy">
+          {%- endif -%}
+          <div class="proj-card-ov"></div>
+          <div class="proj-card-info">
+            <div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}For Sale</div>
+            <div class="proj-card-name">{{ product.title }}</div>
+            <div class="proj-card-loc">{{ mfp.suburb.value }}, {{ mfp.state.value | default: 'QLD' }} — {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
+          </div>
+          <div class="pc-arrow">&rarr;</div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border)" data-proj-section="sold">
+  <div class="inner">
+    <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.sold_label }}</div>
+    <div class="projects-grid">
+      {%- for product in sold_col.products -%}
+        {%- assign mfp = product.metafields.custom -%}
+        {%- assign odd = forloop.index0 | modulo: 2 -%}
+        <a href="{{ product.url }}" class="proj-card reveal {% if odd == 1 %}d1{% endif %}">
+          {%- if product.featured_image -%}
+            <img src="{{ product.featured_image | image_url: width: 1200, height: 750, crop: 'center' }}" alt="{{ product.title | escape }}" loading="lazy">
+          {%- endif -%}
+          <div class="proj-card-ov"></div>
+          <div class="sc-badge">{{ section.settings.sold_badge }}</div>
+          <div class="proj-card-info">
+            <div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}Sold</div>
+            <div class="proj-card-name">{{ product.title }}</div>
+            <div class="proj-card-loc">{{ mfp.suburb.value }}, {{ mfp.state.value | default: 'QLD' }} — {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .pfilter{font-size:11px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--taupe-d);transition:color .3s;background:none;border:none;cursor:pointer;padding:0 0 1px;border-bottom:1px solid transparent;font-family:var(--font-u)}
+  .pfilter:hover{color:var(--ink)}
+  .pfilter.on{color:var(--ink);border-bottom-color:var(--ink)}
+</style>
+
+<script>
+  (function () {
+    var buttons = document.querySelectorAll('.pfilter');
+    var sections = document.querySelectorAll('[data-proj-section]');
+    if (!buttons.length || buttons[0].dataset.filterInit) return;
+    buttons[0].dataset.filterInit = '1';
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        buttons.forEach(function (b) { b.classList.remove('on'); });
+        btn.classList.add('on');
+        var f = btn.dataset.filter;
+        sections.forEach(function (sec) {
+          sec.style.display = f === 'all' || sec.dataset.projSection === f ? '' : 'none';
+        });
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Projects grid",
+  "settings": [
+    { "type": "collection", "id": "current_collection", "label": "Current collection", "info": "Defaults to for-sale" },
+    { "type": "collection", "id": "sold_collection", "label": "Sold collection", "info": "Defaults to sold" },
+    { "type": "text", "id": "filter_label", "label": "Filter label", "default": "Filter:" },
+    { "type": "text", "id": "filter_all", "label": "Filter — all", "default": "All" },
+    { "type": "text", "id": "filter_current", "label": "Filter — current", "default": "Current" },
+    { "type": "text", "id": "filter_sold", "label": "Filter — sold", "default": "Sold" },
+    { "type": "text", "id": "current_label", "label": "Current group label", "default": "For Sale — Current" },
+    { "type": "text", "id": "sold_label", "label": "Sold group label", "default": "Sold Prior to Completion" },
+    { "type": "text", "id": "sold_badge", "label": "Sold card badge", "default": "Sold Prior to Completion" }
+  ],
+  "presets": [{ "name": "Projects grid" }]
+}
+{% endschema %}

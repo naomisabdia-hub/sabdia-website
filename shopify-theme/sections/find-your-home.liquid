@@ -1,0 +1,361 @@
+{%- comment -%}
+  Guided residence match — port of find-your-home.astro. Five questions
+  (timeline, flexibility, bedrooms, budget slider, area) → matched
+  for-sale residences → contact details → posts to the existing Vercel
+  API as form-name "guided-match" / "Future Releases".
+
+  Answer options are written one per line. Bedrooms and area options may
+  carry a matching value after "=>" (e.g. "Four => 4", "North — Ascot,
+  Hendra => north"); a line without one (e.g. "Flexible") matches
+  everything. The suburb map pairs each residence suburb with an area key.
+
+  BUDGET GATE — a stated ceiling under the threshold shows no residences;
+  the visitor is offered first sight of future releases instead. That path
+  never states or implies a price — see the original page for the full
+  reasoning. The threshold lives in the "Budget threshold" setting and is
+  never rendered.
+{%- endcomment -%}
+{%- liquid
+  assign col = section.settings.listings_collection | default: collections['for-sale']
+  assign area_lines = section.settings.area_map | newline_to_br | split: '<br />'
+  assign opts_timeline = section.settings.opts_timeline | newline_to_br | split: '<br />'
+  assign opts_flex = section.settings.opts_flex | newline_to_br | split: '<br />'
+  assign opts_beds = section.settings.opts_beds | newline_to_br | split: '<br />'
+  assign opts_area = section.settings.opts_area | newline_to_br | split: '<br />'
+-%}
+
+<section class="sp-sm" style="min-height:60vh">
+  <div class="inner-md">
+    <div class="fyh-progress" data-fyh-progress aria-hidden="true">
+      <span class="fyh-tick on"></span><span class="fyh-tick"></span><span class="fyh-tick"></span><span class="fyh-tick"></span><span class="fyh-tick"></span><span class="fyh-tick"></span>
+    </div>
+
+    <form class="cform" id="cform" name="guided-match" method="POST" action="{{ settings.forms_endpoint }}/api/contact" data-fyh data-fyh-floor="{{ section.settings.budget_floor | default: 5.5 }}">
+      <input type="hidden" name="form-name" value="guided-match">
+      <input type="hidden" name="enquiry-type" value="Guided Match">
+      <input type="hidden" name="message" data-fyh-message value="">
+      <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+
+      <fieldset class="fyh-step on" data-fyh-step="timeline">
+        <legend class="fyh-q">{{ section.settings.q_timeline }}</legend>
+        <div class="fyh-opts">
+          {%- for o in opts_timeline -%}
+            {%- assign ot = o | strip -%}
+            {%- if ot != blank -%}<button type="button" class="fyh-opt" data-fyh-answer="{{ ot | escape }}">{{ ot }}</button>{%- endif -%}
+          {%- endfor -%}
+        </div>
+      </fieldset>
+
+      <fieldset class="fyh-step" data-fyh-step="flexibility">
+        <legend class="fyh-q">{{ section.settings.q_flex }}</legend>
+        <div class="fyh-opts">
+          {%- for o in opts_flex -%}
+            {%- assign ot = o | strip -%}
+            {%- if ot != blank -%}<button type="button" class="fyh-opt" data-fyh-answer="{{ ot | escape }}">{{ ot }}</button>{%- endif -%}
+          {%- endfor -%}
+        </div>
+      </fieldset>
+
+      <fieldset class="fyh-step" data-fyh-step="bedrooms">
+        <legend class="fyh-q">{{ section.settings.q_beds }}</legend>
+        <div class="fyh-opts">
+          {%- for o in opts_beds -%}
+            {%- assign parts = o | split: '=>' -%}
+            {%- assign olabel = parts[0] | strip -%}
+            {%- assign oval = parts[1] | strip -%}
+            {%- if olabel != blank -%}<button type="button" class="fyh-opt" data-fyh-answer="{{ olabel | escape }}" data-fyh-min-beds="{{ oval }}">{{ olabel }}</button>{%- endif -%}
+          {%- endfor -%}
+        </div>
+      </fieldset>
+
+      <fieldset class="fyh-step" data-fyh-step="budget">
+        <legend class="fyh-q">{{ section.settings.q_budget }}</legend>
+        <div class="fyh-slider">
+          <output class="fyh-slider-val" data-fyh-slider-out for="fyh-budget"></output>
+          <input type="range" class="fyh-range" id="fyh-budget" data-fyh-range
+                 min="{{ section.settings.budget_min | default: 2 }}" max="{{ section.settings.budget_max | default: 15 }}"
+                 step="{{ section.settings.budget_step | default: 0.5 }}" value="{{ section.settings.budget_start | default: 6 }}"
+                 aria-label="Maximum you would consider, in millions of dollars">
+          <div class="fyh-slider-ends" aria-hidden="true">
+            <span>${{ section.settings.budget_min | default: 2 }}m</span>
+            <span>${{ section.settings.budget_max | default: 15 }}m+</span>
+          </div>
+          <button type="button" class="fyh-opt fyh-slider-go" data-fyh-slider-go>{{ section.settings.slider_go }}</button>
+        </div>
+      </fieldset>
+
+      <fieldset class="fyh-step" data-fyh-step="area">
+        <legend class="fyh-q">{{ section.settings.q_area }}</legend>
+        <div class="fyh-opts">
+          {%- for o in opts_area -%}
+            {%- assign parts = o | split: '=>' -%}
+            {%- assign olabel = parts[0] | strip -%}
+            {%- assign oval = parts[1] | strip -%}
+            {%- if olabel != blank -%}<button type="button" class="fyh-opt" data-fyh-answer="{{ olabel | escape }}" data-fyh-area-key="{{ oval }}">{{ olabel }}</button>{%- endif -%}
+          {%- endfor -%}
+        </div>
+      </fieldset>
+
+      <div class="fyh-step" data-fyh-results>
+        <div class="fyh-q" data-fyh-results-heading>{{ section.settings.r_heading }}</div>
+        <p class="fyh-note" data-fyh-results-note></p>
+        <div class="fyh-matches" data-fyh-matches>
+          {%- for product in col.products -%}
+            {%- liquid
+              assign suburb = product.metafields.custom.suburb.value
+              assign parea = 'other'
+              for line in area_lines
+                assign mparts = line | split: '=>'
+                assign msub = mparts[0] | strip
+                assign mkey = mparts[1] | strip
+                if msub != blank and msub == suburb and mkey != blank
+                  assign parea = mkey
+                endif
+              endfor
+            -%}
+            <div data-fyh-card data-beds="{{ product.metafields.custom.beds.value }}" data-area="{{ parea }}">
+              {% render 'property-card', product: product, style: 'aspect-ratio:16/10', img_w: 800, img_h: 500, show_cars: false %}
+            </div>
+          {%- endfor -%}
+        </div>
+
+        <div class="fyh-details">
+          <div class="fyh-q" style="font-size:clamp(20px,2.6vw,30px)" data-fyh-details-heading>{{ section.settings.details_heading }}</div>
+          <div class="frow">
+            <div class="fg"><label class="fl" for="fyh-first">First Name*</label><input type="text" id="fyh-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+            <div class="fg"><label class="fl" for="fyh-last">Last Name*</label><input type="text" id="fyh-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="fl" for="fyh-email">Email*</label><input type="email" id="fyh-email" name="email" class="fi" placeholder="Email address" autocomplete="email" required></div>
+            <div class="fg"><label class="fl" for="fyh-phone">Phone</label><input type="tel" id="fyh-phone" name="phone" class="fi" placeholder="Phone number" autocomplete="tel"></div>
+          </div>
+          <div class="fg"><label class="fl" for="fyh-notes">Anything else we should know?</label><textarea class="fta" id="fyh-notes" name="notes" placeholder="Land you already own, must-haves, questions…" style="min-height:88px"></textarea></div>
+          <button type="submit" class="fsub" id="fsub" data-fyh-submit>{{ section.settings.submit_label }} &rarr;</button>
+          <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+          <p class="form-note" data-fyh-form-note>{{ section.settings.form_note }}</p>
+        </div>
+      </div>
+
+      <button type="button" class="fyh-back" data-fyh-back style="display:none">&larr; Back</button>
+    </form>
+  </div>
+</section>
+
+<style>
+  .fyh-progress{display:flex;gap:10px;justify-content:center;margin-bottom:clamp(32px,5vw,56px)}
+  .fyh-tick{width:26px;height:1.5px;background:var(--border);transition:background .4s}
+  .fyh-tick.on{background:var(--gold)}
+  .fyh-step{display:none;border:none;opacity:0;transform:translateY(14px)}
+  .fyh-step.on{display:block;animation:fyhIn .55s var(--ease) forwards}
+  @keyframes fyhIn{to{opacity:1;transform:translateY(0)}}
+  .fyh-q{font-family:var(--font-d);font-size:clamp(24px,3.4vw,40px);font-weight:300;color:var(--ink);letter-spacing:-.015em;text-align:center;margin-bottom:clamp(24px,4vw,40px);width:100%}
+  .fyh-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;max-width:760px;margin:0 auto}
+  .fyh-opt{font-family:var(--font-u);font-size:11px;font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);background:var(--white);border:1px solid var(--border);padding:22px 18px;cursor:pointer;transition:border-color .3s,color .3s,transform .25s var(--ease)}
+  .fyh-opt:hover{border-color:var(--ink);color:var(--ink);transform:translateY(-2px)}
+  .fyh-slider{max-width:560px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+  .fyh-slider-val{font-family:var(--font-d);font-size:clamp(30px,4.4vw,52px);font-weight:300;font-style:italic;color:var(--ink);letter-spacing:-.02em;line-height:1;margin-bottom:clamp(22px,3vw,32px)}
+  .fyh-range{-webkit-appearance:none;appearance:none;width:100%;background:transparent;cursor:pointer;height:26px}
+  .fyh-range::-webkit-slider-runnable-track{height:1px;background:var(--border)}
+  .fyh-range::-moz-range-track{height:1px;background:var(--border)}
+  .fyh-range::-moz-range-progress{height:1.5px;background:var(--gold)}
+  .fyh-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;margin-top:-12.5px;border-radius:50%;background:var(--bg);border:1px solid var(--gold);box-shadow:0 4px 14px rgba(31,27,20,.14);transition:transform .25s var(--ease)}
+  .fyh-range::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--bg);border:1px solid var(--gold);box-shadow:0 4px 14px rgba(31,27,20,.14)}
+  .fyh-range:hover::-webkit-slider-thumb{transform:scale(1.08)}
+  .fyh-range:focus-visible::-webkit-slider-thumb{outline:1.5px solid var(--gold);outline-offset:3px}
+  .fyh-slider-ends{display:flex;justify-content:space-between;width:100%;margin-top:10px;font-size:9px;font-weight:300;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe-d)}
+  .fyh-slider-go{margin-top:clamp(30px,4vw,44px);min-width:220px}
+  @media(prefers-reduced-motion:reduce){.fyh-range::-webkit-slider-thumb{transition:none}.fyh-range:hover::-webkit-slider-thumb{transform:none}}
+  .fyh-note{font-family:'EB Garamond',Georgia,serif;font-size:15px;font-style:italic;color:var(--ink3);text-align:center;margin:-14px 0 26px}
+  .fyh-matches{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:clamp(32px,5vw,52px)}
+  .fyh-matches [data-fyh-card]{display:none}
+  .fyh-matches [data-fyh-card].show{display:block}
+  .fyh-details{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+  .fyh-back{margin:34px auto 0;display:flex;background:none;border:none;font-family:var(--font-u);font-size:9.5px;font-weight:300;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe-d);cursor:pointer;transition:color .3s;padding:6px}
+  .fyh-back:hover{color:var(--ink)}
+  @media(max-width:760px){.fyh-matches{grid-template-columns:1fr}.fyh-opts{grid-template-columns:1fr}}
+  @media(prefers-reduced-motion:reduce){.fyh-step.on{animation:none;opacity:1;transform:none}}
+</style>
+
+<script>
+  (function () {
+    var form = document.querySelector('[data-fyh]');
+    if (!form || form.dataset.fyhInit) return;
+    form.dataset.fyhInit = '1';
+    var copy = {
+      rHeading: {{ section.settings.r_heading | json }},
+      rHeadingOne: {{ section.settings.r_heading_one | json }},
+      rNote: {{ section.settings.r_note | json }},
+      nmHeading: {{ section.settings.nm_heading | json }},
+      nmNote: {{ section.settings.nm_note | json }},
+      bfHeading: {{ section.settings.bf_heading | json }},
+      bfNote: {{ section.settings.bf_note | json }},
+      detailsHeading: {{ section.settings.details_heading | json }},
+      detailsHeadingBf: {{ section.settings.details_heading_bf | json }},
+      submitLabel: {{ section.settings.submit_label | json }},
+      submitLabelBf: {{ section.settings.submit_label_bf | json }},
+      formNote: {{ section.settings.form_note | json }},
+      formNoteBf: {{ section.settings.form_note_bf | json }}
+    };
+    var steps = [].slice.call(form.querySelectorAll('.fyh-step'));
+    var ticks = [].slice.call(document.querySelectorAll('.fyh-tick'));
+    var back = form.querySelector('[data-fyh-back]');
+    var msgField = form.querySelector('[data-fyh-message]');
+    var answers = {};
+    var idx = 0;
+
+    function show(i) {
+      idx = i;
+      steps.forEach(function (s, k) { s.classList.toggle('on', k === i); });
+      ticks.forEach(function (t, k) { t.classList.toggle('on', k <= i); });
+      back.style.display = i > 0 ? 'flex' : 'none';
+      window.scrollTo({ top: form.getBoundingClientRect().top + window.scrollY - 140, behavior: 'smooth' });
+      if (steps[i].hasAttribute('data-fyh-results')) buildResults();
+    }
+
+    steps.forEach(function (step, i) {
+      [].slice.call(step.querySelectorAll('[data-fyh-answer]')).forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          answers[step.dataset.fyhStep] = btn.dataset.fyhAnswer;
+          if (btn.dataset.fyhMinBeds !== undefined) answers.minBeds = Number(btn.dataset.fyhMinBeds) || 0;
+          if (btn.dataset.fyhAreaKey !== undefined) answers.areaKey = btn.dataset.fyhAreaKey || null;
+          show(i + 1);
+        });
+      });
+
+      // Slider step: needs an explicit Continue — its default value counts
+      // as the answer even if the visitor never drags.
+      var range = step.querySelector('[data-fyh-range]');
+      if (range) {
+        var out = step.querySelector('[data-fyh-slider-out]');
+        var paint = function () { out.textContent = fmtBudget(range); };
+        range.addEventListener('input', paint);
+        paint();
+        step.querySelector('[data-fyh-slider-go]').addEventListener('click', function () {
+          answers[step.dataset.fyhStep] = fmtBudget(range);
+          answers[step.dataset.fyhStep + 'Value'] = Number(range.value);
+          show(i + 1);
+        });
+      }
+    });
+
+    // "$7 million" / "$7.5 million" / "$15 million or more" at the ceiling.
+    function fmtBudget(range) {
+      var v = Number(range.value);
+      var n = v % 1 === 0 ? String(v) : v.toFixed(1);
+      return '$' + n + ' million' + (v >= Number(range.max) ? ' or more' : '');
+    }
+    back.addEventListener('click', function () { show(Math.max(0, idx - 1)); });
+
+    function buildResults() {
+      var cards = [].slice.call(form.querySelectorAll('[data-fyh-card]'));
+      var note = form.querySelector('[data-fyh-results-note]');
+      var heading = form.querySelector('[data-fyh-results-heading]');
+      var shown = 0;
+      var BUDGET_FLOOR = Number(form.dataset.fyhFloor);
+      var minBeds = answers.minBeds || 0;
+      var area = answers.areaKey || null;
+
+      var detailsHeading = form.querySelector('[data-fyh-details-heading]');
+      var submit = form.querySelector('[data-fyh-submit]');
+      var formNote = form.querySelector('[data-fyh-form-note]');
+      var enquiryType = form.querySelector('[name="enquiry-type"]');
+
+      /* Below the threshold: no residences shown; the future-releases
+         invitation instead. Nothing here states or implies a price. */
+      var belowFloor = answers.budgetValue !== undefined && answers.budgetValue < BUDGET_FLOOR;
+
+      if (belowFloor) {
+        cards.forEach(function (c) { c.classList.remove('show'); });
+        heading.textContent = copy.bfHeading;
+        note.textContent = copy.bfNote;
+        detailsHeading.textContent = copy.detailsHeadingBf;
+        submit.innerHTML = copy.submitLabelBf + ' →';
+        formNote.textContent = copy.formNoteBf;
+        enquiryType.value = 'Future Releases';
+      } else {
+        var matched = cards.filter(function (c) {
+          if (minBeds && Number(c.dataset.beds) < minBeds) return false;
+          if (area && c.dataset.area !== area) return false;
+          return true;
+        });
+
+        var showing = matched.length ? matched : cards;
+        cards.forEach(function (c) { c.classList.toggle('show', showing.indexOf(c) !== -1); });
+
+        if (matched.length) {
+          heading.textContent = matched.length === 1 ? copy.rHeadingOne : copy.rHeading;
+          note.textContent = copy.rNote;
+        } else {
+          heading.textContent = copy.nmHeading;
+          note.textContent = copy.nmNote;
+        }
+
+        detailsHeading.textContent = copy.detailsHeading;
+        submit.innerHTML = copy.submitLabel + ' →';
+        formNote.textContent = copy.formNote;
+        enquiryType.value = 'Guided Match';
+        shown = matched.length;
+      }
+
+      // serialise the questionnaire into the lead message
+      msgField.value =
+        (belowFloor ? 'Future-releases registration' : 'Guided match enquiry') + '\n' +
+        'Timeline: ' + (answers.timeline || '-') + '\n' +
+        'Construction flexibility: ' + (answers.flexibility || '-') + '\n' +
+        'Bedrooms: ' + (answers.bedrooms || '-') + '\n' +
+        'Maximum budget: ' + (answers.budget || '-') + '\n' +
+        'Preferred area: ' + (answers.area || '-') + '\n' +
+        (belowFloor
+          ? 'Below threshold — no residences shown; registered for future releases.'
+          : 'Matches shown: ' + (shown || 'none (full collection shown)'));
+    }
+
+    // fold the free-text notes into the message on submit
+    form.addEventListener('submit', function () {
+      var notes = form.querySelector('#fyh-notes');
+      if (notes && notes.value.trim()) msgField.value += '\nNotes: ' + notes.value.trim();
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Guided match",
+  "settings": [
+    { "type": "collection", "id": "listings_collection", "label": "Residences to match against", "info": "Defaults to for-sale" },
+    { "type": "header", "content": "Questions" },
+    { "type": "text", "id": "q_timeline", "label": "Q1 — timeline", "default": "When would you like to make your move?" },
+    { "type": "textarea", "id": "opts_timeline", "label": "Q1 options (one per line)", "default": "Ready now\nWithin 3–6 months\nWithin a year\nJust exploring" },
+    { "type": "text", "id": "q_flex", "label": "Q2 — flexibility", "default": "Would you consider a residence still under construction?" },
+    { "type": "textarea", "id": "opts_flex", "label": "Q2 options (one per line)", "default": "Completed homes only\nHappy to watch it finish\nOpen to either" },
+    { "type": "text", "id": "q_beds", "label": "Q3 — bedrooms", "default": "How many bedrooms does your household need?" },
+    { "type": "textarea", "id": "opts_beds", "label": "Q3 options (label => minimum bedrooms)", "default": "Four => 4\nFive => 5\nSix or more => 6\nFlexible" },
+    { "type": "text", "id": "q_budget", "label": "Q4 — budget", "default": "What is the most you would consider?" },
+    { "type": "number", "id": "budget_min", "label": "Slider minimum ($m)", "default": 2 },
+    { "type": "number", "id": "budget_max", "label": "Slider maximum ($m)", "default": 15 },
+    { "type": "text", "id": "budget_step", "label": "Slider step ($m)", "default": "0.5" },
+    { "type": "number", "id": "budget_start", "label": "Slider resting position ($m)", "default": 6 },
+    { "type": "text", "id": "budget_floor", "label": "Budget threshold ($m)", "info": "Below this stated ceiling, no residences are shown — the future-releases invitation appears instead. Never rendered on the page.", "default": "5.5" },
+    { "type": "text", "id": "slider_go", "label": "Slider continue button", "default": "Continue" },
+    { "type": "text", "id": "q_area", "label": "Q5 — area", "default": "Which pocket of Brisbane calls to you?" },
+    { "type": "textarea", "id": "opts_area", "label": "Q5 options (label => area key)", "default": "Inner-East — Coorparoo, Camp Hill => inner-east\nNorth — Ascot, Hendra => north\nSouth — Holland Park => south\nOpen to suggestions" },
+    { "type": "textarea", "id": "area_map", "label": "Suburb => area key map", "default": "Coorparoo => inner-east\nCamp Hill => inner-east\nAscot => north\nHendra => north\nHolland Park West => south\nHolland Park => south" },
+    { "type": "header", "content": "Results copy" },
+    { "type": "text", "id": "r_heading", "label": "Matches heading", "default": "Residences that fit." },
+    { "type": "text", "id": "r_heading_one", "label": "Single-match heading", "default": "One residence fits beautifully." },
+    { "type": "text", "id": "r_note", "label": "Matches note", "default": "Matched to your bedrooms and preferred pocket of Brisbane." },
+    { "type": "text", "id": "nm_heading", "label": "No-match heading", "default": "Nothing exact — yet." },
+    { "type": "textarea", "id": "nm_note", "label": "No-match note", "default": "None of our current releases match every answer, but new residences are always in design. Here is the full current collection — and we’ll flag upcoming releases that fit." },
+    { "type": "text", "id": "bf_heading", "label": "Future-releases heading", "default": "First sight of what’s next." },
+    { "type": "textarea", "id": "bf_note", "label": "Future-releases note", "default": "Much of what we build is placed privately, before it is ever listed. Tell us where to reach you and we will bring our upcoming residences to you first." },
+    { "type": "header", "content": "Details form copy" },
+    { "type": "text", "id": "details_heading", "label": "Details heading", "default": "Where shall we send your matches?" },
+    { "type": "text", "id": "details_heading_bf", "label": "Details heading (future releases)", "default": "Where shall we reach you?" },
+    { "type": "text", "id": "submit_label", "label": "Submit button", "default": "Send My Matches" },
+    { "type": "text", "id": "submit_label_bf", "label": "Submit button (future releases)", "default": "Register My Interest" },
+    { "type": "text", "id": "form_note", "label": "Form note", "default": "One of our team will be in touch within one business day." },
+    { "type": "text", "id": "form_note_bf", "label": "Form note (future releases)", "default": "We will be in touch as new residences come out of design." }
+  ],
+  "presets": [{ "name": "Guided match" }]
+}
+{% endschema %}

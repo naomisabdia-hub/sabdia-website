@@ -39,18 +39,35 @@ leads keep landing in the Sabdia leads inbox.
 | `enquiry_text` | Multi-line text |
 | `brochure_url`, `film_video`, `film_poster` | Single line text (URL) |
 | `scrollwalk_folder` | Single line text |
+| `year` | Integer |
+| `series_posts` | JSON — `[{ "date", "thumb", "caption", "video"? }, …]`, the residence's real Instagram posts, rendered by the series strip |
 
 First product image = page hero; images 2–7 = the gallery grid.
 
 ## Developing
 
 ```sh
-# preview with hot reload against the store
-SHOPIFY_CLI_THEME_TOKEN=<theme-access-token> shopify theme dev --store <store>.myshopify.com --path shopify-theme
+# token comes from Shopify admin → Apps → Theme Access (emailed link);
+# it lives in .env as SHOPIFY_CLI_THEME_TOKEN
 
-# push as a new UNPUBLISHED theme
-SHOPIFY_CLI_THEME_TOKEN=<theme-access-token> shopify theme push --unpublished --store <store>.myshopify.com --path shopify-theme
+# preview with hot reload against the store
+SHOPIFY_CLI_THEME_TOKEN=<theme-access-token> shopify theme dev --store b91p0j-f4.myshopify.com --path shopify-theme
+
+# push to the uploaded (unpublished) Sabdia theme — id 150554902630.
+# The store's LIVE theme is still the Shopify default; a bare push would
+# target it, so always pass --theme. (`shopify theme list` re-checks ids.)
+SHOPIFY_CLI_THEME_TOKEN=<theme-access-token> shopify theme push --store b91p0j-f4.myshopify.com --path shopify-theme --theme 150554902630
 ```
+
+`.shopifyignore` protects the store-side JSON templates (Naomi's
+customizer edits) from pushes; it lists them one by one so brand-new
+templates still reach the store on their first push — after that first
+push, add the new template to `.shopifyignore` too.
+
+Because `templates/product.json` is protected, the two new property-page
+sections are added on the store in the customizer instead: open a
+property page in the theme editor → **Add section** → "The Series", then
+"Related residences" (below the walkthrough).
 
 Never publish without Naomi's explicit sign-off.
 
@@ -61,8 +78,16 @@ Never publish without Naomi's explicit sign-off.
   scroll walkthrough (verbatim player), collection grid, journal
   list/story, 404. `templates/index.json` is pre-filled with the live
   site's content.
-- 🚧 Dedicated ports pending: About, Services, Projects, Collection,
-  Contact, Agent Access, Find Your Home pages (currently render through
-  the generic page shell); series strip; related-properties row.
-- 🔧 Needs on the Vercel side: CORS headers on `/api/contact`,
-  `/api/subscribe`, `/api/img` for the Shopify origin.
+- ✅ Dedicated page ports: About, Services, Projects, Collection,
+  Contact, Agent Access, Find Your Home (`templates/page.<handle>.json`,
+  pre-filled with the live copy; suffixes already assigned to the store
+  pages by `shopify-app/setup-store.py`). Series strip + related-
+  properties row on the property page.
+- ✅ Vercel side: CORS on `/api/contact`, `/api/subscribe`, `/api/img`
+  (the img route allows any origin — public immutable images drawn onto
+  the walkthrough canvas).
+- 🚧 Collection portfolio cards are unlinked (the site's per-residence
+  collection detail pages have no Shopify counterpart yet); each card
+  has an optional Link setting for when they do.
+- 🚧 The projects-page stats band duplicates the homepage figures —
+  editing one in the customizer does not update the other.
