@@ -224,6 +224,9 @@ document.addEventListener('click', (e) => {
 document.addEventListener('submit', async (e) => {
   const cform = e.target.closest && e.target.closest('form#cform, form.cform');
   if (!cform) return;
+  // Native Shopify forms ({% form %} → /contact) submit the Shopify way;
+  // only the external-API forms are AJAX'd.
+  if (!/\/api\//.test(cform.getAttribute('action') || '')) return;
   e.preventDefault();
   const btn = cform.querySelector('#fsub, .fsub');
   if (!btn || btn.disabled) return;
@@ -269,6 +272,7 @@ document.addEventListener('click', async (e) => {
 document.addEventListener('submit', async (e) => {
   const form = e.target.closest('#nlForm');
   if (!form) return;
+  if (!/\/api\//.test(form.getAttribute('action') || '')) return;
   e.preventDefault();
   const btn = form.querySelector('.nl-btn');
   const status = form.querySelector('[data-form-status]');

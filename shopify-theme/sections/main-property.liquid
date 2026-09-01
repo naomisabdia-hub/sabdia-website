@@ -104,6 +104,7 @@
       <div class="prop-enquire">
         <div class="prop-enquire-h">{{ mf.enquiry_heading.value | default: 'Enquire Now' }}</div>
         <p style="font-size:13px;font-weight:300;color:var(--ink3);line-height:1.75;margin-bottom:24px">{{ mf.enquiry_text.value }}</p>
+        {%- if settings.form_backend == 'vercel' -%}
         <form class="cform" id="cform" name="property-enquiry" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
           <input type="hidden" name="form-name" value="property-enquiry">
           <input type="hidden" name="property" value="{{ product.title | escape }}">
@@ -131,6 +132,38 @@
           <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
           <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
         </form>
+        {%- else -%}
+        {% form 'contact', id: 'cform', class: 'cform' %}
+          {%- if form.posted_successfully? -%}
+            <p class="form-note" role="status" style="color:var(--ink)">{{ section.settings.success_text }}</p>
+          {%- endif -%}
+          {%- if form.errors -%}
+            <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
+          {%- endif -%}
+          <input type="hidden" name="contact[Property]" value="{{ product.title | escape }}">
+          <div class="frow">
+            <div class="fg"><label class="fl" for="pe-first">First Name*</label><input type="text" id="pe-first" name="contact[First name]" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+            <div class="fg"><label class="fl" for="pe-last">Last Name*</label><input type="text" id="pe-last" name="contact[Last name]" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+          </div>
+          <div class="fg"><label class="fl" for="pe-email">Email*</label><input type="email" id="pe-email" name="contact[email]" class="fi" placeholder="Email address" autocomplete="email" required></div>
+          <div class="fg"><label class="fl" for="pe-phone">Phone</label><input type="tel" id="pe-phone" name="contact[Phone]" class="fi" placeholder="Phone number" autocomplete="tel"></div>
+          {%- unless sold -%}
+            <div class="fg">
+              <label class="fl">Enquiry Type</label>
+              <select class="fsel" name="contact[Enquiry type]">
+                {%- assign etypes = section.settings.enquiry_types | newline_to_br | split: '<br />' -%}
+                {%- for t in etypes -%}
+                  {%- assign tt = t | strip -%}
+                  {%- if tt != blank -%}<option>{{ tt }}</option>{%- endif -%}
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endunless -%}
+          <div class="fg"><label class="fl">Message</label><textarea class="fta" name="contact[body]" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
+          <p class="form-note">{{ section.settings.privacy_note }}</p>
+          <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
+        {% endform %}
+        {%- endif -%}
       </div>
       <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
         {%- if mf.brochure_url.value != blank -%}
@@ -285,6 +318,7 @@
     { "type": "text", "id": "sold_banner_label", "label": "Sold banner button", "default": "View Available" },
     { "type": "url", "id": "sold_banner_link", "label": "Sold banner link" },
     { "type": "text", "id": "sold_cta_label", "label": "Sold sidebar button", "default": "View Current Properties" },
+    { "type": "textarea", "id": "success_text", "label": "Success message (Shopify mode)", "default": "Thank you — we've received your enquiry and will be in touch within one business day." },
     { "type": "text", "id": "share_label", "label": "Share row label", "default": "Share" },
     { "type": "text", "id": "sticky_label", "label": "Sticky bar button", "default": "Enquire" },
     { "type": "text", "id": "gallery_label", "label": "Gallery label", "default": "The Residence" },

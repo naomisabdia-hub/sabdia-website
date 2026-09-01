@@ -144,7 +144,7 @@ html.nav-veil #navVeil{opacity:1;pointer-events:auto}
 .nav-logo{flex-shrink:0}
 /* 38px, down from 48 — the wordmark read oversized against the 80px nav
    (Tamsin, 2026-09-01); the mobile size drops in step below. */
-.nav-logo img{height:38px;transition:opacity .3s}
+.nav-logo img{height:var(--logo-h,38px);transition:opacity .3s}
 .logo-light{display:block}
 .logo-dark{display:none}
 #mainNav.sc .logo-light{display:none}
@@ -598,7 +598,10 @@ footer{background:var(--dark);padding-top:0}
 .flinks a:hover{color:rgba(253,251,246,.55)}
 
 /* ── PAGE HERO (inner pages) ── */
-.page-hero{position:relative;height:60vh;min-height:460px;display:flex;align-items:flex-end;overflow:hidden}
+/* min-height (not height): when the title stack outgrows the band —
+   short windows, wide type — the section grows instead of letting the
+   bottom-anchored content overflow up under the fixed nav. */
+.page-hero{position:relative;min-height:max(460px,60vh);display:flex;align-items:flex-end;overflow:hidden}
 .page-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.74) saturate(.95)}
 .plx{will-change:transform}
 /* Page-hero copy sits bottom-LEFT, so the scrim is weighted to the left
@@ -763,7 +766,7 @@ footer{background:var(--dark);padding-top:0}
   .mob-btn{display:flex}
   #mainNav{height:60px;padding:0 20px}
   #mainNav.sc{height:56px}
-  .nav-logo img{height:30px}
+  .nav-logo img{height:var(--logo-h-m,30px)}
 
   /* ── HERO ── */
   .hero{height:100svh;min-height:540px}

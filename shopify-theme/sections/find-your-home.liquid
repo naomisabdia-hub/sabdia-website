@@ -30,12 +30,32 @@
       <span class="fyh-tick on"></span><span class="fyh-tick"></span><span class="fyh-tick"></span><span class="fyh-tick"></span><span class="fyh-tick"></span><span class="fyh-tick"></span>
     </div>
 
-    <form class="cform" id="cform" name="guided-match" method="POST" action="{{ settings.forms_endpoint }}/api/contact" data-fyh data-fyh-floor="{{ section.settings.budget_floor | default: 5.5 }}">
-      <input type="hidden" name="form-name" value="guided-match">
-      <input type="hidden" name="enquiry-type" value="Guided Match">
-      <input type="hidden" name="message" data-fyh-message value="">
-      <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
-
+    {%- liquid
+      # Per-backend field names: the Sabdia API takes flat names, the
+      # Shopify contact endpoint takes contact[...] names it emails on.
+      assign native = true
+      if settings.form_backend == 'vercel'
+        assign native = false
+      endif
+      if native
+        assign n_first = 'contact[First name]'
+        assign n_last = 'contact[Last name]'
+        assign n_email = 'contact[email]'
+        assign n_phone = 'contact[Phone]'
+        assign n_notes = 'contact[Notes]'
+      else
+        assign n_first = 'first-name'
+        assign n_last = 'last-name'
+        assign n_email = 'email'
+        assign n_phone = 'phone'
+        assign n_notes = 'notes'
+      endif
+    -%}
+    <div class="fyh-posted" data-fyh-posted hidden>
+      <div class="fyh-q">{{ section.settings.posted_heading }}</div>
+      <p class="fyh-note">{{ section.settings.posted_text }}</p>
+    </div>
+    {%- capture wizard -%}
       <fieldset class="fyh-step on" data-fyh-step="timeline">
         <legend class="fyh-q">{{ section.settings.q_timeline }}</legend>
         <div class="fyh-opts">
@@ -122,14 +142,14 @@
         <div class="fyh-details">
           <div class="fyh-q" style="font-size:clamp(20px,2.6vw,30px)" data-fyh-details-heading>{{ section.settings.details_heading }}</div>
           <div class="frow">
-            <div class="fg"><label class="fl" for="fyh-first">First Name*</label><input type="text" id="fyh-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
-            <div class="fg"><label class="fl" for="fyh-last">Last Name*</label><input type="text" id="fyh-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+            <div class="fg"><label class="fl" for="fyh-first">First Name*</label><input type="text" id="fyh-first" name="{{ n_first }}" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+            <div class="fg"><label class="fl" for="fyh-last">Last Name*</label><input type="text" id="fyh-last" name="{{ n_last }}" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
           </div>
           <div class="frow">
-            <div class="fg"><label class="fl" for="fyh-email">Email*</label><input type="email" id="fyh-email" name="email" class="fi" placeholder="Email address" autocomplete="email" required></div>
-            <div class="fg"><label class="fl" for="fyh-phone">Phone</label><input type="tel" id="fyh-phone" name="phone" class="fi" placeholder="Phone number" autocomplete="tel"></div>
+            <div class="fg"><label class="fl" for="fyh-email">Email*</label><input type="email" id="fyh-email" name="{{ n_email }}" class="fi" placeholder="Email address" autocomplete="email" required></div>
+            <div class="fg"><label class="fl" for="fyh-phone">Phone</label><input type="tel" id="fyh-phone" name="{{ n_phone }}" class="fi" placeholder="Phone number" autocomplete="tel"></div>
           </div>
-          <div class="fg"><label class="fl" for="fyh-notes">Anything else we should know?</label><textarea class="fta" id="fyh-notes" name="notes" placeholder="Land you already own, must-haves, questions…" style="min-height:88px"></textarea></div>
+          <div class="fg"><label class="fl" for="fyh-notes">Anything else we should know?</label><textarea class="fta" id="fyh-notes" name="{{ n_notes }}" placeholder="Land you already own, must-haves, questions…" style="min-height:88px"></textarea></div>
           <button type="submit" class="fsub" id="fsub" data-fyh-submit>{{ section.settings.submit_label }} &rarr;</button>
           <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
           <p class="form-note" data-fyh-form-note>{{ section.settings.form_note }}</p>
@@ -137,7 +157,28 @@
       </div>
 
       <button type="button" class="fyh-back" data-fyh-back style="display:none">&larr; Back</button>
-    </form>
+    {%- endcapture -%}
+    {%- if native -%}
+      {%- comment -%} Shopify-native: posts to the storefront contact
+          endpoint; Shopify emails every contact[…] field to the store's
+          sender address and files the enquirer under Customers. On
+          success it redirects back here with ?contact_posted=true. {%- endcomment -%}
+      <form class="cform" id="cform" method="post" action="/contact#cform" data-fyh data-fyh-floor="{{ section.settings.budget_floor | default: 5.5 }}">
+        <input type="hidden" name="form_type" value="contact">
+        <input type="hidden" name="utf8" value="✓">
+        <input type="hidden" name="contact[Enquiry type]" value="Guided Match" data-fyh-etype>
+        <input type="hidden" name="contact[body]" data-fyh-message value="">
+        {{ wizard }}
+      </form>
+    {%- else -%}
+      <form class="cform" id="cform" name="guided-match" method="POST" action="{{ settings.forms_endpoint }}/api/contact" data-fyh data-fyh-floor="{{ section.settings.budget_floor | default: 5.5 }}">
+        <input type="hidden" name="form-name" value="guided-match">
+        <input type="hidden" name="enquiry-type" value="Guided Match" data-fyh-etype>
+        <input type="hidden" name="message" data-fyh-message value="">
+        <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        {{ wizard }}
+      </form>
+    {%- endif -%}
   </div>
 </section>
 
@@ -181,6 +222,18 @@
     var form = document.querySelector('[data-fyh]');
     if (!form || form.dataset.fyhInit) return;
     form.dataset.fyhInit = '1';
+    /* Shopify-native submits reload this page with ?contact_posted=true —
+       swap the wizard for the thank-you block. */
+    try {
+      if (new URLSearchParams(location.search).get('contact_posted') === 'true') {
+        form.hidden = true;
+        var posted = document.querySelector('[data-fyh-posted]');
+        if (posted) posted.hidden = false;
+        var prog = document.querySelector('[data-fyh-progress]');
+        if (prog) prog.hidden = true;
+        return;
+      }
+    } catch (e) {}
     var copy = {
       rHeading: {{ section.settings.r_heading | json }},
       rHeadingOne: {{ section.settings.r_heading_one | json }},
@@ -258,7 +311,7 @@
       var detailsHeading = form.querySelector('[data-fyh-details-heading]');
       var submit = form.querySelector('[data-fyh-submit]');
       var formNote = form.querySelector('[data-fyh-form-note]');
-      var enquiryType = form.querySelector('[name="enquiry-type"]');
+      var enquiryType = form.querySelector('[data-fyh-etype]');
 
       /* Below the threshold: no residences shown; the future-releases
          invitation instead. Nothing here states or implies a price. */
@@ -354,7 +407,9 @@
     { "type": "text", "id": "submit_label", "label": "Submit button", "default": "Send My Matches" },
     { "type": "text", "id": "submit_label_bf", "label": "Submit button (future releases)", "default": "Register My Interest" },
     { "type": "text", "id": "form_note", "label": "Form note", "default": "One of our team will be in touch within one business day." },
-    { "type": "text", "id": "form_note_bf", "label": "Form note (future releases)", "default": "We will be in touch as new residences come out of design." }
+    { "type": "text", "id": "form_note_bf", "label": "Form note (future releases)", "default": "We will be in touch as new residences come out of design." },
+    { "type": "text", "id": "posted_heading", "label": "Thank-you heading (Shopify mode)", "default": "Thank you — your matches are on their way." },
+    { "type": "textarea", "id": "posted_text", "label": "Thank-you text (Shopify mode)", "default": "One of our team will be in touch within one business day." }
   ],
   "presets": [{ "name": "Guided match" }]
 }

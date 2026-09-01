@@ -24,8 +24,25 @@ footage. See the repo root `CLAUDE.md`.
 | Walkthrough cut per property | Product metafield `custom.scrollwalk_folder` (e.g. `qasr-v21`) |
 
 Frames, films and clips stay on the existing media library (Supabase
-`media/…`); enquiry + subscribe forms post to the existing Vercel API so
-leads keep landing in the Sabdia leads inbox.
+`media/…`).
+
+## Enquiry handling — two modes
+
+Theme settings → **Site plumbing → Enquiry handling** switches every
+form (contact, property enquiry, agent application, guided match,
+newsletter) between:
+
+- **Shopify** (default) — forms post through Shopify's contact endpoint:
+  each enquiry is emailed to the store's **sender email** (Settings →
+  Notifications) with every field included, and the enquirer is filed
+  under **Customers** (newsletter signups arrive with email-marketing
+  consent + a `newsletter` tag). Spam protection/captcha is Shopify's,
+  toggled in Online Store → Preferences.
+- **Sabdia API** — forms post to the existing Vercel endpoints
+  (`forms_endpoint`), landing in the Supabase leads inbox as before.
+
+The nav logo size is Theme settings → **Brand → Logo size** (reviewed
+default 38px; mobile scales in step).
 
 ## Product metafields (namespace `custom`)
 

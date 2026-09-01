@@ -17,6 +17,17 @@
         "info": "The wordmark used in the nav, loader and footer. Leave empty to use the built-in logo."
       },
       {
+        "type": "range",
+        "id": "logo_height",
+        "label": "Logo size",
+        "min": 24,
+        "max": 52,
+        "step": 2,
+        "unit": "px",
+        "default": 38,
+        "info": "Height of the SABDIA wordmark in the nav. The site's reviewed default is 38px; mobile scales in step."
+      },
+      {
         "type": "text",
         "id": "site_name",
         "label": "Site name",
@@ -104,6 +115,23 @@
   {
     "name": "Site plumbing",
     "settings": [
+      {
+        "type": "select",
+        "id": "form_backend",
+        "label": "Enquiry handling",
+        "options": [
+          {
+            "value": "shopify",
+            "label": "Shopify \u2014 email notifications + customer records"
+          },
+          {
+            "value": "vercel",
+            "label": "Sabdia API \u2014 existing leads inbox (Supabase)"
+          }
+        ],
+        "default": "shopify",
+        "info": "Shopify mode emails each enquiry to the store's sender email (Settings \u2192 Notifications) and files the person under Customers. Sabdia API mode posts to the existing Vercel endpoint instead."
+      },
       {
         "type": "paragraph",
         "content": "Advanced \u2014 these keep the enquiry forms and walkthroughs working. Only change them with your developer."

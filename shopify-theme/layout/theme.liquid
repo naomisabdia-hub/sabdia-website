@@ -13,6 +13,13 @@
 <meta name="theme-color" content="#F7F3EB">
 <title>{{ page_title }}{% unless page_title contains 'Sabdia' or page_title == blank %} | Sabdia Constructions{% endunless %}</title>
 {%- liquid
+  # Customizer-driven logo size (Brand → Logo size); the stylesheet falls
+  # back to the reviewed 38px/30px when the vars are absent.
+  assign lh = settings.logo_height | default: 38
+  assign lhm = lh | times: 0.79 | round
+-%}
+<style>:root{--logo-h:{{ lh }}px;--logo-h-m:{{ lhm }}px}</style>
+{%- liquid
   # The homepage has no page-level SEO fields of its own, so its meta
   # description is a theme setting (Search & sharing) — editable in the
   # customizer like everything else.

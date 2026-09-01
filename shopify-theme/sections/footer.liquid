@@ -28,13 +28,29 @@
         <div class="nl-h">{{ section.settings.nl_heading }}</div>
         <p class="nl-t">{{ section.settings.nl_text }}</p>
       </div>
-      <form class="nl-form" id="nlForm" method="POST" action="{{ settings.forms_endpoint }}/api/subscribe" data-success="{{ section.settings.nl_success | escape }}">
-        <p style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
-        <label class="sr-only" for="nlEmail">Email address</label>
-        <input class="nl-in" id="nlEmail" type="email" name="email" placeholder="{{ section.settings.nl_placeholder | escape }}" autocomplete="email" required>
-        <button class="nl-btn" type="submit">{{ section.settings.nl_button }}</button>
-        <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
-      </form>
+      {%- if settings.form_backend == 'vercel' -%}
+        <form class="nl-form" id="nlForm" method="POST" action="{{ settings.forms_endpoint }}/api/subscribe" data-success="{{ section.settings.nl_success | escape }}">
+          <p style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+          <label class="sr-only" for="nlEmail">Email address</label>
+          <input class="nl-in" id="nlEmail" type="email" name="email" placeholder="{{ section.settings.nl_placeholder | escape }}" autocomplete="email" required>
+          <button class="nl-btn" type="submit">{{ section.settings.nl_button }}</button>
+          <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+        </form>
+      {%- else -%}
+        {%- comment -%} Shopify-native signup: files the subscriber under
+            Customers with email marketing consent. {%- endcomment -%}
+        {% form 'customer', class: 'nl-form', id: 'nlForm' %}
+          {%- if form.posted_successfully? -%}
+            <p class="nl-done">{{ section.settings.nl_success }}</p>
+          {%- else -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <label class="sr-only" for="nlEmail">Email address</label>
+            <input class="nl-in" id="nlEmail" type="email" name="contact[email]" placeholder="{{ section.settings.nl_placeholder | escape }}" autocomplete="email" required>
+            <button class="nl-btn" type="submit">{{ section.settings.nl_button }}</button>
+            {%- if form.errors -%}<p class="sr-status" role="status">{{ form.errors | default_errors }}</p>{%- endif -%}
+          {%- endif -%}
+        {% endform %}
+      {%- endif -%}
     </div>
   </div>
   <div class="fg-grid">

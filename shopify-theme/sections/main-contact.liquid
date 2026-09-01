@@ -44,6 +44,7 @@
       {%- if section.settings.guided_line_html != blank -%}
         <p class="reveal d1" style="font-family:'EB Garamond',Georgia,serif;font-size:14px;font-style:italic;color:var(--ink3);margin:10px 0 6px">{{ section.settings.guided_line_html }}</p>
       {%- endif -%}
+      {%- if settings.form_backend == 'vercel' -%}
       <form class="cform reveal d1" id="cform" style="margin-top:12px" name="contact" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
         <input type="hidden" name="form-name" value="contact">
         <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
@@ -73,6 +74,42 @@
         </div>
         <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
       </form>
+      {%- else -%}
+      {%- comment -%} Shopify-native: emails the store's sender address and
+          files the enquirer under Customers. {%- endcomment -%}
+      {% form 'contact', id: 'cform', class: 'cform reveal d1', style: 'margin-top:12px' %}
+        {%- if form.posted_successfully? -%}
+          <p class="form-note" role="status" style="font-size:13px;color:var(--ink)">{{ section.settings.success_text }}</p>
+        {%- endif -%}
+        {%- if form.errors -%}
+          <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
+        {%- endif -%}
+        <div class="frow">
+          <div class="fg"><label class="fl" for="cf-first">First Name*</label><input type="text" id="cf-first" name="contact[First name]" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="cf-last">Last Name*</label><input type="text" id="cf-last" name="contact[Last name]" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+        </div>
+        <div class="fg"><label class="fl" for="cf-email">Email Address*</label><input type="email" id="cf-email" name="contact[email]" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="cf-phone">Phone Number</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
+        <div class="fg">
+          <label class="fl" for="cf-interest">How can we help?*</label>
+          <select class="fsel" id="cf-interest" name="contact[Enquiry type]" required>
+            <option value="">Select an enquiry type…</option>
+            <option>For Sale — Current Properties</option>
+            {%- for product in fs.products -%}
+              <option>{{ product.title }} — {{ product.metafields.custom.suburb.value }}</option>
+            {%- endfor -%}
+            {%- for block in section.blocks -%}
+              <option {{ block.shopify_attributes }}>{{ block.settings.text }}</option>
+            {%- endfor -%}
+          </select>
+        </div>
+        <div class="fg"><label class="fl" for="cf-message">Your Message*</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
+          <p class="form-note" style="margin:0">{{ section.settings.form_note }}</p>
+        </div>
+      {% endform %}
+      {%- endif -%}
     </div>
   </div>
 </section>
@@ -103,7 +140,8 @@
     { "type": "html", "id": "guided_line_html", "label": "Guided-match pointer line (HTML)" },
     { "type": "collection", "id": "listings_collection", "label": "Residences in the enquiry list", "info": "Defaults to for-sale" },
     { "type": "text", "id": "submit_label", "label": "Submit button", "default": "Submit Enquiry" },
-    { "type": "text", "id": "form_note", "label": "Note beside the button", "default": "We respond within one business day." }
+    { "type": "text", "id": "form_note", "label": "Note beside the button", "default": "We respond within one business day." },
+    { "type": "textarea", "id": "success_text", "label": "Success message (Shopify mode)", "default": "Thank you — we've received your enquiry and will be in touch within one business day." }
   ],
   "blocks": [
     {
