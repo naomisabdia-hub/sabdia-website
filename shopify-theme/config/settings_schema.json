@@ -20,11 +20,11 @@
         "type": "range",
         "id": "logo_height",
         "label": "Logo size",
-        "min": 20,
-        "max": 48,
+        "min": 16,
+        "max": 44,
         "step": 2,
         "unit": "px",
-        "default": 28,
+        "default": 24,
         "info": "Height of the SABDIA wordmark in the nav (32px reads proportionate against the 80px bar; the site's earlier review used 38px). Mobile scales in step."
       },
       {
@@ -129,7 +129,7 @@
             "label": "Sabdia API \u2014 existing leads inbox (Supabase)"
           }
         ],
-        "default": "shopify",
+        "default": "vercel",
         "info": "Shopify mode emails each enquiry to the store's sender email (Settings \u2192 Notifications) and files the person under Customers. Sabdia API mode posts to the existing Vercel endpoint instead."
       },
       {
