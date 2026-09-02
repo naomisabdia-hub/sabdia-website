@@ -20,11 +20,11 @@
         "type": "range",
         "id": "logo_height",
         "label": "Logo size",
-        "min": 24,
-        "max": 52,
+        "min": 20,
+        "max": 48,
         "step": 2,
         "unit": "px",
-        "default": 32,
+        "default": 28,
         "info": "Height of the SABDIA wordmark in the nav (32px reads proportionate against the 80px bar; the site's earlier review used 38px). Mobile scales in step."
       },
       {
