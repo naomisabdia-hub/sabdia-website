@@ -141,6 +141,26 @@ try {
   document.addEventListener('astro:page-load', place);
 })();
 </script>
+<script>
+  /* Edit on page — staff only. The editor itself is a separate chunk,
+     dynamically imported on first use so public visitors never load it. */
+  const wireInline = () => {
+    let ok = false;
+    try { ok = localStorage.getItem('sabdia:staff') === '1'; } catch {}
+    if (!ok || document.getElementById('sbInlinePill')) return;
+    const pill = document.createElement('button');
+    pill.id = 'sbInlinePill';
+    pill.type = 'button';
+    pill.textContent = '⚡ Edit on page';
+    pill.addEventListener('click', async () => {
+      const mod = await import('../lib/admin/inline.js');
+      mod.toggleInlineEdit();
+    });
+    document.body.appendChild(pill);
+  };
+  wireInline();
+  document.addEventListener('astro:page-load', wireInline);
+</script>
 <script src={withV('/js/main.js')} is:inline></script>
 </body>
 </html>
