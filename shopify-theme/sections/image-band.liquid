@@ -1,0 +1,111 @@
+{%- comment -%}
+  Image band — a drop-anywhere photography section with ready-made
+  structures, so image layouts are a dropdown rather than a rebuild:
+    · Full-bleed photograph
+    · Two-up
+    · Gallery row (three-up)
+    · Image beside text
+  Add images as blocks; the chosen layout uses as many as it needs.
+{%- endcomment -%}
+{%- liquid
+  assign layout = section.settings.layout | default: 'full'
+  assign blocks = section.blocks
+-%}
+
+<section class="imgband imgband-{{ layout }}{% if section.settings.tight %} imgband-tight{% endif %}">
+  <div class="inner">
+    {%- if section.settings.label != blank or section.settings.heading_html != blank -%}
+      <div class="imgband-hdr">
+        {%- if section.settings.label != blank -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+        {%- if section.settings.heading_html != blank -%}<h2 class="about-h reveal d1" style="font-size:clamp(30px,4vw,52px)">{{ section.settings.heading_html }}</h2>{%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- capture imgs -%}
+      {%- assign delays = ',d1,d2' | split: ',' -%}
+      {%- for block in blocks -%}
+        {%- assign di = forloop.index0 | modulo: 3 -%}
+        <figure class="imgband-item reveal-wipe {{ delays[di] }}" {{ block.shopify_attributes }}>
+          {%- if block.settings.image -%}
+            <img src="{{ block.settings.image | image_url: width: 1400 }}" alt="{{ block.settings.alt | escape }}" loading="lazy">
+          {%- elsif block.settings.image_ext != blank -%}
+            <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 1400, h: 1000 %}" alt="{{ block.settings.alt | escape }}" loading="lazy">
+          {%- endif -%}
+          {%- if block.settings.caption != blank -%}<figcaption class="imgband-cap">{{ block.settings.caption }}</figcaption>{%- endif -%}
+        </figure>
+      {%- endfor -%}
+    {%- endcapture -%}
+
+    {%- if layout == 'split' -%}
+      <div class="imgband-split">
+        <div class="imgband-grid">{{ imgs }}</div>
+        <div class="imgband-copy reveal d1">
+          {%- if section.settings.text != blank -%}<p class="about-p" style="margin-top:0">{{ section.settings.text }}</p>{%- endif -%}
+          {%- if section.settings.cta_label != blank -%}<a href="{{ section.settings.cta_link }}" class="btn-g" style="margin-top:20px">{{ section.settings.cta_label }} &rarr;</a>{%- endif -%}
+        </div>
+      </div>
+    {%- else -%}
+      <div class="imgband-grid">{{ imgs }}</div>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  .imgband{padding:clamp(52px,7vw,96px) clamp(22px,5vw,80px);background:var(--bg)}
+  .imgband-tight{padding-top:clamp(24px,3vw,40px);padding-bottom:clamp(24px,3vw,40px)}
+  .imgband-hdr{margin-bottom:32px}
+  .imgband-grid{display:grid;gap:10px}
+  .imgband-item{margin:0;overflow:hidden;position:relative}
+  .imgband-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.92);transition:transform .8s var(--ease)}
+  .imgband-item:hover img{transform:scale(1.03)}
+  .imgband-cap{position:absolute;bottom:14px;left:14px;padding:7px 14px;background:rgba(31,27,20,.72);backdrop-filter:blur(8px);font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:rgba(253,251,246,.85)}
+  .imgband-full .imgband-item{aspect-ratio:21/9}
+  .imgband-two .imgband-grid{grid-template-columns:1fr 1fr}
+  .imgband-two .imgband-item{aspect-ratio:4/3}
+  .imgband-three .imgband-grid{grid-template-columns:repeat(3,1fr)}
+  .imgband-three .imgband-item{aspect-ratio:4/3}
+  .imgband-split .imgband-item{aspect-ratio:4/3}
+  .imgband-split{display:grid;grid-template-columns:7fr 5fr;gap:clamp(28px,5vw,72px);align-items:center}
+  @media(max-width:900px){
+    .imgband-two .imgband-grid,.imgband-three .imgband-grid{grid-template-columns:1fr}
+    .imgband-split{grid-template-columns:1fr;gap:28px}
+    .imgband-full .imgband-item{aspect-ratio:16/10}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Image band",
+  "settings": [
+    {
+      "type": "select", "id": "layout", "label": "Structure",
+      "options": [
+        { "value": "full", "label": "Full-bleed photograph" },
+        { "value": "two", "label": "Two-up" },
+        { "value": "three", "label": "Gallery row (three-up)" },
+        { "value": "split", "label": "Image beside text" }
+      ],
+      "default": "full"
+    },
+    { "type": "text", "id": "label", "label": "Small label (optional)" },
+    { "type": "html", "id": "heading_html", "label": "Heading (optional, HTML)" },
+    { "type": "textarea", "id": "text", "label": "Text (Image-beside-text structure)" },
+    { "type": "text", "id": "cta_label", "label": "Button label (optional)" },
+    { "type": "url", "id": "cta_link", "label": "Button link" },
+    { "type": "checkbox", "id": "tight", "label": "Tighter spacing", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_ext", "label": "…or external image path/URL" },
+        { "type": "text", "id": "alt", "label": "Alt text" },
+        { "type": "text", "id": "caption", "label": "Caption (optional)" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Image band", "blocks": [{ "type": "image" }] }]
+}
+{% endschema %}

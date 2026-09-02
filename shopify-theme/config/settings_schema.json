@@ -24,8 +24,8 @@
         "max": 52,
         "step": 2,
         "unit": "px",
-        "default": 38,
-        "info": "Height of the SABDIA wordmark in the nav. The site's reviewed default is 38px; mobile scales in step."
+        "default": 32,
+        "info": "Height of the SABDIA wordmark in the nav (32px reads proportionate against the 80px bar; the site's earlier review used 38px). Mobile scales in step."
       },
       {
         "type": "text",
