@@ -30,6 +30,11 @@
 
 <div class="nav-load" id="navLoad" aria-hidden="true"></div>
 
+{%- comment -%} The opening loader and navigation veil are full-screen
+    wordmark overlays. The theme editor re-injects this section without
+    re-running the script that dismisses them, which left a giant stuck
+    logo over the preview — so they simply never render in design mode. {%- endcomment -%}
+{%- unless request.design_mode -%}
 <div id="navVeil" aria-hidden="true">
   <img src="{{ logo_src }}" alt="" loading="eager">
   <div class="nv-rule"></div>
@@ -44,6 +49,7 @@
     <div class="ld-meta">{{ section.settings.loader_meta }}</div>
   </div>
 {%- endif -%}
+{%- endunless -%}
 
 <div class="mob-nav" id="mobNav" aria-hidden="true">
   <nav class="mob-nav-links" aria-label="Mobile">
