@@ -10,7 +10,7 @@ In order. ☐ = you click it in the admin; ✎ = Claude does it once you say so.
 4. ☐ **Phone number** (or leave hidden) — Theme settings › Contact.
 5. ☐ **Sender email → shared inbox** — Settings › Notifications › Sender email. Then **Authenticate** the sabdia.com.au domain on the same screen (adds the SPF/DKIM records at your DNS host) so enquiry emails do not land in junk.
 6. ☐ **Email alerts for enquiries** — Vercel › sabdia-website › Settings › Environment Variables: `RESEND_API_KEY` (resend.com) and `CONTACT_EMAIL` (the shared inbox). Redeploy.
-7. ☐ **Close the $0 checkout door** — Products › each residence › Inventory: Track quantity ✓, Available = 0, "Continue selling when out of stock" ✗. Six products.
+7. ☐ **Close the $0 checkout door** — Products › each residence › Inventory: Track quantity ✓, Available = 0, "Continue selling when out of stock" ✗. Six products. *(The API token has no inventory permission, so this one is yours.)*
 8. ☐ **Turn off Shop Pay and the Shop channel** — Settings › Payments › Shop Pay; Settings › Apps and sales channels › Shop › remove.
 9. ☐ **Cookie banner** — Settings › Customer privacy › Cookie banner › enable.
 10. ☐ **Photos into Shopify** — drag `Desktop › Sabdia photos for Shopify` onto Content › Files, then tell me "photos are in Files". ✎ I wire all 29 spots.
@@ -32,5 +32,5 @@ In order. ☐ = you click it in the admin; ✎ = Claude does it once you say so.
 
 - ☐ Uptime + form monitoring (a weekly test enquiry is the simplest).
 - ☐ Store plan review — Advanced (~US$399/mo) vs Basic for an enquiry-only site.
-- ✎ Monday.com push from `/api/contact` (see ENQUIRY-FLOW.md); n8n webhook when Heston's stack is ready.
+- ☐ **Monday.com push** is built — add `MONDAY_API_TOKEN` in Vercel (see ENQUIRY-FLOW.md) and every enquiry lands on Lead Pipeline. n8n: set `LEAD_WEBHOOK_URL` when Heston's stack is ready.
 - ☐ Staff access — Settings › Users: give Tamsin a staff account with Online Store + Content permissions rather than sharing yours.

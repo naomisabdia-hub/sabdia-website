@@ -43,6 +43,76 @@ export const OPTIONS: APIRoute = async ({ request }) =>
     },
   });
 
+/**
+ * Lead register hand-off — runs after the enquiry is safely stored and never
+ * affects the visitor's response. Both are dormant until their variable is
+ * set in the environment:
+ *
+ *   MONDAY_API_TOKEN   monday.com › avatar › Developers › My access tokens
+ *   MONDAY_BOARD_ID    defaults to the Admin workspace "Lead Pipeline" board
+ *   MONDAY_GROUP_ID    defaults to that board's "Active" group
+ *   LEAD_WEBHOOK_URL   any HTTPS endpoint (n8n) that wants the raw enquiry
+ */
+const MONDAY_BOARD = '9887617463';
+const MONDAY_GROUP = 'topics';
+/* Column ids on Lead Pipeline (Admin workspace). Override with a JSON map
+   in MONDAY_COLUMNS if the board is ever rebuilt. */
+const MONDAY_COLUMNS: Record<string, string> = {
+  date: 'date4', source: 'color_mkv5rh8h', phone: 'text_mkv5f5wx', property: 'dropdown_mm1a87an',
+  email: 'text_mkv5k99a', location: 'text_mkv5pb3k', notes: 'text_mkwh4nnb',
+};
+/* The board's "Interested PROPERTY" dropdown labels, keyed by residence slug. */
+const MONDAY_PROPERTY_LABEL: Record<string, string> = { qasr: 'QASR', solace: 'Solace', aether: 'Aether', sierra: 'Sierra', caspian: 'Ascot' };
+
+async function pushToMonday(record: Record<string, unknown>, details: Record<string, string>) {
+  const token = env('MONDAY_API_TOKEN');
+  if (!token) return;
+  const cols = { ...MONDAY_COLUMNS, ...(JSON.parse(env('MONDAY_COLUMNS') || '{}') as Record<string, string>) };
+  const name = [record.first_name, record.last_name].filter(Boolean).join(' ') || String(record.email);
+  const lines = [
+    `Form: ${record.form_name}`,
+    record.enquiry_type && `Enquiry type: ${record.enquiry_type}`,
+    record.property && `Residence: ${record.property}`,
+    record.agency && `Agency: ${record.agency}`,
+    record.licence_number && `Licence: ${record.licence_number}`,
+    record.suburb_markets && `Suburb markets: ${record.suburb_markets}`,
+    ...Object.entries(details).map(([k, v]) => `${k.replace(/-/g, ' ')}: ${v}`),
+    record.message && `\n${record.message}`,
+  ].filter(Boolean);
+  const values: Record<string, unknown> = {
+    [cols.date]: { date: new Date().toISOString().slice(0, 10) },
+    [cols.source]: { label: 'Website' },
+    [cols.email]: String(record.email ?? ''),
+    [cols.phone]: String(record.phone ?? ''),
+    /* monday text columns cap at 2000 characters */
+    [cols.notes]: lines.join('\n').slice(0, 2000),
+  };
+  const prop = MONDAY_PROPERTY_LABEL[String(record.property ?? '').toLowerCase()];
+  if (prop) values[cols.property] = { labels: [prop] };
+  if (record.suburb_markets) values[cols.location] = String(record.suburb_markets);
+  const query = `mutation($board: ID!, $group: String!, $name: String!, $values: JSON!) {
+    create_item(board_id: $board, group_id: $group, item_name: $name, column_values: $values, create_labels_if_missing: true) { id }
+  }`;
+  const resp = await fetch('https://api.monday.com/v2', {
+    method: 'POST',
+    headers: { Authorization: token, 'Content-Type': 'application/json', 'API-Version': '2025-01' },
+    body: JSON.stringify({ query, variables: { board: env('MONDAY_BOARD_ID') || MONDAY_BOARD, group: env('MONDAY_GROUP_ID') || MONDAY_GROUP, name, values: JSON.stringify(values) } }),
+  });
+  const out = await resp.json().catch(() => ({}));
+  if (!resp.ok || out.errors || out.error_message) console.error('monday.com push failed:', resp.status, JSON.stringify(out).slice(0, 300));
+}
+
+async function pushToWebhook(record: Record<string, unknown>, details: Record<string, string>) {
+  const url = env('LEAD_WEBHOOK_URL');
+  if (!url) return;
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ source: 'sabdia-website', received_at: new Date().toISOString(), ...record, details }),
+  });
+  if (!resp.ok) console.error('lead webhook failed:', resp.status);
+}
+
 const handlePost: APIRoute = async ({ request }) => {
   let fields: Record<string, string> = {};
   const contentType = request.headers.get('content-type') || '';
@@ -167,6 +237,11 @@ const handlePost: APIRoute = async ({ request }) => {
   if (!stored && !emailed) {
     return json({ error: 'Enquiry could not be delivered — form backend not configured' }, 500);
   }
+
+  /* Hand the lead on. Failures are logged, never surfaced: the enquiry is
+     already stored, and the visitor should not see a third party's outage. */
+  await Promise.allSettled([pushToMonday(record, details), pushToWebhook(record, details)]);
+
   return json({ ok: true });
 };
 

@@ -48,6 +48,6 @@ form → /api/contact ──► Supabase (as now)
 | Zapier / Make | US$20–30/mo | No code | Another vendor, another login, field mapping in a UI, emails parsed from text |
 | Form app with webhooks | US$10–20/mo | Storage + webhooks | Replaces the forms we already have; design would need rebuilding in the app |
 
-**To build it (about an hour):** a Monday API token (monday.com › avatar › Developers › My access tokens) and the Leads board ID go into Vercel as `MONDAY_API_TOKEN` / `MONDAY_BOARD_ID`; `/api/contact` creates the item after storing the row. A `LEAD_WEBHOOK_URL` variable does the same for n8n with no further code.
+**Built (8 Sep 2026), dormant until switched on.** `/api/contact` now creates an item on the **Lead Pipeline** board (Admin workspace, group *Active*) after storing the row: name, date, Source = Website, phone, email, interested residence (QASR / Solace / Aether / Sierra / Ascot), and everything else in Notes. To switch it on: monday.com › your avatar › Developers › My access tokens → copy → Vercel › Environment Variables › `MONDAY_API_TOKEN` → Redeploy. `LEAD_WEBHOOK_URL` does the same for n8n with no further code. Neither can ever block or fail an enquiry — they run after it is stored, and errors only go to the server log.
 
 **Before launch, regardless:** set `RESEND_API_KEY` and `CONTACT_EMAIL` (shared inbox) in Vercel so every enquiry also arrives by email within seconds.
