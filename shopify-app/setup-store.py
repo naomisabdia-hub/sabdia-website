@@ -275,7 +275,7 @@ def page_html(doc_key):
         for s in doc.get("sections") or []:
             parts.append(f"<h2>{s.get('heading','')}</h2>{s.get('bodyHtml','')}")
         if doc.get("updated"):
-            parts.append(f"<p><em>{doc['updated']}</em></p>")
+            parts.append(f"<p><em>Last updated — {doc['updated']}</em></p>")
         return "".join(parts)
     text = doc.get("intro") or doc.get("text") or ""
     if not text and doc.get("paragraphs"):
