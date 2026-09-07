@@ -12,3 +12,6 @@ dist/
 archive/
 
 shopify-app/.shopify/
+
+# local dev-server config carries the Theme Access token — never commit
+.claude/launch.json
