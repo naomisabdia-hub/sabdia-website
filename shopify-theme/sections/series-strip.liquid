@@ -54,7 +54,7 @@
           {%- comment -%} The play is the click-through: the post opens on
               Instagram itself, where the view and any engagement count. {%- endcomment -%}
           <a class="series-card" href="{{ item.url }}" target="_blank" rel="noopener"
-             aria-label="View on Instagram: {{ item.caption | default: series_name | escape }}">
+             aria-label="{{ item.caption | default: series_name | escape }} — view on Instagram">
             <img src="{{ item.thumb }}" alt="{{ item.caption | default: series_name | escape }}" loading="lazy">
             {{ card_meta }}
           </a>

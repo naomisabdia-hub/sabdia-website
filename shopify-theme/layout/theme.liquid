@@ -11,7 +11,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#F7F3EB">
-<title>{{ page_title }}{% unless page_title contains 'Sabdia' or page_title == blank %} | Sabdia Constructions{% endunless %}</title>
+{%- liquid
+  # Routes the site does not use still exist on every store; give them a
+  # neutral title instead of Shopify's "Your Shopping Cart".
+  assign title_text = page_title
+  case template.name
+    when 'cart'
+      assign title_text = 'Not in use'
+    when 'search'
+      assign title_text = 'Search'
+    when 'list-collections'
+      assign title_text = 'Residences'
+  endcase
+-%}
+<title>{{ title_text }}{% unless title_text contains 'Sabdia' or title_text == blank %} | Sabdia Constructions{% endunless %}</title>
 {%- liquid
   # Customizer-driven logo size (Brand → Logo size); the stylesheet falls
   # back to the reviewed 38px/30px when the vars are absent.

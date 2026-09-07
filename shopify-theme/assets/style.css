@@ -204,8 +204,11 @@ html.nav-done .nav-load{opacity:0;transform:scaleX(1);transition:transform .18s 
 }
 
 /* ── MOBILE NAV ── */
-.mob-nav{position:fixed;inset:0;background:var(--dark2);z-index:999;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0;opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
-.mob-nav.open{opacity:1;pointer-events:all}
+/* visibility, not just opacity: an invisible menu whose links can still be
+   tabbed into is an accessibility failure (aria-hidden + focusable). The
+   visibility transition delays hiding until the fade has finished. */
+.mob-nav{position:fixed;inset:0;background:var(--dark2);z-index:999;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .4s var(--ease),visibility 0s linear .4s}
+.mob-nav.open{opacity:1;visibility:visible;pointer-events:all;transition:opacity .4s var(--ease),visibility 0s}
 .mob-nav-links{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%}
 .mob-nav a{font-family:var(--font-d);font-size:clamp(32px,8vw,52px);font-weight:300;color:rgba(253,251,246,.7);padding:10px 0;transition:color .3s;letter-spacing:-.01em}
 .mob-nav a:hover{color:var(--gold2)}

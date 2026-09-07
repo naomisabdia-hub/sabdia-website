@@ -120,8 +120,8 @@
           <div class="fg"><label class="fl" for="pe-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="pe-phone" name="phone" class="fi" placeholder="Phone number" autocomplete="tel"></div>
           {%- unless sold -%}
             <div class="fg">
-              <label class="fl">{{ section.settings.f_interest | default: "Enquiry Type" }}</label>
-              <select class="fsel" name="enquiry-type">
+              <label class="fl" for="pe-type">{{ section.settings.f_interest | default: "Enquiry Type" }}</label>
+              <select class="fsel" id="pe-type" name="enquiry-type">
                 {%- assign etypes = section.settings.enquiry_types | newline_to_br | split: '<br />' -%}
                 {%- for t in etypes -%}
                   {%- assign tt = t | strip -%}
@@ -130,7 +130,7 @@
               </select>
             </div>
           {%- endunless -%}
-          <div class="fg"><label class="fl">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" name="message" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
+          <div class="fg"><label class="fl" for="pe-message">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" id="pe-message" name="message" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
           <p class="form-note">{{ section.settings.privacy_note }}</p>
           <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
           <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
@@ -152,8 +152,8 @@
           <div class="fg"><label class="fl" for="pe-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="pe-phone" name="contact[Phone]" class="fi" placeholder="Phone number" autocomplete="tel"></div>
           {%- unless sold -%}
             <div class="fg">
-              <label class="fl">{{ section.settings.f_interest | default: "Enquiry Type" }}</label>
-              <select class="fsel" name="contact[Enquiry type]">
+              <label class="fl" for="pe-type">{{ section.settings.f_interest | default: "Enquiry Type" }}</label>
+              <select class="fsel" id="pe-type" name="contact[Enquiry type]">
                 {%- assign etypes = section.settings.enquiry_types | newline_to_br | split: '<br />' -%}
                 {%- for t in etypes -%}
                   {%- assign tt = t | strip -%}
@@ -162,7 +162,7 @@
               </select>
             </div>
           {%- endunless -%}
-          <div class="fg"><label class="fl">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" name="contact[body]" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
+          <div class="fg"><label class="fl" for="pe-message">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" id="pe-message" name="contact[body]" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
           <p class="form-note">{{ section.settings.privacy_note }}</p>
           <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
         {% endform %}
