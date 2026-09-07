@@ -152,7 +152,7 @@
       "Construct"
     ],
     "eyebrow": "Boutique Luxury Home Builder & Developer — Brisbane",
-    "description": "Redefining luxury through design, detail, and craftsmanship. For over ten years, Sabdia has delivered award-winning residences that set a new benchmark for contemporary living in Brisbane.",
+    "description": "Sabdia has built award-winning homes in inner Brisbane since 2013, and set the standard for how a contemporary home here should feel.",
     "award": "Award-Winning Luxury Residences.",
     "slides": [
       {
@@ -216,11 +216,11 @@
   },
   "home_about": {
     "label": "About Sabdia",
-    "headingHtml": "Crafting <em>Exquisite</em><br>Living Spaces.",
+    "headingHtml": "Beautiful homes, <em>built properly</em>.",
     "images": [
       {
         "image": "/images/home-hero-1.jpg",
-        "alt": "Sabdia craftsmanship"
+        "alt": "Detail of a Sabdia home"
       },
       {
         "image": "/images/home-hero-2.jpg",
@@ -228,9 +228,9 @@
       }
     ],
     "paragraphs": [
-      "At Sabdia, we manage every step of the residential development journey in-house — from visionary design through to expert construction. This integrated approach allows us to maintain meticulous control over quality, timing, and innovation, delivering homes that stand the test of time.",
-      "With a focus on creating exceptional living spaces, Sabdia Constructions is dedicated to shaping the future of residential developments through innovation, quality, and unparalleled craftsmanship. Every project begins with a deep understanding of both the site and the clients who will call it home.",
-      "We are not merely builders — we are creators of legacy. Each residence we deliver is conceived as a singular work of architecture, thoughtfully designed to complement its surroundings and exceed every expectation of luxury living."
+      "Every Sabdia home is designed in-house and built by our own team. One team answers for the whole job, so the quality holds and so does the program.",
+      "Every project starts with the site and the people who will live there. We take time to understand both before a line is drawn.",
+      "We build homes people keep. Each one is designed for its street and its owners, and finished to a standard that does not date."
     ],
     "sigName": "Sabdia",
     "sigTitle": "Founder & Principal",
@@ -238,12 +238,12 @@
       {
         "n": "i.",
         "title": "Integrated Delivery",
-        "desc": "Design, develop, and construct under one roof — seamless from concept to keys."
+        "desc": "We design the home and build it ourselves, under one roof."
       },
       {
         "n": "ii.",
-        "title": "Uncompromising Quality",
-        "desc": "Only the finest materials, master tradespeople, and meticulous attention to detail."
+        "title": "Quality without shortcuts",
+        "desc": "The best materials, the best trades, and attention to every detail."
       },
       {
         "n": "iii.",
@@ -267,7 +267,7 @@
   "home_services": {
     "label": "What We Do",
     "headingHtml": "Full-spectrum<br><em>development</em><br>expertise.",
-    "text": "From site acquisition through to final handover, Sabdia manages every element in-house — ensuring seamless delivery and uncompromising quality at every stage.",
+    "text": "Sabdia handles every stage of a project in-house, and one team is responsible for all of it. Nothing is lost between trades and the standard never drops.",
     "cta": {
       "label": "Explore Services",
       "href": "/services/"
@@ -318,8 +318,8 @@
   "films": {
     "brand": {
       "label": "The Sabdia Story",
-      "headingHtml": "Crafted moments,<br><em>captured on film</em>.",
-      "text": "A look at the residences, the craftsmanship, and the people behind every Sabdia home.",
+      "headingHtml": "Our homes, <em>on film</em>.",
+      "text": "The residences, the people who build them, and the work that goes into every Sabdia home.",
       "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand.mp4",
       "poster": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand-poster.jpg"
     },
@@ -353,7 +353,7 @@
     "hero": {
       "image": "/images/qasr-hero.jpg"
     },
-    "introTemplate": "{count} extraordinary residences across Brisbane's most sought-after inner suburbs — each designed, developed, and built entirely in-house by Sabdia.",
+    "introTemplate": "{count} homes across Brisbane's most sought-after inner suburbs, each one designed and built by Sabdia.",
     "soldLabel": "Sold Prior to Completion",
     "cta": {
       "label": "Private Enquiry",
@@ -374,7 +374,7 @@
       "image": "/images/qasr-hero.jpg",
       "label": "Portfolio",
       "titleHtml": "Our<br><em>Projects</em>",
-      "sub": "Over 100 residences delivered across inner Brisbane's most prestigious suburbs since 2013."
+      "sub": "More than 100 homes delivered across inner Brisbane since 2013."
     },
     "currentLabel": "For Sale — Current",
     "soldLabel": "Sold Prior to Completion",
@@ -402,15 +402,15 @@
       "label": "Integrated Approach",
       "headingHtml": "Every element,<br><em>under one roof</em>.",
       "paragraphs": [
-        "At Sabdia, we believe the best residential developments are those where design, development, and construction work as one seamless system — not as separate, disconnected disciplines. Our fully integrated in-house model is our defining advantage.",
-        "From the first sketch to the final handover, every decision is made by the same team, with the same vision, and the same commitment to excellence."
+        "Good developments happen when the people who design a home are the same people who build it. At Sabdia they are. Every discipline is in-house, one team, one standard.",
+        "The same people make every decision, on the first sketch and on handover day. Nothing is handed off and nothing gets lost."
       ]
     },
     "processLabel": "The Process",
     "cta": {
       "label": "Start Your Project",
       "headingHtml": "Ready to build something <em style=\"color:var(--gold2)\">remarkable</em>?",
-      "text": "Whether you have a site, a vision, or simply a desire for exceptional living — we'd love to hear from you.",
+      "text": "If you have a site or an idea, we would like to hear from you.",
       "primaryCta": {
         "label": "Begin a Conversation",
         "href": "/contact/"
@@ -426,15 +426,15 @@
       "image": "/images/home-hero-1.jpg",
       "label": "Our Story",
       "titleHtml": "About<br><em>Sabdia</em>",
-      "sub": "A decade of redefining luxury residential development in inner Brisbane."
+      "sub": "Ten years of building luxury homes in inner Brisbane."
     },
     "mission": {
       "label": "Mission",
-      "headingHtml": "Built on <em>vision</em>,<br>delivered with<br>precision.",
+      "headingHtml": "Designed with <em>care</em>, built with precision.",
       "paragraphs": [
-        "Founded in 2013, Sabdia Constructions was born from a singular conviction: that the residential development industry in Brisbane deserved a boutique operator who refused to compromise. One that would bring together exceptional design, rigorous development management, and master-level construction under a single, unified vision.",
+        "Sabdia Constructions started in 2013 because Brisbane needed a boutique developer that would not cut corners, one that would do the design and the development itself and then build the house with its own team.",
         "Over a decade later, that conviction has been validated more than 100 times — in every residence we have delivered, in every client who has trusted us with their most significant investment, and in every award that has recognised our commitment to excellence.",
-        "We remain boutique by choice. By limiting the number of projects we undertake each year, we ensure that every development receives the full force of our attention, creativity, and craftsmanship. We do not build in volume. We build in detail."
+        "We stay small on purpose. We take on a few projects a year so each one gets our full attention. We do not build in volume. We build in detail."
       ],
       "sigName": "Sabdia",
       "sigTitle": "Founder & Principal"
@@ -445,29 +445,29 @@
         {
           "n": "i.",
           "title": "Integrity",
-          "desc": "We say what we do, and we do what we say. Transparency with our clients is non-negotiable at every stage of the journey."
+          "desc": "We say what we do, and we do what we say. Clients hear the truth about cost and timing at every stage."
         },
         {
           "n": "ii.",
           "title": "Innovation",
-          "desc": "We push the boundaries of design and construction, constantly seeking better ways to create residences that will stand the test of time."
+          "desc": "We keep looking for better ways to design and build, so the homes last."
         },
         {
           "n": "iii.",
           "title": "Excellence",
-          "desc": "We do not accept 'good enough'. Every detail, from the grandest architectural gesture to the smallest finishing touch, must be exceptional."
+          "desc": "We do not accept 'good enough'. Every detail, the roofline down to the door handles, has to be right."
         }
       ]
     },
     "journey": {
       "label": "Our Journey",
       "headingHtml": "A decade of<br><em>milestones</em>.",
-      "text": "From a single vision to over 100 delivered residences, each year has brought new achievements and raised the bar for what luxury living in Brisbane can be.",
+      "text": "The company started with one project. It has now completed more than 100 homes, and each year the standard has gone up.",
       "items": [
         {
           "year": "2013",
           "title": "Founded",
-          "desc": "Sabdia Constructions established with a vision to redefine boutique luxury residential development in inner Brisbane."
+          "desc": "Sabdia Constructions opens in Brisbane, designing and building its own homes."
         },
         {
           "year": "2015",
@@ -477,7 +477,7 @@
         {
           "year": "2017",
           "title": "50 Residences Delivered",
-          "desc": "A major milestone — 50 homes delivered to satisfied clients across inner Brisbane's most prestigious suburbs."
+          "desc": "50 homes delivered across inner Brisbane."
         },
         {
           "year": "2020",
@@ -487,12 +487,12 @@
         {
           "year": "2023",
           "title": "100+ Residences",
-          "desc": "Surpassed 100 completed residences — a testament to a decade of consistency, quality, and unwavering commitment to excellence."
+          "desc": "More than 100 residences completed, ten years in, with the same team and the same standard."
         },
         {
           "year": "2025",
           "title": "QASR — Flagship Release",
-          "desc": "The launch of QASR, Coorparoo — Sabdia's most ambitious and extraordinary residence to date, representing a new pinnacle of Brisbane luxury."
+          "desc": "QASR launches in Coorparoo, the largest home Sabdia has built."
         }
       ]
     },
@@ -534,8 +534,8 @@
     },
     "cta": {
       "label": "Begin Your Journey",
-      "headingHtml": "Ready to create something <em>extraordinary</em>?",
-      "text": "Whether you're seeking a current property for sale or have a vision for a bespoke home, we'd love to begin a conversation.",
+      "headingHtml": "Ready to talk about your <em>home</em>?",
+      "text": "If you are looking for a home for sale now, or you have a site and want something built properly, we would like to talk.",
       "primaryCta": {
         "label": "View Properties",
         "href": "/properties/"
@@ -549,7 +549,7 @@
   "collection_page": {
     "label": "Our Work",
     "titleHtml": "The Sabdia<br><em>Collection</em>.",
-    "text": "A portfolio of completed luxury residences across inner Brisbane — each one designed, developed, and constructed entirely in-house by Sabdia.",
+    "text": "Completed luxury homes across inner Brisbane, every one designed and built by Sabdia.",
     "items": [
       {
         "name": "MILOS",
@@ -622,12 +622,12 @@
     },
     "benefits": {
       "label": "Why Join",
-      "headingHtml": "The Sabdia agent program gives you <em style=\"color:var(--gold2)\">a genuine edge</em>.",
+      "headingHtml": "The Sabdia agent program gives you a <em>head start</em>.",
       "items": [
         {
           "icon": "layers",
           "title": "Pre-Release Access",
-          "desc": "Be first to know about upcoming developments before they reach the public market. Give your clients a genuine first-mover advantage."
+          "desc": "Hear about upcoming developments before they reach the public market, so your clients get first pick."
         },
         {
           "icon": "plan",
@@ -683,7 +683,7 @@
     "directLabel": "Direct Contact",
     "agentBlock": {
       "heading": "Agent Enquiries",
-      "bodyHtml": "Real estate professionals seeking exclusive agent access — pre-launch information, priority access and commission structures — please visit our <a href=\"/agent-access/\" style=\"color:var(--gold2);text-decoration:underline;text-underline-offset:3px\">Agent Access page</a>."
+      "bodyHtml": "If you are a real estate agent, pre-launch information and commission details are on our <a href=\"/agent-access/\" style=\"color:var(--gold2);text-decoration:underline;text-underline-offset:3px\">Agent Access page</a>."
     },
     "map": {
       "image": "/images/home-hero-1.jpg",
@@ -692,7 +692,7 @@
     "form": {
       "label": "Send a Message",
       "interests": [
-        "Custom Home / Bespoke Build",
+        "Custom Home Build",
         "Development Partnership",
         "Agent Access",
         "Media & Press",
@@ -719,7 +719,7 @@
         {
           "tag": "Company",
           "title": "About Sabdia",
-          "desc": "Learn about our story, values, and integrated approach to boutique luxury development.",
+          "desc": "Our story, our values, and the way we work.",
           "href": "/about/"
         }
       ]
