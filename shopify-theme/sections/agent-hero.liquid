@@ -22,13 +22,43 @@
 {
   "name": "Agent hero",
   "settings": [
-    { "type": "text", "id": "label", "label": "Small label", "default": "For Real Estate Professionals" },
-    { "type": "html", "id": "title_html", "label": "Title (HTML)" },
-    { "type": "textarea", "id": "text", "label": "Text" },
-    { "type": "image_picker", "id": "image", "label": "Hero image" },
-    { "type": "text", "id": "image_ext", "label": "…or external image path/URL" },
-    { "type": "text", "id": "image_alt", "label": "Image alt text" }
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label",
+      "default": "For Real Estate Professionals"
+    },
+    {
+      "type": "html",
+      "id": "title_html",
+      "label": "Title (HTML)"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "image_ext",
+      "label": "Current photo (URL)",
+      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text"
+    }
   ],
-  "presets": [{ "name": "Agent hero" }]
+  "presets": [
+    {
+      "name": "Agent hero"
+    }
+  ]
 }
 {% endschema %}

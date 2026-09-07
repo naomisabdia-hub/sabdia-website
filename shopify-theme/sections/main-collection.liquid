@@ -256,24 +256,112 @@
 {
   "name": "Collection grid",
   "settings": [
-    { "type": "text", "id": "label", "label": "Small label", "default": "For Sale" },
-    { "type": "html", "id": "heading_html", "label": "Heading (HTML)", "default": "<em>Current<\/em><br>Properties." },
-    { "type": "textarea", "id": "intro_template", "label": "Intro line", "info": "{count} becomes the number of residences", "default": "{count} extraordinary residences across Brisbane's most sought-after inner suburbs — each designed, developed, and built entirely in-house by Sabdia." },
-    { "type": "image_picker", "id": "image", "label": "Hero image" },
-    { "type": "text", "id": "image_ext", "label": "…or external image path/URL", "default": "/images/qasr-hero.jpg" },
-    { "type": "text", "id": "refine_label", "label": "Toolbar label", "default": "Refine:" },
-    { "type": "text", "id": "all_suburbs", "label": "All-suburbs option", "default": "All Suburbs" },
-    { "type": "text", "id": "empty_text", "label": "No-matches text", "default": "No residences match your criteria — try widening your search." },
-    { "type": "text", "id": "sold_label", "label": "Sold band label", "default": "Sold Prior to Completion" },
-    { "type": "text", "id": "cta_label", "label": "CTA label", "default": "Private Enquiry" },
-    { "type": "html", "id": "cta_heading_html", "label": "CTA heading (HTML)", "default": "Interested in a<br><em>private viewing<\/em>?" },
-    { "type": "textarea", "id": "cta_text", "label": "CTA text", "default": "We offer private, exclusive viewings for serious buyers. Contact us to arrange an inspection at a time that suits you." },
-    { "type": "text", "id": "cta1_label", "label": "Primary button", "default": "Request a Viewing" },
-    { "type": "url", "id": "cta1_link", "label": "Primary link" },
-    { "type": "text", "id": "cta2_label", "label": "Secondary button", "default": "Agent Enquiries" },
-    { "type": "url", "id": "cta2_link", "label": "Secondary link" },
-    { "type": "text", "id": "cta3_label", "label": "Gold button", "default": "Guided Match" },
-    { "type": "url", "id": "cta3_link", "label": "Gold button link" }
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label",
+      "default": "For Sale"
+    },
+    {
+      "type": "html",
+      "id": "heading_html",
+      "label": "Heading (HTML)",
+      "default": "<em>Current</em><br>Properties."
+    },
+    {
+      "type": "textarea",
+      "id": "intro_template",
+      "label": "Intro line",
+      "info": "{count} becomes the number of residences",
+      "default": "{count} extraordinary residences across Brisbane's most sought-after inner suburbs — each designed, developed, and built entirely in-house by Sabdia."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "image_ext",
+      "label": "Current photo (URL)",
+      "default": "/images/qasr-hero.jpg",
+      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+    },
+    {
+      "type": "text",
+      "id": "refine_label",
+      "label": "Toolbar label",
+      "default": "Refine:"
+    },
+    {
+      "type": "text",
+      "id": "all_suburbs",
+      "label": "All-suburbs option",
+      "default": "All Suburbs"
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "No-matches text",
+      "default": "No residences match your criteria — try widening your search."
+    },
+    {
+      "type": "text",
+      "id": "sold_label",
+      "label": "Sold band label",
+      "default": "Sold Prior to Completion"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Private Enquiry"
+    },
+    {
+      "type": "html",
+      "id": "cta_heading_html",
+      "label": "CTA heading (HTML)",
+      "default": "Interested in a<br><em>private viewing</em>?"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "CTA text",
+      "default": "We offer private, exclusive viewings for serious buyers. Contact us to arrange an inspection at a time that suits you."
+    },
+    {
+      "type": "text",
+      "id": "cta1_label",
+      "label": "Primary button",
+      "default": "Request a Viewing"
+    },
+    {
+      "type": "url",
+      "id": "cta1_link",
+      "label": "Primary link"
+    },
+    {
+      "type": "text",
+      "id": "cta2_label",
+      "label": "Secondary button",
+      "default": "Agent Enquiries"
+    },
+    {
+      "type": "url",
+      "id": "cta2_link",
+      "label": "Secondary link"
+    },
+    {
+      "type": "text",
+      "id": "cta3_label",
+      "label": "Gold button",
+      "default": "Guided Match"
+    },
+    {
+      "type": "url",
+      "id": "cta3_link",
+      "label": "Gold button link"
+    }
   ]
 }
 {% endschema %}

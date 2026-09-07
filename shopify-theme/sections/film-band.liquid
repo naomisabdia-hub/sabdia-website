@@ -3,7 +3,17 @@
   editorial copy. Autoplays muted in view; tap for sound. The film clips
   live on the Sabdia media library (Supabase films/…).
 {%- endcomment -%}
-{%- if section.settings.video_url != blank -%}
+{%- liquid
+  # An uploaded film (Shopify-hosted) wins over the URL fallback.
+  assign film_src = section.settings.video_url
+  if section.settings.film
+    assign mp4 = section.settings.film.sources | where: 'format', 'mp4' | first
+    if mp4
+      assign film_src = mp4.url
+    endif
+  endif
+-%}
+{%- if film_src != blank -%}
 <section class="film-band" id="{{ section.settings.anchor | default: 'film' }}">
   <div class="film-grid">
     <div class="film-copy">
@@ -17,7 +27,7 @@
     <div class="reveal d2">
       <div class="film-frame" data-film>
         <video
-          src="{{ section.settings.video_url }}"
+          src="{{ film_src }}"
           {% if section.settings.poster %}poster="{{ section.settings.poster | image_url: width: 900 }}"{% elsif section.settings.poster_ext != blank %}poster="{{ section.settings.poster_ext }}"{% endif %}
           muted
           loop
@@ -94,18 +104,75 @@ sabdiaFilmInit();
 {
   "name": "Film band",
   "settings": [
-    { "type": "text", "id": "anchor", "label": "Anchor id", "default": "story" },
-    { "type": "text", "id": "label", "label": "Small label" },
-    { "type": "html", "id": "heading_html", "label": "Heading" },
-    { "type": "textarea", "id": "text", "label": "Paragraph" },
-    { "type": "text", "id": "video_url", "label": "Film URL (mp4)", "info": "From the media library — portrait 9:16 works best." },
-    { "type": "image_picker", "id": "poster", "label": "Poster image" },
-    { "type": "text", "id": "poster_ext", "label": "Poster URL", "info": "Used when no poster image is picked." },
-    { "type": "text", "id": "caption_left", "label": "Caption — left" },
-    { "type": "text", "id": "caption_right", "label": "Caption — right" },
-    { "type": "text", "id": "cta_label", "label": "Button label" },
-    { "type": "text", "id": "cta_link", "label": "Button link" }
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor id",
+      "default": "story"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label"
+    },
+    {
+      "type": "html",
+      "id": "heading_html",
+      "label": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Paragraph"
+    },
+    {
+      "type": "video",
+      "id": "film",
+      "label": "Film",
+      "info": "Upload the mp4 here. Portrait 9:16 works best."
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Current film (URL)",
+      "info": "The film playing now is loaded from this address. Upload a film above and it takes over."
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "Poster image"
+    },
+    {
+      "type": "text",
+      "id": "poster_ext",
+      "label": "Current poster (URL)",
+      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+    },
+    {
+      "type": "text",
+      "id": "caption_left",
+      "label": "Caption — left"
+    },
+    {
+      "type": "text",
+      "id": "caption_right",
+      "label": "Caption — right"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label"
+    },
+    {
+      "type": "text",
+      "id": "cta_link",
+      "label": "Button link"
+    }
   ],
-  "presets": [{ "name": "Film band" }]
+  "presets": [
+    {
+      "name": "Film band"
+    }
+  ]
 }
 {% endschema %}

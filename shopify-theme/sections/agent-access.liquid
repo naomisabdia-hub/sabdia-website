@@ -29,27 +29,85 @@
 {
   "name": "Agent access",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "text", "id": "image_ext", "label": "External image URL" },
-    { "type": "text", "id": "image_alt", "label": "Image alt text" },
-    { "type": "text", "id": "badge", "label": "Badge" },
-    { "type": "text", "id": "label", "label": "Small label", "default": "For Agents" },
-    { "type": "html", "id": "heading_html", "label": "Heading" },
-    { "type": "textarea", "id": "text", "label": "Paragraph" },
-    { "type": "text", "id": "cta1_label", "label": "Primary button label", "default": "Request Access" },
-    { "type": "text", "id": "cta1_link", "label": "Primary button link", "default": "/pages/agent-access" },
-    { "type": "text", "id": "cta2_label", "label": "Secondary button label", "default": "Learn More" },
-    { "type": "text", "id": "cta2_link", "label": "Secondary button link", "default": "/pages/agent-access" }
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "image_ext",
+      "label": "Current photo (URL)",
+      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Badge"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label",
+      "default": "For Agents"
+    },
+    {
+      "type": "html",
+      "id": "heading_html",
+      "label": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Paragraph"
+    },
+    {
+      "type": "text",
+      "id": "cta1_label",
+      "label": "Primary button label",
+      "default": "Request Access"
+    },
+    {
+      "type": "text",
+      "id": "cta1_link",
+      "label": "Primary button link",
+      "default": "/pages/agent-access"
+    },
+    {
+      "type": "text",
+      "id": "cta2_label",
+      "label": "Secondary button label",
+      "default": "Learn More"
+    },
+    {
+      "type": "text",
+      "id": "cta2_link",
+      "label": "Secondary button link",
+      "default": "/pages/agent-access"
+    }
   ],
   "blocks": [
     {
       "type": "feature",
       "name": "Feature",
       "settings": [
-        { "type": "text", "id": "text", "label": "Text" }
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text"
+        }
       ]
     }
   ],
-  "presets": [{ "name": "Agent access" }]
+  "presets": [
+    {
+      "name": "Agent access"
+    }
+  ]
 }
 {% endschema %}

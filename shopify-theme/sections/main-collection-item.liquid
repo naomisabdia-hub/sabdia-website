@@ -82,8 +82,10 @@
     {%- assign shown = shown | plus: 1 -%}
     <a href="{{ block.settings.link }}" class="port-card reveal" {{ block.shopify_attributes }}>
       <div class="port-img-wrap">
-        {%- if block.settings.image_ext != blank -%}
-          <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 800, h: 600 %}" alt="{{ block.settings.name | escape }}" loading="lazy">
+        {%- if block.settings.image -%}
+          <img src="{{ block.settings.image | image_url: width: 800, height: 600, crop: 'center' }}" alt="{{ block.settings.name | escape }}" loading="lazy" width="800" height="600">
+        {%- elsif block.settings.image_ext != blank -%}
+          <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 800, h: 600 %}" alt="{{ block.settings.name | escape }}" loading="lazy" width="800" height="600">
         {%- endif -%}
       </div>
       <div class="port-name">{{ block.settings.name }}</div>
@@ -118,28 +120,108 @@
 {
   "name": "Collection residence",
   "settings": [
-    { "type": "text", "id": "badge", "label": "Hero badge", "default": "The Sabdia Collection" },
-    { "type": "text", "id": "film_label", "label": "Film label", "default": "The Film" },
-    { "type": "html", "id": "film_heading_html", "label": "Film heading (HTML — {name})", "default": "Experience <em>{name}<\/em>." },
-    { "type": "textarea", "id": "film_text", "label": "Film text ({name})", "default": "A cinematic walkthrough of {name} — its materials, its light, and the craft within." },
-    { "type": "text", "id": "more_label", "label": "More label", "default": "More from the Collection" },
-    { "type": "text", "id": "cta_label", "label": "CTA label", "default": "Commission Your Own" },
-    { "type": "html", "id": "cta_heading_html", "label": "CTA heading (HTML — {name})", "default": "Inspired by <em style=\"font-style:italic;color:var(--gold2)\">{name}<\/em>?" },
-    { "type": "textarea", "id": "cta_text", "label": "CTA text", "default": "Every Sabdia residence begins as a conversation. Tell us about your site, your vision, or simply the way you want to live." },
-    { "type": "text", "id": "cta1_label", "label": "Primary button", "default": "Begin a Conversation" },
-    { "type": "url", "id": "cta1_link", "label": "Primary link" },
-    { "type": "text", "id": "cta2_label", "label": "Secondary button", "default": "View Current Properties" },
-    { "type": "url", "id": "cta2_link", "label": "Secondary link" }
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "Hero badge",
+      "default": "The Sabdia Collection"
+    },
+    {
+      "type": "text",
+      "id": "film_label",
+      "label": "Film label",
+      "default": "The Film"
+    },
+    {
+      "type": "html",
+      "id": "film_heading_html",
+      "label": "Film heading (HTML — {name})",
+      "default": "Experience <em>{name}</em>."
+    },
+    {
+      "type": "textarea",
+      "id": "film_text",
+      "label": "Film text ({name})",
+      "default": "A cinematic walkthrough of {name} — its materials, its light, and the craft within."
+    },
+    {
+      "type": "text",
+      "id": "more_label",
+      "label": "More label",
+      "default": "More from the Collection"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Commission Your Own"
+    },
+    {
+      "type": "html",
+      "id": "cta_heading_html",
+      "label": "CTA heading (HTML — {name})",
+      "default": "Inspired by <em style=\"font-style:italic;color:var(--gold2)\">{name}</em>?"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "CTA text",
+      "default": "Every Sabdia residence begins as a conversation. Tell us about your site, your vision, or simply the way you want to live."
+    },
+    {
+      "type": "text",
+      "id": "cta1_label",
+      "label": "Primary button",
+      "default": "Begin a Conversation"
+    },
+    {
+      "type": "url",
+      "id": "cta1_link",
+      "label": "Primary link"
+    },
+    {
+      "type": "text",
+      "id": "cta2_label",
+      "label": "Secondary button",
+      "default": "View Current Properties"
+    },
+    {
+      "type": "url",
+      "id": "cta2_link",
+      "label": "Secondary link"
+    }
   ],
   "blocks": [
     {
       "type": "residence",
       "name": "Portfolio residence",
       "settings": [
-        { "type": "text", "id": "name", "label": "Name" },
-        { "type": "text", "id": "loc", "label": "Location line" },
-        { "type": "text", "id": "image_ext", "label": "Image path/URL" },
-        { "type": "url", "id": "link", "label": "Link" }
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name"
+        },
+        {
+          "type": "text",
+          "id": "loc",
+          "label": "Location line"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "image_ext",
+          "label": "Current photo (URL)",
+          "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
       ]
     }
   ]

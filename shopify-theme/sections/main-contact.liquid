@@ -128,28 +128,103 @@
 {
   "name": "Contact body",
   "settings": [
-    { "type": "text", "id": "direct_label", "label": "Direct-contact label", "default": "Direct Contact" },
-    { "type": "text", "id": "facebook_label", "label": "Facebook display name" },
-    { "type": "text", "id": "linkedin_label", "label": "LinkedIn display name" },
-    { "type": "text", "id": "agent_heading", "label": "Agent block heading", "default": "Agent Enquiries" },
-    { "type": "html", "id": "agent_body_html", "label": "Agent block text (HTML links allowed)" },
-    { "type": "image_picker", "id": "map_image", "label": "Map card image" },
-    { "type": "text", "id": "map_image_ext", "label": "…or external image path/URL" },
-    { "type": "text", "id": "map_label", "label": "Map card label", "default": "Brisbane, Queensland" },
-    { "type": "text", "id": "form_label", "label": "Form label", "default": "Send a Message" },
-    { "type": "html", "id": "guided_line_html", "label": "Guided-match pointer line (HTML)" },
-    { "type": "collection", "id": "listings_collection", "label": "Residences in the enquiry list", "info": "Defaults to for-sale" },
-    { "type": "text", "id": "submit_label", "label": "Submit button", "default": "Submit Enquiry" },
-    { "type": "text", "id": "form_note", "label": "Note beside the button", "default": "We respond within one business day." },
-    { "type": "textarea", "id": "success_text", "label": "Success message (Shopify mode)", "default": "Thank you — we've received your enquiry and will be in touch within one business day." }
+    {
+      "type": "text",
+      "id": "direct_label",
+      "label": "Direct-contact label",
+      "default": "Direct Contact"
+    },
+    {
+      "type": "text",
+      "id": "facebook_label",
+      "label": "Facebook display name"
+    },
+    {
+      "type": "text",
+      "id": "linkedin_label",
+      "label": "LinkedIn display name"
+    },
+    {
+      "type": "text",
+      "id": "agent_heading",
+      "label": "Agent block heading",
+      "default": "Agent Enquiries"
+    },
+    {
+      "type": "html",
+      "id": "agent_body_html",
+      "label": "Agent block text (HTML links allowed)"
+    },
+    {
+      "type": "image_picker",
+      "id": "map_image",
+      "label": "Map card image"
+    },
+    {
+      "type": "text",
+      "id": "map_image_ext",
+      "label": "Current map image (URL)",
+      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+    },
+    {
+      "type": "text",
+      "id": "map_label",
+      "label": "Map card label",
+      "default": "Brisbane, Queensland"
+    },
+    {
+      "type": "text",
+      "id": "form_label",
+      "label": "Form label",
+      "default": "Send a Message"
+    },
+    {
+      "type": "html",
+      "id": "guided_line_html",
+      "label": "Guided-match pointer line (HTML)"
+    },
+    {
+      "type": "collection",
+      "id": "listings_collection",
+      "label": "Residences in the enquiry list",
+      "info": "Defaults to for-sale"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit button",
+      "default": "Submit Enquiry"
+    },
+    {
+      "type": "text",
+      "id": "form_note",
+      "label": "Note beside the button",
+      "default": "We respond within one business day."
+    },
+    {
+      "type": "textarea",
+      "id": "success_text",
+      "label": "Success message (Shopify mode)",
+      "default": "Thank you — we've received your enquiry and will be in touch within one business day."
+    }
   ],
   "blocks": [
     {
       "type": "interest",
       "name": "Enquiry option",
-      "settings": [{ "type": "text", "id": "text", "label": "Option" }]
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Option"
+        }
+      ]
     }
   ],
-  "presets": [{ "name": "Contact body" }]
+  "presets": [
+    {
+      "name": "Contact body"
+    }
+  ]
 }
 {% endschema %}

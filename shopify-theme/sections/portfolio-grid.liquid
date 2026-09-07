@@ -17,8 +17,17 @@
             {%- elsif block.settings.image_ext != blank -%}
               <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 800, h: 600 %}" alt="{{ block.settings.name | escape }}" loading="lazy">
             {%- endif -%}
-            {%- if block.settings.video != blank -%}
-              <video src="{{ block.settings.video }}" muted loop playsinline preload="none" data-port-video></video>
+            {%- liquid
+              assign port_vid = block.settings.video
+              if block.settings.video_file
+                assign pmp4 = block.settings.video_file.sources | where: 'format', 'mp4' | first
+                if pmp4
+                  assign port_vid = pmp4.url
+                endif
+              endif
+            -%}
+            {%- if port_vid != blank -%}
+              <video src="{{ port_vid }}" muted loop playsinline preload="none" data-port-video></video>
               <span class="port-film-tag">Film</span>
             {%- endif -%}
           </div>
@@ -63,15 +72,50 @@
       "type": "residence",
       "name": "Residence",
       "settings": [
-        { "type": "text", "id": "name", "label": "Name" },
-        { "type": "text", "id": "loc", "label": "Location line" },
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "image_ext", "label": "…or external image path/URL" },
-        { "type": "text", "id": "video", "label": "Hover film URL (optional)" },
-        { "type": "url", "id": "link", "label": "Link (optional)" }
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name"
+        },
+        {
+          "type": "text",
+          "id": "loc",
+          "label": "Location line"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "image_ext",
+          "label": "Current photo (URL)",
+          "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+        },
+        {
+          "type": "video",
+          "id": "video_file",
+          "label": "Hover film (upload, optional)"
+        },
+        {
+          "type": "text",
+          "id": "video",
+          "label": "Current hover film (URL)",
+          "info": "Upload a film above and it takes over."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (optional)"
+        }
       ]
     }
   ],
-  "presets": [{ "name": "Portfolio grid" }]
+  "presets": [
+    {
+      "name": "Portfolio grid"
+    }
+  ]
 }
 {% endschema %}

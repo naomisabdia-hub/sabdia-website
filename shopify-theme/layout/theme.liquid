@@ -50,6 +50,13 @@ try {
 <link rel="preload" as="font" type="font/woff2" href="{{ 'cormorant-garamond-var.woff2' | asset_url }}" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="{{ 'eb-garamond-var-italic.woff2' | asset_url }}" crossorigin>
 {{ 'style.css' | asset_url | stylesheet_tag }}
+{%- comment -%}
+  Theme settings → Design. Must come AFTER the stylesheet: style.css sets
+  the same :root variables, and the later declaration wins.
+{%- endcomment -%}
+{%- if settings.design_override -%}
+<style>:root{--bg:{{ settings.c_bg }};--bg2:{{ settings.c_bg2 }};--dark:{{ settings.c_dark }};--ink:{{ settings.c_ink }};--gold:{{ settings.c_gold }};--gold2:{{ settings.c_gold2 }}}</style>
+{%- endif -%}
 {{ content_for_header }}
 </head>
 <body>

@@ -75,26 +75,81 @@
 {
   "name": "Hero slideshow",
   "settings": [
-    { "type": "text", "id": "words", "label": "Title words", "info": "Comma-separated — rendered word · by · word.", "default": "Design, Develop, Construct" },
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow line" },
-    { "type": "textarea", "id": "description", "label": "Description" },
-    { "type": "text", "id": "award", "label": "Award line" },
-    { "type": "text", "id": "cta1_label", "label": "Primary button label", "default": "View Properties" },
-    { "type": "text", "id": "cta1_link", "label": "Primary button link", "default": "/collections/for-sale" },
-    { "type": "text", "id": "cta2_label", "label": "Secondary button label", "default": "Enquire" },
-    { "type": "text", "id": "cta2_link", "label": "Secondary button link", "default": "/pages/contact" }
+    {
+      "type": "text",
+      "id": "words",
+      "label": "Title words",
+      "info": "Comma-separated — rendered word · by · word.",
+      "default": "Design, Develop, Construct"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow line"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "text",
+      "id": "award",
+      "label": "Award line"
+    },
+    {
+      "type": "text",
+      "id": "cta1_label",
+      "label": "Primary button label",
+      "default": "View Properties"
+    },
+    {
+      "type": "text",
+      "id": "cta1_link",
+      "label": "Primary button link",
+      "default": "/collections/for-sale"
+    },
+    {
+      "type": "text",
+      "id": "cta2_label",
+      "label": "Secondary button label",
+      "default": "Enquire"
+    },
+    {
+      "type": "text",
+      "id": "cta2_link",
+      "label": "Secondary button link",
+      "default": "/pages/contact"
+    }
   ],
   "blocks": [
     {
       "type": "slide",
       "name": "Slide",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "ext", "label": "External image URL", "info": "Used only when no image is picked — carries the current site's image over." },
-        { "type": "text", "id": "alt", "label": "Alt text" }
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "ext",
+          "label": "Current photo (URL)",
+          "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text"
+        }
       ]
     }
   ],
-  "presets": [{ "name": "Hero slideshow" }]
+  "presets": [
+    {
+      "name": "Hero slideshow"
+    }
+  ]
 }
 {% endschema %}

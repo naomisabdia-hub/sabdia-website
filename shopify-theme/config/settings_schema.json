@@ -42,9 +42,74 @@
       },
       {
         "type": "text",
+        "id": "abn",
+        "label": "ABN",
+        "info": "Shown in the footer legal line, e.g. 12 345 678 901. Leave empty to hide."
+      },
+      {
+        "type": "text",
+        "id": "qbcc_licence",
+        "label": "QBCC licence number",
+        "info": "Queensland requires a licensed builder to show its QBCC licence number in advertising, and this website advertises the business. Leave empty to hide — but fill it in before launch."
+      },
+      {
+        "type": "text",
         "id": "location",
         "label": "Location line",
         "default": "Brisbane, Queensland, Australia"
+      }
+    ]
+  },
+  {
+    "name": "Design",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Colours flow into every page of the site. Off = the built-in Sabdia palette. Fonts, spacing and page layouts are part of the brand system and live in the theme code — the guide explains how those changes are made."
+      },
+      {
+        "type": "checkbox",
+        "id": "design_override",
+        "label": "Use the colours below",
+        "default": false,
+        "info": "Leave off to keep the built-in palette. Turn on to apply your own colours site-wide."
+      },
+      {
+        "type": "color",
+        "id": "c_bg",
+        "label": "Page background",
+        "default": "#F7F3EB"
+      },
+      {
+        "type": "color",
+        "id": "c_bg2",
+        "label": "Soft panel background",
+        "default": "#F0EADE"
+      },
+      {
+        "type": "color",
+        "id": "c_dark",
+        "label": "Dark bands",
+        "default": "#1F1B14"
+      },
+      {
+        "type": "color",
+        "id": "c_ink",
+        "label": "Text on light",
+        "default": "#292319"
+      },
+      {
+        "type": "color",
+        "id": "c_gold",
+        "label": "Gold — rules and borders",
+        "default": "#A8874A",
+        "info": "Decoration only on light backgrounds; never body text (contrast)."
+      },
+      {
+        "type": "color",
+        "id": "c_gold2",
+        "label": "Gold — text on dark",
+        "default": "#C3A45E"
       }
     ]
   },
@@ -101,7 +166,7 @@
         "type": "image_picker",
         "id": "share_image",
         "label": "Social share image",
-        "info": "Shown when pages are shared \u2014 1200\u00d7630 works best."
+        "info": "Shown when pages are shared — 1200×630 works best."
       },
       {
         "type": "textarea",
@@ -122,19 +187,19 @@
         "options": [
           {
             "value": "shopify",
-            "label": "Shopify \u2014 email notifications + customer records"
+            "label": "Shopify — email notifications + customer records"
           },
           {
             "value": "vercel",
-            "label": "Sabdia API \u2014 existing leads inbox (Supabase)"
+            "label": "Sabdia API — existing leads inbox (Supabase)"
           }
         ],
         "default": "vercel",
-        "info": "Shopify mode emails each enquiry to the store's sender email (Settings \u2192 Notifications) and files the person under Customers. Sabdia API mode posts to the existing Vercel endpoint instead."
+        "info": "Shopify mode emails each enquiry to the store's sender email (Settings → Notifications) and files the person under Customers. Sabdia API mode posts to the existing Vercel endpoint instead."
       },
       {
         "type": "paragraph",
-        "content": "Advanced \u2014 these keep the enquiry forms and walkthroughs working. Only change them with your developer."
+        "content": "Advanced — these keep the enquiry forms and walkthroughs working. Only change them with your developer."
       },
       {
         "type": "text",

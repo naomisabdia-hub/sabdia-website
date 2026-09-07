@@ -1,0 +1,217 @@
+{%- comment -%}
+  Photo gallery — the "put all my photos here" section. Drop it on any
+  page from ⊕ Add section, then add one Photo block per image (up to 50).
+  Structures are a dropdown; every photo opens in the same full-screen
+  viewer the residence pages use (the .lb styles in style.css), with
+  arrow keys, swipe-free tap targets and Escape to close.
+
+  The viewer is scoped to this section instance so two galleries on one
+  page never fight, and the script guards against ClientRouter-style
+  double binding the way the rest of the theme does.
+{%- endcomment -%}
+{%- liquid
+  assign layout = section.settings.layout | default: 'three'
+  assign sid = section.id
+  assign delays = ',d1,d2,d3' | split: ','
+-%}
+
+<section class="pg pg-{{ layout }}{% if section.settings.dark %} pg-dark{% endif %}" id="pg-{{ sid }}" data-gallery>
+  <div class="inner">
+    {%- if section.settings.label != blank or section.settings.heading_html != blank or section.settings.text != blank -%}
+      <div class="pg-hdr">
+        {%- if section.settings.label != blank -%}<div class="slabel{% if section.settings.dark %} slabel-dark{% endif %} reveal">{{ section.settings.label }}</div>{%- endif -%}
+        {%- if section.settings.heading_html != blank -%}<h2 class="pg-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
+        {%- if section.settings.text != blank -%}<p class="pg-p reveal d2">{{ section.settings.text }}</p>{%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="pg-grid">
+      {%- for block in section.blocks -%}
+        {%- assign di = forloop.index0 | modulo: 4 -%}
+        {%- liquid
+          assign thumb = blank
+          assign full = blank
+          assign alt = block.settings.alt | default: block.settings.caption | default: section.settings.label
+          if block.settings.image
+            assign thumb = block.settings.image | image_url: width: 1200
+            assign full = block.settings.image | image_url: width: 2400
+            if block.settings.alt == blank and block.settings.image.alt != blank
+              assign alt = block.settings.image.alt
+            endif
+          elsif block.settings.image_ext != blank
+            capture thumb
+              render 'ext-variant', src: block.settings.image_ext, w: 1200, h: 900
+            endcapture
+            capture full
+              render 'ext-variant', src: block.settings.image_ext, w: 2400, h: 1800
+            endcapture
+          endif
+        -%}
+        {%- if thumb != blank -%}
+          <figure class="pg-item{% if block.settings.wide %} pg-wide{% endif %}{% if block.settings.tall %} pg-tall{% endif %} reveal-wipe {{ delays[di] }}"
+                  data-lb-item data-src="{{ full }}" data-alt="{{ alt | escape }}" data-cap="{{ block.settings.caption | escape }}"
+                  role="button" tabindex="0" aria-label="View photo: {{ alt | escape }}" {{ block.shopify_attributes }}>
+            <img src="{{ thumb }}" alt="{{ alt | escape }}" loading="lazy" decoding="async" width="1200" height="900">
+            {%- if block.settings.caption != blank and section.settings.show_captions -%}
+              <figcaption class="pg-cap">{{ block.settings.caption }}</figcaption>
+            {%- endif -%}
+          </figure>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if section.blocks.size == 0 -%}
+      <p class="pg-empty">Add photos with <strong>⊕ Add block → Photo</strong> in the panel on the left.</p>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%} Full-screen viewer — same look as the residence galleries. {%- endcomment -%}
+  <div class="lb" id="lb-{{ sid }}" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+    <img src="" alt="">
+    <button class="lb-btn lb-prev" type="button" aria-label="Previous photo">&larr;</button>
+    <button class="lb-btn lb-next" type="button" aria-label="Next photo">&rarr;</button>
+    <button class="lb-close" type="button" aria-label="Close">&#10005;</button>
+    <div class="lb-meta"><span class="lb-cap"></span><span class="lb-count"></span></div>
+  </div>
+</section>
+
+<style>
+  .pg{padding:clamp(56px,7vw,104px) clamp(22px,5vw,80px);background:var(--bg)}
+  .pg-dark{background:var(--dark)}
+  .pg-hdr{max-width:720px;margin-bottom:clamp(28px,4vw,48px)}
+  .pg-h{font-family:var(--font-d);font-size:clamp(30px,4vw,52px);font-weight:300;line-height:1.05;letter-spacing:-.02em;color:var(--ink);margin-top:14px}
+  .pg-h em{font-style:italic}
+  .pg-dark .pg-h{color:var(--white)}
+  .pg-dark .pg-h em{color:var(--gold2)}
+  .pg-p{font-size:13px;font-weight:300;line-height:1.85;color:var(--ink3);margin-top:16px;max-width:520px}
+  .pg-dark .pg-p{color:rgba(253,251,246,.6)}
+  .pg-grid{display:grid;gap:10px;grid-auto-flow:dense}
+  .pg-two .pg-grid{grid-template-columns:repeat(2,1fr)}
+  .pg-three .pg-grid{grid-template-columns:repeat(3,1fr)}
+  .pg-four .pg-grid{grid-template-columns:repeat(4,1fr)}
+  .pg-editorial .pg-grid{grid-template-columns:repeat(6,1fr)}
+  .pg-item{margin:0;position:relative;overflow:hidden;aspect-ratio:4/3;cursor:zoom-in;background:var(--bg3)}
+  .pg-dark .pg-item{background:var(--dark2)}
+  .pg-editorial .pg-item{grid-column:span 2}
+  .pg-editorial .pg-item:nth-child(6n+1){grid-column:span 4;aspect-ratio:16/10}
+  .pg-editorial .pg-item:nth-child(6n+4){grid-column:span 3;aspect-ratio:3/2}
+  .pg-editorial .pg-item:nth-child(6n+5){grid-column:span 3;aspect-ratio:3/2}
+  .pg-item.pg-wide{grid-column:span 2}
+  .pg-editorial .pg-item.pg-wide{grid-column:span 4}
+  .pg-item.pg-tall{grid-row:span 2;aspect-ratio:auto}
+  .pg-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.94);transition:transform 1s var(--ease),filter .5s}
+  .pg-item:hover img,.pg-item:focus-visible img{transform:scale(1.035);filter:saturate(1)}
+  .pg-item:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
+  .pg-cap{position:absolute;left:0;right:0;bottom:0;padding:28px 14px 12px;background:linear-gradient(to top,rgba(31,27,20,.7),transparent);font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:rgba(253,251,246,.85);pointer-events:none}
+  .pg-empty{font-size:12px;color:var(--ink3);padding:36px;border:1px dashed var(--border);text-align:center}
+  .lb[hidden]{display:none}
+  .lb-count{opacity:.7}
+  @media(max-width:900px){
+    .pg-four .pg-grid{grid-template-columns:repeat(2,1fr)}
+    .pg-editorial .pg-grid{grid-template-columns:repeat(2,1fr)}
+    .pg-editorial .pg-item,.pg-editorial .pg-item:nth-child(n){grid-column:span 1;aspect-ratio:4/3}
+    .pg-editorial .pg-item.pg-wide,.pg-item.pg-wide{grid-column:span 2}
+  }
+  @media(max-width:560px){
+    .pg-three .pg-grid,.pg-four .pg-grid{grid-template-columns:repeat(2,1fr)}
+    .pg-two .pg-grid{grid-template-columns:1fr}
+  }
+</style>
+
+<script>
+  (function () {
+    var root = document.getElementById('pg-{{ sid }}');
+    if (!root || root.dataset.pgInit) return;
+    root.dataset.pgInit = '1';
+    var items = Array.prototype.slice.call(root.querySelectorAll('[data-lb-item]'));
+    var lb = document.getElementById('lb-{{ sid }}');
+    if (!items.length || !lb) return;
+    var img = lb.querySelector('img'), cap = lb.querySelector('.lb-cap'), count = lb.querySelector('.lb-count');
+    var i = 0, lastFocus = null;
+
+    function show(n) {
+      i = (n + items.length) % items.length;
+      var it = items[i];
+      img.src = it.getAttribute('data-src');
+      img.alt = it.getAttribute('data-alt') || '';
+      cap.textContent = it.getAttribute('data-cap') || it.getAttribute('data-alt') || '';
+      count.textContent = (i + 1) + ' / ' + items.length;
+      /* Warm the neighbours so arrowing feels instant. */
+      [i + 1, i - 1].forEach(function (k) { var p = new Image(); p.src = items[(k + items.length) % items.length].getAttribute('data-src'); });
+    }
+    function open(n) {
+      lastFocus = document.activeElement;
+      lb.hidden = false;
+      requestAnimationFrame(function () { lb.classList.add('open'); });
+      document.documentElement.style.overflow = 'hidden';
+      show(n);
+      lb.querySelector('.lb-close').focus();
+    }
+    function close() {
+      lb.classList.remove('open');
+      document.documentElement.style.overflow = '';
+      setTimeout(function () { lb.hidden = true; }, 350);
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    items.forEach(function (it, n) {
+      it.addEventListener('click', function () { open(n); });
+      it.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(n); } });
+    });
+    lb.querySelector('.lb-prev').addEventListener('click', function () { show(i - 1); });
+    lb.querySelector('.lb-next').addEventListener('click', function () { show(i + 1); });
+    lb.querySelector('.lb-close').addEventListener('click', close);
+    lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+    document.addEventListener('keydown', function (e) {
+      if (lb.hidden) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowRight') show(i + 1);
+      else if (e.key === 'ArrowLeft') show(i - 1);
+    });
+    /* A viewer left open would strand the next page unscrollable under
+       client-side navigation, so close on any page swap. */
+    document.addEventListener('astro:before-swap', close);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Photo gallery",
+  "settings": [
+    { "type": "paragraph", "content": "Add one Photo block per image (up to 50). Every photo opens full-screen when clicked. Choose a structure below; Editorial mixes large and small frames automatically." },
+    {
+      "type": "select", "id": "layout", "label": "Structure",
+      "options": [
+        { "value": "two", "label": "Two across" },
+        { "value": "three", "label": "Three across" },
+        { "value": "four", "label": "Four across" },
+        { "value": "editorial", "label": "Editorial (mixed sizes)" }
+      ],
+      "default": "three"
+    },
+    { "type": "text", "id": "label", "label": "Small label (optional)", "default": "Gallery" },
+    { "type": "html", "id": "heading_html", "label": "Heading (optional)", "info": "Wrap a word in <em> for the italic accent." },
+    { "type": "textarea", "id": "text", "label": "Intro text (optional)" },
+    { "type": "checkbox", "id": "show_captions", "label": "Show captions on the photos", "default": false },
+    { "type": "checkbox", "id": "dark", "label": "Dark background", "default": false }
+  ],
+  "blocks": [
+    {
+      "type": "photo",
+      "name": "Photo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Photo" },
+        { "type": "text", "id": "image_ext", "label": "Current photo (URL)", "info": "Only used when no photo is chosen above." },
+        { "type": "text", "id": "alt", "label": "Describe the photo (alt text)", "info": "Read by screen readers and search engines, e.g. \"QASR kitchen — travertine island under the skylight\"." },
+        { "type": "text", "id": "caption", "label": "Caption (optional)" },
+        { "type": "checkbox", "id": "wide", "label": "Make this one wide", "default": false },
+        { "type": "checkbox", "id": "tall", "label": "Make this one tall", "default": false }
+      ]
+    }
+  ],
+  "max_blocks": 50,
+  "presets": [
+    { "name": "Photo gallery", "blocks": [{ "type": "photo" }, { "type": "photo" }, { "type": "photo" }] }
+  ]
+}
+{% endschema %}

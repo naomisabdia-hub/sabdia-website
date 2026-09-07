@@ -121,7 +121,16 @@
     </div>
   </div>
   <div class="fbot">
-    <div class="fcopy">&copy; {{ 'now' | date: '%Y' }} {{ settings.legal_name }}. All rights reserved.</div>
+    <div class="fcopy">
+      &copy; {{ 'now' | date: '%Y' }} {{ settings.legal_name }}. All rights reserved.
+      {%- if settings.qbcc_licence != blank or settings.abn != blank -%}
+        <span class="flegal">
+          {%- if settings.qbcc_licence != blank -%}<span>QBCC Licence {{ settings.qbcc_licence }}</span>{%- endif -%}
+          {%- if settings.qbcc_licence != blank and settings.abn != blank -%}<span aria-hidden="true"> &middot; </span>{%- endif -%}
+          {%- if settings.abn != blank -%}<span>ABN {{ settings.abn }}</span>{%- endif -%}
+        </span>
+      {%- endif -%}
+    </div>
     <div class="flinks">
       {%- if legal_menu.links.size > 0 -%}
         {%- for link in legal_menu.links -%}

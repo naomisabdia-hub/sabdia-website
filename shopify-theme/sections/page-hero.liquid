@@ -20,13 +20,42 @@
 {
   "name": "Page hero (photo)",
   "settings": [
-    { "type": "text", "id": "label", "label": "Small label" },
-    { "type": "html", "id": "title_html", "label": "Title (HTML — <em> and <br> allowed)" },
-    { "type": "textarea", "id": "sub", "label": "Sub-line" },
-    { "type": "image_picker", "id": "image", "label": "Hero image" },
-    { "type": "text", "id": "image_ext", "label": "…or external image path/URL", "info": "A /images/… path or Supabase URL served through the media pipeline. Ignored when a hero image is picked above." },
-    { "type": "text", "id": "image_alt", "label": "Image alt text" }
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label"
+    },
+    {
+      "type": "html",
+      "id": "title_html",
+      "label": "Title (HTML — <em> and <br> allowed)"
+    },
+    {
+      "type": "textarea",
+      "id": "sub",
+      "label": "Sub-line"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "image_ext",
+      "label": "Current photo (URL)",
+      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text"
+    }
   ],
-  "presets": [{ "name": "Page hero (photo)" }]
+  "presets": [
+    {
+      "name": "Page hero (photo)"
+    }
+  ]
 }
 {% endschema %}
