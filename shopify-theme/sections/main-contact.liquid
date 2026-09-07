@@ -11,16 +11,16 @@
     <div>
       <div class="slabel reveal">{{ section.settings.direct_label }}</div>
       <ul class="cdet reveal d1" style="margin-top:12px">
-        <li class="cd"><span class="cd-l">Location</span><span class="cd-v">{{ settings.location }}</span></li>
+        <li class="cd"><span class="cd-l">{{ section.settings.d_location | default: "Location" }}</span><span class="cd-v">{{ settings.location }}</span></li>
         {%- if settings.contact_phone != blank -%}
           <li class="cd"><span class="cd-l">Phone</span><a href="tel:{{ settings.contact_phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}" class="cd-v">{{ settings.contact_phone }}</a></li>
         {%- endif -%}
         {%- if settings.contact_email != blank -%}
           <li class="cd"><span class="cd-l">Email</span><a href="mailto:{{ settings.contact_email }}" class="cd-v">{{ settings.contact_email }}</a></li>
         {%- endif -%}
-        <li class="cd"><span class="cd-l">Instagram</span><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.instagram_label }}</a></li>
-        <li class="cd"><span class="cd-l">Facebook</span><a href="{{ settings.facebook_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.facebook_label | default: settings.site_name }}</a></li>
-        <li class="cd"><span class="cd-l">LinkedIn</span><a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.linkedin_label | default: settings.site_name }}</a></li>
+        <li class="cd"><span class="cd-l">{{ section.settings.d_instagram | default: "Instagram" }}</span><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.instagram_label }}</a></li>
+        <li class="cd"><span class="cd-l">{{ section.settings.d_facebook | default: "Facebook" }}</span><a href="{{ settings.facebook_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.facebook_label | default: settings.site_name }}</a></li>
+        <li class="cd"><span class="cd-l">{{ section.settings.d_linkedin | default: "LinkedIn" }}</span><a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.linkedin_label | default: settings.site_name }}</a></li>
         <li class="cd"><span class="cd-l">Website</span><a href="{{ settings.domain_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.domain_display }}</a></li>
       </ul>
 
@@ -49,8 +49,8 @@
         <input type="hidden" name="form-name" value="contact">
         <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
         <div class="frow">
-          <div class="fg"><label class="fl" for="cf-first">First Name*</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
-          <div class="fg"><label class="fl" for="cf-last">Last Name*</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+          <div class="fg"><label class="fl" for="cf-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="{{ section.settings.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
         </div>
         <div class="fg"><label class="fl" for="cf-email">Email Address*</label><input type="email" id="cf-email" name="email" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
         <div class="fg"><label class="fl" for="cf-phone">Phone Number</label><input type="tel" id="cf-phone" name="phone" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
@@ -85,8 +85,8 @@
           <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
         {%- endif -%}
         <div class="frow">
-          <div class="fg"><label class="fl" for="cf-first">First Name*</label><input type="text" id="cf-first" name="contact[First name]" class="fi" placeholder="First name" autocomplete="given-name" required></div>
-          <div class="fg"><label class="fl" for="cf-last">Last Name*</label><input type="text" id="cf-last" name="contact[Last name]" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+          <div class="fg"><label class="fl" for="cf-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="contact[First name]" class="fi" placeholder="{{ section.settings.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="contact[Last name]" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
         </div>
         <div class="fg"><label class="fl" for="cf-email">Email Address*</label><input type="email" id="cf-email" name="contact[email]" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
         <div class="fg"><label class="fl" for="cf-phone">Phone Number</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
@@ -206,6 +206,122 @@
       "id": "success_text",
       "label": "Success message (Shopify mode)",
       "default": "Thank you — we've received your enquiry and will be in touch within one business day."
+    },
+    {
+      "type": "header",
+      "content": "Form wording"
+    },
+    {
+      "type": "text",
+      "id": "f_first",
+      "label": "First name label",
+      "default": "First Name*"
+    },
+    {
+      "type": "text",
+      "id": "f_first_ph",
+      "label": "First name placeholder",
+      "default": "First name"
+    },
+    {
+      "type": "text",
+      "id": "f_last",
+      "label": "Last name label",
+      "default": "Last Name*"
+    },
+    {
+      "type": "text",
+      "id": "f_last_ph",
+      "label": "Last name placeholder",
+      "default": "Last name"
+    },
+    {
+      "type": "text",
+      "id": "f_email",
+      "label": "Email label",
+      "default": "Email*"
+    },
+    {
+      "type": "text",
+      "id": "f_email_ph",
+      "label": "Email placeholder",
+      "default": "Email address"
+    },
+    {
+      "type": "text",
+      "id": "f_phone",
+      "label": "Phone label",
+      "default": "Phone"
+    },
+    {
+      "type": "text",
+      "id": "f_phone_ph",
+      "label": "Phone placeholder",
+      "default": "Phone number"
+    },
+    {
+      "type": "text",
+      "id": "f_interest",
+      "label": "Interest label",
+      "default": "Interest"
+    },
+    {
+      "type": "text",
+      "id": "f_message",
+      "label": "Message label",
+      "default": "Message*"
+    },
+    {
+      "type": "text",
+      "id": "f_message_ph",
+      "label": "Message placeholder",
+      "default": "Tell us about your interest..."
+    },
+    {
+      "type": "text",
+      "id": "f_submit",
+      "label": "Button",
+      "default": "Submit"
+    },
+    {
+      "type": "header",
+      "content": "Details column"
+    },
+    {
+      "type": "text",
+      "id": "d_location",
+      "label": "Location row label",
+      "default": "Location"
+    },
+    {
+      "type": "text",
+      "id": "d_instagram",
+      "label": "Instagram row label",
+      "default": "Instagram"
+    },
+    {
+      "type": "text",
+      "id": "d_facebook",
+      "label": "Facebook row label",
+      "default": "Facebook"
+    },
+    {
+      "type": "text",
+      "id": "d_facebook_v",
+      "label": "Facebook display text",
+      "default": "Sabdia Constructions"
+    },
+    {
+      "type": "text",
+      "id": "d_linkedin",
+      "label": "LinkedIn row label",
+      "default": "LinkedIn"
+    },
+    {
+      "type": "text",
+      "id": "d_linkedin_v",
+      "label": "LinkedIn display text",
+      "default": "Sabdia Constructions"
     }
   ],
   "blocks": [

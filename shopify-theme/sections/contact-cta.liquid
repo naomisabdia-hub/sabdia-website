@@ -10,10 +10,10 @@
       <h2 class="contact-h reveal d1">{{ section.settings.heading_html }}</h2>
       <p class="about-p reveal d2" style="margin-bottom:36px">{{ section.settings.text }}</p>
       <ul class="cdet reveal d3">
-        <li class="cd"><span class="cd-l">Location</span><span class="cd-v">{{ settings.location }}</span></li>
-        <li class="cd"><span class="cd-l">Instagram</span><a href="{{ settings.instagram_url }}" target="_blank" class="cd-v">{{ settings.instagram_label }}</a></li>
-        <li class="cd"><span class="cd-l">Facebook</span><a href="{{ settings.facebook_url }}" target="_blank" class="cd-v">Sabdia Constructions</a></li>
-        <li class="cd"><span class="cd-l">LinkedIn</span><a href="{{ settings.linkedin_url }}" target="_blank" class="cd-v">Sabdia Constructions</a></li>
+        <li class="cd"><span class="cd-l">{{ section.settings.d_location | default: "Location" }}</span><span class="cd-v">{{ settings.location }}</span></li>
+        <li class="cd"><span class="cd-l">{{ section.settings.d_instagram | default: "Instagram" }}</span><a href="{{ settings.instagram_url }}" target="_blank" class="cd-v">{{ settings.instagram_label }}</a></li>
+        <li class="cd"><span class="cd-l">{{ section.settings.d_facebook | default: "Facebook" }}</span><a href="{{ settings.facebook_url }}" target="_blank" class="cd-v">{{ section.settings.d_facebook_v | default: "Sabdia Constructions" }}</a></li>
+        <li class="cd"><span class="cd-l">{{ section.settings.d_linkedin | default: "LinkedIn" }}</span><a href="{{ settings.linkedin_url }}" target="_blank" class="cd-v">{{ section.settings.d_linkedin_v | default: "Sabdia Constructions" }}</a></li>
       </ul>
     </div>
     <div>
@@ -21,13 +21,13 @@
         <input type="hidden" name="form-name" value="contact">
         <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
         <div class="frow">
-          <div class="fg"><label class="fl" for="cf-first">First Name*</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
-          <div class="fg"><label class="fl" for="cf-last">Last Name*</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+          <div class="fg"><label class="fl" for="cf-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="{{ section.settings.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
         </div>
-        <div class="fg"><label class="fl" for="cf-email">Email*</label><input type="email" id="cf-email" name="email" class="fi" placeholder="Email address" autocomplete="email" required></div>
-        <div class="fg"><label class="fl" for="cf-phone">Phone</label><input type="tel" id="cf-phone" name="phone" class="fi" placeholder="Phone number" autocomplete="tel"></div>
+        <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email*" }}</label><input type="email" id="cf-email" name="email" class="fi" placeholder="{{ section.settings.f_email_ph | default: "Email address" }}" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="cf-phone" name="phone" class="fi" placeholder="{{ section.settings.f_phone_ph | default: "Phone number" }}" autocomplete="tel"></div>
         <div class="fg">
-          <label class="fl" for="cf-interest">Interest</label>
+          <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "Interest" }}</label>
           <select class="fsel" id="cf-interest" name="enquiry-type">
             {%- assign interests = section.settings.interests | newline_to_br | split: '<br />' -%}
             {%- for opt in interests -%}
@@ -36,8 +36,8 @@
             {%- endfor -%}
           </select>
         </div>
-        <div class="fg"><label class="fl" for="cf-message">Message*</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest..." required></textarea></div>
-        <button type="submit" class="fsub" id="fsub">Submit &rarr;</button>
+        <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Message*" }}</label><textarea class="fta" id="cf-message" name="message" placeholder="{{ section.settings.f_message_ph | default: "Tell us about your interest..." }}" required></textarea></div>
+        <button type="submit" class="fsub" id="fsub">{{ section.settings.f_submit | default: "Submit" }} &rarr;</button>
         <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
         <p class="form-note">{{ section.settings.note }}</p>
       </form>
@@ -49,12 +49,154 @@
 {
   "name": "Contact",
   "settings": [
-    { "type": "text", "id": "label", "label": "Small label", "default": "Get In Touch" },
-    { "type": "html", "id": "heading_html", "label": "Heading" },
-    { "type": "textarea", "id": "text", "label": "Paragraph" },
-    { "type": "textarea", "id": "interests", "label": "Interest options", "info": "One option per line." },
-    { "type": "text", "id": "note", "label": "Note under the button" }
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label",
+      "default": "Get In Touch"
+    },
+    {
+      "type": "html",
+      "id": "heading_html",
+      "label": "Heading"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Paragraph"
+    },
+    {
+      "type": "textarea",
+      "id": "interests",
+      "label": "Interest options",
+      "info": "One option per line."
+    },
+    {
+      "type": "text",
+      "id": "note",
+      "label": "Note under the button"
+    },
+    {
+      "type": "header",
+      "content": "Form wording"
+    },
+    {
+      "type": "text",
+      "id": "f_first",
+      "label": "First name label",
+      "default": "First Name*"
+    },
+    {
+      "type": "text",
+      "id": "f_first_ph",
+      "label": "First name placeholder",
+      "default": "First name"
+    },
+    {
+      "type": "text",
+      "id": "f_last",
+      "label": "Last name label",
+      "default": "Last Name*"
+    },
+    {
+      "type": "text",
+      "id": "f_last_ph",
+      "label": "Last name placeholder",
+      "default": "Last name"
+    },
+    {
+      "type": "text",
+      "id": "f_email",
+      "label": "Email label",
+      "default": "Email*"
+    },
+    {
+      "type": "text",
+      "id": "f_email_ph",
+      "label": "Email placeholder",
+      "default": "Email address"
+    },
+    {
+      "type": "text",
+      "id": "f_phone",
+      "label": "Phone label",
+      "default": "Phone"
+    },
+    {
+      "type": "text",
+      "id": "f_phone_ph",
+      "label": "Phone placeholder",
+      "default": "Phone number"
+    },
+    {
+      "type": "text",
+      "id": "f_interest",
+      "label": "Interest label",
+      "default": "Interest"
+    },
+    {
+      "type": "text",
+      "id": "f_message",
+      "label": "Message label",
+      "default": "Message*"
+    },
+    {
+      "type": "text",
+      "id": "f_message_ph",
+      "label": "Message placeholder",
+      "default": "Tell us about your interest..."
+    },
+    {
+      "type": "text",
+      "id": "f_submit",
+      "label": "Button",
+      "default": "Submit"
+    },
+    {
+      "type": "header",
+      "content": "Details column"
+    },
+    {
+      "type": "text",
+      "id": "d_location",
+      "label": "Location row label",
+      "default": "Location"
+    },
+    {
+      "type": "text",
+      "id": "d_instagram",
+      "label": "Instagram row label",
+      "default": "Instagram"
+    },
+    {
+      "type": "text",
+      "id": "d_facebook",
+      "label": "Facebook row label",
+      "default": "Facebook"
+    },
+    {
+      "type": "text",
+      "id": "d_facebook_v",
+      "label": "Facebook display text",
+      "default": "Sabdia Constructions"
+    },
+    {
+      "type": "text",
+      "id": "d_linkedin",
+      "label": "LinkedIn row label",
+      "default": "LinkedIn"
+    },
+    {
+      "type": "text",
+      "id": "d_linkedin_v",
+      "label": "LinkedIn display text",
+      "default": "Sabdia Constructions"
+    }
   ],
-  "presets": [{ "name": "Contact" }]
+  "presets": [
+    {
+      "name": "Contact"
+    }
+  ]
 }
 {% endschema %}
