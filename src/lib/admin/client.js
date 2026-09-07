@@ -45,7 +45,12 @@ export async function getClerk() {
       });
     }
     clerkInstance = window.Clerk;
-    await clerkInstance.load();
+    /* Clerk's product telemetry beacon (clerk-telemetry.com) is not needed
+       to sign anyone in, and the site's Content-Security-Policy refuses it
+       — which filled the admin console with violation errors that would
+       mask a real one. Switched off at the source instead of allowlisting
+       a third-party tracking host. */
+    await clerkInstance.load({ telemetry: { disabled: true } });
   }
   return clerkInstance;
 }

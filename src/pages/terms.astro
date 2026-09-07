@@ -1,0 +1,11 @@
+---
+import LegalPage from '../components/LegalPage.astro';
+import { getContent } from '../lib/content.js';
+
+const { legal_terms: doc } = await getContent('legal_terms');
+---
+<LegalPage
+  doc={doc}
+  title="Terms of Use | Sabdia Constructions"
+  description="The terms governing use of the Sabdia Constructions website — the status of property information, images and renders, intellectual property, and liability under Queensland law."
+/>

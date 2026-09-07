@@ -106,7 +106,7 @@ const ord = (k) => { const i = bandSeq.indexOf(k); return (i === -1 ? BAND_ORDER
         <p class="about-p reveal d2">{page.apply.text}</p>
         <div class="reveal d3" style="margin-top:36px;padding:28px;background:var(--dark);border-left:2px solid var(--gold)">
           <div style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--gold3);margin-bottom:10px">{page.apply.noteLabel}</div>
-          <div style="font-size:14px;font-weight:400;color:rgba(253,251,246,.78);line-height:1.75">{page.apply.noteText}</div>
+          <div style="font-size:14px;font-weight:400;color:rgba(253,251,246,.78);line-height:1.75" set:html={page.apply.noteText} />
         </div>
       </div>
       <div>

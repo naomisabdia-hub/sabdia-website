@@ -2,6 +2,8 @@
   "settings": {
     "siteName": "Sabdia Constructions",
     "legalName": "Sabdia Constructions Pty Ltd",
+    "abn": "",
+    "qbccLicence": "",
     "estYear": 2013,
     "logo": "/images/logo.png",
     "logoLarge": "/images/logo.png",
@@ -136,6 +138,10 @@
       {
         "label": "Privacy",
         "href": "/privacy/"
+      },
+      {
+        "label": "Terms",
+        "href": "/terms/"
       }
     ]
   },
@@ -665,7 +671,8 @@
       "noteLabel": "Please note",
       "noteText": "The Sabdia agent program is available to licensed real estate professionals only. We may request verification of your licence at the time of application approval.",
       "submitLabel": "Submit Application"
-    }
+    },
+    "noteText": "The Sabdia agent program is available to licensed real estate professionals only. We may request verification of your licence at the time of application approval. Your details are handled in line with our <a href=\"/privacy/\">Privacy Policy</a>."
   },
   "contact_page": {
     "hero": {
@@ -692,7 +699,7 @@
         "General Enquiry"
       ],
       "submitLabel": "Submit Enquiry",
-      "note": "We respond within one business day."
+      "note": "We respond within one business day. Your details are used only to answer your enquiry — see our <a href=\"/privacy/\">Privacy Policy</a>."
     },
     "quickLinks": {
       "label": "You May Also Be Interested In",
@@ -721,7 +728,7 @@
   "legal_privacy": {
     "label": "Legal",
     "titleHtml": "Privacy <em>Policy</em>.",
-    "updated": "July 2026",
+    "updated": "September 2026",
     "intro": "Sabdia Constructions Pty Ltd is committed to protecting your privacy in accordance with the Privacy Act 1988 (Cth) and the Australian Privacy Principles. This policy explains how we collect, use, and safeguard your personal information.",
     "sections": [
       {
@@ -741,16 +748,92 @@
         "bodyHtml": "We may share your information with trusted service providers who help us operate this website and communicate with you (for example, our email delivery provider). These providers are bound to handle your information only for the purpose of providing services to us."
       },
       {
+        "heading": "Where your information is stored",
+        "bodyHtml": "This website runs on cloud services whose servers are located outside Australia, mainly in the United States and Europe. That means your enquiry is stored and processed overseas by our hosting provider, our database provider, our email delivery provider and, where enabled, our newsletter and analytics providers. We take reasonable steps to ensure these providers handle your information consistently with the Australian Privacy Principles, but by submitting an enquiry you consent to that overseas disclosure. Australian Privacy Principle 8 requires us to tell you this; if you would prefer not to have your details stored overseas, contact us by phone or email instead of using the forms."
+      },
+      {
         "heading": "Cookies and analytics",
-        "bodyHtml": "This website may use privacy-friendly analytics to understand how visitors use the site. Analytics data is aggregated and does not identify you personally."
+        "bodyHtml": "This site sets nothing in your browser beyond what it needs to work — a per-session flag so the opening animation plays once, and, if you sign in to our admin portal, your session. Where analytics is enabled we use Google Analytics 4 with Google Consent Mode: analytics storage is <strong>denied by default</strong> and is only switched on if you press Accept on the notice. Decline, or simply ignore it, and no analytics cookie is set. You can change your mind at any time by clearing this site's data in your browser, which brings the notice back. Analytics data is aggregated, IP addresses are anonymised, and none of it identifies you personally."
+      },
+      {
+        "heading": "How long we keep it",
+        "bodyHtml": "We keep enquiry records for as long as we may reasonably need them to deal with your enquiry and any resulting relationship, and to meet our record-keeping obligations. When information is no longer needed for any purpose for which it may be used or disclosed, and we are not required by law to retain it, we destroy or de-identify it."
       },
       {
         "heading": "Access and correction",
         "bodyHtml": "You may request access to, or correction of, the personal information we hold about you at any time by contacting us. We will respond within a reasonable period."
       },
       {
+        "heading": "If something goes wrong",
+        "bodyHtml": "If a data breach occurs that is likely to result in serious harm, we will assess it and, where the Notifiable Data Breaches scheme under the Privacy Act 1988 (Cth) applies, notify affected individuals and the Office of the Australian Information Commissioner as required."
+      },
+      {
         "heading": "Contact",
         "bodyHtml": "For any privacy-related questions or requests, contact us via the enquiry form on this website or by email. If you are not satisfied with our response, you may contact the Office of the Australian Information Commissioner (OAIC)."
+      }
+    ]
+  },
+  "legal_terms": {
+    "label": "Legal",
+    "titleHtml": "Terms of <em>Use</em>.",
+    "updated": "September 2026",
+    "intro": "These terms govern your use of this website. By browsing the site, submitting an enquiry, or applying for agent access, you agree to them. If you do not agree, please do not use the site.",
+    "sections": [
+      {
+        "heading": "Who we are",
+        "bodyHtml": "This website is operated by Sabdia Constructions Pty Ltd, a boutique luxury home builder and developer based in Brisbane, Queensland. References to “we”, “us” and “our” mean Sabdia Constructions Pty Ltd. Our ABN and QBCC licence number appear in the footer of every page."
+      },
+      {
+        "heading": "Information is general, not an offer",
+        "bodyHtml": "Everything on this site is published for general information and marketing purposes. Nothing here is an offer, a contract, or a promise to sell or build. It is not legal, financial, taxation, investment, or building advice, and it does not take account of your circumstances. Before you act on anything you read here, obtain your own professional advice."
+      },
+      {
+        "heading": "Property details, images and renders",
+        "bodyHtml": "Property descriptions, floor areas, specifications, inclusions, timelines, and prices are indicative and may change without notice. Photography, films, walkthroughs, and computer-generated renders are illustrative: they may show styling, landscaping, furniture, or finishes that are not included, and completed work may differ. Nothing shown on this site forms part of any contract. Before entering into a contract, rely only on the contract documents, the plans and specifications, and your own inspection and advice."
+      },
+      {
+        "heading": "Availability and sale status",
+        "bodyHtml": "Residences shown as available may be sold, withdrawn, or repriced at any time, and the site may not reflect that immediately. Please confirm current availability with us directly."
+      },
+      {
+        "heading": "Building work and statutory warranties",
+        "bodyHtml": "Sabdia Constructions Pty Ltd carries out domestic building work in Queensland under a licence issued by the Queensland Building and Construction Commission. Where we contract to carry out building work for you, that work is governed by the contract between us and by the Queensland Building and Construction Commission Act 1991 (Qld) and the Domestic Building Contracts provisions of Schedule 1B to that Act, including the statutory warranties and the statutory insurance scheme that apply to that work. Nothing on this website limits, replaces, or varies those rights, and nothing here forms part of any building contract."
+      },
+      {
+        "heading": "Enquiries and agent access",
+        "bodyHtml": "When you submit a form you agree to give accurate information and to be contacted about your enquiry. Agent access is offered at our discretion to licensed real estate professionals; we may verify the details you give, and we may decline or withdraw access at any time. Personal information is handled in line with our <a href=\"/privacy/\">Privacy Policy</a>."
+      },
+      {
+        "heading": "Intellectual property",
+        "bodyHtml": "All content on this site — including text, photography, film, renders, plans, designs, logos, and the name Sabdia — is owned by us or our licensors and protected by copyright and trade mark law. You may view, download, and print pages for your own personal, non-commercial use. You may not otherwise reproduce, republish, adapt, or use our content commercially without our written permission."
+      },
+      {
+        "heading": "Acceptable use",
+        "bodyHtml": "Please do not use this site unlawfully, attempt to gain unauthorised access to it or any system behind it, interfere with its operation or security, scrape or harvest it by automated means, or submit anything false, misleading, unlawful, or harmful through our forms."
+      },
+      {
+        "heading": "Third-party links",
+        "bodyHtml": "This site links to third-party websites and social media accounts we do not control. Those links are provided for convenience only; we are not responsible for their content, availability, or privacy practices."
+      },
+      {
+        "heading": "Availability of the site",
+        "bodyHtml": "We aim to keep this site available and accurate, but we do not guarantee it will be uninterrupted, error-free, or secure from every risk. We may change, suspend, or withdraw any part of it at any time without notice."
+      },
+      {
+        "heading": "Liability",
+        "bodyHtml": "Nothing in these terms excludes, restricts, or modifies any guarantee, right, or remedy you have under the Australian Consumer Law or other law that cannot be excluded. Subject to that, to the extent permitted by law we exclude all warranties not expressly given, and we are not liable for any loss or damage arising from your use of, or reliance on, this site or its content. Where our liability cannot be excluded, it is limited to resupplying the relevant information or paying the cost of having it resupplied."
+      },
+      {
+        "heading": "Changes to these terms",
+        "bodyHtml": "We may update these terms from time to time. The version published here is the current one, and the date above shows when it last changed. Continuing to use the site after a change means you accept the updated terms."
+      },
+      {
+        "heading": "Complaints",
+        "bodyHtml": "If you have a concern about this website, our conduct, or building work we have carried out, please raise it with us first through the <a href=\"/contact/\">enquiry form</a> so we can try to resolve it. Concerns about licensed building work in Queensland may also be taken to the Queensland Building and Construction Commission, and privacy concerns to the Office of the Australian Information Commissioner."
+      },
+      {
+        "heading": "Governing law and contact",
+        "bodyHtml": "These terms are governed by the laws of Queensland, Australia, and you submit to the non-exclusive jurisdiction of its courts. For any question about these terms, contact us through the <a href=\"/contact/\">enquiry form</a>."
       }
     ]
   },

@@ -34,7 +34,7 @@ async function isAdmin(request: Request): Promise<boolean> {
 }
 
 const SEEDS = ['/', '/about/', '/services/', '/projects/', '/collection/', '/contact/',
-  '/agent-access/', '/find-your-home/', '/properties/', '/journal/', '/privacy/', '/accessibility/'];
+  '/agent-access/', '/find-your-home/', '/properties/', '/journal/', '/privacy/', '/terms/', '/accessibility/'];
 
 export const GET: APIRoute = async ({ request }) => {
   if (!(await isAdmin(request))) return json({ error: 'Sign in to the admin portal first.' }, 401);

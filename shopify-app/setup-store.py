@@ -294,6 +294,7 @@ PAGES = [
     ("Agent Access", "agent-access", "agent_page", "agent-access"),
     ("Find Your Home", "find-your-home", "find_home", "find-your-home"),
     ("Privacy Policy", "privacy", "legal_privacy", None),
+    ("Terms of Use", "terms", "legal_terms", None),
     ("Accessibility", "accessibility", "legal_accessibility", None),
 ]
 have = gql("query { pages(first: 50) { nodes { id handle templateSuffix } } }")["pages"]["nodes"]

@@ -9,6 +9,13 @@ const [{ settings, footer, newsletter }, all] = await Promise.all([
 const forSale = all.filter((p) => p.data.status === 'for-sale');
 const socials = settings.socials;
 const year = new Date().getFullYear();
+/* Every page must reach the legal pages, so the Terms link is guaranteed
+   here rather than relying on the saved footer document — a site_content
+   row written before Terms existed would otherwise drop it. Appended only
+   when absent, so editing or reordering the row in the admin still wins. */
+const legalLinks = footer.legalLinks.some((l) => l.href === '/terms/')
+  ? footer.legalLinks
+  : [...footer.legalLinks, { label: 'Terms', href: '/terms/' }];
 ---
 <footer>
   <div class="footer-tagline">
@@ -81,9 +88,23 @@ const year = new Date().getFullYear();
     </div>
   </div>
   <div class="fbot">
-    <div class="fcopy">&copy; {year} {settings.legalName}. All rights reserved.</div>
+    {/* Queensland requires a licensed builder to publish its QBCC licence
+        number in advertising, and this site advertises the business. Both
+        identifiers render only once they are filled in at Admin → Global
+        Settings — an invented or placeholder licence number would be worse
+        than none at all. */}
+    <div class="fcopy">
+      &copy; {year} {settings.legalName}. All rights reserved.
+      {(settings.qbccLicence || settings.abn) && (
+        <span class="flegal">
+          {settings.qbccLicence && <span>QBCC Licence {settings.qbccLicence}</span>}
+          {settings.qbccLicence && settings.abn && <span aria-hidden="true"> · </span>}
+          {settings.abn && <span>ABN {settings.abn}</span>}
+        </span>
+      )}
+    </div>
     <div class="flinks">
-      {footer.legalLinks.map((l) => (
+      {legalLinks.map((l) => (
         <a href={l.href}>{l.label}</a>
       ))}
     </div>

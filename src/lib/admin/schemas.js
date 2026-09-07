@@ -51,6 +51,8 @@ export const contentSchemas = {
     schema: [
       { key: 'siteName', label: 'Site name', type: 'text' },
       { key: 'legalName', label: 'Legal name', type: 'text', help: 'shown in the footer copyright' },
+      { key: 'abn', label: 'ABN', type: 'text', help: 'shown in the footer legal line, e.g. 12 345 678 901. Leave blank to hide.' },
+      { key: 'qbccLicence', label: 'QBCC licence number', type: 'text', help: 'Queensland requires a licensed builder to show its QBCC licence number in advertising, and this website advertises the business. Leave blank to hide — but it should be filled in before launch.' },
       { key: 'location', label: 'Location line', type: 'text' },
       { key: 'email', label: 'Contact email', type: 'text' },
       { key: 'phone', label: 'Phone', type: 'text' },
@@ -311,6 +313,19 @@ export const contentSchemas = {
 
   legal_privacy: {
     title: 'Privacy Policy',
+    schema: [
+      { key: 'titleHtml', label: 'Page title', type: 'html' },
+      { key: 'updated', label: '"Last updated" text', type: 'text' },
+      { key: 'intro', label: 'Introduction', type: 'textarea' },
+      { key: 'sections', label: 'Sections', type: 'items', itemLabel: 'section', fields: [
+        { key: 'heading', label: 'Heading', type: 'text' },
+        { key: 'bodyHtml', label: 'Body', type: 'html' },
+      ] },
+    ],
+  },
+
+  legal_terms: {
+    title: 'Terms of Use',
     schema: [
       { key: 'titleHtml', label: 'Page title', type: 'html' },
       { key: 'updated', label: '"Last updated" text', type: 'text' },
@@ -769,7 +784,7 @@ export const customPageSchema = [
 export const contentGroups = [
   { name: 'Homepage', keys: ['home_hero', 'home_stats', 'home_marquee', 'home_about', 'home_properties', 'home_services', 'home_process', 'home_agent', 'home_contact'] },
   { name: 'Pages', keys: ['properties_page', 'property_page', 'projects_page', 'services_page', 'about_page', 'collection_page', 'agent_page', 'contact_page', 'find_home', 'notfound'] },
-  { name: 'Site-wide', keys: ['seo_pages', 'page_layout', 'films', 'walkthroughs', 'nav', 'footer', 'newsletter', 'series', 'legal_privacy', 'legal_accessibility'] },
+  { name: 'Site-wide', keys: ['seo_pages', 'page_layout', 'films', 'walkthroughs', 'nav', 'footer', 'newsletter', 'series', 'legal_privacy', 'legal_terms', 'legal_accessibility'] },
 ];
 
 /** Property editor schema (columns of the properties table). */

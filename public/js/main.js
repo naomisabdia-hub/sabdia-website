@@ -239,15 +239,24 @@ document.addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body
     });
-    if (!res.ok) throw new Error(`Form submit failed: ${res.status}`);
+    /* The endpoint explains WHY it refused (bad address, empty enquiry,
+       too many attempts); show that instead of a generic failure, so a
+       visitor with a typo can fix it rather than give up. */
+    if (!res.ok) {
+      const detail = await res.json().catch(() => null);
+      throw new Error((detail && detail.error) || `Form submit failed: ${res.status}`);
+    }
     btn.textContent = 'Thank you — we\'ll be in touch shortly.';
     btn.style.background = 'var(--ink2)';
     btn.disabled = true;
     announce('Thank you — your enquiry was sent. We\'ll be in touch shortly.');
   } catch (err) {
-    btn.textContent = 'Something went wrong — please try again.';
+    const msg = (err && err.message && !/^Form submit failed|Failed to fetch|NetworkError/.test(err.message))
+      ? err.message
+      : 'Something went wrong — please try again.';
+    btn.textContent = msg;
     btn.style.background = '';
-    announce('Something went wrong sending your enquiry — please try again.');
+    announce(msg);
   }
 });
 
@@ -283,14 +292,19 @@ document.addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams(new FormData(form)).toString()
     });
-    if (!res.ok) throw new Error('subscribe failed: ' + res.status);
+    if (!res.ok) {
+      const detail = await res.json().catch(() => null);
+      throw new Error((detail && detail.error) || 'subscribe failed: ' + res.status);
+    }
     const done = form.getAttribute('data-success') || 'Thank you — you\'re subscribed.';
     form.innerHTML = '<p class="nl-done">' + done + '</p>';
     announce(done);
   } catch (err) {
     btn.textContent = original;
     btn.disabled = false;
-    announce('Something went wrong — please try again.');
+    announce((err && err.message && !/^subscribe failed|Failed to fetch|NetworkError/.test(err.message))
+      ? err.message
+      : 'Something went wrong — please try again.');
   }
 });
 

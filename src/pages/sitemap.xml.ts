@@ -15,6 +15,7 @@ const STATIC_PATHS = [
   '/find-your-home/',
   '/journal/',
   '/privacy/',
+  '/terms/',
   '/accessibility/',
 ];
 

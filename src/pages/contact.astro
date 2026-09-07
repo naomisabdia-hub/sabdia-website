@@ -108,7 +108,7 @@ const contactLd = JSON.stringify({
           <div class="fg"><label class="fl" for="cf-message">Your Message*</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
             <button type="submit" class="fsub" id="fsub">{page.form.submitLabel} &rarr;</button>
-            <p class="form-note" style="margin:0">{page.form.note}</p>
+            <p class="form-note" style="margin:0" set:html={page.form.note} />
           </div>
           <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
         </form>

@@ -2,6 +2,7 @@
 import { ClientRouter } from 'astro:transitions';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import CookieConsent from '../components/CookieConsent.astro';
 import { getContent } from '../lib/content.js';
 
 interface Props {
@@ -96,8 +97,15 @@ try {
 <meta name="twitter:title" content={ogT}>
 <meta name="twitter:description" content={ogD}>
 <meta name="twitter:image" content={ogImageAbs}>
+{/* Google Consent Mode v2. Storage starts denied for everyone; the
+    notice in CookieConsent.astro is the only thing that grants it, and a
+    visitor who ignores it is never tracked. The default must be queued
+    before the config call, so this inline snippet precedes gtag.js. */}
+{gaId && <script is:inline set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)};
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',functionality_storage:'granted',security_storage:'granted',wait_for_update:500});
+try{if(localStorage.getItem('sabdia:consent')==='granted')gtag('consent','update',{analytics_storage:'granted'})}catch(e){}
+gtag('js',new Date());gtag('config','${gaId}',{anonymize_ip:true});`}></script>}
 {gaId && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>}
-{gaId && <script is:inline set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','${gaId}');`}></script>}
 <link rel="preconnect" href="https://fvczsjcrvwzqtcbforgo.supabase.co" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/jost-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/cormorant-garamond-var.woff2" crossorigin>
@@ -118,6 +126,8 @@ try {
 </main>
 
 <Footer />
+
+{gaId && <CookieConsent />}
 <script is:inline>
 /* Staff-only edit shortcut: a browser that has signed in to /admin
    carries a local flag, and for it every public page shows a small
