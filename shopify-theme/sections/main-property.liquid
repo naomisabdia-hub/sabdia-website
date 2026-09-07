@@ -52,34 +52,37 @@
   </div>
 {%- endif -%}
 
+{%- unless section.settings.hide_specs -%}
 <div class="prop-specs-bar">
   <div class="prop-specs-inner">
     <div class="prop-spec-item">
-      <div class="prop-spec-l">Location</div>
+      <div class="prop-spec-l">{{ section.settings.spec_location | default: "Location" }}</div>
       <div class="prop-spec-v" style="font-size:16px">{{ mf.suburb.value }}</div>
     </div>
     <div class="prop-spec-item">
-      <div class="prop-spec-l">Bedrooms</div>
+      <div class="prop-spec-l">{{ section.settings.spec_beds | default: "Bedrooms" }}</div>
       <div class="prop-spec-v">{{ mf.beds.value }}</div>
     </div>
     <div class="prop-spec-item">
-      <div class="prop-spec-l">Bathrooms</div>
+      <div class="prop-spec-l">{{ section.settings.spec_baths | default: "Bathrooms" }}</div>
       <div class="prop-spec-v">{{ mf.baths.value }}</div>
     </div>
     <div class="prop-spec-item">
-      <div class="prop-spec-l">Garages</div>
+      <div class="prop-spec-l">{{ section.settings.spec_cars | default: "Garages" }}</div>
       <div class="prop-spec-v">{{ mf.cars.value }}</div>
     </div>
     <div class="prop-spec-item">
-      <div class="prop-spec-l">Land Size</div>
+      <div class="prop-spec-l">{{ section.settings.spec_land | default: "Land Size" }}</div>
       <div class="prop-spec-v">{{ mf.land.value }}<em>m&sup2;{% if mf.land_over.value %}+{% endif %}</em></div>
     </div>
     <div class="prop-spec-item">
-      <div class="prop-spec-l">Status</div>
-      <div class="prop-spec-v" style="font-size:16px;color:{% if sold %}var(--taupe-d){% else %}var(--ink){% endif %}">{% if sold %}Sold{% else %}For Sale{% endif %}</div>
+      <div class="prop-spec-l">{{ section.settings.spec_status | default: "Status" }}</div>
+      <div class="prop-spec-v" style="font-size:16px;color:{% if sold %}var(--taupe-d){% else %}var(--ink){% endif %}">{% if sold %}{{ section.settings.status_sold | default: "Sold" }}{% else %}{{ section.settings.status_forsale | default: "For Sale" }}{% endif %}</div>
     </div>
   </div>
 </div>
+
+{%- endunless -%}
 
 <div class="prop-body">
   <div class="prop-layout inner">
@@ -307,29 +310,206 @@
 {
   "name": "Property page",
   "settings": [
-    { "type": "paragraph", "content": "Shared framing text for every property page. Write {name} wherever the residence's name should appear." },
-    { "type": "text", "id": "about_label", "label": "Description label", "default": "About {name}" },
-    { "type": "text", "id": "features_heading", "label": "Features heading", "default": "Key Features" },
-    { "type": "textarea", "id": "enquiry_types", "label": "Enquiry types (one per line)", "default": "Register Interest\nArrange Private Inspection\nRequest Price Guide\nGeneral Enquiry" },
-    { "type": "textarea", "id": "privacy_note", "label": "Privacy note", "default": "By submitting this form you agree to our privacy policy. Your details will not be shared with third parties." },
-    { "type": "text", "id": "brochure_label", "label": "Brochure button", "default": "Download Brochure" },
-    { "type": "text", "id": "general_label", "label": "General enquiry button", "default": "General Enquiry" },
-    { "type": "url", "id": "general_link", "label": "General enquiry link" },
-    { "type": "text", "id": "sold_banner_label", "label": "Sold banner button", "default": "View Available" },
-    { "type": "url", "id": "sold_banner_link", "label": "Sold banner link" },
-    { "type": "text", "id": "sold_cta_label", "label": "Sold sidebar button", "default": "View Current Properties" },
-    { "type": "textarea", "id": "success_text", "label": "Success message (Shopify mode)", "default": "Thank you — we've received your enquiry and will be in touch within one business day." },
-    { "type": "text", "id": "share_label", "label": "Share row label", "default": "Share" },
-    { "type": "text", "id": "sticky_label", "label": "Sticky bar button", "default": "Enquire" },
-    { "type": "text", "id": "gallery_label", "label": "Gallery label", "default": "The Residence" },
-    { "type": "html", "id": "gallery_heading_html", "label": "Gallery heading", "default": "Inside <em>{name}<\/em>." },
-    { "type": "text", "id": "film_label", "label": "Film label", "default": "The Film" },
-    { "type": "text", "id": "sold_badge", "label": "Sold badge", "default": "Sold Prior to Completion" },
-    { "type": "text", "id": "sold_notice", "label": "Sold notice", "default": "This residence has found its owner. Register your interest for upcoming releases." },
-    { "type": "text", "id": "cta_label", "label": "Closing CTA label", "default": "Private Appointments" },
-    { "type": "html", "id": "cta_heading_html", "label": "Closing CTA heading", "default": "Experience <em>{name}<\/em> in person." },
-    { "type": "textarea", "id": "cta_text", "label": "Closing CTA text", "default": "Private inspections are available by appointment." },
-    { "type": "text", "id": "cta_button", "label": "Closing CTA button", "default": "Enquire About {name}" }
+    {
+      "type": "paragraph",
+      "content": "Shared framing text for every property page. Write {name} wherever the residence's name should appear."
+    },
+    {
+      "type": "text",
+      "id": "about_label",
+      "label": "Description label",
+      "default": "About {name}"
+    },
+    {
+      "type": "text",
+      "id": "features_heading",
+      "label": "Features heading",
+      "default": "Key Features"
+    },
+    {
+      "type": "textarea",
+      "id": "enquiry_types",
+      "label": "Enquiry types (one per line)",
+      "default": "Register Interest\nArrange Private Inspection\nRequest Price Guide\nGeneral Enquiry"
+    },
+    {
+      "type": "textarea",
+      "id": "privacy_note",
+      "label": "Privacy note",
+      "default": "By submitting this form you agree to our privacy policy. Your details will not be shared with third parties."
+    },
+    {
+      "type": "text",
+      "id": "brochure_label",
+      "label": "Brochure button",
+      "default": "Download Brochure"
+    },
+    {
+      "type": "text",
+      "id": "general_label",
+      "label": "General enquiry button",
+      "default": "General Enquiry"
+    },
+    {
+      "type": "url",
+      "id": "general_link",
+      "label": "General enquiry link"
+    },
+    {
+      "type": "text",
+      "id": "sold_banner_label",
+      "label": "Sold banner button",
+      "default": "View Available"
+    },
+    {
+      "type": "url",
+      "id": "sold_banner_link",
+      "label": "Sold banner link"
+    },
+    {
+      "type": "text",
+      "id": "sold_cta_label",
+      "label": "Sold sidebar button",
+      "default": "View Current Properties"
+    },
+    {
+      "type": "textarea",
+      "id": "success_text",
+      "label": "Success message (Shopify mode)",
+      "default": "Thank you — we've received your enquiry and will be in touch within one business day."
+    },
+    {
+      "type": "text",
+      "id": "share_label",
+      "label": "Share row label",
+      "default": "Share"
+    },
+    {
+      "type": "text",
+      "id": "sticky_label",
+      "label": "Sticky bar button",
+      "default": "Enquire"
+    },
+    {
+      "type": "text",
+      "id": "gallery_label",
+      "label": "Gallery label",
+      "default": "The Residence"
+    },
+    {
+      "type": "html",
+      "id": "gallery_heading_html",
+      "label": "Gallery heading",
+      "default": "Inside <em>{name}</em>."
+    },
+    {
+      "type": "text",
+      "id": "film_label",
+      "label": "Film label",
+      "default": "The Film"
+    },
+    {
+      "type": "paragraph",
+      "content": "Shown only on residences tagged \"sold\" (Products › the residence › Tags)."
+    },
+    {
+      "type": "text",
+      "id": "sold_badge",
+      "label": "Sold badge",
+      "default": "Sold Prior to Completion"
+    },
+    {
+      "type": "text",
+      "id": "sold_notice",
+      "label": "Sold notice",
+      "default": "This residence has found its owner. Register your interest for upcoming releases."
+    },
+    {
+      "type": "header",
+      "content": "Specs bar"
+    },
+    {
+      "type": "paragraph",
+      "content": "The NUMBERS in this bar (suburb, bedrooms, bathrooms, garages, land size) belong to the residence itself — edit them at Products › the residence › Metafields, near the bottom of that page. Sold / For Sale follows the product's \"sold\" tag. Only the wording of the labels is set here."
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_specs",
+      "label": "Hide the specs bar",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "spec_location",
+      "label": "Location label",
+      "default": "Location"
+    },
+    {
+      "type": "text",
+      "id": "spec_beds",
+      "label": "Bedrooms label",
+      "default": "Bedrooms"
+    },
+    {
+      "type": "text",
+      "id": "spec_baths",
+      "label": "Bathrooms label",
+      "default": "Bathrooms"
+    },
+    {
+      "type": "text",
+      "id": "spec_cars",
+      "label": "Garages label",
+      "default": "Garages"
+    },
+    {
+      "type": "text",
+      "id": "spec_land",
+      "label": "Land size label",
+      "default": "Land Size"
+    },
+    {
+      "type": "text",
+      "id": "spec_status",
+      "label": "Status label",
+      "default": "Status"
+    },
+    {
+      "type": "text",
+      "id": "status_forsale",
+      "label": "Status word — for sale",
+      "default": "For Sale"
+    },
+    {
+      "type": "text",
+      "id": "status_sold",
+      "label": "Status word — sold",
+      "default": "Sold"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Closing CTA label",
+      "default": "Private Appointments"
+    },
+    {
+      "type": "html",
+      "id": "cta_heading_html",
+      "label": "Closing CTA heading",
+      "default": "Experience <em>{name}</em> in person."
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "Closing CTA text",
+      "default": "Private inspections are available by appointment."
+    },
+    {
+      "type": "text",
+      "id": "cta_button",
+      "label": "Closing CTA button",
+      "default": "Enquire About {name}"
+    }
   ]
 }
 {% endschema %}
