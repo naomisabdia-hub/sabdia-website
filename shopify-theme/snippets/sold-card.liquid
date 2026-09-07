@@ -15,7 +15,7 @@
       alt="{{ product.title | escape }}" loading="lazy" decoding="async" width="{{ img_w }}" height="{{ img_h }}">
   {%- endif -%}
   <div class="sc-ov"></div>
-  <div class="sc-badge">Sold Prior to Completion</div>
+  <div class="sc-badge">{{ settings.label_sold_badge | default: "Sold Prior to Completion" }}</div>
   <div class="sc-info">
     <div class="sc-name">{{ product.title }}</div>
     {%- if show_suburb and mf.suburb.value != blank -%}

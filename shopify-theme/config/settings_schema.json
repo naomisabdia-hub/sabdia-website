@@ -228,5 +228,26 @@
         "default": "https://www.sabdiaconstructions.com.au"
       }
     ]
+  },
+  {
+    "name": "Labels",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Small words that appear on residence cards across the site."
+      },
+      {
+        "type": "text",
+        "id": "label_for_sale",
+        "label": "For-sale chip",
+        "default": "For Sale"
+      },
+      {
+        "type": "text",
+        "id": "label_sold_badge",
+        "label": "Sold badge",
+        "default": "Sold Prior to Completion"
+      }
+    ]
   }
 ]

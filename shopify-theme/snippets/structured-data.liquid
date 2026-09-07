@@ -1,0 +1,56 @@
+{%- comment -%}
+  Organization + LocalBusiness (HomeAndConstructionBusiness) for search
+  engines, built entirely from theme settings and store data — nothing
+  is invented. Address is locality-level (Brisbane, QLD, AU) until a
+  street address is added under Theme settings; phone and identifiers
+  appear only once they are filled in.
+{%- endcomment -%}
+{%- liquid
+  assign site_name = settings.site_name | default: shop.name
+  assign logo_src = 'logo.png' | asset_url
+  if settings.logo
+    assign logo_src = settings.logo | image_url: width: 600
+  endif
+  assign same_as = ''
+  if settings.instagram_url != blank
+    assign same_as = same_as | append: '"' | append: settings.instagram_url | append: '",'
+  endif
+  if settings.facebook_url != blank
+    assign same_as = same_as | append: '"' | append: settings.facebook_url | append: '",'
+  endif
+  if settings.linkedin_url != blank
+    assign same_as = same_as | append: '"' | append: settings.linkedin_url | append: '",'
+  endif
+  assign same_as = same_as | remove_last: ','
+-%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{ shop.url }}/#organization",
+      "name": {{ site_name | json }},
+      "legalName": {{ settings.legal_name | default: site_name | json }},
+      "url": "{{ shop.url }}",
+      "logo": "https:{{ logo_src | remove: 'https:' }}",
+      {%- if settings.contact_email != blank %}"email": {{ settings.contact_email | json }},{% endif %}
+      {%- if settings.contact_phone != blank %}"telephone": {{ settings.contact_phone | json }},{% endif %}
+      {%- if same_as != blank %}"sameAs": [{{ same_as }}],{% endif %}
+      "foundingDate": "2013"
+    },
+    {
+      "@type": "HomeAndConstructionBusiness",
+      "@id": "{{ shop.url }}/#localbusiness",
+      "name": {{ site_name | json }},
+      "url": "{{ shop.url }}",
+      "image": "https:{{ logo_src | remove: 'https:' }}",
+      "parentOrganization": { "@id": "{{ shop.url }}/#organization" },
+      {%- if settings.contact_email != blank %}"email": {{ settings.contact_email | json }},{% endif %}
+      {%- if settings.contact_phone != blank %}"telephone": {{ settings.contact_phone | json }},{% endif %}
+      "address": { "@type": "PostalAddress", "addressLocality": "Brisbane", "addressRegion": "QLD", "addressCountry": "AU" },
+      "areaServed": {{ settings.location | default: 'Brisbane, Queensland, Australia' | json }}
+    }
+  ]
+}
+</script>

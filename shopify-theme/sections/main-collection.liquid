@@ -69,22 +69,22 @@
       {%- endfor -%}
     </select>
     <select class="ptool-sel" id="fCars" aria-label="Minimum garage spaces">
-      <option value="">Any Garage</option>
+      <option value="">{{ section.settings.filter_any_garage | default: "Any Garage" }}</option>
       <option value="4">4+ Cars</option>
       <option value="6">6+ Cars</option>
       <option value="8">8+ Cars</option>
     </select>
     <select class="ptool-sel" id="fLand" aria-label="Land size">
-      <option value="">Any Land Size</option>
+      <option value="">{{ section.settings.filter_any_land | default: "Any Land Size" }}</option>
       <option value="0-600">Up to 600m&sup2;</option>
       <option value="600-800">600&ndash;800m&sup2;</option>
       <option value="800-">800m&sup2;+</option>
     </select>
     <select class="ptool-sel" id="fSort" aria-label="Sort properties">
-      <option value="featured">Sort &mdash; Featured</option>
-      <option value="land">Land Size</option>
-      <option value="cars">Garage Spaces</option>
-      <option value="name">Name A&ndash;Z</option>
+      <option value="featured">{{ section.settings.sort_featured_label | default: "Sort — Featured" }}</option>
+      <option value="land">{{ section.settings.filter_land_label | default: "Land Size" }}</option>
+      <option value="cars">{{ section.settings.filter_garage_label | default: "Garage Spaces" }}</option>
+      <option value="name">{{ section.settings.sort_name_label | default: "Name A–Z" }}</option>
     </select>
     <span class="ptool-count" id="fCount"></span>
   </div>
@@ -103,7 +103,7 @@
         <div style="position:absolute;bottom:0;left:0;right:0;padding:clamp(28px,4vw,52px)">
           <div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
             <div style="width:5px;height:5px;border-radius:50%;background:var(--gold2);animation:pulse 2s ease-in-out infinite;flex-shrink:0"></div>
-            <span style="font-size:10.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2)">For Sale</span>
+            <span style="font-size:10.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2)">{{ settings.label_for_sale | default: "For Sale" }}</span>
           </div>
           <div style="font-family:var(--font-d);font-size:clamp(44px,8vw,110px);font-weight:300;line-height:.88;letter-spacing:-.04em;color:var(--white);margin-bottom:10px">{{ featured.title }}</div>
           <div style="font-size:11.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(253,251,246,.78);margin-bottom:18px">{{ fmf.suburb.value }}, {{ fmf.state.value | default: 'QLD' }}</div>
@@ -361,6 +361,46 @@
       "type": "url",
       "id": "cta3_link",
       "label": "Gold button link"
+    },
+    {
+      "type": "header",
+      "content": "Wording"
+    },
+    {
+      "type": "text",
+      "id": "filter_land_label",
+      "label": "Land size filter label",
+      "default": "Land Size"
+    },
+    {
+      "type": "text",
+      "id": "filter_garage_label",
+      "label": "Garage filter label",
+      "default": "Garage Spaces"
+    },
+    {
+      "type": "text",
+      "id": "sort_featured_label",
+      "label": "Sort: featured",
+      "default": "Sort — Featured"
+    },
+    {
+      "type": "text",
+      "id": "sort_name_label",
+      "label": "Sort: name",
+      "default": "Name A–Z"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_garage",
+      "label": "Garage: any",
+      "default": "Any Garage"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_land",
+      "label": "Land: any",
+      "default": "Any Land Size"
     }
   ]
 }

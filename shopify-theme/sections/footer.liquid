@@ -83,11 +83,11 @@
             <li><a href="{{ p.url }}">{{ p.title }}{% if p.metafields.custom.suburb.value != blank %} — {{ p.metafields.custom.suburb.value }}{% endif %}</a></li>
           {%- endfor -%}
         {%- endif -%}
-        <li><a href="/collections/for-sale">View All Properties</a></li>
+        <li><a href="/collections/for-sale">{{ section.settings.view_all_label | default: "View All Properties" }}</a></li>
       </ul>
     </div>
     <div>
-      <div class="fct">Company</div>
+      <div class="fct">{{ section.settings.col_company | default: "Company" }}</div>
       <ul class="fcl">
         {%- if company_menu.links.size > 0 -%}
           {%- for link in company_menu.links -%}
@@ -104,9 +104,9 @@
       </ul>
     </div>
     <div>
-      <div class="fct">Connect</div>
+      <div class="fct">{{ section.settings.col_connect | default: "Connect" }}</div>
       <ul class="fcl">
-        <li><a href="/pages/contact">Contact Us</a></li>
+        <li><a href="/pages/contact">{{ section.settings.contact_us_label | default: "Contact Us" }}</a></li>
         {%- if settings.contact_phone != blank -%}
           <li><a href="tel:{{ settings.contact_phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}">{{ settings.contact_phone }}</a></li>
         {%- endif -%}
@@ -149,19 +149,106 @@
 {
   "name": "Footer",
   "settings": [
-    { "type": "html", "id": "tagline_html", "label": "Tagline", "default": "Design. <em>Develop.<\/em><br>Construct." },
-    { "type": "text", "id": "tagline_sub", "label": "Tagline subtitle", "default": "Boutique luxury home builder & developer delivering award-winning residences across inner Brisbane since 2013." },
-    { "type": "html", "id": "blurb_html", "label": "Footer blurb", "default": "Boutique Luxury Home Builder &<br>Developer — Brisbane, QLD" },
-    { "type": "header", "content": "Newsletter band" },
-    { "type": "text", "id": "nl_heading", "label": "Heading", "default": "The Sabdia Journal" },
-    { "type": "textarea", "id": "nl_text", "label": "Text", "default": "Occasional notes from our studio — new releases, completed residences, and ideas in luxury living. No noise, unsubscribe any time." },
-    { "type": "text", "id": "nl_placeholder", "label": "Email placeholder", "default": "Your email address" },
-    { "type": "text", "id": "nl_button", "label": "Button label", "default": "Subscribe" },
-    { "type": "text", "id": "nl_success", "label": "Success message", "default": "Welcome — you're on the list." },
-    { "type": "header", "content": "Link columns" },
-    { "type": "link_list", "id": "for_sale_menu", "label": "For Sale menu", "info": "Leave unset to list the for-sale collection automatically." },
-    { "type": "link_list", "id": "company_menu", "label": "Company menu" },
-    { "type": "link_list", "id": "legal_menu", "label": "Legal menu" }
+    {
+      "type": "html",
+      "id": "tagline_html",
+      "label": "Tagline",
+      "default": "Design. <em>Develop.</em><br>Construct."
+    },
+    {
+      "type": "text",
+      "id": "tagline_sub",
+      "label": "Tagline subtitle",
+      "default": "Boutique luxury home builder & developer delivering award-winning residences across inner Brisbane since 2013."
+    },
+    {
+      "type": "html",
+      "id": "blurb_html",
+      "label": "Footer blurb",
+      "default": "Boutique Luxury Home Builder &<br>Developer — Brisbane, QLD"
+    },
+    {
+      "type": "header",
+      "content": "Newsletter band"
+    },
+    {
+      "type": "text",
+      "id": "nl_heading",
+      "label": "Heading",
+      "default": "The Sabdia Journal"
+    },
+    {
+      "type": "textarea",
+      "id": "nl_text",
+      "label": "Text",
+      "default": "Occasional notes from our studio — new releases, completed residences, and ideas in luxury living. No noise, unsubscribe any time."
+    },
+    {
+      "type": "text",
+      "id": "nl_placeholder",
+      "label": "Email placeholder",
+      "default": "Your email address"
+    },
+    {
+      "type": "text",
+      "id": "nl_button",
+      "label": "Button label",
+      "default": "Subscribe"
+    },
+    {
+      "type": "text",
+      "id": "nl_success",
+      "label": "Success message",
+      "default": "Welcome — you're on the list."
+    },
+    {
+      "type": "header",
+      "content": "Link columns"
+    },
+    {
+      "type": "link_list",
+      "id": "for_sale_menu",
+      "label": "For Sale menu",
+      "info": "Leave unset to list the for-sale collection automatically."
+    },
+    {
+      "type": "link_list",
+      "id": "company_menu",
+      "label": "Company menu"
+    },
+    {
+      "type": "link_list",
+      "id": "legal_menu",
+      "label": "Legal menu"
+    },
+    {
+      "type": "header",
+      "content": "Wording"
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "\"View all\" link",
+      "default": "View All Properties"
+    },
+    {
+      "type": "text",
+      "id": "contact_us_label",
+      "label": "\"Contact us\" link",
+      "default": "Contact Us"
+    },
+    {
+      "type": "text",
+      "id": "col_connect",
+      "label": "Connect column heading",
+      "default": "Connect"
+    },
+    {
+      "type": "text",
+      "id": "col_company",
+      "label": "Company column heading",
+      "default": "Company"
+    }
   ]
 }
 {% endschema %}

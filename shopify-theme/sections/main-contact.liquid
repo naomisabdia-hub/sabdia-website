@@ -13,15 +13,15 @@
       <ul class="cdet reveal d1" style="margin-top:12px">
         <li class="cd"><span class="cd-l">{{ section.settings.d_location | default: "Location" }}</span><span class="cd-v">{{ settings.location }}</span></li>
         {%- if settings.contact_phone != blank -%}
-          <li class="cd"><span class="cd-l">Phone</span><a href="tel:{{ settings.contact_phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}" class="cd-v">{{ settings.contact_phone }}</a></li>
+          <li class="cd"><span class="cd-l">{{ section.settings.d_phone | default: "Phone" }}</span><a href="tel:{{ settings.contact_phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}" class="cd-v">{{ settings.contact_phone }}</a></li>
         {%- endif -%}
         {%- if settings.contact_email != blank -%}
-          <li class="cd"><span class="cd-l">Email</span><a href="mailto:{{ settings.contact_email }}" class="cd-v">{{ settings.contact_email }}</a></li>
+          <li class="cd"><span class="cd-l">{{ section.settings.d_email | default: "Email" }}</span><a href="mailto:{{ settings.contact_email }}" class="cd-v">{{ settings.contact_email }}</a></li>
         {%- endif -%}
         <li class="cd"><span class="cd-l">{{ section.settings.d_instagram | default: "Instagram" }}</span><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.instagram_label }}</a></li>
         <li class="cd"><span class="cd-l">{{ section.settings.d_facebook | default: "Facebook" }}</span><a href="{{ settings.facebook_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.facebook_label | default: settings.site_name }}</a></li>
         <li class="cd"><span class="cd-l">{{ section.settings.d_linkedin | default: "LinkedIn" }}</span><a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.linkedin_label | default: settings.site_name }}</a></li>
-        <li class="cd"><span class="cd-l">Website</span><a href="{{ settings.domain_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.domain_display }}</a></li>
+        <li class="cd"><span class="cd-l">{{ section.settings.d_website | default: "Website" }}</span><a href="{{ settings.domain_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.domain_display }}</a></li>
       </ul>
 
       <div class="contact-info-block reveal d2">
@@ -52,12 +52,12 @@
           <div class="fg"><label class="fl" for="cf-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="{{ section.settings.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
           <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
         </div>
-        <div class="fg"><label class="fl" for="cf-email">Email Address*</label><input type="email" id="cf-email" name="email" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
-        <div class="fg"><label class="fl" for="cf-phone">Phone Number</label><input type="tel" id="cf-phone" name="phone" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
+        <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email Address*" }}</label><input type="email" id="cf-email" name="email" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone Number" }}</label><input type="tel" id="cf-phone" name="phone" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
         <div class="fg">
-          <label class="fl" for="cf-interest">How can we help?*</label>
+          <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "How can we help?*" }}</label>
           <select class="fsel" id="cf-interest" name="enquiry-type" required>
-            <option value="">Select an enquiry type…</option>
+            <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
             <option>For Sale — Current Properties</option>
             {%- for product in fs.products -%}
               <option>{{ product.title }} — {{ product.metafields.custom.suburb.value }}</option>
@@ -67,7 +67,7 @@
             {%- endfor -%}
           </select>
         </div>
-        <div class="fg"><label class="fl" for="cf-message">Your Message*</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
+        <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
           <p class="form-note" style="margin:0">{{ section.settings.form_note }}</p>
@@ -88,12 +88,12 @@
           <div class="fg"><label class="fl" for="cf-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="contact[First name]" class="fi" placeholder="{{ section.settings.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
           <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="contact[Last name]" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
         </div>
-        <div class="fg"><label class="fl" for="cf-email">Email Address*</label><input type="email" id="cf-email" name="contact[email]" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
-        <div class="fg"><label class="fl" for="cf-phone">Phone Number</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
+        <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email Address*" }}</label><input type="email" id="cf-email" name="contact[email]" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone Number" }}</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
         <div class="fg">
-          <label class="fl" for="cf-interest">How can we help?*</label>
+          <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "How can we help?*" }}</label>
           <select class="fsel" id="cf-interest" name="contact[Enquiry type]" required>
-            <option value="">Select an enquiry type…</option>
+            <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
             <option>For Sale — Current Properties</option>
             {%- for product in fs.products -%}
               <option>{{ product.title }} — {{ product.metafields.custom.suburb.value }}</option>
@@ -103,7 +103,7 @@
             {%- endfor -%}
           </select>
         </div>
-        <div class="fg"><label class="fl" for="cf-message">Your Message*</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
+        <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
           <p class="form-note" style="margin:0">{{ section.settings.form_note }}</p>
@@ -322,6 +322,34 @@
       "id": "d_linkedin_v",
       "label": "LinkedIn display text",
       "default": "Sabdia Constructions"
+    },
+    {
+      "type": "header",
+      "content": "Wording"
+    },
+    {
+      "type": "text",
+      "id": "f_interest_ph",
+      "label": "Interest placeholder",
+      "default": "Select an enquiry type…"
+    },
+    {
+      "type": "text",
+      "id": "d_phone",
+      "label": "Phone row label",
+      "default": "Phone"
+    },
+    {
+      "type": "text",
+      "id": "d_email",
+      "label": "Email row label",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "d_website",
+      "label": "Website row label",
+      "default": "Website"
     }
   ],
   "blocks": [

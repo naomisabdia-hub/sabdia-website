@@ -20,18 +20,18 @@
         <input type="hidden" name="form-name" value="agent-application">
         <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
         <div class="frow">
-          <div class="fg"><label class="fl" for="aa-first">First Name*</label><input type="text" id="aa-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
-          <div class="fg"><label class="fl" for="aa-last">Last Name*</label><input type="text" id="aa-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+          <div class="fg"><label class="fl" for="aa-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="aa-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="aa-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="aa-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
         </div>
-        <div class="fg"><label class="fl" for="aa-agency">Agency / Company*</label><input type="text" id="aa-agency" name="agency" class="fi" placeholder="Agency or company name" autocomplete="organization" required></div>
-        <div class="fg"><label class="fl" for="aa-email">Email Address*</label><input type="email" id="aa-email" name="email" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
-        <div class="fg"><label class="fl" for="aa-phone">Phone Number*</label><input type="tel" id="aa-phone" name="phone" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel" required></div>
-        <div class="fg"><label class="fl" for="aa-licence">Real Estate Licence No.*</label><input type="text" id="aa-licence" name="licence-number" class="fi" placeholder="Your licence number" autocomplete="off" required></div>
+        <div class="fg"><label class="fl" for="aa-agency">{{ section.settings.f_agency | default: "Agency / Company*" }}</label><input type="text" id="aa-agency" name="agency" class="fi" placeholder="Agency or company name" autocomplete="organization" required></div>
+        <div class="fg"><label class="fl" for="aa-email">{{ section.settings.f_email | default: "Email Address*" }}</label><input type="email" id="aa-email" name="email" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="aa-phone">{{ section.settings.f_phone | default: "Phone Number*" }}</label><input type="tel" id="aa-phone" name="phone" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel" required></div>
+        <div class="fg"><label class="fl" for="aa-licence">{{ section.settings.f_licence | default: "Real Estate Licence No.*" }}</label><input type="text" id="aa-licence" name="licence-number" class="fi" placeholder="Your licence number" autocomplete="off" required></div>
         <div class="fg">
-          <label class="fl" for="aa-suburbs">Primary Suburb Markets</label>
+          <label class="fl" for="aa-suburbs">{{ section.settings.f_suburbs | default: "Primary Suburb Markets" }}</label>
           <input type="text" id="aa-suburbs" name="suburb-markets" class="fi" placeholder="e.g. Coorparoo, Camp Hill, New Farm…">
         </div>
-        <div class="fg"><label class="fl" for="aa-message">Additional Information</label><textarea class="fta" id="aa-message" name="message" placeholder="Tell us about your client base, experience with luxury property, or any other relevant information…"></textarea></div>
+        <div class="fg"><label class="fl" for="aa-message">{{ section.settings.f_message | default: "Additional Information" }}</label><textarea class="fta" id="aa-message" name="message" placeholder="Tell us about your client base, experience with luxury property, or any other relevant information…"></textarea></div>
         <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
         <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
       </form>
@@ -45,18 +45,18 @@
         {%- endif -%}
         <input type="hidden" name="contact[Enquiry]" value="Agent application">
         <div class="frow">
-          <div class="fg"><label class="fl" for="aa-first">First Name*</label><input type="text" id="aa-first" name="contact[First name]" class="fi" placeholder="First name" autocomplete="given-name" required></div>
-          <div class="fg"><label class="fl" for="aa-last">Last Name*</label><input type="text" id="aa-last" name="contact[Last name]" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+          <div class="fg"><label class="fl" for="aa-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="aa-first" name="contact[First name]" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="aa-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="aa-last" name="contact[Last name]" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
         </div>
-        <div class="fg"><label class="fl" for="aa-agency">Agency / Company*</label><input type="text" id="aa-agency" name="contact[Agency]" class="fi" placeholder="Agency or company name" autocomplete="organization" required></div>
-        <div class="fg"><label class="fl" for="aa-email">Email Address*</label><input type="email" id="aa-email" name="contact[email]" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
-        <div class="fg"><label class="fl" for="aa-phone">Phone Number*</label><input type="tel" id="aa-phone" name="contact[Phone]" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel" required></div>
-        <div class="fg"><label class="fl" for="aa-licence">Real Estate Licence No.*</label><input type="text" id="aa-licence" name="contact[Licence number]" class="fi" placeholder="Your licence number" autocomplete="off" required></div>
+        <div class="fg"><label class="fl" for="aa-agency">{{ section.settings.f_agency | default: "Agency / Company*" }}</label><input type="text" id="aa-agency" name="contact[Agency]" class="fi" placeholder="Agency or company name" autocomplete="organization" required></div>
+        <div class="fg"><label class="fl" for="aa-email">{{ section.settings.f_email | default: "Email Address*" }}</label><input type="email" id="aa-email" name="contact[email]" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="aa-phone">{{ section.settings.f_phone | default: "Phone Number*" }}</label><input type="tel" id="aa-phone" name="contact[Phone]" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel" required></div>
+        <div class="fg"><label class="fl" for="aa-licence">{{ section.settings.f_licence | default: "Real Estate Licence No.*" }}</label><input type="text" id="aa-licence" name="contact[Licence number]" class="fi" placeholder="Your licence number" autocomplete="off" required></div>
         <div class="fg">
-          <label class="fl" for="aa-suburbs">Primary Suburb Markets</label>
+          <label class="fl" for="aa-suburbs">{{ section.settings.f_suburbs | default: "Primary Suburb Markets" }}</label>
           <input type="text" id="aa-suburbs" name="contact[Suburb markets]" class="fi" placeholder="e.g. Coorparoo, Camp Hill, New Farm…">
         </div>
-        <div class="fg"><label class="fl" for="aa-message">Additional Information</label><textarea class="fta" id="aa-message" name="contact[body]" placeholder="Tell us about your client base, experience with luxury property, or any other relevant information…"></textarea></div>
+        <div class="fg"><label class="fl" for="aa-message">{{ section.settings.f_message | default: "Additional Information" }}</label><textarea class="fta" id="aa-message" name="contact[body]" placeholder="Tell us about your client base, experience with luxury property, or any other relevant information…"></textarea></div>
         <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
       {% endform %}
       {%- endif -%}
@@ -73,14 +73,102 @@
 {
   "name": "Agent application",
   "settings": [
-    { "type": "text", "id": "label", "label": "Small label", "default": "Apply for Access" },
-    { "type": "html", "id": "heading_html", "label": "Heading (HTML)" },
-    { "type": "textarea", "id": "text", "label": "Text" },
-    { "type": "text", "id": "note_label", "label": "Note label", "default": "Please note" },
-    { "type": "textarea", "id": "note_text", "label": "Note text" },
-    { "type": "text", "id": "submit_label", "label": "Submit button", "default": "Submit Application" },
-    { "type": "textarea", "id": "success_text", "label": "Success message (Shopify mode)", "default": "Thank you — your application has been received. We'll be in touch within one business day." }
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label",
+      "default": "Apply for Access"
+    },
+    {
+      "type": "html",
+      "id": "heading_html",
+      "label": "Heading (HTML)"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text"
+    },
+    {
+      "type": "text",
+      "id": "note_label",
+      "label": "Note label",
+      "default": "Please note"
+    },
+    {
+      "type": "textarea",
+      "id": "note_text",
+      "label": "Note text"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit button",
+      "default": "Submit Application"
+    },
+    {
+      "type": "textarea",
+      "id": "success_text",
+      "label": "Success message (Shopify mode)",
+      "default": "Thank you — your application has been received. We'll be in touch within one business day."
+    },
+    {
+      "type": "header",
+      "content": "Wording"
+    },
+    {
+      "type": "text",
+      "id": "f_first",
+      "label": "First name label",
+      "default": "First Name*"
+    },
+    {
+      "type": "text",
+      "id": "f_last",
+      "label": "Last name label",
+      "default": "Last Name*"
+    },
+    {
+      "type": "text",
+      "id": "f_agency",
+      "label": "Agency label",
+      "default": "Agency / Company*"
+    },
+    {
+      "type": "text",
+      "id": "f_email",
+      "label": "Email label",
+      "default": "Email Address*"
+    },
+    {
+      "type": "text",
+      "id": "f_phone",
+      "label": "Phone label",
+      "default": "Phone Number*"
+    },
+    {
+      "type": "text",
+      "id": "f_licence",
+      "label": "Licence number label",
+      "default": "Real Estate Licence No.*"
+    },
+    {
+      "type": "text",
+      "id": "f_suburbs",
+      "label": "Suburb markets label",
+      "default": "Primary Suburb Markets"
+    },
+    {
+      "type": "text",
+      "id": "f_message",
+      "label": "Additional information label",
+      "default": "Additional Information"
+    }
   ],
-  "presets": [{ "name": "Agent application" }]
+  "presets": [
+    {
+      "name": "Agent application"
+    }
+  ]
 }
 {% endschema %}

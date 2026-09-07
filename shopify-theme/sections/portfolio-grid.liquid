@@ -28,7 +28,7 @@
             -%}
             {%- if port_vid != blank -%}
               <video src="{{ port_vid }}" muted loop playsinline preload="none" data-port-video></video>
-              <span class="port-film-tag">Film</span>
+              <span class="port-film-tag">{{ section.settings.film_tag | default: "Film" }}</span>
             {%- endif -%}
           </div>
           <div class="port-name">{{ block.settings.name }}{% if block.settings.link != blank %} <span style="color:var(--ink);font-weight:400">&rarr;</span>{% endif %}</div>
@@ -66,7 +66,18 @@
 {% schema %}
 {
   "name": "Portfolio grid",
-  "settings": [],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Wording"
+    },
+    {
+      "type": "text",
+      "id": "film_tag",
+      "label": "Film tag",
+      "default": "Film"
+    }
+  ],
   "blocks": [
     {
       "type": "residence",

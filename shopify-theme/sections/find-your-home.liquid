@@ -142,21 +142,21 @@
         <div class="fyh-details">
           <div class="fyh-q" style="font-size:clamp(20px,2.6vw,30px)" data-fyh-details-heading>{{ section.settings.details_heading }}</div>
           <div class="frow">
-            <div class="fg"><label class="fl" for="fyh-first">First Name*</label><input type="text" id="fyh-first" name="{{ n_first }}" class="fi" placeholder="First name" autocomplete="given-name" required></div>
-            <div class="fg"><label class="fl" for="fyh-last">Last Name*</label><input type="text" id="fyh-last" name="{{ n_last }}" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+            <div class="fg"><label class="fl" for="fyh-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="fyh-first" name="{{ n_first }}" class="fi" placeholder="First name" autocomplete="given-name" required></div>
+            <div class="fg"><label class="fl" for="fyh-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="fyh-last" name="{{ n_last }}" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
           </div>
           <div class="frow">
-            <div class="fg"><label class="fl" for="fyh-email">Email*</label><input type="email" id="fyh-email" name="{{ n_email }}" class="fi" placeholder="Email address" autocomplete="email" required></div>
-            <div class="fg"><label class="fl" for="fyh-phone">Phone</label><input type="tel" id="fyh-phone" name="{{ n_phone }}" class="fi" placeholder="Phone number" autocomplete="tel"></div>
+            <div class="fg"><label class="fl" for="fyh-email">{{ section.settings.f_email | default: "Email*" }}</label><input type="email" id="fyh-email" name="{{ n_email }}" class="fi" placeholder="Email address" autocomplete="email" required></div>
+            <div class="fg"><label class="fl" for="fyh-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="fyh-phone" name="{{ n_phone }}" class="fi" placeholder="Phone number" autocomplete="tel"></div>
           </div>
-          <div class="fg"><label class="fl" for="fyh-notes">Anything else we should know?</label><textarea class="fta" id="fyh-notes" name="{{ n_notes }}" placeholder="Land you already own, must-haves, questions…" style="min-height:88px"></textarea></div>
+          <div class="fg"><label class="fl" for="fyh-notes">{{ section.settings.f_notes | default: "Anything else we should know?" }}</label><textarea class="fta" id="fyh-notes" name="{{ n_notes }}" placeholder="Land you already own, must-haves, questions…" style="min-height:88px"></textarea></div>
           <button type="submit" class="fsub" id="fsub" data-fyh-submit>{{ section.settings.submit_label }} &rarr;</button>
           <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
           <p class="form-note" data-fyh-form-note>{{ section.settings.form_note }}</p>
         </div>
       </div>
 
-      <button type="button" class="fyh-back" data-fyh-back style="display:none">&larr; Back</button>
+      <button type="button" class="fyh-back" data-fyh-back style="display:none">&larr; {{ section.settings.back_label | default: "Back" }}</button>
     {%- endcapture -%}
     {%- if native -%}
       {%- comment -%} Shopify-native: posts to the storefront contact
@@ -375,42 +375,256 @@
 {
   "name": "Guided match",
   "settings": [
-    { "type": "collection", "id": "listings_collection", "label": "Residences to match against", "info": "Defaults to for-sale" },
-    { "type": "header", "content": "Questions" },
-    { "type": "text", "id": "q_timeline", "label": "Q1 — timeline", "default": "When would you like to make your move?" },
-    { "type": "textarea", "id": "opts_timeline", "label": "Q1 options (one per line)", "default": "Ready now\nWithin 3–6 months\nWithin a year\nJust exploring" },
-    { "type": "text", "id": "q_flex", "label": "Q2 — flexibility", "default": "Would you consider a residence still under construction?" },
-    { "type": "textarea", "id": "opts_flex", "label": "Q2 options (one per line)", "default": "Completed homes only\nHappy to watch it finish\nOpen to either" },
-    { "type": "text", "id": "q_beds", "label": "Q3 — bedrooms", "default": "How many bedrooms does your household need?" },
-    { "type": "textarea", "id": "opts_beds", "label": "Q3 options (label => minimum bedrooms)", "default": "Four => 4\nFive => 5\nSix or more => 6\nFlexible" },
-    { "type": "text", "id": "q_budget", "label": "Q4 — budget", "default": "What is the most you would consider?" },
-    { "type": "number", "id": "budget_min", "label": "Slider minimum ($m)", "default": 2 },
-    { "type": "number", "id": "budget_max", "label": "Slider maximum ($m)", "default": 15 },
-    { "type": "text", "id": "budget_step", "label": "Slider step ($m)", "default": "0.5" },
-    { "type": "number", "id": "budget_start", "label": "Slider resting position ($m)", "default": 6 },
-    { "type": "text", "id": "budget_floor", "label": "Budget threshold ($m)", "info": "Below this stated ceiling, no residences are shown — the future-releases invitation appears instead. Never rendered on the page.", "default": "5.5" },
-    { "type": "text", "id": "slider_go", "label": "Slider continue button", "default": "Continue" },
-    { "type": "text", "id": "q_area", "label": "Q5 — area", "default": "Which pocket of Brisbane calls to you?" },
-    { "type": "textarea", "id": "opts_area", "label": "Q5 options (label => area key)", "default": "Inner-East — Coorparoo, Camp Hill => inner-east\nNorth — Ascot, Hendra => north\nSouth — Holland Park => south\nOpen to suggestions" },
-    { "type": "textarea", "id": "area_map", "label": "Suburb => area key map", "default": "Coorparoo => inner-east\nCamp Hill => inner-east\nAscot => north\nHendra => north\nHolland Park West => south\nHolland Park => south" },
-    { "type": "header", "content": "Results copy" },
-    { "type": "text", "id": "r_heading", "label": "Matches heading", "default": "Residences that fit." },
-    { "type": "text", "id": "r_heading_one", "label": "Single-match heading", "default": "One residence fits beautifully." },
-    { "type": "text", "id": "r_note", "label": "Matches note", "default": "Matched to your bedrooms and preferred pocket of Brisbane." },
-    { "type": "text", "id": "nm_heading", "label": "No-match heading", "default": "Nothing exact — yet." },
-    { "type": "textarea", "id": "nm_note", "label": "No-match note", "default": "None of our current releases match every answer, but new residences are always in design. Here is the full current collection — and we’ll flag upcoming releases that fit." },
-    { "type": "text", "id": "bf_heading", "label": "Future-releases heading", "default": "First sight of what’s next." },
-    { "type": "textarea", "id": "bf_note", "label": "Future-releases note", "default": "Much of what we build is placed privately, before it is ever listed. Tell us where to reach you and we will bring our upcoming residences to you first." },
-    { "type": "header", "content": "Details form copy" },
-    { "type": "text", "id": "details_heading", "label": "Details heading", "default": "Where shall we send your matches?" },
-    { "type": "text", "id": "details_heading_bf", "label": "Details heading (future releases)", "default": "Where shall we reach you?" },
-    { "type": "text", "id": "submit_label", "label": "Submit button", "default": "Send My Matches" },
-    { "type": "text", "id": "submit_label_bf", "label": "Submit button (future releases)", "default": "Register My Interest" },
-    { "type": "text", "id": "form_note", "label": "Form note", "default": "One of our team will be in touch within one business day." },
-    { "type": "text", "id": "form_note_bf", "label": "Form note (future releases)", "default": "We will be in touch as new residences come out of design." },
-    { "type": "text", "id": "posted_heading", "label": "Thank-you heading (Shopify mode)", "default": "Thank you — your matches are on their way." },
-    { "type": "textarea", "id": "posted_text", "label": "Thank-you text (Shopify mode)", "default": "One of our team will be in touch within one business day." }
+    {
+      "type": "collection",
+      "id": "listings_collection",
+      "label": "Residences to match against",
+      "info": "Defaults to for-sale"
+    },
+    {
+      "type": "header",
+      "content": "Questions"
+    },
+    {
+      "type": "text",
+      "id": "q_timeline",
+      "label": "Q1 — timeline",
+      "default": "When would you like to make your move?"
+    },
+    {
+      "type": "textarea",
+      "id": "opts_timeline",
+      "label": "Q1 options (one per line)",
+      "default": "Ready now\nWithin 3–6 months\nWithin a year\nJust exploring"
+    },
+    {
+      "type": "text",
+      "id": "q_flex",
+      "label": "Q2 — flexibility",
+      "default": "Would you consider a residence still under construction?"
+    },
+    {
+      "type": "textarea",
+      "id": "opts_flex",
+      "label": "Q2 options (one per line)",
+      "default": "Completed homes only\nHappy to watch it finish\nOpen to either"
+    },
+    {
+      "type": "text",
+      "id": "q_beds",
+      "label": "Q3 — bedrooms",
+      "default": "How many bedrooms does your household need?"
+    },
+    {
+      "type": "textarea",
+      "id": "opts_beds",
+      "label": "Q3 options (label => minimum bedrooms)",
+      "default": "Four => 4\nFive => 5\nSix or more => 6\nFlexible"
+    },
+    {
+      "type": "text",
+      "id": "q_budget",
+      "label": "Q4 — budget",
+      "default": "What is the most you would consider?"
+    },
+    {
+      "type": "number",
+      "id": "budget_min",
+      "label": "Slider minimum ($m)",
+      "default": 2
+    },
+    {
+      "type": "number",
+      "id": "budget_max",
+      "label": "Slider maximum ($m)",
+      "default": 15
+    },
+    {
+      "type": "text",
+      "id": "budget_step",
+      "label": "Slider step ($m)",
+      "default": "0.5"
+    },
+    {
+      "type": "number",
+      "id": "budget_start",
+      "label": "Slider resting position ($m)",
+      "default": 6
+    },
+    {
+      "type": "text",
+      "id": "budget_floor",
+      "label": "Budget threshold ($m)",
+      "info": "Below this stated ceiling, no residences are shown — the future-releases invitation appears instead. Never rendered on the page.",
+      "default": "5.5"
+    },
+    {
+      "type": "text",
+      "id": "slider_go",
+      "label": "Slider continue button",
+      "default": "Continue"
+    },
+    {
+      "type": "text",
+      "id": "q_area",
+      "label": "Q5 — area",
+      "default": "Which pocket of Brisbane calls to you?"
+    },
+    {
+      "type": "textarea",
+      "id": "opts_area",
+      "label": "Q5 options (label => area key)",
+      "default": "Inner-East — Coorparoo, Camp Hill => inner-east\nNorth — Ascot, Hendra => north\nSouth — Holland Park => south\nOpen to suggestions"
+    },
+    {
+      "type": "textarea",
+      "id": "area_map",
+      "label": "Suburb => area key map",
+      "default": "Coorparoo => inner-east\nCamp Hill => inner-east\nAscot => north\nHendra => north\nHolland Park West => south\nHolland Park => south"
+    },
+    {
+      "type": "header",
+      "content": "Results copy"
+    },
+    {
+      "type": "text",
+      "id": "r_heading",
+      "label": "Matches heading",
+      "default": "Residences that fit."
+    },
+    {
+      "type": "text",
+      "id": "r_heading_one",
+      "label": "Single-match heading",
+      "default": "One residence fits beautifully."
+    },
+    {
+      "type": "text",
+      "id": "r_note",
+      "label": "Matches note",
+      "default": "Matched to your bedrooms and preferred pocket of Brisbane."
+    },
+    {
+      "type": "text",
+      "id": "nm_heading",
+      "label": "No-match heading",
+      "default": "Nothing exact — yet."
+    },
+    {
+      "type": "textarea",
+      "id": "nm_note",
+      "label": "No-match note",
+      "default": "None of our current releases match every answer, but new residences are always in design. Here is the full current collection — and we’ll flag upcoming releases that fit."
+    },
+    {
+      "type": "text",
+      "id": "bf_heading",
+      "label": "Future-releases heading",
+      "default": "First sight of what’s next."
+    },
+    {
+      "type": "textarea",
+      "id": "bf_note",
+      "label": "Future-releases note",
+      "default": "Much of what we build is placed privately, before it is ever listed. Tell us where to reach you and we will bring our upcoming residences to you first."
+    },
+    {
+      "type": "header",
+      "content": "Details form copy"
+    },
+    {
+      "type": "text",
+      "id": "details_heading",
+      "label": "Details heading",
+      "default": "Where shall we send your matches?"
+    },
+    {
+      "type": "text",
+      "id": "details_heading_bf",
+      "label": "Details heading (future releases)",
+      "default": "Where shall we reach you?"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit button",
+      "default": "Send My Matches"
+    },
+    {
+      "type": "text",
+      "id": "submit_label_bf",
+      "label": "Submit button (future releases)",
+      "default": "Register My Interest"
+    },
+    {
+      "type": "text",
+      "id": "form_note",
+      "label": "Form note",
+      "default": "One of our team will be in touch within one business day."
+    },
+    {
+      "type": "text",
+      "id": "form_note_bf",
+      "label": "Form note (future releases)",
+      "default": "We will be in touch as new residences come out of design."
+    },
+    {
+      "type": "text",
+      "id": "posted_heading",
+      "label": "Thank-you heading (Shopify mode)",
+      "default": "Thank you — your matches are on their way."
+    },
+    {
+      "type": "textarea",
+      "id": "posted_text",
+      "label": "Thank-you text (Shopify mode)",
+      "default": "One of our team will be in touch within one business day."
+    },
+    {
+      "type": "header",
+      "content": "Wording"
+    },
+    {
+      "type": "text",
+      "id": "f_first",
+      "label": "First name label",
+      "default": "First Name*"
+    },
+    {
+      "type": "text",
+      "id": "f_last",
+      "label": "Last name label",
+      "default": "Last Name*"
+    },
+    {
+      "type": "text",
+      "id": "f_email",
+      "label": "Email label",
+      "default": "Email*"
+    },
+    {
+      "type": "text",
+      "id": "f_phone",
+      "label": "Phone label",
+      "default": "Phone"
+    },
+    {
+      "type": "text",
+      "id": "f_notes",
+      "label": "Notes label",
+      "default": "Anything else we should know?"
+    },
+    {
+      "type": "text",
+      "id": "back_label",
+      "label": "Back button",
+      "default": "Back"
+    }
   ],
-  "presets": [{ "name": "Guided match" }]
+  "presets": [
+    {
+      "name": "Guided match"
+    }
+  ]
 }
 {% endschema %}

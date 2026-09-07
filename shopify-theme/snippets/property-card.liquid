@@ -18,7 +18,7 @@
       alt="{{ product.title | escape }}" loading="lazy" decoding="async" width="{{ img_w }}" height="{{ img_h }}">
   {%- endif -%}
   <div class="pc-ov"></div>
-  <div class="pc-status-chip"><span class="pc-dot"></span>For Sale</div>
+  <div class="pc-status-chip"><span class="pc-dot"></span>{{ settings.label_for_sale | default: "For Sale" }}</div>
   <div class="pc-info">
     <div class="pc-name">{{ product.title }}</div>
     {%- if mf.suburb.value != blank -%}
