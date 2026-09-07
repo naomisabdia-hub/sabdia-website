@@ -22,10 +22,19 @@
 <meta property="og:url" content="{{ canonical_url }}">
 <meta property="og:site_name" content="Sabdia Constructions">
 <meta property="og:locale" content="en_AU">
-{%- if og_image != blank %}
-<meta property="og:image" content="https:{{ og_image }}">
-<meta name="twitter:image" content="https:{{ og_image }}">
-{%- endif %}
+{%- comment -%}
+  Never ship a bare share card: with no Social share image chosen in
+  Theme settings, fall back to the bundled home-hero crop (1200×630).
+{%- endcomment -%}
+{%- if og_image == blank -%}
+  {%- assign og_image = 'share-default.jpg' | asset_url -%}
+{%- endif -%}
+{%- assign og_image_abs = og_image -%}
+{%- unless og_image_abs contains 'https:' -%}{%- assign og_image_abs = og_image_abs | prepend: 'https:' -%}{%- endunless -%}
+<meta property="og:image" content="{{ og_image_abs }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="{{ og_image_abs }}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ og_title | escape }}">
 <meta name="twitter:description" content="{{ og_description | escape }}">
