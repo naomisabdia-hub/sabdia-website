@@ -33,7 +33,7 @@
   # deduplicated, first three, each closed with a full stop.
   capture story_raw
     for p in posts
-      if p.caption.size > 60
+      if p.caption.size > 60 and p.hidden != true
         echo p.caption | strip | append: '¦'
       endif
     endfor

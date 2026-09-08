@@ -146,7 +146,7 @@
       fetch(base + '/manifest.json')
         .then(function (r) { return r.json(); })
         .then(boot)
-        .catch(function (e) { console.error('[scrollwalk] manifest failed', e); });
+        .catch(function () { /* manifest missing: the section stays a still */ });
     }
 
     function nearestLoaded(i) {

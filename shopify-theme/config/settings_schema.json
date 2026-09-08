@@ -208,6 +208,19 @@
         "default": "https://sabdia-website.vercel.app",
         "info": "Enquiries and subscriptions post here, into the Sabdia leads inbox."
       },
+    {
+      "type": "text",
+      "id": "privacy_link_label",
+      "label": "Privacy link beside forms",
+      "default": "Privacy Policy",
+      "info": "Shown after the note under every enquiry form. Leave blank to hide."
+    },
+    {
+      "type": "url",
+      "id": "privacy_link_url",
+      "label": "Privacy link goes to",
+      "info": "Defaults to /pages/privacy."
+    },
       {
         "type": "text",
         "id": "media_base",

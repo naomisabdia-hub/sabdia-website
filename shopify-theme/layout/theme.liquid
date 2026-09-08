@@ -40,6 +40,11 @@
   if template.name == 'index' and settings.seo_home_description != blank
     assign meta_description = settings.seo_home_description
   endif
+  # Never ship a page without a description: fall back to the store's
+  # own description (Settings › Store details) or the homepage one.
+  if meta_description == blank
+    assign meta_description = shop.description | default: settings.seo_home_description
+  endif
 -%}
 {%- if meta_description -%}<meta name="description" content="{{ meta_description | escape }}">{%- endif -%}
 <link rel="canonical" href="{{ canonical_url }}">
@@ -62,6 +67,7 @@ try {
 <link rel="preconnect" href="https://fvczsjcrvwzqtcbforgo.supabase.co" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="{{ 'jost-var.woff2' | asset_url }}" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="{{ 'cormorant-garamond-var.woff2' | asset_url }}" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="{{ 'eb-garamond-var.woff2' | asset_url }}" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="{{ 'eb-garamond-var-italic.woff2' | asset_url }}" crossorigin>
 {{ 'style.css' | asset_url | stylesheet_tag }}
 {%- comment -%}

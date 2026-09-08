@@ -2,11 +2,28 @@
   Photographic page hero shared by About / Services / Projects — the
   full-bleed image with a label, display title and sub-line at the base.
 {%- endcomment -%}
-<section class="page-hero">
+{%- liquid
+  assign focus = section.settings.focus | default: 'center'
+  case section.settings.height
+    when 'short'
+      assign ph_h = '44vh'
+      assign ph_hm = '40vh'
+    when 'tall'
+      assign ph_h = '78vh'
+      assign ph_hm = '60vh'
+    when 'full'
+      assign ph_h = '100vh'
+      assign ph_hm = '100svh'
+    else
+      assign ph_h = '60vh'
+      assign ph_hm = '50vh'
+  endcase
+-%}
+<section class="page-hero ph-sized" style="--ph-h:{{ ph_h }};--ph-hm:{{ ph_hm }}">
   {%- if section.settings.image -%}
-    <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="{{ section.settings.image_alt | default: page.title | escape }}" loading="eager" width="1920" height="1080">
+    <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: focus }}" alt="{{ section.settings.image_alt | default: page.title | escape }}" loading="eager" width="1920" height="1080" style="object-position:{{ focus }}">
   {%- elsif section.settings.image_ext != blank -%}
-    <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}" alt="{{ section.settings.image_alt | default: page.title | escape }}" loading="eager" width="1920" height="1080">
+    <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}" alt="{{ section.settings.image_alt | default: page.title | escape }}" loading="eager" width="1920" height="1080" style="object-position:{{ focus }}">
   {%- endif -%}
   <div class="page-hero-ov"></div>
   <div class="page-hero-content inner">
@@ -15,6 +32,11 @@
     <p class="page-hero-sub">{{ section.settings.sub }}</p>
   </div>
 </section>
+
+<style>
+  .page-hero.ph-sized{min-height:max(380px,var(--ph-h,60vh))}
+  @media(max-width:900px){.page-hero.ph-sized{height:auto;min-height:max(320px,var(--ph-hm,50vh))}}
+</style>
 
 {% schema %}
 {
@@ -50,6 +72,33 @@
       "type": "text",
       "id": "image_alt",
       "label": "Image alt text"
+    },
+    { "type": "header", "content": "Size" },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Height",
+      "options": [
+        { "value": "short", "label": "Short" },
+        { "value": "standard", "label": "Standard" },
+        { "value": "tall", "label": "Tall" },
+        { "value": "full", "label": "Full screen" }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "select",
+      "id": "focus",
+      "label": "Crop focus",
+      "options": [
+        { "value": "center", "label": "Centre" },
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center",
+      "info": "Which part of the photo stays in view as the hero is cropped."
     }
   ],
   "presets": [

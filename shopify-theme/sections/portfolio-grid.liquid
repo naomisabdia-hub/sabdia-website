@@ -13,9 +13,9 @@
         {%- capture card_inner -%}
           <div class="port-img-wrap">
             {%- if block.settings.image -%}
-              <img src="{{ block.settings.image | image_url: width: 800, height: 600, crop: 'center' }}" alt="{{ block.settings.name | escape }}" loading="lazy">
+              <img src="{{ block.settings.image | image_url: width: 800, height: 600, crop: 'center' }}" alt="{{ block.settings.name | escape }}" width="800" height="600" loading="lazy" decoding="async">
             {%- elsif block.settings.image_ext != blank -%}
-              <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 800, h: 600 %}" alt="{{ block.settings.name | escape }}" loading="lazy">
+              <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 800, h: 600 %}" alt="{{ block.settings.name | escape }}" width="800" height="600" loading="lazy" decoding="async">
             {%- endif -%}
             {%- liquid
               assign port_vid = block.settings.video

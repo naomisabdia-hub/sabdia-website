@@ -245,7 +245,20 @@ const handlePost: APIRoute = async ({ request }) => {
   return json({ ok: true });
 };
 
+/* A form-encoded POST is CORS-"simple" (no preflight), so the allow-list
+   above only governs who may READ the reply. Reject the write itself when a
+   browser reports an Origin we do not serve (our own host and preview
+   deployments included). Requests with no Origin — curl, server-to-server —
+   are left to the honeypot and rate limit. */
+const originAllowed = (request: Request): boolean => {
+  const origin = request.headers.get('origin');
+  if (!origin) return true;
+  if (ALLOWED_ORIGINS.has(origin)) return true;
+  try { return origin === new URL(request.url).origin; } catch { return false; }
+};
+
 export const POST: APIRoute = async (ctx) => {
+  if (!originAllowed(ctx.request)) return json({ error: 'Forbidden' }, 403);
   const res = await handlePost(ctx);
   for (const [k, v] of Object.entries(cors(ctx.request))) res.headers.set(k, v);
   return res;

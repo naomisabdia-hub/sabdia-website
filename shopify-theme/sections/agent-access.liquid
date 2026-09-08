@@ -2,9 +2,9 @@
 <div class="agent-grid" id="agents">
   <div class="agent-vis reveal-wipe-x">
     {%- if section.settings.image -%}
-      <img src="{{ section.settings.image | image_url: width: 900, height: 1100, crop: 'center' }}" alt="{{ section.settings.image_alt | escape }}" loading="lazy" decoding="async" width="900" height="1100">
+      <img src="{{ section.settings.image | image_url: width: 900, height: 1100, crop: 'center' }}" alt="{{ section.settings.image_alt | default: 'Sabdia agent program' | escape }}" loading="lazy" decoding="async" width="900" height="1100">
     {%- elsif section.settings.image_ext != blank -%}
-      <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 900, h: 1100 %}" alt="{{ section.settings.image_alt | escape }}" loading="lazy" decoding="async" width="900" height="1100">
+      <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 900, h: 1100 %}" alt="{{ section.settings.image_alt | default: 'Sabdia agent program' | escape }}" loading="lazy" decoding="async" width="900" height="1100">
     {%- endif -%}
     <div class="agent-frame"></div>
     <div class="agent-badge">{{ section.settings.badge }}</div>

@@ -57,7 +57,8 @@ default 38px; mobile scales in step).
 | `brochure_url`, `film_video`, `film_poster` | Single line text (URL) |
 | `scrollwalk_folder` | Single line text |
 | `year` | Integer |
-| `series_posts` | JSON — `[{ "date", "thumb", "caption", "video"?, "url"? }, …]`, the residence's real Instagram posts, rendered by the series strip. A post with a `url` (its Instagram permalink) becomes a click-through to the real post — the view and any engagement land on Instagram; without one, videos play in the site's own player. |
+| `series_posts` | JSON — `[{ "id"?, "date", "type"?, "thumb", "caption", "url"?, "video"?, "slides"?, "hidden"? }, …]`, the residence's real Instagram posts, rendered by the series strip. **Filled automatically** by the Instagram sync (`shopify-app/sync-instagram.mjs`, daily via GitHub Actions — see `docs/INSTAGRAM-SERIES.md`): reels bring a `video`, carousels their `slides`, every post its Instagram `url`, all media copied to Shopify Files. The section setting *Reels and carousels* chooses between playing them on the site (with a "View on Instagram" link) and opening the post on Instagram. Entries without an `id` were added by hand and are left alone; `"hidden": true` keeps one out of the strip. |
+| `series_tags` | List of single line text — optional words / #hashtags that mark a post as this residence's (defaults to the name); `-` switches matching off. Same two keys exist on Collection PAGES. |
 
 First product image = page hero; images 2–7 = the gallery grid.
 

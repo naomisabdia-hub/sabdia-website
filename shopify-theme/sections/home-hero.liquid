@@ -3,8 +3,58 @@
   description bar, slide dots, award line and CTAs. Slides are blocks:
   pick a Shopify image, or leave the external URL that carries today's
   image over from the Sabdia media pipeline.
+
+  "Header media" switches the backdrop to a looping film instead of the
+  slides. The slide blocks stay in place while the film shows, so
+  switching back loses nothing. The film must be real footage (see
+  CLAUDE.md — no generated architecture).
 {%- endcomment -%}
-<section class="hero" id="hero">
+{%- liquid
+  # An uploaded film (Shopify-hosted) wins over the URL fallback.
+  assign film_src = section.settings.video_url
+  if section.settings.video
+    assign mp4 = section.settings.video.sources | where: 'format', 'mp4' | first
+    if mp4
+      assign film_src = mp4.url
+    endif
+  endif
+  assign use_video = false
+  if section.settings.media == 'video' and film_src != blank
+    assign use_video = true
+  endif
+
+  # Poster: the chosen poster, else the first slide's picture.
+  assign poster_src = ''
+  if section.settings.video_poster
+    assign poster_src = section.settings.video_poster | image_url: width: 1920
+  else
+    assign first_slide = section.blocks | first
+    if first_slide.settings.image
+      assign poster_src = first_slide.settings.image | image_url: width: 1920
+    elsif first_slide.settings.ext != blank
+      capture poster_src
+        render 'ext-variant', src: first_slide.settings.ext, w: 1920, h: 1080, q: 80
+      endcapture
+      assign poster_src = poster_src | strip
+    endif
+  endif
+-%}
+<section class="hero{% if use_video %} hero-video{% endif %}" id="hero">
+  {%- if use_video -%}
+  <div class="h-video" id="hVideo">
+    <video
+      src="{{ film_src }}"
+      {% if poster_src != blank %}poster="{{ poster_src }}"{% endif %}
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      aria-hidden="true"
+      tabindex="-1"
+    ></video>
+  </div>
+  {%- else -%}
   <div class="h-slides" id="hSlides">
     {%- for block in section.blocks -%}
       <div class="h-slide{% if forloop.first %} active{% endif %}" {{ block.shopify_attributes }}>
@@ -13,19 +63,20 @@
             src="{{ block.settings.image | image_url: width: 1920 }}"
             srcset="{{ block.settings.image | image_url: width: 768 }} 768w, {{ block.settings.image | image_url: width: 1280 }} 1280w, {{ block.settings.image | image_url: width: 1920 }} 1920w"
             sizes="100vw"
-            alt="{{ block.settings.alt | escape }}"
+            alt="{{ block.settings.alt | escape }}" width="1920" height="1080"
             {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy" decoding="async"{% endif %}>
         {%- elsif block.settings.ext != blank -%}
           {%- capture src -%}{% render 'ext-variant', src: block.settings.ext, w: 1920, h: 1080, q: 80 %}{%- endcapture -%}
           <picture>
             <source media="(max-width: 767px)" srcset="{% render 'ext-variant', src: block.settings.ext, w: 768, h: 1365, q: 80 %}" sizes="100vw">
-            <img src="{{ src | strip }}" sizes="100vw" alt="{{ block.settings.alt | escape }}"
+            <img src="{{ src | strip }}" sizes="100vw" alt="{{ block.settings.alt | escape }}" width="1920" height="1080"
               {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy" decoding="async"{% endif %}>
           </picture>
         {%- endif -%}
       </div>
     {%- endfor -%}
   </div>
+  {%- endif -%}
   <div class="h-overlay"></div>
 
   <div class="h-mid">
@@ -52,11 +103,13 @@
     <div class="h-bottom-rule"></div>
     <div class="h-bottom-inner inner">
       <div class="h-bottom-left">
+        {%- unless use_video -%}
         <div class="h-dots" id="hDots">
           {%- for block in section.blocks -%}
             <button type="button" class="h-dot{% if forloop.first %} active{% endif %}" aria-label="Show slide {{ forloop.index }} of {{ section.blocks.size }}"></button>
           {%- endfor -%}
         </div>
+        {%- endunless -%}
         <p class="h-award"><em>{{ section.settings.award }}</em></p>
       </div>
       <div class="h-actions">
@@ -66,15 +119,68 @@
     </div>
   </div>
   <div class="h-scroll-wrap">
-    <span class="h-scroll-num">01 / {{ section.blocks.size | prepend: '00' | slice: -2, 2 }}</span>
+    {%- unless use_video -%}<span class="h-scroll-num">01 / {{ section.blocks.size | prepend: '00' | slice: -2, 2 }}</span>{%- endunless -%}
     <div class="h-scroll-line"></div>
   </div>
 </section>
+{%- if use_video -%}
+<script>
+  (function () {
+    var v = document.querySelector('#hVideo video');
+    if (!v) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.removeAttribute('autoplay');
+      v.pause();
+      return;
+    }
+    // Some browsers ignore the autoplay attribute on late-loading media.
+    var p = v.play();
+    if (p && p.catch) p.catch(function () {});
+  })();
+</script>
+{%- endif -%}
 
 {% schema %}
 {
   "name": "Hero slideshow",
   "settings": [
+    {
+      "type": "header",
+      "content": "Header media"
+    },
+    {
+      "type": "select",
+      "id": "media",
+      "label": "Show",
+      "options": [
+        { "value": "slides", "label": "Slideshow" },
+        { "value": "video", "label": "Video instead" }
+      ],
+      "default": "slides",
+      "info": "Your slides are kept either way — switch back any time."
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "info": "Upload the mp4 here. Landscape 16:9, real footage only, no sound needed (it plays muted). Under 20 MB keeps the page fast."
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Video (URL)",
+      "info": "Used only when no video is uploaded above — e.g. a film already on the Sabdia media library."
+    },
+    {
+      "type": "image_picker",
+      "id": "video_poster",
+      "label": "Video poster",
+      "info": "Shown while the video loads. Leave empty to use the first slide."
+    },
+    {
+      "type": "header",
+      "content": "Words"
+    },
     {
       "type": "text",
       "id": "words",

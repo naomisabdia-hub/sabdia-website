@@ -26,7 +26,7 @@
         {%- assign odd = forloop.index0 | modulo: 2 -%}
         <a href="{{ product.url }}" class="proj-card reveal {% if odd == 1 %}d1{% endif %}">
           {%- if product.featured_image -%}
-            <img src="{{ product.featured_image | image_url: width: 1200, height: 750, crop: 'center' }}" alt="{{ product.title | escape }}" loading="lazy">
+            <img src="{{ product.featured_image | image_url: width: 1200, height: 750, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="750" loading="lazy" decoding="async">
           {%- endif -%}
           <div class="proj-card-ov"></div>
           <div class="proj-card-info">
@@ -50,7 +50,7 @@
         {%- assign odd = forloop.index0 | modulo: 2 -%}
         <a href="{{ product.url }}" class="proj-card reveal {% if odd == 1 %}d1{% endif %}">
           {%- if product.featured_image -%}
-            <img src="{{ product.featured_image | image_url: width: 1200, height: 750, crop: 'center' }}" alt="{{ product.title | escape }}" loading="lazy">
+            <img src="{{ product.featured_image | image_url: width: 1200, height: 750, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="750" loading="lazy" decoding="async">
           {%- endif -%}
           <div class="proj-card-ov"></div>
           <div class="sc-badge">{{ section.settings.sold_badge }}</div>

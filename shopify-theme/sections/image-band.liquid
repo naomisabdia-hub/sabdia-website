@@ -10,10 +10,26 @@
 {%- liquid
   assign layout = section.settings.layout | default: 'full'
   assign blocks = section.blocks
+  # Size controls: a shape (aspect ratio) or a fixed height, a band width, a gap.
+  assign shape = section.settings.shape | default: 'auto'
+  assign ib_h = section.settings.height | default: 480
+  assign ib_hm = section.settings.height_mobile | default: 260
+  assign ib_gap = section.settings.gap | default: 10
+  case section.settings.width
+    when 'wide'
+      assign ib_max = '1100px'
+    when 'medium'
+      assign ib_max = '900px'
+    when 'narrow'
+      assign ib_max = '700px'
+    else
+      assign ib_max = '1400px'
+  endcase
 -%}
 
-<section class="imgband imgband-{{ layout }}{% if section.settings.tight %} imgband-tight{% endif %}">
-  <div class="inner">
+<section class="imgband imgband-{{ layout }}{% if section.settings.tight %} imgband-tight{% endif %}{% if shape == 'custom' %} imgband-custom{% elsif shape != 'auto' %} imgband-shape{% endif %}"
+         style="--ib-gap:{{ ib_gap }}px;--ib-h:{{ ib_h }}px;--ib-hm:{{ ib_hm }}px;--ib-max:{{ ib_max }}{% if shape != 'auto' and shape != 'custom' %};--ib-ar:{{ shape }}{% endif %}">
+  <div class="inner" style="max-width:var(--ib-max)">
     {%- if section.settings.label != blank or section.settings.heading_html != blank -%}
       <div class="imgband-hdr">
         {%- if section.settings.label != blank -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
@@ -25,11 +41,13 @@
       {%- assign delays = ',d1,d2' | split: ',' -%}
       {%- for block in blocks -%}
         {%- assign di = forloop.index0 | modulo: 3 -%}
+        {%- assign focus = block.settings.focus | default: 'center' -%}
+        {%- assign zoom = block.settings.zoom | default: 100 -%}
         <figure class="imgband-item reveal-wipe {{ delays[di] }}" {{ block.shopify_attributes }}>
           {%- if block.settings.image -%}
-            <img src="{{ block.settings.image | image_url: width: 1400 }}" alt="{{ block.settings.alt | escape }}" loading="lazy">
+            {%- assign ibh = 1400 | divided_by: block.settings.image.aspect_ratio | round -%}<img src="{{ block.settings.image | image_url: width: 1400 }}" alt="{{ block.settings.alt | escape }}" width="1400" height="{{ ibh }}" loading="lazy" decoding="async" style="object-position:{{ focus }};--ib-zoom:{{ zoom | divided_by: 100.0 }}">
           {%- elsif block.settings.image_ext != blank -%}
-            <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 1400, h: 1000 %}" alt="{{ block.settings.alt | escape }}" loading="lazy">
+            <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 1400, h: 1000 %}" alt="{{ block.settings.alt | escape }}" width="1400" height="1000" loading="lazy" decoding="async" style="object-position:{{ focus }};--ib-zoom:{{ zoom | divided_by: 100.0 }}">
           {%- endif -%}
           {%- if block.settings.caption != blank -%}<figcaption class="imgband-cap">{{ block.settings.caption }}</figcaption>{%- endif -%}
         </figure>
@@ -54,10 +72,14 @@
   .imgband{padding:clamp(52px,7vw,96px) clamp(22px,5vw,80px);background:var(--bg)}
   .imgband-tight{padding-top:clamp(24px,3vw,40px);padding-bottom:clamp(24px,3vw,40px)}
   .imgband-hdr{margin-bottom:32px}
-  .imgband-grid{display:grid;gap:10px}
+  .imgband-grid{display:grid;gap:var(--ib-gap,10px)}
   .imgband-item{margin:0;overflow:hidden;position:relative}
-  .imgband-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.92);transition:transform .8s var(--ease)}
-  .imgband-item:hover img{transform:scale(1.03)}
+  .imgband-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.92);transform:scale(var(--ib-zoom,1));transition:transform .8s var(--ease)}
+  .imgband-item:hover img{transform:scale(calc(var(--ib-zoom,1) * 1.03))}
+  /* Shape / height overrides from the section's size controls */
+  .imgband.imgband-shape .imgband-item{aspect-ratio:var(--ib-ar)}
+  .imgband.imgband-custom .imgband-item{aspect-ratio:auto;height:var(--ib-h)}
+  @media(max-width:900px){.imgband.imgband-custom .imgband-item{aspect-ratio:auto;height:var(--ib-hm)}}
   .imgband-cap{position:absolute;bottom:14px;left:14px;padding:7px 14px;background:rgba(31,27,20,.72);backdrop-filter:blur(8px);font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:rgba(253,251,246,.85)}
   .imgband-full .imgband-item{aspect-ratio:21/9}
   .imgband-two .imgband-grid{grid-template-columns:1fr 1fr}
@@ -131,7 +153,39 @@
       "id": "tight",
       "label": "Tighter spacing",
       "default": false
-    }
+    },
+    { "type": "header", "content": "Size" },
+    {
+      "type": "select",
+      "id": "shape",
+      "label": "Image shape",
+      "options": [
+        { "value": "auto", "label": "Automatic (by structure)" },
+        { "value": "21/9", "label": "Cinematic 21:9" },
+        { "value": "16/9", "label": "Wide 16:9" },
+        { "value": "3/2", "label": "Landscape 3:2" },
+        { "value": "4/3", "label": "Landscape 4:3" },
+        { "value": "1/1", "label": "Square" },
+        { "value": "4/5", "label": "Portrait 4:5" },
+        { "value": "custom", "label": "Fixed height (set below)" }
+      ],
+      "default": "auto"
+    },
+    { "type": "range", "id": "height", "label": "Height", "min": 160, "max": 900, "step": 20, "unit": "px", "default": 480, "info": "Only used with \"Fixed height\"." },
+    { "type": "range", "id": "height_mobile", "label": "Height on phones", "min": 120, "max": 600, "step": 20, "unit": "px", "default": 260, "info": "Only used with \"Fixed height\"." },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Band width",
+      "options": [
+        { "value": "full", "label": "Full page width" },
+        { "value": "wide", "label": "Wide (1100px)" },
+        { "value": "medium", "label": "Medium (900px)" },
+        { "value": "narrow", "label": "Narrow (700px)" }
+      ],
+      "default": "full"
+    },
+    { "type": "range", "id": "gap", "label": "Gap between images", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 10 }
   ],
   "blocks": [
     {
@@ -158,7 +212,22 @@
           "type": "text",
           "id": "caption",
           "label": "Caption (optional)"
-        }
+        },
+        {
+          "type": "select",
+          "id": "focus",
+          "label": "Crop focus",
+          "options": [
+            { "value": "center", "label": "Centre" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "center",
+          "info": "Which part of the photo to keep when it is cropped to the frame."
+        },
+        { "type": "range", "id": "zoom", "label": "Zoom", "min": 100, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Enlarge the photo inside its frame." }
       ]
     }
   ],

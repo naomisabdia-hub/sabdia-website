@@ -1,0 +1,39 @@
+name: Instagram → The Series
+
+# Pulls the latest @_sabdia posts into each residence's "The Series" strip
+# on Shopify. Runs every morning (Brisbane) and on demand from the Actions
+# tab. Secrets: SHOPIFY_STORE, SHOPIFY_ADMIN_TOKEN, INSTAGRAM_ACCESS_TOKEN
+# (repo → Settings → Secrets and variables → Actions).
+
+on:
+  schedule:
+    - cron: '0 20 * * *'   # 06:00 Brisbane
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Only report what would change'
+        type: boolean
+        default: false
+
+concurrency:
+  group: instagram-series
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Sync
+        env:
+          SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+          SHOPIFY_ADMIN_TOKEN: ${{ secrets.SHOPIFY_ADMIN_TOKEN }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          # Post types to pull. Stories are never included. Drop IMAGE to
+          # keep single photos out of the strips.
+          SERIES_TYPES: REEL,CAROUSEL,IMAGE
+        run: node shopify-app/sync-instagram.mjs ${{ inputs.dry_run && '--dry-run' || '' }}

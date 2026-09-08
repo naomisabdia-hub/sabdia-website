@@ -152,7 +152,7 @@
           <div class="fg"><label class="fl" for="fyh-notes">{{ section.settings.f_notes | default: "Anything else we should know?" }}</label><textarea class="fta" id="fyh-notes" name="{{ n_notes }}" placeholder="Land you already own, must-haves, questions…" style="min-height:88px"></textarea></div>
           <button type="submit" class="fsub" id="fsub" data-fyh-submit>{{ section.settings.submit_label }} &rarr;</button>
           <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
-          <p class="form-note" data-fyh-form-note>{{ section.settings.form_note }}</p>
+          <p class="form-note"><span data-fyh-form-note>{{ section.settings.form_note }}</span>{% unless section.settings.form_note contains settings.privacy_link_label %}{% render 'privacy-link' %}{% endunless %}</p>
         </div>
       </div>
 

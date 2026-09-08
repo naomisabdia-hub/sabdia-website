@@ -10,10 +10,10 @@
   endif
   assign og_image = blank
   if settings.share_image
-    assign og_image = settings.share_image | image_url: width: 1200
+    assign og_image = settings.share_image | image_url: width: 1200, height: 630, crop: 'center'
   endif
   if template.name == 'product' and product.featured_image
-    assign og_image = product.featured_image | image_url: width: 1200
+    assign og_image = product.featured_image | image_url: width: 1200, height: 630, crop: 'center'
   endif
 -%}
 <meta property="og:title" content="{{ og_title | escape }}">

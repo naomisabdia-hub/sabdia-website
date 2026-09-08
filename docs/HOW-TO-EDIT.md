@@ -6,8 +6,14 @@ The full illustrated guide is *Sabdia Website Guide.pdf* on the Desktop.
 | I want to change… | Go to | Notes |
 |---|---|---|
 | Words, pictures, films on a page | **Online Store › Themes › Customize** | Pick the page in the top-centre dropdown first |
+| Home banner: slideshow or a film | Customize › Home › **Hero slideshow** › Header media | Set "Show" to **Video instead**, upload the mp4. Slides are kept — set it back to Slideshow any time |
+| Size, shape or crop of a photo | Customize › click the section › **Size** | Image band, Photo gallery and Page hero: shape (4:3, square, portrait…) or fixed height, band width, gap; each image block has **Crop focus** and Image band a **Zoom**. Shopify has no drag-to-resize — these settings are the resize |
+| Size of the two About photos | Customize › Home › **About** › Image strip | Layout (2:1, equal, 1:2, single), height, phone height, gap; each Strip image block has a crop focus |
+| "Privacy Policy" link under forms | Theme settings › Site plumbing › **Privacy link beside forms** | Appears after every enquiry note automatically; blank it to hide |
+| Password page (store locked) | Customize › pick **Password** page in the dropdown | Section "Password page": heading, text, button |
 | Form labels, button text, filter names, small labels | Customize › click the section › **Wording** | Every visible word is a setting; card chips are under Theme settings › **Labels** |
 | A residence (QASR, SOLACE…) | **Products** › the residence | Media: first image = hero, next six = gallery. Tag `sold` to move it to Sold. Numbers live under **Metafields** at the bottom |
+| The Series (Instagram strip on a residence) | Runs itself — posts arrive from @_sabdia each morning | Name or #hashtag the house in the caption. Play on site vs open on Instagram: Customize › the residence › **The Series**. Hide a post or add keywords: `docs/INSTAGRAM-SERIES.md` |
 | For Sale / Sold order | Products › **Collections** › for-sale / sold | Sort "Manually", drag |
 | The Journal | **Content › Blog posts** | Blog "The Journal"; featured image + excerpt matter |
 | Nav and footer links | **Content › Menus** | Main menu; Company and Legal menus for the footer |

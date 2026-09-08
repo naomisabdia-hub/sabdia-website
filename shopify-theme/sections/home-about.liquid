@@ -7,24 +7,48 @@
     <div class="about-sticky">
       <div class="slabel reveal">{{ section.settings.label }}</div>
       <h2 class="about-h reveal d1">{{ section.settings.heading_html }}</h2>
-      <div class="about-img-strip reveal-wipe d2">
+      {%- liquid
+        assign strip_h = section.settings.strip_height | default: 240
+        assign strip_hm = section.settings.strip_height_mobile | default: 160
+        assign strip_gap = section.settings.strip_gap | default: 8
+        case section.settings.strip_split
+          when 'equal'
+            assign strip_cols = '1fr 1fr'
+            assign w1 = 700
+            assign w2 = 700
+          when 'small-large'
+            assign strip_cols = '1fr 2fr'
+            assign w1 = 500
+            assign w2 = 900
+          when 'single'
+            assign strip_cols = '1fr'
+            assign w1 = 1400
+            assign w2 = 1400
+          else
+            assign strip_cols = '2fr 1fr'
+            assign w1 = 900
+            assign w2 = 500
+        endcase
+        # Request the crop at twice the display height for retina screens.
+        assign ih = strip_h | times: 2.5 | round
+      -%}
+      <div class="about-img-strip reveal-wipe d2" style="--strip-h:{{ strip_h }}px;--strip-h-m:{{ strip_hm }}px;--strip-gap:{{ strip_gap }}px;--strip-cols:{{ strip_cols }}">
         {%- assign img_i = 0 -%}
         {%- for block in section.blocks -%}
           {%- if block.type == 'image' -%}
             {%- liquid
               if img_i == 0
-                assign iw = 900
-                assign ih = 600
+                assign iw = w1
               else
-                assign iw = 500
-                assign ih = 600
+                assign iw = w2
               endif
               assign img_i = img_i | plus: 1
+              assign focus = block.settings.focus | default: 'center'
             -%}
             {%- if block.settings.image -%}
-              <img src="{{ block.settings.image | image_url: width: iw, height: ih, crop: 'center' }}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" {{ block.shopify_attributes }}>
+              <img src="{{ block.settings.image | image_url: width: iw, height: ih, crop: focus }}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {{ block.shopify_attributes }}>
             {%- elsif block.settings.ext != blank -%}
-              <img src="{% render 'ext-variant', src: block.settings.ext, w: iw, h: ih %}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" {{ block.shopify_attributes }}>
+              <img src="{% render 'ext-variant', src: block.settings.ext, w: iw, h: ih %}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {{ block.shopify_attributes }}>
             {%- endif -%}
           {%- endif -%}
         {%- endfor -%}
@@ -73,6 +97,57 @@
       "label": "Heading"
     },
     {
+      "type": "header",
+      "content": "Image strip"
+    },
+    {
+      "type": "select",
+      "id": "strip_split",
+      "label": "Layout",
+      "options": [
+        { "value": "large-small", "label": "Large + small (2:1)" },
+        { "value": "equal", "label": "Two equal" },
+        { "value": "small-large", "label": "Small + large (1:2)" },
+        { "value": "single", "label": "One image, full width" }
+      ],
+      "default": "large-small",
+      "info": "With one image selected, only the first Strip image block shows."
+    },
+    {
+      "type": "range",
+      "id": "strip_height",
+      "label": "Height",
+      "min": 120,
+      "max": 520,
+      "step": 10,
+      "unit": "px",
+      "default": 240
+    },
+    {
+      "type": "range",
+      "id": "strip_height_mobile",
+      "label": "Height on phones",
+      "min": 100,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "default": 160
+    },
+    {
+      "type": "range",
+      "id": "strip_gap",
+      "label": "Gap between images",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Signature"
+    },
+    {
       "type": "text",
       "id": "sig_name",
       "label": "Signature name"
@@ -115,6 +190,20 @@
           "type": "text",
           "id": "alt",
           "label": "Alt text"
+        },
+        {
+          "type": "select",
+          "id": "focus",
+          "label": "Crop focus",
+          "options": [
+            { "value": "center", "label": "Centre" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "center",
+          "info": "Which part of the photo to keep when it is cropped to the strip height."
         }
       ]
     },

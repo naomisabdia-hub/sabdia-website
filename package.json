@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "sync:instagram": "node shopify-app/sync-instagram.mjs",
+    "sync:instagram:check": "node shopify-app/sync-instagram.mjs --check"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.4",

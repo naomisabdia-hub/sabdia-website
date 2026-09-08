@@ -70,7 +70,7 @@
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
-          <p class="form-note" style="margin:0">{{ section.settings.form_note }}</p>
+          <p class="form-note" style="margin:0">{% render 'privacy-link', note: section.settings.form_note %}</p>
         </div>
         <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
       </form>
@@ -106,7 +106,7 @@
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
-          <p class="form-note" style="margin:0">{{ section.settings.form_note }}</p>
+          <p class="form-note" style="margin:0">{% render 'privacy-link', note: section.settings.form_note %}</p>
         </div>
       {% endform %}
       {%- endif -%}

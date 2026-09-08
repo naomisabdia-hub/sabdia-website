@@ -29,7 +29,7 @@
 
 <section class="prop-hero">
   {%- if product.featured_image -%}
-    <img src="{{ product.featured_image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="{{ product.title | escape }}" loading="eager" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:{% if sold %}brightness(.72) saturate(.9){% else %}brightness(.78) saturate(.96){% endif %}">
+    <img src="{{ product.featured_image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="{{ product.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:{% if sold %}brightness(.72) saturate(.9){% else %}brightness(.78) saturate(.96){% endif %}">
   {%- endif -%}
   <div class="prop-hero-ov"></div>
   <div class="prop-hero-content inner">
@@ -131,7 +131,7 @@
             </div>
           {%- endunless -%}
           <div class="fg"><label class="fl" for="pe-message">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" id="pe-message" name="message" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
-          <p class="form-note">{{ section.settings.privacy_note }}</p>
+          <p class="form-note">{% render 'privacy-link', note: section.settings.privacy_note %}</p>
           <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
           <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
         </form>
@@ -163,7 +163,7 @@
             </div>
           {%- endunless -%}
           <div class="fg"><label class="fl" for="pe-message">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" id="pe-message" name="contact[body]" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
-          <p class="form-note">{{ section.settings.privacy_note }}</p>
+          <p class="form-note">{% render 'privacy-link', note: section.settings.privacy_note %}</p>
           <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
         {% endform %}
         {%- endif -%}
@@ -210,20 +210,68 @@
           assign gh2 = gh | times: 1.5 | round
         -%}
         <div class="gallery-item gallery-{{ slot }} reveal-wipe {{ gdelays[i] | default: 'd3' }}" data-lb-item data-src="{{ image | image_url: width: gw2, height: gh2, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}" role="button" tabindex="0" aria-label="View photo: {{ image.alt | default: product.title | escape }}">
-          <img class="gallery-img" src="{{ image | image_url: width: gw, height: gh, crop: 'center' }}" alt="{{ image.alt | default: product.title | escape }}" loading="lazy">
+          <img class="gallery-img" src="{{ image | image_url: width: gw, height: gh, crop: 'center' }}" alt="{{ image.alt | default: product.title | escape }}" width="{{ gw }}" height="{{ gh }}" loading="lazy" decoding="async">
         </div>
       {%- endfor -%}
     </div>
   </div>
 {%- endif -%}
 
-<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer">
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
   <img id="lbImg" src="" alt="">
   <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&larr;</button>
   <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&rarr;</button>
   <button class="lb-close" id="lbClose" aria-label="Close">&#10005;</button>
   <div class="lb-meta"><span class="lb-cap" id="lbCap"></span><span id="lbCount"></span></div>
 </div>
+<script>
+  (function () {
+    var lb = document.getElementById('lb');
+    if (!lb || lb.dataset.lbInit) return;
+    lb.dataset.lbInit = '1';
+    var items = Array.prototype.slice.call(document.querySelectorAll('[data-lb-item]')).filter(function (el) { return !el.closest('[id^="pg-"]'); });
+    if (!items.length) return;
+    var img = document.getElementById('lbImg'), cap = document.getElementById('lbCap'), count = document.getElementById('lbCount');
+    var i = 0, lastFocus = null;
+    function show(n) {
+      i = (n + items.length) % items.length;
+      var it = items[i];
+      img.src = it.getAttribute('data-src');
+      img.alt = it.getAttribute('data-alt') || '';
+      cap.textContent = it.getAttribute('data-alt') || '';
+      count.textContent = (i + 1) + ' / ' + items.length;
+      [i + 1, i - 1].forEach(function (k) { var p = new Image(); p.src = items[(k + items.length) % items.length].getAttribute('data-src'); });
+    }
+    function open(n) {
+      lastFocus = document.activeElement;
+      lb.hidden = false;
+      requestAnimationFrame(function () { lb.classList.add('open'); });
+      document.documentElement.style.overflow = 'hidden';
+      show(n);
+      document.getElementById('lbClose').focus();
+    }
+    function close() {
+      lb.classList.remove('open');
+      document.documentElement.style.overflow = '';
+      setTimeout(function () { lb.hidden = true; }, 350);
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+    items.forEach(function (it, n) {
+      it.addEventListener('click', function () { open(n); });
+      it.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(n); } });
+    });
+    document.getElementById('lbPrev').addEventListener('click', function () { show(i - 1); });
+    document.getElementById('lbNext').addEventListener('click', function () { show(i + 1); });
+    document.getElementById('lbClose').addEventListener('click', close);
+    lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+    document.addEventListener('keydown', function (e) {
+      if (lb.hidden) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowRight') show(i + 1);
+      else if (e.key === 'ArrowLeft') show(i - 1);
+    });
+  })();
+</script>
 
 {%- if mf.film_video.value != blank -%}
   <section class="film-band" id="film">

@@ -34,3 +34,15 @@ In order. ☐ = you click it in the admin; ✎ = Claude does it once you say so.
 - ☐ Store plan review — Advanced (~US$399/mo) vs Basic for an enquiry-only site.
 - ☐ **Monday.com push** is built — add `MONDAY_API_TOKEN` in Vercel (see ENQUIRY-FLOW.md) and every enquiry lands on Lead Pipeline. n8n: set `LEAD_WEBHOOK_URL` when Heston's stack is ready.
 - ☐ Staff access — Settings › Users: give Tamsin a staff account with Online Store + Content permissions rather than sharing yours.
+
+## Added 8 Sep 2026 — after the vibecoded-site checklists audit
+
+Done in the theme (lands with the next push to staging): video option on the Hero slideshow; About image-strip size controls; a real password form on the locked-store page; residence photo lightbox now opens; "Privacy Policy" link after every enquiry note; meta description on every page; share image cropped to 1200×630; width/height on all images (no layout jump); three contrast fixes; `eb-garamond` preloaded; no console output in production; the Sabdia enquiry API now rejects POSTs from unlisted origins.
+
+Still yours to do in the Shopify admin:
+1. ☐ **Accessibility page** — the footer links `/pages/accessibility`; create Content › Pages › "Accessibility" (text in `src/pages/accessibility.astro`) or remove the link (Content › Menus › Legal).
+2. ☐ **Phone number** — Theme settings › Contact; without it the tel: row in the footer and contact page does not show.
+3. ☐ **Cookie banner** — Settings › Customer privacy › Cookie banner (before any GA4).
+4. ☐ **GA4 + Search Console** — Online Store › Preferences.
+5. ☐ **Password page copy** — Customize › Password page (default copy is a placeholder "Something considered is on its way").
+6. ☐ Optional: spam captcha (Settings › Customer privacy › "Enable reCAPTCHA" covers Shopify forms only; the Sabdia API forms rely on honeypot + rate limit).

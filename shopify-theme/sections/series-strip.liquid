@@ -2,9 +2,16 @@
   "The Series" — the horizontally scrolling strip of Instagram posts
   documenting this residence, from first render to final reveal (port of
   SeriesStrip.astro). Posts come from the product's custom.series_posts
-  JSON metafield: [{ "date", "thumb", "caption", "video"? }, …] — real
-  captures of the published posts, edited per product in the admin.
+  JSON metafield: [{ "date", "thumb", "caption", "url"?, "video"?,
+  "slides"?, "type"?, "hidden"? }, …] — real captures of the published
+  posts. The Instagram sync (shopify-app/sync-instagram.mjs, run daily by
+  GitHub Actions) fills this automatically from @_sabdia: reels bring a
+  "video", carousels bring "slides", every post its Instagram "url".
   Renders nothing when the residence has no posts.
+
+  Clicking a tile: the "Reels and carousels" setting decides whether they
+  play here on the site (with a "View on Instagram" link in the player) or
+  open the real post on Instagram.
 {%- endcomment -%}
 {%- liquid
   # Works on product pages AND on collection-item pages: the posts and
@@ -15,8 +22,14 @@
     assign posts = page.metafields.custom.series_posts.value
     assign series_name = page.title
   endif
+  assign visible = 0
+  for item in posts
+    unless item.hidden == true
+      assign visible = visible | plus: 1
+    endunless
+  endfor
 -%}
-{%- if posts.size > 0 -%}
+{%- if visible > 0 -%}
 <section class="series-band{% if section.settings.dark %} on-dark{% endif %}" data-series>
   <div class="series-hdr">
     <div>
@@ -34,15 +47,46 @@
     <button class="series-nav series-next" type="button" aria-label="Scroll forward" data-series-next>&rarr;</button>
     <div class="series-track" data-series-track>
       {%- for item in posts -%}
+        {%- if item.hidden == true -%}{%- continue -%}{%- endif -%}
+        {%- liquid
+          # Where does a click go? On-site player when the setting says so
+          # and we hold the media; otherwise the Instagram post itself — or
+          # the @_sabdia profile while a post has no link of its own yet.
+          assign ig_link = item.url
+          if ig_link == blank
+            assign ig_link = section.settings.instagram_url | default: settings.instagram_url
+          endif
+          assign has_media = false
+          if item.video != blank or item.slides.size > 0
+            assign has_media = true
+          endif
+          assign on_site = false
+          if section.settings.reel_mode == 'site' and has_media
+            assign on_site = true
+          endif
+          assign kind = item.type | default: ''
+          if kind == blank
+            if item.video != blank
+              assign kind = 'REEL'
+            elsif item.slides.size > 0
+              assign kind = 'CAROUSEL'
+            endif
+          endif
+          assign alt = item.caption | default: series_name | escape
+        -%}
         {%- capture card_meta -%}
           <div class="series-card-ov"></div>
-          {%- if item.url -%}
-            <div class="series-play" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
-            </div>
-          {%- elsif item.video -%}
-            <div class="series-play" aria-hidden="true">
+          {%- if kind == 'REEL' -%}
+            <div class="series-play" aria-hidden="true" title="Reel">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            </div>
+          {%- elsif kind == 'CAROUSEL' -%}
+            <div class="series-play" aria-hidden="true" title="Carousel">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="14" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v11"/></svg>
+            </div>
+          {%- else -%}
+            <div class="series-play" aria-hidden="true" title="Instagram post">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
             </div>
           {%- endif -%}
           <div class="series-card-meta">
@@ -50,43 +94,78 @@
             {%- if item.caption != blank -%}<div class="series-card-cap">{{ item.caption }}</div>{%- endif -%}
           </div>
         {%- endcapture -%}
-        {%- if item.url -%}
-          {%- comment -%} The play is the click-through: the post opens on
-              Instagram itself, where the view and any engagement count. {%- endcomment -%}
-          <a class="series-card" href="{{ item.url }}" target="_blank" rel="noopener"
-             aria-label="{{ item.caption | default: series_name | escape }} — view on Instagram">
-            <img src="{{ item.thumb }}" alt="{{ item.caption | default: series_name | escape }}" loading="lazy">
-            {{ card_meta }}
-          </a>
-        {%- else -%}
+        {%- if on_site -%}
           <div
             class="series-card"
             data-series-card
-            {% if item.video %}data-video="{{ item.video }}"{% endif %}
+            {% if item.video != blank %}data-video="{{ item.video }}"{% endif %}
+            {% if item.slides.size > 0 %}data-slides="{{ item.slides | join: '|' | escape }}"{% endif %}
+            {% if item.url != blank %}data-url="{{ item.url }}"{% endif %}
             data-caption="{{ item.caption | escape }}"
-            {% if item.video %}role="button" tabindex="0" aria-label="Play film: {{ item.caption | escape }}"{% endif %}
+            role="button" tabindex="0"
+            aria-label="{% if item.video != blank %}Play reel{% else %}View carousel{% endif %}: {{ alt }}"
           >
-            <img src="{{ item.thumb }}" alt="{{ item.caption | default: series_name | escape }}" loading="lazy">
+            <img src="{{ item.thumb }}" alt="{{ alt }}" loading="lazy" width="540" height="840">
             {{ card_meta }}
           </div>
+        {%- else -%}
+          {%- comment -%} The click-through: the post opens on Instagram
+              itself, where the view and any engagement count. {%- endcomment -%}
+          <a class="series-card" href="{{ ig_link }}" target="_blank" rel="noopener"
+             aria-label="{{ alt }} — view on Instagram">
+            <img src="{{ item.thumb }}" alt="{{ alt }}" loading="lazy" width="540" height="840">
+            {{ card_meta }}
+          </a>
         {%- endif -%}
       {%- endfor -%}
     </div>
   </div>
 </section>
 
-<div class="lbv" id="lbv" role="dialog" aria-modal="true" aria-label="Film player">
-  <video id="lbvVideo" controls playsinline preload="none"></video>
+<div class="lbv" id="lbv" role="dialog" aria-modal="true" aria-label="Post viewer">
+  <video id="lbvVideo" controls playsinline preload="none" hidden></video>
+  <div class="lbv-slides" id="lbvSlides" hidden>
+    <img id="lbvSlide" alt="" width="1080" height="1350">
+    <button class="lbv-arrow lbv-arrow-prev" id="lbvPrev" type="button" aria-label="Previous slide">&larr;</button>
+    <button class="lbv-arrow lbv-arrow-next" id="lbvNext" type="button" aria-label="Next slide">&rarr;</button>
+    <div class="lbv-dots" id="lbvDots" aria-hidden="true"></div>
+  </div>
   <button class="lb-close" id="lbvClose" aria-label="Close">&#10005;</button>
-  <div class="lbv-cap" id="lbvCap"></div>
+  <div class="lbv-cap" id="lbvCap">
+    <span id="lbvCapText"></span>
+    <a class="lbv-ig" id="lbvIg" target="_blank" rel="noopener" hidden>{{ section.settings.view_on_instagram | default: 'View on Instagram' }} &nearr;</a>
+  </div>
 </div>
+
+<style>
+  .lbv [hidden]{display:none!important}
+  .lbv-slides{position:relative;display:flex;align-items:center;justify-content:center;max-width:calc(100vw - 100px);max-height:calc(100vh - 120px)}
+  .lbv-slides img{display:block;width:auto;height:auto;max-width:calc(100vw - 100px);max-height:calc(100vh - 190px);object-fit:contain;background:#000;box-shadow:0 30px 90px rgba(0,0,0,.7);border:1px solid rgba(195,164,94,.25)}
+  .lbv video{max-height:calc(100vh - 190px)}
+  #lbvCapText{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .lbv-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(10,9,8,.55);color:rgba(253,251,246,.75);font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--font-u);transition:border-color .3s,color .3s}
+  .lbv-arrow:hover{border-color:var(--gold2);color:var(--gold2)}
+  .lbv-arrow-prev{left:-22px}.lbv-arrow-next{right:-22px}
+  .lbv-arrow[disabled]{opacity:.25;cursor:default}
+  .lbv-dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:6px}
+  .lbv-dots i{width:5px;height:5px;border-radius:50%;background:rgba(253,251,246,.35)}
+  .lbv-dots i.on{background:var(--gold2)}
+  .lbv-ig{display:inline-block;margin-top:10px;color:var(--gold2);text-decoration:none;font-size:9px;letter-spacing:.22em;text-transform:uppercase;white-space:nowrap}
+  .lbv-ig:hover{text-decoration:underline}
+  @media (max-width:640px){
+    .lbv-slides,.lbv-slides img{max-width:calc(100vw - 24px)}
+    .lbv-arrow-prev{left:6px}.lbv-arrow-next{right:6px}
+  }
+</style>
 
 <script>
   (function () {
     document.addEventListener('keydown', function (e) {
-      if (e.key !== 'Escape') return;
       var lbv = document.getElementById('lbv');
-      if (lbv && lbv.classList.contains('open')) closeSeriesFilm(lbv);
+      if (!lbv || !lbv.classList.contains('open')) return;
+      if (e.key === 'Escape') closeSeriesFilm(lbv);
+      if (e.key === 'ArrowLeft') lbv.dispatchEvent(new CustomEvent('lbv:step', { detail: -1 }));
+      if (e.key === 'ArrowRight') lbv.dispatchEvent(new CustomEvent('lbv:step', { detail: 1 }));
     });
 
     function closeSeriesFilm(lbv) {
@@ -122,21 +201,67 @@
     if (lbv && !lbv.dataset.init) {
       lbv.dataset.init = '1';
       var video = document.getElementById('lbvVideo');
-      var cap = document.getElementById('lbvCap');
-      function openV(src, caption) {
-        video.src = src;
-        cap.textContent = caption || '';
+      var slides = document.getElementById('lbvSlides');
+      var slideImg = document.getElementById('lbvSlide');
+      var dots = document.getElementById('lbvDots');
+      var prevBtn = document.getElementById('lbvPrev');
+      var nextBtn = document.getElementById('lbvNext');
+      var capText = document.getElementById('lbvCapText');
+      var igLink = document.getElementById('lbvIg');
+      var list = [];
+      var idx = 0;
+
+      function show(i) {
+        if (!list.length) return;
+        idx = Math.max(0, Math.min(list.length - 1, i));
+        slideImg.src = list[idx];
+        prevBtn.disabled = idx === 0;
+        nextBtn.disabled = idx === list.length - 1;
+        dots.innerHTML = '';
+        list.forEach(function (_, n) {
+          var d = document.createElement('i');
+          if (n === idx) d.className = 'on';
+          dots.appendChild(d);
+        });
+        // warm the neighbours
+        [idx + 1, idx - 1].forEach(function (n) { if (list[n]) { var im = new Image(); im.src = list[n]; } });
+      }
+
+      function open(card) {
+        var src = card.dataset.video;
+        list = card.dataset.slides ? card.dataset.slides.split('|') : [];
+        capText.textContent = card.dataset.caption || '';
+        if (card.dataset.url) { igLink.href = card.dataset.url; igLink.hidden = false; } else { igLink.hidden = true; }
+        video.hidden = !src;
+        slides.hidden = !!src || !list.length;
         lbv.classList.add('open');
         document.body.style.overflow = 'hidden';
-        video.play().catch(function () {});
+        if (src) {
+          video.src = src;
+          video.play().catch(function () {});
+        } else if (list.length) {
+          show(0);
+        }
       }
-      function closeV() { closeSeriesFilm(lbv); }
-      document.querySelectorAll('[data-series-card][data-video]').forEach(function (card) {
-        card.addEventListener('click', function () { openV(card.dataset.video, card.dataset.caption); });
-        card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openV(card.dataset.video, card.dataset.caption); } });
+      function close() { closeSeriesFilm(lbv); }
+
+      document.querySelectorAll('[data-series-card]').forEach(function (card) {
+        card.addEventListener('click', function () { open(card); });
+        card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(card); } });
       });
-      document.getElementById('lbvClose').addEventListener('click', closeV);
-      lbv.addEventListener('click', function (e) { if (e.target === lbv) closeV(); });
+      prevBtn.addEventListener('click', function () { show(idx - 1); });
+      nextBtn.addEventListener('click', function () { show(idx + 1); });
+      lbv.addEventListener('lbv:step', function (e) { if (!slides.hidden) show(idx + e.detail); });
+      var tx = null;
+      slides.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+      slides.addEventListener('touchend', function (e) {
+        if (tx === null) return;
+        var dx = e.changedTouches[0].clientX - tx;
+        tx = null;
+        if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1));
+      }, { passive: true });
+      document.getElementById('lbvClose').addEventListener('click', close);
+      lbv.addEventListener('click', function (e) { if (e.target === lbv) close(); });
     }
   })();
 </script>
@@ -152,6 +277,18 @@
     { "type": "text", "id": "handle", "label": "Instagram handle", "info": "Defaults to the theme's Instagram label" },
     { "type": "url", "id": "instagram_url", "label": "Instagram URL", "info": "Defaults to the theme's Instagram URL" },
     { "type": "text", "id": "sub", "label": "Sub-line", "default": "From first render to final reveal — swipe through the journey as it was shared." },
+    {
+      "type": "select",
+      "id": "reel_mode",
+      "label": "Reels and carousels",
+      "options": [
+        { "value": "instagram", "label": "Open the post on Instagram" },
+        { "value": "site", "label": "Play here on the site (with a link to the post)" }
+      ],
+      "default": "instagram",
+      "info": "Posts arrive automatically from @_sabdia via the Instagram sync — see docs/INSTAGRAM-SERIES.md. A post without its own link opens the @_sabdia profile."
+    },
+    { "type": "text", "id": "view_on_instagram", "label": "Player link text", "default": "View on Instagram" },
     { "type": "checkbox", "id": "dark", "label": "Dark band", "default": false }
   ],
   "presets": [{ "name": "The Series" }]

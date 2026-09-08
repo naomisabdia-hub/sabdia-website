@@ -11,7 +11,7 @@
       <p class="about-p reveal d2">{{ section.settings.text }}</p>
       <div class="reveal d3" style="margin-top:36px;padding:28px;background:var(--dark);border-left:2px solid var(--gold)">
         <div style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--gold3);margin-bottom:10px">{{ section.settings.note_label }}</div>
-        <div style="font-size:14px;font-weight:400;color:rgba(253,251,246,.78);line-height:1.75">{{ section.settings.note_text }}</div>
+        <div style="font-size:14px;font-weight:400;color:rgba(253,251,246,.78);line-height:1.75">{% render 'privacy-link', note: section.settings.note_text %}</div>
       </div>
     </div>
     <div>

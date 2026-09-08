@@ -25,7 +25,7 @@
         {%- for article in blog.articles -%}
           <a href="{{ article.url }}" class="pc reveal-wipe" style="aspect-ratio:16/10">
             {%- if article.image -%}
-              <img src="{{ article.image | image_url: width: 900, height: 560, crop: 'center' }}" alt="{{ article.title | escape }}" loading="lazy" decoding="async">
+              <img src="{{ article.image | image_url: width: 900, height: 560, crop: 'center' }}" alt="{{ article.title | escape }}" width="900" height="560" loading="lazy" decoding="async">
             {%- endif -%}
             <div class="pc-ov"></div>
             <div class="pc-info">

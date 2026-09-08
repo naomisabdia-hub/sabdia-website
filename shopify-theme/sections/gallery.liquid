@@ -15,7 +15,8 @@
   assign delays = ',d1,d2,d3' | split: ','
 -%}
 
-<section class="pg pg-{{ layout }}{% if section.settings.dark %} pg-dark{% endif %}" id="pg-{{ sid }}" data-gallery>
+<section class="pg pg-{{ layout }}{% if section.settings.dark %} pg-dark{% endif %}" id="pg-{{ sid }}" data-gallery
+         style="--pg-ar:{{ section.settings.shape | default: '4/3' }};--pg-gap:{{ section.settings.gap | default: 10 }}px">
   <div class="inner">
     {%- if section.settings.label != blank or section.settings.heading_html != blank or section.settings.text != blank -%}
       <div class="pg-hdr">
@@ -51,7 +52,7 @@
           <figure class="pg-item{% if block.settings.wide %} pg-wide{% endif %}{% if block.settings.tall %} pg-tall{% endif %} reveal-wipe {{ delays[di] }}"
                   data-lb-item data-src="{{ full }}" data-alt="{{ alt | escape }}" data-cap="{{ block.settings.caption | escape }}"
                   role="button" tabindex="0" aria-label="View photo: {{ alt | escape }}" {{ block.shopify_attributes }}>
-            <img src="{{ thumb }}" alt="{{ alt | escape }}" loading="lazy" decoding="async" width="1200" height="900">
+            <img src="{{ thumb }}" alt="{{ alt | escape }}" loading="lazy" decoding="async" width="1200" height="900" style="object-position:{{ block.settings.focus | default: 'center' }}">
             {%- if block.settings.caption != blank and section.settings.show_captions -%}
               <figcaption class="pg-cap">{{ block.settings.caption }}</figcaption>
             {%- endif -%}
@@ -67,7 +68,7 @@
 
   {%- comment -%} Full-screen viewer — same look as the residence galleries. {%- endcomment -%}
   <div class="lb" id="lb-{{ sid }}" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
-    <img src="" alt="">
+    <img src="" alt="" width="1600" height="1200">
     <button class="lb-btn lb-prev" type="button" aria-label="Previous photo">&larr;</button>
     <button class="lb-btn lb-next" type="button" aria-label="Next photo">&rarr;</button>
     <button class="lb-close" type="button" aria-label="Close">&#10005;</button>
@@ -85,12 +86,12 @@
   .pg-dark .pg-h em{color:var(--gold2)}
   .pg-p{font-size:13px;font-weight:300;line-height:1.85;color:var(--ink3);margin-top:16px;max-width:520px}
   .pg-dark .pg-p{color:rgba(253,251,246,.6)}
-  .pg-grid{display:grid;gap:10px;grid-auto-flow:dense}
+  .pg-grid{display:grid;gap:var(--pg-gap,10px);grid-auto-flow:dense}
   .pg-two .pg-grid{grid-template-columns:repeat(2,1fr)}
   .pg-three .pg-grid{grid-template-columns:repeat(3,1fr)}
   .pg-four .pg-grid{grid-template-columns:repeat(4,1fr)}
   .pg-editorial .pg-grid{grid-template-columns:repeat(6,1fr)}
-  .pg-item{margin:0;position:relative;overflow:hidden;aspect-ratio:4/3;cursor:zoom-in;background:var(--bg3)}
+  .pg-item{margin:0;position:relative;overflow:hidden;aspect-ratio:var(--pg-ar,4/3);cursor:zoom-in;background:var(--bg3)}
   .pg-dark .pg-item{background:var(--dark2)}
   .pg-editorial .pg-item{grid-column:span 2}
   .pg-editorial .pg-item:nth-child(6n+1){grid-column:span 4;aspect-ratio:16/10}
@@ -192,6 +193,21 @@
     { "type": "text", "id": "label", "label": "Small label (optional)", "default": "Gallery" },
     { "type": "html", "id": "heading_html", "label": "Heading (optional)", "info": "Wrap a word in <em> for the italic accent." },
     { "type": "textarea", "id": "text", "label": "Intro text (optional)" },
+    { "type": "header", "content": "Size" },
+    {
+      "type": "select", "id": "shape", "label": "Photo shape",
+      "options": [
+        { "value": "4/3", "label": "Landscape 4:3" },
+        { "value": "3/2", "label": "Landscape 3:2" },
+        { "value": "16/9", "label": "Wide 16:9" },
+        { "value": "1/1", "label": "Square" },
+        { "value": "4/5", "label": "Portrait 4:5" },
+        { "value": "3/4", "label": "Portrait 3:4" }
+      ],
+      "default": "4/3",
+      "info": "Editorial keeps its own mix of large frames; the small frames follow this."
+    },
+    { "type": "range", "id": "gap", "label": "Gap between photos", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 10 },
     { "type": "checkbox", "id": "show_captions", "label": "Show captions on the photos", "default": false },
     { "type": "checkbox", "id": "dark", "label": "Dark background", "default": false }
   ],
@@ -205,7 +221,19 @@
         { "type": "text", "id": "alt", "label": "Describe the photo (alt text)", "info": "Read by screen readers and search engines, e.g. \"QASR kitchen — travertine island under the skylight\"." },
         { "type": "text", "id": "caption", "label": "Caption (optional)" },
         { "type": "checkbox", "id": "wide", "label": "Make this one wide", "default": false },
-        { "type": "checkbox", "id": "tall", "label": "Make this one tall", "default": false }
+        { "type": "checkbox", "id": "tall", "label": "Make this one tall", "default": false },
+        {
+          "type": "select", "id": "focus", "label": "Crop focus",
+          "options": [
+            { "value": "center", "label": "Centre" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "center",
+          "info": "Which part of the photo to keep when it is cropped to the frame."
+        }
       ]
     }
   ],
