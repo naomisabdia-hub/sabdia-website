@@ -23,12 +23,12 @@ The full illustrated guide is *Sabdia Website Guide.pdf* on the Desktop.
 | Fonts | Theme settings › **Design** › *Body and interface font* | Two typefaces only: the large headings stay in Cormorant Garamond; everything else is this font (Open Sans by default) |
 | Text sizes (hierarchy) | Theme code: the **Type scale** block at the top of `style.css` | One set of roles for the whole site - display, h1, h2, h3, lead, body, small, label, micro. Every section uses these, so a size changes everywhere at once. Ask for a code change to adjust |
 | Dashes | Nowhere - the site uses plain hyphens, never the long dash | Type - with a space either side when you write copy |
-| The Collection page | Customize › Collection › **Portfolio grid** | Shows the For Sale and Sold residences first (from Products), then the completed Residence blocks, with an All / For Sale / Sold / Completed filter. Both switchable. Projects is no longer in the menu; its old address redirects here |
+| The Collection page (past projects) | Customize › Collection › **Portfolio grid** | Sold residences (from Products, by Status) then the completed Residence blocks, with an All / Sold / Completed filter. *Which ones* can widen it to include For Sale. Projects is no longer in the menu; its old address redirects here |
 | A sideways photo slideshow (carousel) on any page | Customize › **+ Add section › Photo gallery** › Structure: **Carousel** | Arrows, swipe, optional auto-advance and photo width under the Carousel header. Any page, as many as you like |
 | The Series (Instagram strip on a residence) | Runs itself — posts arrive from @_sabdia each morning | Name or #hashtag the house in the caption. Play on site vs open on Instagram: Customize › the residence › **The Series**. Hide a post or add keywords: `docs/INSTAGRAM-SERIES.md` |
 | For Sale / Sold order | Products › **Collections** › For Sale / Sold | Sort "Manually", drag. The first For Sale residence is the big card on the home page and the banner on /collections/for-sale. (Which list a house is in is its **Status**, not the collection) |
 | The Journal | **Content › Blog posts** | Blog "The Journal"; featured image + excerpt matter |
-| Nav and footer links | **Content › Menus** | Main menu; Company and Legal menus for the footer |
+| Nav and footer links | **Content › Menus** | Main menu; Company and Legal menus for the footer. Drag an item under another to make a dropdown (Properties › For Sale, Collection) |
 | Privacy / Terms / Accessibility text | **Content › Pages** | The page body is the text. Other pages keep their words in the customizer |
 | Logo, logo size, ABN, QBCC number, phone, email, socials | Customize › **Theme settings** (bottom-left) › Brand / Contact / Social | |
 | Colours | Theme settings › **Design** › switch on "Use the colours below" | Off = built-in palette |

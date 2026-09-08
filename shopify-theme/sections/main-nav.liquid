@@ -55,13 +55,21 @@
   <nav class="mob-nav-links" aria-label="Mobile">
     {%- if menu.links.size > 0 -%}
       {%- for link in menu.links -%}
-        <a href="{{ link.url }}">{{ link.title }}</a>
+        {%- if link.links.size > 0 -%}
+          <span class="mob-nav-group">{{ link.title }}</span>
+          {%- for child in link.links -%}
+            <a href="{{ child.url }}" class="mob-nav-child">{{ child.title }}</a>
+          {%- endfor -%}
+        {%- else -%}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {%- endif -%}
       {%- endfor -%}
     {%- else -%}
-      <a href="/collections/for-sale">For Sale</a>
+      <span class="mob-nav-group">Properties</span>
+      <a href="/collections/for-sale" class="mob-nav-child">For Sale</a>
+      <a href="/pages/collection" class="mob-nav-child">Collection</a>
       <a href="/pages/services">Services</a>
       <a href="/pages/about">About</a>
-      <a href="/pages/collection">Collection</a>
       <a href="/pages/agent-access">Agent Access</a>
     {%- endif -%}
     <a href="{{ section.settings.cta_link }}">{{ section.settings.mobile_contact_label }}</a>
@@ -82,13 +90,29 @@
   <ul class="nav-center">
     {%- if menu.links.size > 0 -%}
       {%- for link in menu.links -%}
-        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+        {%- if link.links.size > 0 -%}
+          <li class="has-sub">
+            <a href="{{ link.url }}" aria-haspopup="true" aria-expanded="false">{{ link.title }}<span class="nav-caret" aria-hidden="true"></span></a>
+            <ul class="nav-sub" aria-label="{{ link.title | escape }}">
+              {%- for child in link.links -%}
+                <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </li>
+        {%- else -%}
+          <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+        {%- endif -%}
       {%- endfor -%}
     {%- else -%}
-      <li><a href="/collections/for-sale">For Sale</a></li>
+      <li class="has-sub">
+        <a href="/collections/for-sale" aria-haspopup="true" aria-expanded="false">Properties<span class="nav-caret" aria-hidden="true"></span></a>
+        <ul class="nav-sub" aria-label="Properties">
+          <li><a href="/collections/for-sale">For Sale</a></li>
+          <li><a href="/pages/collection">Collection</a></li>
+        </ul>
+      </li>
       <li><a href="/pages/services">Services</a></li>
       <li><a href="/pages/about">About</a></li>
-      <li><a href="/pages/collection">Collection</a></li>
       <li><a href="/pages/agent-access">Agent Access</a></li>
     {%- endif -%}
   </ul>

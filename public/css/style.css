@@ -100,8 +100,8 @@
 
 /* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{overflow-x:hidden;scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-body{background:var(--bg);color:var(--ink);font-family:var(--font-u);overflow-x:hidden;line-height:1.6}
+html{overflow-x:hidden;overflow-x:clip;scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-u);overflow-x:hidden;overflow-x:clip;line-height:1.6}
 img{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
 button{font-family:var(--font-u)}
@@ -191,6 +191,19 @@ html.nav-veil #navVeil{opacity:1;pointer-events:auto}
 .nav-center a::after{content:'';position:absolute;bottom:-5px;left:0;width:0;height:1px;background:var(--gold2);transition:width .35s var(--ease)}
 .nav-center a:hover{color:var(--white)}
 .nav-center a:hover::after{width:100%}
+/* Dropdown for a menu item with children (Content › Menus › nested items) */
+.nav-center .has-sub{position:relative}
+.nav-center .has-sub>a{padding-bottom:6px}
+.nav-caret{display:inline-block;width:5px;height:5px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg);margin:0 0 3px 9px;opacity:.7}
+.nav-sub{position:absolute;top:100%;left:50%;transform:translate(-50%,6px);min-width:190px;padding:12px 0;margin:0;list-style:none;background:rgba(31,27,20,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(195,164,94,.25);opacity:0;visibility:hidden;transition:opacity .3s var(--ease),transform .3s var(--ease),visibility 0s .3s;z-index:5}
+.nav-sub::before{content:'';position:absolute;top:-12px;left:0;right:0;height:12px}
+.nav-sub li{padding:0}
+.nav-sub a{display:block;padding:9px 22px;color:rgba(253,251,246,.8);white-space:nowrap}
+.nav-sub a::after{display:none}
+.nav-sub a:hover,.nav-sub a:focus-visible{color:var(--gold2);background:rgba(253,251,246,.04)}
+.has-sub:hover .nav-sub,.has-sub:focus-within .nav-sub{opacity:1;visibility:visible;transform:translate(-50%,0);transition:opacity .3s var(--ease),transform .3s var(--ease),visibility 0s}
+.mob-nav-group{font-size:var(--t-label);font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--gold2);padding:14px 0 2px}
+.mob-nav a.mob-nav-child{font-size:clamp(24px,6vw,38px);padding:6px 0}
 #mainNav.sc .nav-center a{color:var(--ink3)}
 #mainNav.sc .nav-center a:hover{color:var(--ink)}
 .nav-right{display:flex;align-items:center;gap:12px;margin-left:auto}

@@ -7,11 +7,17 @@
 {%- endcomment -%}
 {%- liquid
   assign show_current = section.settings.show_current
+  assign scope = section.settings.current_scope | default: 'sold'
+  assign show_live = false
   if show_current
-    capture live_csv
-      render 'residence-handles', col: collections['for-sale'], group: 'live'
-    endcapture
-    assign live_handles = live_csv | split: ','
+    assign live_handles = '' | split: ','
+    if scope == 'all'
+      assign show_live = true
+      capture live_csv
+        render 'residence-handles', col: collections['for-sale'], group: 'live'
+      endcapture
+      assign live_handles = live_csv | split: ','
+    endif
     capture sold_csv
       render 'residence-handles', col: collections['sold'], group: 'sold'
     endcapture
@@ -25,7 +31,7 @@
   <div class="inner" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap" data-port-filter="{{ sid }}">
     <span style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)">{{ section.settings.filter_label }}</span>
     <button class="pfilter on" type="button" data-filter="all">{{ section.settings.filter_all }}</button>
-    <button class="pfilter" type="button" data-filter="live">{{ section.settings.filter_live }}</button>
+    {%- if show_live -%}<button class="pfilter" type="button" data-filter="live">{{ section.settings.filter_live }}</button>{%- endif -%}
     <button class="pfilter" type="button" data-filter="sold">{{ section.settings.filter_sold }}</button>
     <button class="pfilter" type="button" data-filter="done">{{ section.settings.filter_done }}</button>
   </div>
@@ -163,14 +169,24 @@
     {
       "type": "checkbox",
       "id": "show_current",
-      "label": "Show the For Sale and Sold residences first",
+      "label": "Include residences from Products",
       "default": true,
-      "info": "Pulled straight from Products (their Status decides the group). Turn off to show only the completed Residence blocks below."
+      "info": "Pulled straight from Products (their Status decides the group). Off = only the completed Residence blocks below."
+    },
+    {
+      "type": "select",
+      "id": "current_scope",
+      "label": "Which ones",
+      "options": [
+        { "value": "sold", "label": "Sold only (past projects)" },
+        { "value": "all", "label": "For Sale and Sold" }
+      ],
+      "default": "sold"
     },
     {
       "type": "checkbox",
       "id": "show_filter",
-      "label": "Show the filter bar (All / For Sale / Sold / Completed)",
+      "label": "Show the filter bar (All / Sold / Completed)",
       "default": true
     },
     {
