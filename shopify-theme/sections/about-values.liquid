@@ -11,9 +11,9 @@
           {%- assign di = forloop.index0 | modulo: 3 -%}
           <div class="reveal {{ vdelays[di] }}" {{ block.shopify_attributes }}>
             <div style="font-family:var(--font-d);font-size:56px;font-weight:300;color:rgba(216,196,142,.7);line-height:1;margin-bottom:20px">{{ block.settings.numeral }}</div>
-            <div style="font-family:var(--font-d);font-size:24px;font-weight:300;color:var(--white);margin-bottom:12px">{{ block.settings.title }}</div>
+            <div style="font-family:var(--font-d);font-size:var(--t-h3);font-weight:300;color:var(--white);margin-bottom:12px">{{ block.settings.title }}</div>
             {%- comment -%} .72, not .4 - at .4 the descriptions were near-invisible on the obsidian band (Tamsin, 2026-09-01). {%- endcomment -%}
-            <div style="font-size:13.5px;font-weight:300;line-height:1.85;color:rgba(253,251,246,.86)">{{ block.settings.desc }}</div>
+            <div style="font-size:var(--t-body);font-weight:300;line-height:var(--lh-body);color:rgba(253,251,246,.86)">{{ block.settings.desc }}</div>
           </div>
         {%- endfor -%}
       </div>

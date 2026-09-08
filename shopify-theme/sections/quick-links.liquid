@@ -10,7 +10,7 @@
         {%- assign di = forloop.index0 | modulo: 3 -%}
         <a href="{{ block.settings.link }}" class="reveal {{ qdelays[di] }}" style="display:block;padding:32px;background:var(--white);border:1px solid var(--border);transition:border-color .3s;text-decoration:none" {{ block.shopify_attributes }}>
           <div style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--ink);margin-bottom:10px">{{ block.settings.tag }}</div>
-          <div style="font-family:var(--font-d);font-size:22px;font-weight:300;color:var(--ink);margin-bottom:8px">{{ block.settings.title }}</div>
+          <div style="font-family:var(--font-d);font-size:var(--t-h3);font-weight:300;color:var(--ink);margin-bottom:8px">{{ block.settings.title }}</div>
           <div style="font-size:12px;font-weight:300;color:var(--ink3)">{{ block.settings.desc }}</div>
         </a>
       {%- endfor -%}
