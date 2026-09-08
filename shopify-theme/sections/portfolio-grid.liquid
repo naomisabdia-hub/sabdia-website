@@ -62,15 +62,25 @@
       {%- for block in section.blocks -%}
         {%- assign di = ci | modulo: 3 -%}
         {%- assign ci = ci | plus: 1 -%}
+        {%- liquid
+          # A picked Residence page supplies name, location, photo, film and
+          # link from its own metafields; the block's fields only override.
+          assign rp = block.settings.page
+          assign r_name = block.settings.name | default: rp.title
+          assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
+          assign r_image_ext = block.settings.image_ext | default: rp.metafields.custom.image.value
+          assign r_video = block.settings.video | default: rp.metafields.custom.video.value
+          assign r_link = block.settings.link | default: rp.url
+        -%}
         {%- capture card_inner -%}
           <div class="port-img-wrap">
             {%- if block.settings.image -%}
-              <img src="{{ block.settings.image | image_url: width: 800, height: 600, crop: 'center' }}" alt="{{ block.settings.name | escape }}" width="800" height="600" loading="lazy" decoding="async">
-            {%- elsif block.settings.image_ext != blank -%}
-              <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 800, h: 600 %}" alt="{{ block.settings.name | escape }}" width="800" height="600" loading="lazy" decoding="async">
+              <img src="{{ block.settings.image | image_url: width: 800, height: 600, crop: 'center' }}" alt="{{ r_name | escape }}" width="800" height="600" loading="lazy" decoding="async">
+            {%- elsif r_image_ext != blank -%}
+              <img src="{% render 'ext-variant', src: r_image_ext, w: 800, h: 600 %}" alt="{{ r_name | escape }}" width="800" height="600" loading="lazy" decoding="async">
             {%- endif -%}
             {%- liquid
-              assign port_vid = block.settings.video
+              assign port_vid = r_video
               if block.settings.video_file
                 assign pmp4 = block.settings.video_file.sources | where: 'format', 'mp4' | first
                 if pmp4
@@ -83,11 +93,11 @@
               <span class="port-film-tag">{{ section.settings.film_tag | default: "Film" }}</span>
             {%- endif -%}
           </div>
-          <div class="port-name">{{ block.settings.name }}{% if block.settings.link != blank %} <span style="color:var(--ink);font-weight:400">&rarr;</span>{% endif %}</div>
-          <div class="port-loc">{{ block.settings.loc }}</div>
+          <div class="port-name">{{ r_name }}{% if r_link != blank %} <span style="color:var(--ink);font-weight:400">&rarr;</span>{% endif %}</div>
+          <div class="port-loc">{{ r_loc }}</div>
         {%- endcapture -%}
-        {%- if block.settings.link != blank -%}
-          <a href="{{ block.settings.link }}" class="port-card reveal {{ pdelays[di] }}" data-port-card data-group="done" {{ block.shopify_attributes }}>{{ card_inner }}</a>
+        {%- if r_link != blank -%}
+          <a href="{{ r_link }}" class="port-card reveal {{ pdelays[di] }}" data-port-card data-group="done" {{ block.shopify_attributes }}>{{ card_inner }}</a>
         {%- else -%}
           <div class="port-card reveal {{ pdelays[di] }}" data-port-card data-group="done" {{ block.shopify_attributes }}>{{ card_inner }}</div>
         {%- endif -%}
@@ -185,9 +195,16 @@
       "name": "Residence",
       "settings": [
         {
+          "type": "page",
+          "id": "page",
+          "label": "Residence page",
+          "info": "Pick the completed residence's page (Content › Pages, theme template \"collection-item\"). Its name, location line, photo, film and link then fill in by themselves — the fields below only override."
+        },
+        {
           "type": "text",
           "id": "name",
-          "label": "Name"
+          "label": "Name",
+          "info": "Leave empty to use the page title."
         },
         {
           "type": "text",
