@@ -4,7 +4,7 @@
       "type": "home-hero",
       "settings": {
         "words": "Design, Develop, Construct",
-        "eyebrow": "Boutique Luxury Home Builder & Developer — Brisbane",
+        "eyebrow": "Boutique Luxury Home Builder & Developer - Brisbane",
         "description": "Redefining luxury through design, detail, and craftsmanship. For over ten years, Sabdia has delivered award-winning residences that set a new benchmark for contemporary living in Brisbane.",
         "award": "Award-Winning Luxury Residences.",
         "cta1_label": "View Properties",
@@ -160,7 +160,7 @@
         "paragraph-3": {
           "type": "paragraph",
           "settings": {
-            "text": "At Sabdia, we manage every step of the residential development journey in-house — from visionary design through to expert construction. This integrated approach allows us to maintain meticulous control over quality, timing, and innovation, delivering homes that stand the test of time."
+            "text": "At Sabdia, we manage every step of the residential development journey in-house - from visionary design through to expert construction. This integrated approach allows us to maintain meticulous control over quality, timing, and innovation, delivering homes that stand the test of time."
           }
         },
         "paragraph-4": {
@@ -172,7 +172,7 @@
         "paragraph-5": {
           "type": "paragraph",
           "settings": {
-            "text": "We are not merely builders — we are creators of legacy. Each residence we deliver is conceived as a singular work of architecture, thoughtfully designed to complement its surroundings and exceed every expectation of luxury living."
+            "text": "We are not merely builders - we are creators of legacy. Each residence we deliver is conceived as a singular work of architecture, thoughtfully designed to complement its surroundings and exceed every expectation of luxury living."
           }
         },
         "value-6": {
@@ -180,7 +180,7 @@
           "settings": {
             "n": "i.",
             "title": "Integrated Delivery",
-            "desc": "Design, develop, and construct under one roof — seamless from concept to keys."
+            "desc": "Design, develop, and construct under one roof - seamless from concept to keys."
           }
         },
         "value-7": {
@@ -220,7 +220,7 @@
         "text": "A look at the residences, the craftsmanship, and the people behind every Sabdia home.",
         "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand.mp4",
         "poster_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand-poster.jpg",
-        "caption_left": "Sabdia — On Film",
+        "caption_left": "Sabdia - On Film",
         "caption_right": "Brisbane, QLD",
         "cta_label": "Explore the Collection",
         "cta_link": "/pages/collection"
@@ -242,7 +242,7 @@
       "settings": {
         "label": "What We Do",
         "heading_html": "Full-spectrum<br><em>development</em><br>expertise.",
-        "text": "From site acquisition through to final handover, Sabdia manages every element in-house — ensuring seamless delivery and uncompromising quality at every stage.",
+        "text": "From site acquisition through to final handover, Sabdia manages every element in-house - ensuring seamless delivery and uncompromising quality at every stage.",
         "cta_label": "Explore Services",
         "cta_link": "/pages/services"
       },
@@ -337,7 +337,7 @@
       "type": "testimonial",
       "settings": {
         "quote": "One team did the design and the build, so nothing was lost in between. The house is exactly what we asked for, and better made.",
-        "attribution": "Satisfied Client — Inner Brisbane Residence"
+        "attribution": "Satisfied Client - Inner Brisbane Residence"
       }
     },
     "agent": {
@@ -407,7 +407,7 @@
         "label": "Get In Touch",
         "heading_html": "Let's start<br>a <em>conversation</em>.",
         "text": "Leave your details and we will call or email within a business day.",
-        "interests": "For Sale — Current Properties\nCustom Home Design\nDevelopment Partnership\nAgent Access\nGeneral Enquiry",
+        "interests": "For Sale - Current Properties\nCustom Home Design\nDevelopment Partnership\nAgent Access\nGeneral Enquiry",
         "note": "We typically respond within one business day."
       }
     }

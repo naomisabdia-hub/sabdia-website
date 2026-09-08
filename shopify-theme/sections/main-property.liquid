@@ -6,7 +6,7 @@
 
   Product fields used: title, description (paragraphs), featured image
   (hero), remaining images (gallery), Status (custom.status, see the
-  residence-status snippet — the old "sold" tag still works), and metafields
+  residence-status snippet - the old "sold" tag still works), and metafields
   custom.suburb / state / beds / baths / cars / land / land_over /
   headline / features / enquiry_heading / enquiry_text / enquiry_button /
   brochure_url / film_video / film_poster / scrollwalk_folder.
@@ -300,7 +300,7 @@
           </button>
         </div>
         <div class="film-caption">
-          <span><b>{{ product.title }} — On Film</b></span>
+          <span><b>{{ product.title }} - On Film</b></span>
           <span>{{ mf.suburb.value }}, {{ state }}</span>
         </div>
       </div>
@@ -322,7 +322,7 @@
 <section style="padding:0 clamp(22px,5vw,80px) clamp(48px,6vw,72px)">
   <div class="inner" style="display:flex;justify-content:center">
     {%- assign share_url = shop.url | append: product.url -%}
-    {%- assign share_title = product.title | append: ' — ' | append: mf.suburb.value | append: ' | Sabdia Constructions' -%}
+    {%- assign share_title = product.title | append: ' - ' | append: mf.suburb.value | append: ' | Sabdia Constructions' -%}
     {%- assign eu = share_url | url_encode -%}
     {%- assign et = share_title | url_encode -%}
     <div class="share-row" aria-label="Share this page">
@@ -338,7 +338,7 @@
 
 {%- unless sold -%}
   <div class="prop-sticky-bar" id="stickyEnquire">
-    <div class="psb-name">{{ product.title }} <span class="psb-loc">&mdash; {{ mf.suburb.value }}</span></div>
+    <div class="psb-name">{{ product.title }} <span class="psb-loc">- {{ mf.suburb.value }}</span></div>
     <a href="#cform" class="psb-btn">{{ section.settings.sticky_label }} &rarr;</a>
   </div>
   <script>
@@ -434,7 +434,7 @@
       "type": "textarea",
       "id": "success_text",
       "label": "Success message (Shopify mode)",
-      "default": "Thank you — we've received your enquiry and will be in touch within one business day."
+      "default": "Thank you - we've received your enquiry and will be in touch within one business day."
     },
     {
       "type": "text",
@@ -489,7 +489,7 @@
     },
     {
       "type": "paragraph",
-      "content": "The NUMBERS in this bar (suburb, bedrooms, bathrooms, garages, land size) belong to the residence itself — edit them at Products › the residence › Metafields, near the bottom of that page. The Status line prints the residence's Status word (For Sale, Under Offer, Sold…) from Products › the residence › Status. Only the wording of the labels is set here."
+      "content": "The NUMBERS in this bar (suburb, bedrooms, bathrooms, garages, land size) belong to the residence itself - edit them at Products › the residence › Metafields, near the bottom of that page. The Status line prints the residence's Status word (For Sale, Under Offer, Sold…) from Products › the residence › Status. Only the wording of the labels is set here."
     },
     {
       "type": "checkbox",

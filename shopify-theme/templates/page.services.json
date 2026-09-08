@@ -20,7 +20,7 @@
         "paragraph-1": {
           "type": "paragraph",
           "settings": {
-            "text": "At Sabdia, we believe the best residential developments are those where design, development, and construction work as one seamless system — not as separate, disconnected disciplines. Our fully integrated in-house model is our defining advantage."
+            "text": "At Sabdia, we believe the best residential developments are those where design, development, and construction work as one seamless system - not as separate, disconnected disciplines. Our fully integrated in-house model is our defining advantage."
           }
         },
         "paragraph-2": {
@@ -146,7 +146,7 @@
       "settings": {
         "label": "Start Your Project",
         "heading_html": "Ready to build something <em style=\"color:var(--gold2)\">remarkable</em>?",
-        "text": "Whether you have a site, a vision, or simply a desire for exceptional living — we'd love to hear from you.",
+        "text": "Whether you have a site, a vision, or simply a desire for exceptional living - we'd love to hear from you.",
         "cta1_label": "Begin a Conversation",
         "cta1_link": "/pages/contact",
         "cta2_label": "View Properties",

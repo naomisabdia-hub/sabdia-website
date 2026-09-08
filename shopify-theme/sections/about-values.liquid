@@ -1,5 +1,5 @@
 {%- comment -%}
-  About — values: the obsidian band of numbered values.
+  About - values: the obsidian band of numbered values.
 {%- endcomment -%}
 <section style="background:var(--dark)">
   <div style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px)">
@@ -12,7 +12,7 @@
           <div class="reveal {{ vdelays[di] }}" {{ block.shopify_attributes }}>
             <div style="font-family:var(--font-d);font-size:56px;font-weight:300;color:rgba(216,196,142,.7);line-height:1;margin-bottom:20px">{{ block.settings.numeral }}</div>
             <div style="font-family:var(--font-d);font-size:24px;font-weight:300;color:var(--white);margin-bottom:12px">{{ block.settings.title }}</div>
-            {%- comment -%} .72, not .4 — at .4 the descriptions were near-invisible on the obsidian band (Tamsin, 2026-09-01). {%- endcomment -%}
+            {%- comment -%} .72, not .4 - at .4 the descriptions were near-invisible on the obsidian band (Tamsin, 2026-09-01). {%- endcomment -%}
             <div style="font-size:13.5px;font-weight:300;line-height:1.85;color:rgba(253,251,246,.86)">{{ block.settings.desc }}</div>
           </div>
         {%- endfor -%}
@@ -34,7 +34,7 @@
 
 {% schema %}
 {
-  "name": "About — values",
+  "name": "About - values",
   "settings": [
     { "type": "text", "id": "label", "label": "Small label", "default": "Our Values" }
   ],
@@ -49,6 +49,6 @@
       ]
     }
   ],
-  "presets": [{ "name": "About — values" }]
+  "presets": [{ "name": "About - values" }]
 }
 {% endschema %}

@@ -1,11 +1,11 @@
 {%- comment -%}
-  Collection residence page — port of collection/[slug].astro, shared by
+  Collection residence page - port of collection/[slug].astro, shared by
   every completed residence via templates/page.collection-item.json.
   The residence itself comes from PAGE metafields (namespace custom):
-    loc            single line   — "Camp Hill QLD, Australia"
-    image          single line   — hero/poster URL or /images/… path
-    video          single line   — film URL (optional)
-    series_posts   json          — the residence's real Instagram posts
+    loc            single line   - "Camp Hill QLD, Australia"
+    image          single line   - hero/poster URL or /images/… path
+    video          single line   - film URL (optional)
+    series_posts   json          - the residence's real Instagram posts
   The editorial story is stitched from the strongest Series captions,
   exactly like the live site. "More from the Collection" renders from
   this section's blocks (the full portfolio list; the residence being
@@ -29,7 +29,7 @@
 </section>
 
 {%- liquid
-  # Editorial story — the strongest captions (over 60 characters),
+  # Editorial story - the strongest captions (over 60 characters),
   # deduplicated, first three, each closed with a full stop.
   capture story_raw
     for p in posts
@@ -67,7 +67,7 @@
           </button>
         </div>
         <div class="film-caption">
-          <span><b>{{ page.title }} — On Film</b></span>
+          <span><b>{{ page.title }} - On Film</b></span>
           <span>{{ mf.loc.value }}</span>
         </div>
       </div>
@@ -135,7 +135,7 @@
     {
       "type": "html",
       "id": "film_heading_html",
-      "label": "Film heading (HTML — {name})",
+      "label": "Film heading (HTML - {name})",
       "default": "Experience <em>{name}</em>."
     },
     {
@@ -159,7 +159,7 @@
     {
       "type": "html",
       "id": "cta_heading_html",
-      "label": "CTA heading (HTML — {name})",
+      "label": "CTA heading (HTML - {name})",
       "default": "Inspired by <em style=\"font-style:italic;color:var(--gold2)\">{name}</em>?"
     },
     {
@@ -225,7 +225,7 @@
           "type": "text",
           "id": "image_ext",
           "label": "Current photo (URL)",
-          "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+          "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field."
         },
         {
           "type": "url",

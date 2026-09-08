@@ -1,17 +1,17 @@
 {%- comment -%}
-  Guided residence match — port of find-your-home.astro. Five questions
+  Guided residence match - port of find-your-home.astro. Five questions
   (timeline, flexibility, bedrooms, budget slider, area) → matched
   for-sale residences → contact details → posts to the existing Vercel
   API as form-name "guided-match" / "Future Releases".
 
   Answer options are written one per line. Bedrooms and area options may
-  carry a matching value after "=>" (e.g. "Four => 4", "North — Ascot,
+  carry a matching value after "=>" (e.g. "Four => 4", "North - Ascot,
   Hendra => north"); a line without one (e.g. "Flexible") matches
   everything. The suburb map pairs each residence suburb with an area key.
 
-  BUDGET GATE — a stated ceiling under the threshold shows no residences;
+  BUDGET GATE - a stated ceiling under the threshold shows no residences;
   the visitor is offered first sight of future releases instead. That path
-  never states or implies a price — see the original page for the full
+  never states or implies a price - see the original page for the full
   reasoning. The threshold lives in the "Budget threshold" setting and is
   never rendered.
 {%- endcomment -%}
@@ -222,7 +222,7 @@
     var form = document.querySelector('[data-fyh]');
     if (!form || form.dataset.fyhInit) return;
     form.dataset.fyhInit = '1';
-    /* Shopify-native submits reload this page with ?contact_posted=true —
+    /* Shopify-native submits reload this page with ?contact_posted=true - 
        swap the wizard for the thank-you block. */
     try {
       if (new URLSearchParams(location.search).get('contact_posted') === 'true') {
@@ -275,7 +275,7 @@
         });
       });
 
-      // Slider step: needs an explicit Continue — its default value counts
+      // Slider step: needs an explicit Continue - its default value counts
       // as the answer even if the visitor never drags.
       var range = step.querySelector('[data-fyh-range]');
       if (range) {
@@ -359,7 +359,7 @@
         'Maximum budget: ' + (answers.budget || '-') + '\n' +
         'Preferred area: ' + (answers.area || '-') + '\n' +
         (belowFloor
-          ? 'Below threshold — no residences shown; registered for future releases.'
+          ? 'Below threshold - no residences shown; registered for future releases.'
           : 'Matches shown: ' + (shown || 'none (full collection shown)'));
     }
 
@@ -388,7 +388,7 @@
     {
       "type": "text",
       "id": "q_timeline",
-      "label": "Q1 — timeline",
+      "label": "Q1 - timeline",
       "default": "When are you looking to move?"
     },
     {
@@ -400,7 +400,7 @@
     {
       "type": "text",
       "id": "q_flex",
-      "label": "Q2 — flexibility",
+      "label": "Q2 - flexibility",
       "default": "Would you consider a residence still under construction?"
     },
     {
@@ -412,7 +412,7 @@
     {
       "type": "text",
       "id": "q_beds",
-      "label": "Q3 — bedrooms",
+      "label": "Q3 - bedrooms",
       "default": "How many bedrooms does your household need?"
     },
     {
@@ -424,7 +424,7 @@
     {
       "type": "text",
       "id": "q_budget",
-      "label": "Q4 — budget",
+      "label": "Q4 - budget",
       "default": "What is your budget?"
     },
     {
@@ -455,7 +455,7 @@
       "type": "text",
       "id": "budget_floor",
       "label": "Budget threshold ($m)",
-      "info": "Below this stated ceiling, no residences are shown — the future-releases invitation appears instead. Never rendered on the page.",
+      "info": "Below this stated ceiling, no residences are shown - the future-releases invitation appears instead. Never rendered on the page.",
       "default": "5.5"
     },
     {
@@ -467,14 +467,14 @@
     {
       "type": "text",
       "id": "q_area",
-      "label": "Q5 — area",
+      "label": "Q5 - area",
       "default": "Which part of Brisbane?"
     },
     {
       "type": "textarea",
       "id": "opts_area",
       "label": "Q5 options (label => area key)",
-      "default": "Inner-East — Coorparoo, Camp Hill => inner-east\nNorth — Ascot, Hendra => north\nSouth — Holland Park => south\nOpen to suggestions"
+      "default": "Inner-East - Coorparoo, Camp Hill => inner-east\nNorth - Ascot, Hendra => north\nSouth - Holland Park => south\nOpen to suggestions"
     },
     {
       "type": "textarea",
@@ -508,13 +508,13 @@
       "type": "text",
       "id": "nm_heading",
       "label": "No-match heading",
-      "default": "Nothing exact — yet."
+      "default": "Nothing exact - yet."
     },
     {
       "type": "textarea",
       "id": "nm_note",
       "label": "No-match note",
-      "default": "None of our current releases match every answer, but new residences are always in design. Here is the full current collection — and we’ll flag upcoming releases that fit."
+      "default": "None of our current releases match every answer, but new residences are always in design. Here is the full current collection - and we’ll flag upcoming releases that fit."
     },
     {
       "type": "text",
@@ -572,7 +572,7 @@
       "type": "text",
       "id": "posted_heading",
       "label": "Thank-you heading (Shopify mode)",
-      "default": "Thank you — your matches are on their way."
+      "default": "Thank you - your matches are on their way."
     },
     {
       "type": "textarea",

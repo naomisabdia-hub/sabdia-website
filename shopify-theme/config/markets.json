@@ -8,15 +8,9 @@
  * ------------------------------------------------------------
  */
 {
-  "type": "footer",
-  "name": "Footer",
-  "sections": {
-    "footer": {
-      "type": "footer",
-      "settings": {}
+  "markets": {
+    "au": {
+      "parent": "@default"
     }
-  },
-  "order": [
-    "footer"
-  ]
+  }
 }

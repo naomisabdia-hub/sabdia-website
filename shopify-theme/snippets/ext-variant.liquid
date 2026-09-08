@@ -1,6 +1,6 @@
 {%- comment -%}
   Resized/cropped variant of an image that still lives on the Sabdia
-  media pipeline (local /images master or Supabase media) — served via
+  media pipeline (local /images master or Supabase media) - served via
   the existing /api/img endpoint so crops and focal points render exactly
   as on the Vercel site. Shopify-hosted images should use image_url
   instead; this exists so externally-hosted content renders identically
@@ -8,7 +8,7 @@
 
   Accepts: src (path or URL), w, h, focus (optional "fp_x_y"), q (optional)
 
-  Built entirely inside one liquid block with echo — a stray newline in
+  Built entirely inside one liquid block with echo - a stray newline in
   the template would land inside the src="…" attribute.
 {%- endcomment -%}
 {%- liquid

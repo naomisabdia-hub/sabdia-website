@@ -1,9 +1,9 @@
 {%- comment -%}
-  "The Series" — the horizontally scrolling strip of Instagram posts
+  "The Series" - the horizontally scrolling strip of Instagram posts
   documenting this residence, from first render to final reveal (port of
   SeriesStrip.astro). Posts come from the product's custom.series_posts
   JSON metafield: [{ "date", "thumb", "caption", "url"?, "video"?,
-  "slides"?, "type"?, "hidden"? }, …] — real captures of the published
+  "slides"?, "type"?, "hidden"? }, …] - real captures of the published
   posts. The Instagram sync (shopify-app/sync-instagram.mjs, run daily by
   GitHub Actions) fills this automatically from @_sabdia: reels bring a
   "video", carousels bring "slides", every post its Instagram "url".
@@ -50,7 +50,7 @@
         {%- if item.hidden == true -%}{%- continue -%}{%- endif -%}
         {%- liquid
           # Where does a click go? On-site player when the setting says so
-          # and we hold the media; otherwise the Instagram post itself — or
+          # and we hold the media; otherwise the Instagram post itself - or
           # the @_sabdia profile while a post has no link of its own yet.
           assign ig_link = item.url
           if ig_link == blank
@@ -112,7 +112,7 @@
           {%- comment -%} The click-through: the post opens on Instagram
               itself, where the view and any engagement count. {%- endcomment -%}
           <a class="series-card" href="{{ ig_link }}" target="_blank" rel="noopener"
-             aria-label="{{ alt }} — view on Instagram">
+             aria-label="{{ alt }} - view on Instagram">
             <img src="{{ item.thumb }}" alt="{{ alt }}" loading="lazy" width="540" height="840">
             {{ card_meta }}
           </a>
@@ -286,7 +286,7 @@
         { "value": "site", "label": "Play here on the site (with a link to the post)" }
       ],
       "default": "instagram",
-      "info": "Posts arrive automatically from @_sabdia via the Instagram sync — see docs/INSTAGRAM-SERIES.md. A post without its own link opens the @_sabdia profile."
+      "info": "Posts arrive automatically from @_sabdia via the Instagram sync - see docs/INSTAGRAM-SERIES.md. A post without its own link opens the @_sabdia profile."
     },
     { "type": "text", "id": "view_on_instagram", "label": "Player link text", "default": "View on Instagram" },
     { "type": "checkbox", "id": "dark", "label": "Dark band", "default": false }

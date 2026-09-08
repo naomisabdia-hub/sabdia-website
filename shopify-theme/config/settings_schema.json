@@ -50,7 +50,7 @@
         "type": "text",
         "id": "qbcc_licence",
         "label": "QBCC licence number",
-        "info": "Queensland requires a licensed builder to show its QBCC licence number in advertising, and this website advertises the business. Leave empty to hide — but fill it in before launch."
+        "info": "Queensland requires a licensed builder to show its QBCC licence number in advertising, and this website advertises the business. Leave empty to hide - but fill it in before launch."
       },
       {
         "type": "text",
@@ -65,7 +65,14 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "Colours flow into every page of the site. Off = the built-in Sabdia palette. Fonts, spacing and page layouts are part of the brand system and live in the theme code — the guide explains how those changes are made."
+        "content": "Colours flow into every page of the site. Off = the built-in Sabdia palette. Spacing and page layouts are part of the brand system and live in the theme code - the guide explains how those changes are made."
+      },
+      {
+        "type": "font_picker",
+        "id": "font_body",
+        "label": "Body and interface font",
+        "default": "open_sans_n4",
+        "info": "Everything except the large serif headings: paragraphs, labels, buttons, forms, the nav. Open Sans by default. The headings stay in Cormorant Garamond."
       },
       {
         "type": "checkbox",
@@ -101,14 +108,14 @@
       {
         "type": "color",
         "id": "c_gold",
-        "label": "Gold — rules and borders",
+        "label": "Gold - rules and borders",
         "default": "#A8874A",
         "info": "Decoration only on light backgrounds; never body text (contrast)."
       },
       {
         "type": "color",
         "id": "c_gold2",
-        "label": "Gold — text on dark",
+        "label": "Gold - text on dark",
         "default": "#C3A45E"
       }
     ]
@@ -166,7 +173,7 @@
         "type": "image_picker",
         "id": "share_image",
         "label": "Social share image",
-        "info": "Shown when pages are shared — 1200×630 works best."
+        "info": "Shown when pages are shared - 1200×630 works best."
       },
       {
         "type": "textarea",
@@ -187,11 +194,11 @@
         "options": [
           {
             "value": "shopify",
-            "label": "Shopify — email notifications + customer records"
+            "label": "Shopify - email notifications + customer records"
           },
           {
             "value": "vercel",
-            "label": "Sabdia API — existing leads inbox (Supabase)"
+            "label": "Sabdia API - existing leads inbox (Supabase)"
           }
         ],
         "default": "vercel",
@@ -199,7 +206,7 @@
       },
       {
         "type": "paragraph",
-        "content": "Advanced — these keep the enquiry forms and walkthroughs working. Only change them with your developer."
+        "content": "Advanced - these keep the enquiry forms and walkthroughs working. Only change them with your developer."
       },
       {
         "type": "text",
@@ -254,7 +261,7 @@
         "id": "label_for_sale",
         "label": "For-sale chip",
         "default": "For Sale",
-        "info": "Wording on cards whose Status is For Sale. Other statuses (Under Offer, Coming Soon…) print their own word — Products › the residence › Status."
+        "info": "Wording on cards whose Status is For Sale. Other statuses (Under Offer, Coming Soon…) print their own word - Products › the residence › Status."
       },
       {
         "type": "text",

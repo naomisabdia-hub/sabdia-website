@@ -1,5 +1,5 @@
 {%- comment -%}
-  Port of Nav.astro — cursor dots, nav progress, the black SABDIA
+  Port of Nav.astro - cursor dots, nav progress, the black SABDIA
   navigation veil, the once-per-session homepage loader, mobile menu and
   the fixed primary nav. Menu links come from a Shopify navigation menu;
   until one is chosen the original Sabdia items render as the fallback.
@@ -33,7 +33,7 @@
 {%- comment -%} The opening loader and navigation veil are full-screen
     wordmark overlays. The theme editor re-injects this section without
     re-running the script that dismisses them, which left a giant stuck
-    logo over the preview — so they simply never render in design mode. {%- endcomment -%}
+    logo over the preview - so they simply never render in design mode. {%- endcomment -%}
 {%- unless request.design_mode -%}
 <div id="navVeil" aria-hidden="true">
   <img src="{{ logo_src }}" alt="" loading="eager">
@@ -75,9 +75,9 @@
 </div>
 
 <nav id="mainNav" {% if on_light %}class="on-light"{% endif %} aria-label="Primary">
-  <a href="/" class="nav-logo" aria-label="{{ settings.site_name }} — Home">
-    <img class="logo-light" src="{{ logo_src }}" alt="{{ settings.site_name }} — Design Develop Construct" style="filter:invert(1) brightness(10)">
-    <img class="logo-dark" src="{{ logo_src }}" alt="{{ settings.site_name }} — Design Develop Construct">
+  <a href="/" class="nav-logo" aria-label="{{ settings.site_name }} - Home">
+    <img class="logo-light" src="{{ logo_src }}" alt="{{ settings.site_name }} - Design Develop Construct" style="filter:invert(1) brightness(10)">
+    <img class="logo-dark" src="{{ logo_src }}" alt="{{ settings.site_name }} - Design Develop Construct">
   </a>
   <ul class="nav-center">
     {%- if menu.links.size > 0 -%}
@@ -106,9 +106,9 @@
     { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
     { "type": "text", "id": "cta_label", "label": "Button label", "default": "Enquire" },
     { "type": "text", "id": "cta_link", "label": "Button link", "default": "/pages/contact" },
-    { "type": "text", "id": "mobile_contact_label", "label": "Mobile menu — final link label", "default": "Contact" },
+    { "type": "text", "id": "mobile_contact_label", "label": "Mobile menu - final link label", "default": "Contact" },
     { "type": "text", "id": "loader_meta", "label": "Homepage loader caption", "default": "Sabdia · Est. 2013" },
-    { "type": "text", "id": "light_templates", "label": "Light-top templates", "default": "blog, article, page.contact, page.find-your-home, page.collection", "info": "Comma-separated template names whose first section is a light surface — the nav renders dark-on-light there from the top." }
+    { "type": "text", "id": "light_templates", "label": "Light-top templates", "default": "blog, article, page.contact, page.find-your-home, page.collection", "info": "Comma-separated template names whose first section is a light surface - the nav renders dark-on-light there from the top." }
   ]
 }
 {% endschema %}

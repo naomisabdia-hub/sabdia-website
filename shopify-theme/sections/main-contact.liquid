@@ -1,5 +1,5 @@
 {%- comment -%}
-  Contact — the two-column body: direct-contact details (from theme
+  Contact - the two-column body: direct-contact details (from theme
   settings), the dark agent-enquiries block and map card on the left;
   the enquiry form on the right. The form posts to the existing Vercel
   API so leads keep landing in the Sabdia inbox. The enquiry-type select
@@ -58,9 +58,9 @@
           <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "How can we help?*" }}</label>
           <select class="fsel" id="cf-interest" name="enquiry-type" required>
             <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
-            <option>For Sale — Current Properties</option>
+            <option>For Sale - Current Properties</option>
             {%- for product in fs.products -%}
-              <option>{{ product.title }} — {{ product.metafields.custom.suburb.value }}</option>
+              <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
             {%- endfor -%}
             {%- for block in section.blocks -%}
               <option {{ block.shopify_attributes }}>{{ block.settings.text }}</option>
@@ -94,9 +94,9 @@
           <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "How can we help?*" }}</label>
           <select class="fsel" id="cf-interest" name="contact[Enquiry type]" required>
             <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
-            <option>For Sale — Current Properties</option>
+            <option>For Sale - Current Properties</option>
             {%- for product in fs.products -%}
-              <option>{{ product.title }} — {{ product.metafields.custom.suburb.value }}</option>
+              <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
             {%- endfor -%}
             {%- for block in section.blocks -%}
               <option {{ block.shopify_attributes }}>{{ block.settings.text }}</option>
@@ -164,7 +164,7 @@
       "type": "text",
       "id": "map_image_ext",
       "label": "Current map image (URL)",
-      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field."
     },
     {
       "type": "text",
@@ -205,7 +205,7 @@
       "type": "textarea",
       "id": "success_text",
       "label": "Success message (Shopify mode)",
-      "default": "Thank you — we've received your enquiry and will be in touch within one business day."
+      "default": "Thank you - we've received your enquiry and will be in touch within one business day."
     },
     {
       "type": "header",

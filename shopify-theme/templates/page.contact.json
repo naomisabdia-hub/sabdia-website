@@ -16,11 +16,11 @@
         "facebook_label": "Sabdia Constructions",
         "linkedin_label": "Sabdia Constructions",
         "agent_heading": "Agent Enquiries",
-        "agent_body_html": "Real estate professionals seeking exclusive agent access — pre-launch information, priority access and commission structures — please visit our <a href=\"/pages/agent-access\" style=\"color:var(--gold2);text-decoration:underline;text-underline-offset:3px\">Agent Access page</a>.",
+        "agent_body_html": "Real estate professionals seeking exclusive agent access - pre-launch information, priority access and commission structures - please visit our <a href=\"/pages/agent-access\" style=\"color:var(--gold2);text-decoration:underline;text-underline-offset:3px\">Agent Access page</a>.",
         "map_image_ext": "/images/home-hero-1.jpg",
         "map_label": "Brisbane, Queensland",
         "form_label": "Send a Message",
-        "guided_line_html": "Looking to buy? Try our <a href=\"/pages/find-your-home\" style=\"color:var(--ink);border-bottom:1px solid rgba(41,35,25,.45)\">guided residence match</a> — five questions, tailored suggestions.",
+        "guided_line_html": "Looking to buy? Try our <a href=\"/pages/find-your-home\" style=\"color:var(--ink);border-bottom:1px solid rgba(41,35,25,.45)\">guided residence match</a> - five questions, tailored suggestions.",
         "submit_label": "Submit Enquiry",
         "form_note": "We respond within one business day."
       },

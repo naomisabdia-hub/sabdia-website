@@ -1,5 +1,5 @@
 {%- comment -%}
-  Projects — filter bar plus the Current / Sold groups. Which group a
+  Projects - filter bar plus the Current / Sold groups. Which group a
   residence sits in comes from its Status (see residence-status); the
   for-sale and sold collections only set the order. Year comes from
   custom.year; specs line mirrors "4 Bed · 4 Bath · 2 Garage · 716m²+".
@@ -44,7 +44,7 @@
             <div class="proj-card-info">
               <div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}{{ pstatus }}</div>
               <div class="proj-card-name">{{ product.title }}</div>
-              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD — {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
+              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD - {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
             </div>
             <div class="pc-arrow">&rarr;</div>
           </a>
@@ -76,7 +76,7 @@
             <div class="proj-card-info">
               <div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}Sold</div>
               <div class="proj-card-name">{{ product.title }}</div>
-              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD — {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
+              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD - {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
             </div>
           </a>
           {%- break -%}
@@ -119,10 +119,10 @@
     { "type": "collection", "id": "current_collection", "label": "Current collection (order)", "info": "Defaults to for-sale" },
     { "type": "collection", "id": "sold_collection", "label": "Sold collection (order)", "info": "Defaults to sold" },
     { "type": "text", "id": "filter_label", "label": "Filter label", "default": "Filter:" },
-    { "type": "text", "id": "filter_all", "label": "Filter — all", "default": "All" },
-    { "type": "text", "id": "filter_current", "label": "Filter — current", "default": "Current" },
-    { "type": "text", "id": "filter_sold", "label": "Filter — sold", "default": "Sold" },
-    { "type": "text", "id": "current_label", "label": "Current group label", "default": "For Sale — Current" },
+    { "type": "text", "id": "filter_all", "label": "Filter - all", "default": "All" },
+    { "type": "text", "id": "filter_current", "label": "Filter - current", "default": "Current" },
+    { "type": "text", "id": "filter_sold", "label": "Filter - sold", "default": "Sold" },
+    { "type": "text", "id": "current_label", "label": "Current group label", "default": "For Sale - Current" },
     { "type": "text", "id": "sold_label", "label": "Sold group label", "default": "Sold Prior to Completion" },
     { "type": "text", "id": "sold_badge", "label": "Sold card badge", "default": "Sold Prior to Completion", "info": "Wording for residences whose Status is Sold Prior to Completion. Other statuses print their own word." }
   ],

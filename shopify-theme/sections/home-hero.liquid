@@ -1,5 +1,5 @@
 {%- comment -%}
-  Port of the homepage hero — full-screen slideshow, word-by-word title,
+  Port of the homepage hero - full-screen slideshow, word-by-word title,
   description bar, slide dots, award line and CTAs. Slides are blocks:
   pick a Shopify image, or leave the external URL that carries today's
   image over from the Sabdia media pipeline.
@@ -7,7 +7,7 @@
   "Header media" switches the backdrop to a looping film instead of the
   slides. The slide blocks stay in place while the film shows, so
   switching back loses nothing. The film must be real footage (see
-  CLAUDE.md — no generated architecture).
+  CLAUDE.md - no generated architecture).
 {%- endcomment -%}
 {%- liquid
   # An uploaded film (Shopify-hosted) wins over the URL fallback.
@@ -96,7 +96,13 @@
       assign mark_src = settings.logo | image_url: width: 800
     endif
   -%}
-  <div class="h-mid{% if wpos == 'low' %} h-mid-low{% elsif wpos == 'high' %} h-mid-high{% endif %}" style="{% if hold > 0 %}--h-hold:{{ hold }}s;{% endif %}{% if show_mark %}--h-mark-hold:{{ mark_hold }}s;--h-mark-h:{{ section.settings.wordmark_size | default: 44 }}px;{% endif %}">
+  {%- liquid
+    assign loop_words = false
+    if use_video and section.settings.words_loop
+      assign loop_words = true
+    endif
+  -%}
+  <div class="h-mid{% if wpos == 'low' %} h-mid-low{% elsif wpos == 'high' %} h-mid-high{% endif %}{% if loop_words %} h-js-words{% endif %}" style="{% if hold > 0 %}--h-hold:{{ hold }}s;{% endif %}{% if show_mark %}--h-mark-hold:{{ mark_hold }}s;--h-mark-h:{{ section.settings.wordmark_size | default: 44 }}px;{% endif %}"{% if loop_words %} data-loop-words data-hold="{{ hold }}" data-mark-hold="{{ mark_hold }}" data-lead="{{ section.settings.words_fade_lead | default: 1 }}"{% endif %}>
     <div class="h-mid-content">
       {%- if show_mark -%}
         <img class="h-mark" src="{{ mark_src }}" alt="{{ settings.site_name | default: 'Sabdia' }}" width="800" height="160" loading="eager">
@@ -156,6 +162,31 @@
     // Some browsers ignore the autoplay attribute on late-loading media.
     var p = v.play();
     if (p && p.catch) p.catch(function () {});
+
+    // "Replay with the film": the words and wordmark follow the film's
+    // clock instead of a one-off CSS delay - they fade in at their set
+    // second, fade out just before the film ends, and come back with
+    // every loop, so they never sit on top of the film's own wordmark.
+    var mid = document.querySelector('#hero .h-mid[data-loop-words]');
+    if (mid && !mid.dataset.loopInit) {
+      mid.dataset.loopInit = '1';
+      var hold = Number(mid.dataset.hold || 0);
+      var markHold = Number(mid.dataset.markHold || 0);
+      var lead = Number(mid.dataset.lead || 1);
+      function tick() {
+        var d = v.duration;
+        if (!d || !isFinite(d)) return;
+        var t = v.currentTime;
+        var ending = t > d - lead;
+        mid.classList.toggle('words-on', t >= hold && !ending);
+        mid.classList.toggle('mark-on', t >= markHold && !ending);
+      }
+      v.addEventListener('timeupdate', tick);
+      v.addEventListener('seeked', tick);
+      v.addEventListener('loadedmetadata', tick);
+      // If the film never starts (autoplay refused, slow network), show the words anyway.
+      setTimeout(function () { if (v.paused || !v.duration) mid.classList.add('words-on', 'mark-on'); }, 6000);
+    }
   })();
 </script>
 {%- endif -%}
@@ -177,7 +208,7 @@
         { "value": "video", "label": "Video instead" }
       ],
       "default": "slides",
-      "info": "Your slides are kept either way — switch back any time."
+      "info": "Your slides are kept either way - switch back any time."
     },
     {
       "type": "video",
@@ -189,7 +220,7 @@
       "type": "text",
       "id": "video_url",
       "label": "Video (URL)",
-      "info": "Used only when no video is uploaded above — e.g. a film already on the Sabdia media library."
+      "info": "Used only when no video is uploaded above - e.g. a film already on the Sabdia media library."
     },
     {
       "type": "image_picker",
@@ -201,21 +232,34 @@
       "type": "range",
       "id": "words_delay",
       "label": "Hold the words back (video only)",
-      "min": 0, "max": 15, "step": 0.5, "unit": "s", "default": 0,
-      "info": "If the film carries its own SABDIA wordmark, wait this many seconds before the title words and eyebrow fade in — so they appear after that moment rather than on top of it."
+      "min": 0, "max": 60, "step": 1, "unit": "s", "default": 0,
+      "info": "If the film carries its own SABDIA wordmark, wait this many seconds before the title words and eyebrow fade in - so they appear after that moment rather than on top of it."
     },
     {
       "type": "checkbox",
       "id": "show_wordmark",
       "label": "Show the SABDIA wordmark over the film",
       "default": false,
-      "info": "Video only. Draws the site logo in the hero (Theme settings › Brand › Logo) and fades it in after the delay below — set the delay to the moment the film's own wordmark disappears, so ours takes its place and stays. The title words sit underneath."
+      "info": "Video only. Draws the site logo in the hero (Theme settings › Brand › Logo) and fades it in after the delay below - set the delay to the moment the film's own wordmark disappears, so ours takes its place and stays. The title words sit underneath."
     },
     {
       "type": "range",
       "id": "wordmark_delay",
       "label": "Wordmark fades in after",
-      "min": 0, "max": 15, "step": 0.5, "unit": "s", "default": 4
+      "min": 0, "max": 60, "step": 1, "unit": "s", "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "words_loop",
+      "label": "Fade out at the end of the film and replay with it",
+      "default": true,
+      "info": "Video only. The title words and wordmark follow the film: in at their set seconds, out just before the film ends, back again on every loop."
+    },
+    {
+      "type": "range",
+      "id": "words_fade_lead",
+      "label": "Fade out this long before the film ends",
+      "min": 0.5, "max": 5, "step": 0.5, "unit": "s", "default": 1
     },
     {
       "type": "range",
@@ -242,7 +286,7 @@
       "type": "text",
       "id": "words",
       "label": "Title words",
-      "info": "Comma-separated — rendered word · by · word.",
+      "info": "Comma-separated - rendered word · by · word.",
       "default": "Design, Develop, Construct"
     },
     {
@@ -299,7 +343,7 @@
           "type": "text",
           "id": "ext",
           "label": "Current photo (URL)",
-          "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+          "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field."
         },
         {
           "type": "text",

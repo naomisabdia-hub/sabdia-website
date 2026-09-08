@@ -1,5 +1,5 @@
 {%- comment -%}
-  Sabdia theme shell — a faithful port of the Astro site's Base.astro.
+  Sabdia theme shell - a faithful port of the Astro site's Base.astro.
   Same stylesheet, same fonts, same body structure (skip link → nav →
   main → footer → main.js), so every page renders identically to the
   Vercel site. Header/footer live in section groups so they are editable
@@ -34,7 +34,7 @@
 <style>:root{--logo-h:{{ lh }}px;--logo-h-m:{{ lhm }}px}</style>
 {%- liquid
   # The homepage has no page-level SEO fields of its own, so its meta
-  # description is a theme setting (Search & sharing) — editable in the
+  # description is a theme setting (Search & sharing) - editable in the
   # customizer like everything else.
   assign meta_description = page_description
   if template.name == 'index' and settings.seo_home_description != blank
@@ -56,7 +56,7 @@ document.documentElement.classList.add('js');
 /* Runs before first paint so the loader never flashes on a repeat visit.
    sessionStorage, not localStorage: the opening is worth seeing once per
    visit, not once per lifetime. Wrapped because Safari private mode throws
-   on storage access — a failure here just means the loader plays. */
+   on storage access - a failure here just means the loader plays. */
 try {
   if (sessionStorage.getItem('sabdia:seen')) document.documentElement.classList.add('no-loader');
   else sessionStorage.setItem('sabdia:seen', '1');
@@ -65,11 +65,29 @@ try {
 {% render 'meta-tags' %}
 {% render 'structured-data' %}
 <link rel="preconnect" href="https://fvczsjcrvwzqtcbforgo.supabase.co" crossorigin>
-<link rel="preload" as="font" type="font/woff2" href="{{ 'jost-var.woff2' | asset_url }}" crossorigin>
+{%- liquid
+  # Two typefaces only: Cormorant Garamond (self-hosted) for the large
+  # headings, and the body/interface font from Theme settings › Design
+  # (Open Sans by default) for everything else, served by Shopify.
+  assign body_font = settings.font_body
+  assign body_font_light = body_font | font_modify: 'weight', '300'
+  assign body_font_medium = body_font | font_modify: 'weight', '500'
+  assign body_font_bold = body_font | font_modify: 'weight', 'bold'
+  assign body_font_italic = body_font | font_modify: 'style', 'italic'
+-%}
 <link rel="preload" as="font" type="font/woff2" href="{{ 'cormorant-garamond-var.woff2' | asset_url }}" crossorigin>
-<link rel="preload" as="font" type="font/woff2" href="{{ 'eb-garamond-var.woff2' | asset_url }}" crossorigin>
-<link rel="preload" as="font" type="font/woff2" href="{{ 'eb-garamond-var-italic.woff2' | asset_url }}" crossorigin>
+{%- if body_font -%}<link rel="preload" as="font" type="font/woff2" href="{{ body_font | font_url }}" crossorigin>{%- endif -%}
 {{ 'style.css' | asset_url | stylesheet_tag }}
+{%- if body_font -%}
+<style>
+  {{ body_font | font_face: font_display: 'swap' }}
+  {{ body_font_light | font_face: font_display: 'swap' }}
+  {{ body_font_medium | font_face: font_display: 'swap' }}
+  {{ body_font_bold | font_face: font_display: 'swap' }}
+  {{ body_font_italic | font_face: font_display: 'swap' }}
+  :root{--font-u:{{ body_font.family }},{{ body_font.fallback_families }}}
+</style>
+{%- endif -%}
 {%- comment -%}
   Theme settings → Design. Must come AFTER the stylesheet: style.css sets
   the same :root variables, and the later declaration wins.

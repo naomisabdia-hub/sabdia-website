@@ -1,5 +1,5 @@
 {%- comment -%}
-  Port of FilmBand.astro — a vertical reel in a framed player beside
+  Port of FilmBand.astro - a vertical reel in a framed player beside
   editorial copy. Autoplays muted in view; tap for sound. The film clips
   live on the Sabdia media library (Supabase films/…).
 {%- endcomment -%}
@@ -50,7 +50,7 @@
 </section>
 
 <script>
-/* Port of the FilmBand player — immediate call + per-element guard. */
+/* Port of the FilmBand player - immediate call + per-element guard. */
 function sabdiaFilmInit() {
   document.querySelectorAll('[data-film]').forEach(function (frame) {
     if (frame.dataset.filmInit) return;
@@ -146,17 +146,17 @@ sabdiaFilmInit();
       "type": "text",
       "id": "poster_ext",
       "label": "Current poster (URL)",
-      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over — you never need to edit this field."
+      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field."
     },
     {
       "type": "text",
       "id": "caption_left",
-      "label": "Caption — left"
+      "label": "Caption - left"
     },
     {
       "type": "text",
       "id": "caption_right",
-      "label": "Caption — right"
+      "label": "Caption - right"
     },
     {
       "type": "text",

@@ -1,13 +1,13 @@
 {%- comment -%}
-  Scroll-driven cinematic walkthrough — verbatim port of ScrollWalk.astro.
+  Scroll-driven cinematic walkthrough - verbatim port of ScrollWalk.astro.
 
   ⛔ ABSOLUTE CONTENT RULE: frame sequences fed to this section must
   contain ONLY the visualiser's real footage. No AI-generated
-  architecture, ever — including "anchored" transitions. Missing joins =
+  architecture, ever - including "anchored" transitions. Missing joins =
   reversed real footage or a plain crossfade.
 
   Frames + manifest.json live in the media library under
-  scrollwalk/<folder>/ — the folder comes from this section's setting or,
+  scrollwalk/<folder>/ - the folder comes from this section's setting or,
   on a property page, from the product's scrollwalk_folder metafield.
   Publishing a new cut is just pointing at the new folder.
 {%- endcomment -%}
@@ -60,7 +60,7 @@
 </section>
 
 <script>
-  /* Verbatim port of the ScrollWalk player — immediate call + guard. */
+  /* Verbatim port of the ScrollWalk player - immediate call + guard. */
   function sabdiaScrollWalkInit() {
     var section = document.querySelector('.sw-section');
     if (!section || section.dataset.swInit) return;
@@ -89,7 +89,7 @@
       frames = new Array(total + 1);
       canvas.width = m.w;
       canvas.height = m.h;
-      /* ~12px of scroll per frame — unhurried but not endless */
+      /* ~12px of scroll per frame - unhurried but not endless */
       track.style.height = Math.max(320, Math.round((total * 12) / 8)) + 'vh';
       buildRooms();
       loadFrame(1);
@@ -166,7 +166,7 @@
     }
 
     /* displayF eases toward the scroll target every animation frame, and
-       adjacent frames are alpha-blended for the fractional part — the
+       adjacent frames are alpha-blended for the fractional part - the
        scrub glides instead of stepping. */
     var frameF = 1;
     var displayF = 1;
@@ -176,7 +176,7 @@
       var f = Math.min(total, Math.max(1, displayF));
       var i0 = nearestLoaded(Math.floor(f));
       var i1 = Math.floor(f) + 1;
-      // blend ONLY true neighbours — blending across a loading gap
+      // blend ONLY true neighbours - blending across a loading gap
       // ghosts two different views and reads as pixelated mush
       var blendOK = i1 <= total && frames[i1] && i1 - i0 === 1;
       var a = blendOK ? f - Math.floor(f) : 0;
@@ -286,16 +286,16 @@
 {
   "name": "Scroll walkthrough",
   "settings": [
-    { "type": "paragraph", "content": "On a residence page the frames come from Products › the residence › Scroll walkthrough folder, and the switch \"Show the scroll walkthrough\" (Metafields) turns it on or off for that residence. Not every residence has one — leave the folder empty or the switch off and the section simply does not appear." },
+    { "type": "paragraph", "content": "On a residence page the frames come from Products › the residence › Scroll walkthrough folder, and the switch \"Show the scroll walkthrough\" (Metafields) turns it on or off for that residence. Not every residence has one - leave the folder empty or the switch off and the section simply does not appear." },
     {
       "type": "paragraph",
-      "content": "⛔ Frame sets must be 100% real visualiser footage — never AI-generated architecture, in any form."
+      "content": "⛔ Frame sets must be 100% real visualiser footage - never AI-generated architecture, in any form."
     },
     {
       "type": "text",
       "id": "folder",
       "label": "Frame folder",
-      "info": "Folder name inside scrollwalk/ — e.g. qasr-v21. On a property page, leave blank to use the product's scrollwalk_folder field. Publishing a new cut is just typing the new folder name."
+      "info": "Folder name inside scrollwalk/ - e.g. qasr-v21. On a property page, leave blank to use the product's scrollwalk_folder field. Publishing a new cut is just typing the new folder name."
     },
     {
       "type": "text",

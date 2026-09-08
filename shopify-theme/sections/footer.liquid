@@ -1,5 +1,5 @@
 {%- comment -%}
-  Port of Footer.astro — tagline band, newsletter band (posts into the
+  Port of Footer.astro - tagline band, newsletter band (posts into the
   Sabdia leads/subscriber system via the forms endpoint), link grid and
   the legal row. For Sale links come from the for-sale collection (or a
   chosen menu); company and legal links from Shopify menus with the
@@ -80,7 +80,7 @@
           {%- endfor -%}
         {%- elsif for_sale_collection.products.size > 0 -%}
           {%- for p in for_sale_collection.products limit: 6 -%}
-            <li><a href="{{ p.url }}">{{ p.title }}{% if p.metafields.custom.suburb.value != blank %} — {{ p.metafields.custom.suburb.value }}{% endif %}</a></li>
+            <li><a href="{{ p.url }}">{{ p.title }}{% if p.metafields.custom.suburb.value != blank %} - {{ p.metafields.custom.suburb.value }}{% endif %}</a></li>
           {%- endfor -%}
         {%- endif -%}
         <li><a href="/collections/for-sale">{{ section.settings.view_all_label | default: "View All Properties" }}</a></li>
@@ -165,7 +165,7 @@
       "type": "html",
       "id": "blurb_html",
       "label": "Footer blurb",
-      "default": "Boutique Luxury Home Builder &<br>Developer — Brisbane, QLD"
+      "default": "Boutique Luxury Home Builder &<br>Developer - Brisbane, QLD"
     },
     {
       "type": "header",
@@ -199,7 +199,7 @@
       "type": "text",
       "id": "nl_success",
       "label": "Success message",
-      "default": "Welcome — you're on the list."
+      "default": "Welcome - you're on the list."
     },
     {
       "type": "header",

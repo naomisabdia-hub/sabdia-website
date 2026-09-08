@@ -110,7 +110,7 @@
           "settings": {
             "year": "2017",
             "title": "50 Residences Delivered",
-            "desc": "A major milestone — 50 homes delivered to satisfied clients across inner Brisbane's most prestigious suburbs."
+            "desc": "A major milestone - 50 homes delivered to satisfied clients across inner Brisbane's most prestigious suburbs."
           }
         },
         "milestone-4": {
@@ -126,15 +126,15 @@
           "settings": {
             "year": "2023",
             "title": "100+ Residences",
-            "desc": "Surpassed 100 completed residences — a testament to a decade of consistency, quality, and unwavering commitment to excellence."
+            "desc": "Surpassed 100 completed residences - a testament to a decade of consistency, quality, and unwavering commitment to excellence."
           }
         },
         "milestone-6": {
           "type": "milestone",
           "settings": {
             "year": "2025",
-            "title": "QASR — Flagship Release",
-            "desc": "The launch of QASR, Coorparoo — Sabdia's most ambitious and extraordinary residence to date, representing a new pinnacle of Brisbane luxury."
+            "title": "QASR - Flagship Release",
+            "desc": "The launch of QASR, Coorparoo - Sabdia's most ambitious and extraordinary residence to date, representing a new pinnacle of Brisbane luxury."
           }
         }
       },
@@ -182,7 +182,7 @@
           "type": "award",
           "settings": {
             "year": "2021",
-            "title": "Residential Interior Design — Luxury",
+            "title": "Residential Interior Design - Luxury",
             "org": "IDEA Awards"
           }
         },
@@ -190,7 +190,7 @@
           "type": "award",
           "settings": {
             "year": "2020",
-            "title": "Custom Home of the Year — QLD",
+            "title": "Custom Home of the Year - QLD",
             "org": "Master Builders Queensland"
           }
         },
@@ -198,7 +198,7 @@
           "type": "award",
           "settings": {
             "year": "2019",
-            "title": "Best Luxury Home Builder — Brisbane",
+            "title": "Best Luxury Home Builder - Brisbane",
             "org": "REIQ Awards for Excellence"
           }
         }
