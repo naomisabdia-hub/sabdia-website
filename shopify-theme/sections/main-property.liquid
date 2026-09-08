@@ -283,7 +283,13 @@
       <div class="film-copy">
         <div class="slabel slabel-dark reveal">{{ section.settings.film_label }}</div>
         <h2 class="film-h reveal d1">Experience <em>{{ product.title }}</em>.</h2>
-        <p class="film-p reveal d2">Step inside {{ product.title }} — a cinematic walkthrough of the residence, its materials, and its light.</p>
+        {%- liquid
+          assign film_text = section.settings.film_text
+          if film_text == blank
+            assign film_text = 'A walk through ' | append: name_token | append: ', on film.'
+          endif
+        -%}
+        <p class="film-p reveal d2">{{ film_text | replace: name_token, product.title }}</p>
       </div>
       <div class="reveal d2">
         <div class="film-frame" data-film>
@@ -459,6 +465,13 @@
       "id": "film_label",
       "label": "Film label",
       "default": "The Film"
+    },
+    {
+      "type": "text",
+      "id": "film_text",
+      "label": "Film line",
+      "default": "A walk through {name}, on film.",
+      "info": "{name} becomes the residence's name."
     },
     {
       "type": "paragraph",

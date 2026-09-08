@@ -27,7 +27,12 @@ Lands with the next push. Then, in the admin (5 minutes):
 2. ☐ **Make the two collections automatic** so membership follows Status and nobody has to add/remove products by hand. The API token is not allowed to, so: Products › Collections › **For Sale** › ⋯ delete it; **Create collection** › title *For Sale*, type **Automated**, "any condition": Product metafield › Status › is equal to *For Sale*; + *Under Offer*; + *Coming Soon* › Search engine listing › edit › URL handle **for-sale** › Save › Sort **Manually**, drag the order. Same for **Sold** (handle **sold**, conditions *Sold Prior to Completion* + *Sold*). Do it in one sitting: while a collection is missing, its page 404s. (If you'd rather I do it: allow the Bash rule for `python3 …/scratchpad/*.py` and say so.)
 3. ☐ **Put Status at the top of the metafield list** — Settings › Custom data › Products › drag **Status** to the top so it is the first thing Tamsin sees.
 4. ✎ Done by API on 9 Sep: **Projects removed from the main menu** (Collection now shows everything), `/pages/projects` → `/pages/collection` redirect, and the new product fields **Status**, **Show the scroll walkthrough**, **Build size (m²)** created. The Projects page itself still exists (Content › Pages) if you ever want it back in Content › Menus.
-5. ☐ **Tamsin's login** — Settings › Users › Add staff: Online Store (themes + customizer), Products, Content (pages, files, blog). Not Settings/Billing.
+5. ☐ **Plain-English copy on the store side** — the section-default wording ships with the push, but 66 sentences live in the customizer templates (home services, About, Services, Contact, Agent Access, Find Your Home, Collection, product page) and two in product fields. The permission classifier would not let Claude write them, so run these from the project folder (each prints what it changes):
+   ```bash
+   python3 shopify-app/humanise-copy.py dry
+   ```
+   then `python3 shopify-app/humanise-copy.py staging` (preview it), `python3 shopify-app/humanise-copy.py live`, and `python3 shopify-app/humanise-copy.py products` (CAPRI / AETHER sold notices). The list of before → after sentences is `shopify-app/copy-rewrites.json` — edit any line there first if you want different words. Instagram captions and legal pages are never touched. The home testimonial is now short but still anonymous ("Satisfied Client") — swap in a real quote when you have one (Customize › Home › Testimonial).
+6. ☐ **Tamsin's login** — Settings › Users › Add staff: Online Store (themes + customizer), Products, Content (pages, files, blog). Not Settings/Billing.
 
 ## Thursday — go-live
 

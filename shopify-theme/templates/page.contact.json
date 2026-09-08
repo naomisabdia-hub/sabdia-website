@@ -6,7 +6,7 @@
         "style": "contact",
         "label": "Get In Touch",
         "title_html": "Let's start<br>a <em style=\"font-style:italic;color:var(--gold2)\">conversation</em>.",
-        "text": "We're always keen to hear from potential clients, real estate professionals, and development partners. Submit your details and we'll be in touch shortly."
+        "text": "Buying, selling, or thinking about a build? Leave your details and we will be in touch within a business day."
       }
     },
     "body": {
@@ -16,11 +16,11 @@
         "facebook_label": "Sabdia Constructions",
         "linkedin_label": "Sabdia Constructions",
         "agent_heading": "Agent Enquiries",
-        "agent_body_html": "Real estate professionals seeking exclusive agent access \u2014 pre-launch information, priority access and commission structures \u2014 please visit our <a href=\"/pages/agent-access\" style=\"color:var(--gold2);text-decoration:underline;text-underline-offset:3px\">Agent Access page</a>.",
+        "agent_body_html": "Real estate professionals seeking exclusive agent access — pre-launch information, priority access and commission structures — please visit our <a href=\"/pages/agent-access\" style=\"color:var(--gold2);text-decoration:underline;text-underline-offset:3px\">Agent Access page</a>.",
         "map_image_ext": "/images/home-hero-1.jpg",
         "map_label": "Brisbane, Queensland",
         "form_label": "Send a Message",
-        "guided_line_html": "Looking to buy? Try our <a href=\"/pages/find-your-home\" style=\"color:var(--ink);border-bottom:1px solid rgba(41,35,25,.45)\">guided residence match</a> \u2014 five questions, tailored suggestions.",
+        "guided_line_html": "Looking to buy? Try our <a href=\"/pages/find-your-home\" style=\"color:var(--ink);border-bottom:1px solid rgba(41,35,25,.45)\">guided residence match</a> — five questions, tailored suggestions.",
         "submit_label": "Submit Enquiry",
         "form_note": "We respond within one business day."
       },
@@ -75,7 +75,7 @@
           "settings": {
             "tag": "For Sale",
             "title": "Current Properties",
-            "desc": "View our current portfolio of luxury residences available for sale across Brisbane.",
+            "desc": "The homes for sale now.",
             "link": "/collections/for-sale"
           }
         },
@@ -84,7 +84,7 @@
           "settings": {
             "tag": "Professionals",
             "title": "Agent Access",
-            "desc": "Exclusive pre-launch information, priority access, and commission structures for real estate professionals.",
+            "desc": "Pre-launch plans, pricing and commissions for agents.",
             "link": "/pages/agent-access"
           }
         },

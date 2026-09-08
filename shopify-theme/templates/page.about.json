@@ -28,7 +28,7 @@
         "paragraph-2": {
           "type": "paragraph",
           "settings": {
-            "text": "Over a decade later, that conviction has been validated more than 100 times \u2014 in every residence we have delivered, in every client who has trusted us with their most significant investment, and in every award that has recognised our commitment to excellence."
+            "text": "More than 100 homes later, that is still how we work."
           }
         },
         "paragraph-3": {
@@ -102,7 +102,7 @@
           "settings": {
             "year": "2015",
             "title": "First Award",
-            "desc": "Recognised with our first industry award for design excellence, validating the Sabdia approach to integrated development."
+            "desc": "First industry award, for design."
           }
         },
         "milestone-3": {
@@ -110,7 +110,7 @@
           "settings": {
             "year": "2017",
             "title": "50 Residences Delivered",
-            "desc": "A major milestone \u2014 50 homes delivered to satisfied clients across inner Brisbane's most prestigious suburbs."
+            "desc": "A major milestone — 50 homes delivered to satisfied clients across inner Brisbane's most prestigious suburbs."
           }
         },
         "milestone-4": {
@@ -118,7 +118,7 @@
           "settings": {
             "year": "2020",
             "title": "Interior Architecture Division",
-            "desc": "Expanded in-house capabilities to include a dedicated interior architecture team, deepening creative integration across all projects."
+            "desc": "An in-house interior architecture team joins the studio."
           }
         },
         "milestone-5": {
@@ -126,15 +126,15 @@
           "settings": {
             "year": "2023",
             "title": "100+ Residences",
-            "desc": "Surpassed 100 completed residences \u2014 a testament to a decade of consistency, quality, and unwavering commitment to excellence."
+            "desc": "Surpassed 100 completed residences — a testament to a decade of consistency, quality, and unwavering commitment to excellence."
           }
         },
         "milestone-6": {
           "type": "milestone",
           "settings": {
             "year": "2025",
-            "title": "QASR \u2014 Flagship Release",
-            "desc": "The launch of QASR, Coorparoo \u2014 Sabdia's most ambitious and extraordinary residence to date, representing a new pinnacle of Brisbane luxury."
+            "title": "QASR — Flagship Release",
+            "desc": "The launch of QASR, Coorparoo — Sabdia's most ambitious and extraordinary residence to date, representing a new pinnacle of Brisbane luxury."
           }
         }
       },
@@ -182,7 +182,7 @@
           "type": "award",
           "settings": {
             "year": "2021",
-            "title": "Residential Interior Design \u2014 Luxury",
+            "title": "Residential Interior Design — Luxury",
             "org": "IDEA Awards"
           }
         },
@@ -190,7 +190,7 @@
           "type": "award",
           "settings": {
             "year": "2020",
-            "title": "Custom Home of the Year \u2014 QLD",
+            "title": "Custom Home of the Year — QLD",
             "org": "Master Builders Queensland"
           }
         },
@@ -198,7 +198,7 @@
           "type": "award",
           "settings": {
             "year": "2019",
-            "title": "Best Luxury Home Builder \u2014 Brisbane",
+            "title": "Best Luxury Home Builder — Brisbane",
             "org": "REIQ Awards for Excellence"
           }
         }
@@ -215,7 +215,7 @@
     "cta": {
       "type": "cta-centered",
       "settings": {
-        "label": "Begin Your Journey",
+        "label": "Get in Touch",
         "heading_html": "Ready to create something <em>extraordinary</em>?",
         "text": "Whether you're seeking a current property for sale or have a vision for a bespoke home, we'd love to begin a conversation.",
         "cta1_label": "View Properties",

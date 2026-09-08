@@ -196,7 +196,7 @@
           "settings": {
             "n": "iii.",
             "title": "Boutique & Personal",
-            "desc": "Limited projects annually to ensure every client receives our full dedication."
+            "desc": "A few projects a year, so each one gets our full attention."
           }
         }
       },
@@ -252,7 +252,7 @@
           "settings": {
             "number": "01",
             "title": "Luxury Residential Design",
-            "description": "Bespoke single residences and boutique developments designed for discerning clients. From architectural concept to interior finishing — every detail considered, nothing left to chance.",
+            "description": "Single homes and small developments, designed from the first sketch to the last finish.",
             "icon": "home"
           }
         },
@@ -261,7 +261,7 @@
           "settings": {
             "number": "02",
             "title": "Development Management",
-            "description": "End-to-end residential development managed from vision to completion. Our integrated in-house model maintains meticulous control over quality, timing, and innovation throughout.",
+            "description": "We manage the whole development ourselves, from site to handover, so quality and timing stay in our hands.",
             "icon": "case"
           }
         },
@@ -270,7 +270,7 @@
           "settings": {
             "number": "03",
             "title": "Interior Architecture",
-            "description": "Integrated interior architecture that elevates every space. Our design team collaborates closely with builders to ensure perfect cohesion between vision and reality.",
+            "description": "Our interior team works alongside the builders from day one, so what was drawn is what gets built.",
             "icon": "clock"
           }
         },
@@ -279,7 +279,7 @@
           "settings": {
             "number": "04",
             "title": "Expert Construction",
-            "description": "Premium construction by master tradespeople. We use only the finest materials and proven methodologies — delivered with full transparency and precision at every stage.",
+            "description": "Built by our own trades, with good materials and no shortcuts. You see every stage.",
             "icon": "grid"
           }
         }
@@ -301,28 +301,28 @@
           "type": "step",
           "settings": {
             "title": "Design",
-            "description": "Visionary design that balances beauty, functionality, and long-term value. Every project begins with a deep understanding of site, context, and client."
+            "description": "Design that works as well as it looks. We start with the site, the street and the people."
           }
         },
         "step-2": {
           "type": "step",
           "settings": {
             "title": "Develop",
-            "description": "We manage the complete development process in-house — approvals, planning, engineering — maintaining full control over every decision and outcome."
+            "description": "Approvals, planning and engineering are handled in-house, so every decision is ours."
           }
         },
         "step-3": {
           "type": "step",
           "settings": {
             "title": "Construct",
-            "description": "Precision construction by our own team of master tradespeople, using premium materials and meticulous quality control at every stage of the build."
+            "description": "Our own team builds it, with the materials we specified and a check at every stage."
           }
         },
         "step-4": {
           "type": "step",
           "settings": {
             "title": "Deliver",
-            "description": "Handover marks the beginning of your story. Our aftercare ensures your home continues to perform and delight for decades to come."
+            "description": "After handover we stay in touch. If something needs attention, we come back."
           }
         }
       },
@@ -336,7 +336,7 @@
     "testimonial": {
       "type": "testimonial",
       "settings": {
-        "quote": "Sabdia delivered a home that exceeded every expectation. Their integrated approach — from design through to construction — meant every detail was perfectly executed. A truly exceptional result that we will treasure for generations.",
+        "quote": "One team did the design and the build, so nothing was lost in between. The house is exactly what we asked for, and better made.",
         "attribution": "Satisfied Client — Inner Brisbane Residence"
       }
     },
@@ -348,7 +348,7 @@
         "badge": "Exclusive Access",
         "label": "For Real Estate Professionals",
         "heading_html": "Exclusive <em>Agent</em><br>Access.",
-        "text": "Gain exclusive insight into Sabdia's future releases. Our agent-only preview list offers early access to premium developments, pre-launch information, and priority communication — giving your clients an edge in Brisbane's luxury market.",
+        "text": "Agents on our list hear about new releases first, with plans and pricing before launch.",
         "cta1_label": "Apply for Access",
         "cta1_link": "/pages/agent-access",
         "cta2_label": "Start a Conversation",
@@ -370,13 +370,13 @@
         "feature-3": {
           "type": "feature",
           "settings": {
-            "text": "Priority communication on new releases"
+            "text": "First word on new releases"
           }
         },
         "feature-4": {
           "type": "feature",
           "settings": {
-            "text": "Exclusive commission structures"
+            "text": "Agent commission structures"
           }
         },
         "feature-5": {
@@ -388,7 +388,7 @@
         "feature-6": {
           "type": "feature",
           "settings": {
-            "text": "Dedicated liaison with the Sabdia team"
+            "text": "A direct line to the Sabdia team"
           }
         }
       },
@@ -406,7 +406,7 @@
       "settings": {
         "label": "Get In Touch",
         "heading_html": "Let's start<br>a <em>conversation</em>.",
-        "text": "Please submit your contact information and one of our team members will be in touch with you shortly.",
+        "text": "Leave your details and we will call or email within a business day.",
         "interests": "For Sale — Current Properties\nCustom Home Design\nDevelopment Partnership\nAgent Access\nGeneral Enquiry",
         "note": "We typically respond within one business day."
       }

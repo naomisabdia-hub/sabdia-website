@@ -5,7 +5,7 @@
       "settings": {
         "label": "For Real Estate Professionals",
         "title_html": "Exclusive<br><em style=\"color:var(--gold2)\">Agent</em><br>Access.",
-        "text": "Join Sabdia's exclusive agent network and be the first to know about our next landmark development before it reaches the market.",
+        "text": "Join the Sabdia agent list and hear about the next release before it goes to market.",
         "image_ext": "/images/agent-portrait.jpg",
         "image_alt": "Agent Access"
       }
@@ -30,7 +30,7 @@
           "settings": {
             "icon": "plan",
             "title": "Floor Plans & Pricing",
-            "desc": "Access pre-launch floor plans and indicative pricing information exclusively \u2014 everything you need to prepare your clients before public release."
+            "desc": "Floor plans and indicative pricing before launch, so you can brief your clients early."
           }
         },
         "benefit-3": {
@@ -38,7 +38,7 @@
           "settings": {
             "icon": "phone",
             "title": "Priority Communication",
-            "desc": "A dedicated Sabdia liaison to keep you informed, respond to questions, and support you throughout the sales process."
+            "desc": "One person at Sabdia to call, from first enquiry to settlement."
           }
         },
         "benefit-4": {
@@ -46,7 +46,7 @@
           "settings": {
             "icon": "dollar",
             "title": "Exclusive Commissions",
-            "desc": "Competitive and exclusive commission structures for agent network members \u2014 recognising the value of your relationships and referrals."
+            "desc": "Commission structures for agents on the list."
           }
         },
         "benefit-5": {
@@ -54,7 +54,7 @@
           "settings": {
             "icon": "users",
             "title": "Private Previews",
-            "desc": "Invitations to exclusive agent-only preview events \u2014 an opportunity to walk through completed or near-complete residences before public launch."
+            "desc": "Walk through homes before they launch, at agent-only previews."
           }
         },
         "benefit-6": {
@@ -62,7 +62,7 @@
           "settings": {
             "icon": "star",
             "title": "Award-Winning Product",
-            "desc": "Represent Brisbane's most acclaimed boutique luxury developer \u2014 a brand that your clients will immediately recognise as a hallmark of quality."
+            "desc": "Award-winning homes your clients will already know by name."
           }
         }
       },
@@ -89,9 +89,9 @@
       "settings": {
         "label": "Apply for Access",
         "heading_html": "Join the <em>network</em>.",
-        "text": "Complete the form and a member of the Sabdia team will be in touch within one business day to discuss your application and confirm your access to our exclusive agent program.",
+        "text": "Fill in the form and we will be in touch within a business day.",
         "note_label": "Please note",
-        "note_text": "The Sabdia agent program is available to licensed real estate professionals only. We may request verification of your licence at the time of application approval.",
+        "note_text": "Licensed agents only. We may ask to see your licence.",
         "submit_label": "Submit Application"
       }
     }

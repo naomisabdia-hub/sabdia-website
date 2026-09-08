@@ -5,7 +5,7 @@
       "settings": {
         "label": "What We Offer",
         "title_html": "Our<br><em>Services</em>",
-        "sub": "Full-spectrum residential development expertise delivered entirely in-house.",
+        "sub": "Design, development and construction, all in-house.",
         "image_ext": "/images/aether-hero.jpg",
         "image_alt": "Services"
       }
@@ -20,7 +20,7 @@
         "paragraph-1": {
           "type": "paragraph",
           "settings": {
-            "text": "At Sabdia, we believe the best residential developments are those where design, development, and construction work as one seamless system \u2014 not as separate, disconnected disciplines. Our fully integrated in-house model is our defining advantage."
+            "text": "At Sabdia, we believe the best residential developments are those where design, development, and construction work as one seamless system — not as separate, disconnected disciplines. Our fully integrated in-house model is our defining advantage."
           }
         },
         "paragraph-2": {
@@ -43,12 +43,12 @@
           "type": "service",
           "settings": {
             "number": "01",
-            "label": "Service One",
+            "label": "Design",
             "title": "Luxury Residential Design",
             "heading_html": "Luxury Residential <em>Design</em>",
             "image_ext": "/images/home-hero-1.jpg",
             "image_alt": "Luxury Residential Design",
-            "paragraphs": "Our in-house architecture and design team creates residences that are as functional as they are breathtaking. We approach each project as a singular creative endeavour \u2014 absorbing the site's character, the client's aspirations, and the neighbourhood's context before a single line is drawn.\nThe result is homes that feel inevitable \u2014 as though they could not have existed anywhere else, built for anyone else, or been conceived by any other studio.",
+            "paragraphs": "Our architecture and design team is in-house. Each home starts with the site, the street and the client, before anything is drawn.\nThe result is a home that belongs to its site and its owners.",
             "bullets": "Architectural concept and schematic design\nDesign development and documentation\nPlanning approvals and DA management\nLandscape architecture\nMaterial and finishes specification\n3D visualisation and virtual walkthroughs"
           }
         },
@@ -56,12 +56,12 @@
           "type": "service",
           "settings": {
             "number": "02",
-            "label": "Service Two",
+            "label": "Development",
             "title": "Development Management",
             "heading_html": "Development <em>Management</em>",
             "image_ext": "/images/solace-hero.jpg",
             "image_alt": "Development Management",
-            "paragraphs": "Development management is the complex art of orchestrating every moving part of a residential project \u2014 land acquisition, town planning, engineering, approvals, finance, sales, and delivery \u2014 into one coherent, high-performing whole.\nSabdia handles this process entirely in-house. This means fewer delays, tighter budgets, faster approvals, and a development that performs as well on paper as it does in person.",
+            "paragraphs": "Development management is everything between the land and the keys: town planning, engineering, approvals, finance, sales and delivery.\nWe do all of it in-house. Fewer hand-offs means fewer delays and a tighter budget.",
             "bullets": "Site acquisition analysis and due diligence\nFeasibility modelling and investment structuring\nTown planning strategy and DA management\nEngineering and civil coordination\nSales and marketing strategy\nProject reporting and stakeholder management"
           }
         },
@@ -69,12 +69,12 @@
           "type": "service",
           "settings": {
             "number": "03",
-            "label": "Service Three",
+            "label": "Interiors",
             "title": "Interior Architecture",
             "heading_html": "Interior <em>Architecture</em>",
             "image_ext": "/images/sierra-hero.jpg",
             "image_alt": "Interior Architecture",
-            "paragraphs": "Our interior architecture division ensures that the lived experience of a Sabdia home is as extraordinary as its exterior presence. Working in close collaboration with the architecture team from day one, our interior architects shape spaces that are luminous, considered, and deeply personal.\nEvery kitchen, bathroom, bedroom, and living space is designed as part of a holistic vision \u2014 where each room flows effortlessly into the next, and light, material, and proportion conspire to create homes that feel genuinely special.",
+            "paragraphs": "Our interior architects work with the architecture team from day one, so the inside of the house is planned with the same care as the outside.\nKitchens, bathrooms, bedrooms and living rooms are designed together, so light, materials and proportion carry through the whole house.",
             "bullets": "Interior concept and spatial design\nCustom joinery design and specification\nMaterial, finish, and hardware selection\nLighting design and coordination\nFF&E procurement and styling\nKitchen and bathroom design"
           }
         },
@@ -82,12 +82,12 @@
           "type": "service",
           "settings": {
             "number": "04",
-            "label": "Service Four",
+            "label": "Construction",
             "title": "Expert Construction",
             "heading_html": "Expert <em>Construction</em>",
             "image_ext": "/images/caspian-hero.jpg",
             "image_alt": "Expert Construction",
-            "paragraphs": "Sabdia's construction arm brings the vision to life with precision, skill, and an obsessive attention to detail. Our team of master tradespeople \u2014 many of whom have worked with Sabdia for years \u2014 share our commitment to doing everything properly.\nWe use only the finest materials, source from trusted suppliers, and never cut corners. The result is a home that not only looks extraordinary on the day of handover, but continues to perform to the highest standard for decades to come.",
+            "paragraphs": "Our own team builds every home. Many of the trades have worked with Sabdia for years and hold the same standard we do.\nGood materials from suppliers we trust, and no shortcuts. The house should look right at handover and still be right in twenty years.",
             "bullets": "Full residential construction management\nPremium material sourcing and procurement\nMaster tradesperson coordination\nQuality assurance and defect management\nClient reporting and site access\nPost-completion aftercare and warranty"
           }
         }
@@ -109,28 +109,28 @@
           "type": "step",
           "settings": {
             "title": "Design",
-            "description": "Visionary design that balances beauty, functionality, and long-term value. Every project begins with a deep understanding of site, context, and client."
+            "description": "Design that works as well as it looks. We start with the site, the street and the people."
           }
         },
         "step-2": {
           "type": "step",
           "settings": {
             "title": "Develop",
-            "description": "We manage the complete development process in-house \u2014 approvals, planning, engineering \u2014 maintaining full control over every decision and outcome."
+            "description": "Approvals, planning and engineering are handled in-house, so every decision is ours."
           }
         },
         "step-3": {
           "type": "step",
           "settings": {
             "title": "Construct",
-            "description": "Precision construction by our own team of master tradespeople, using premium materials and meticulous quality control at every stage of the build."
+            "description": "Our own team builds it, with the materials we specified and a check at every stage."
           }
         },
         "step-4": {
           "type": "step",
           "settings": {
             "title": "Deliver",
-            "description": "Handover marks the beginning of your story. Our aftercare ensures your home continues to perform and delight for decades to come."
+            "description": "After handover we stay in touch. If something needs attention, we come back."
           }
         }
       },
@@ -146,7 +146,7 @@
       "settings": {
         "label": "Start Your Project",
         "heading_html": "Ready to build something <em style=\"color:var(--gold2)\">remarkable</em>?",
-        "text": "Whether you have a site, a vision, or simply a desire for exceptional living \u2014 we'd love to hear from you.",
+        "text": "Whether you have a site, a vision, or simply a desire for exceptional living — we'd love to hear from you.",
         "cta1_label": "Begin a Conversation",
         "cta1_link": "/pages/contact",
         "cta2_label": "View Properties",
