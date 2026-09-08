@@ -1,15 +1,67 @@
 {%- comment -%}
-  Collection — the portfolio grid of completed residences. Cards play
-  their film on hover; a card with a link navigates, one without stays
-  a still/film card (the site's collection detail pages have no Shopify
-  counterpart yet).
+  Collection — everything Sabdia has built, in one grid: the current
+  residences (For Sale / Sold, straight from Products and their Status)
+  followed by the completed portfolio (the Residence blocks). A filter
+  bar narrows to one group. Cards play their film on hover; a card with
+  a link navigates.
 {%- endcomment -%}
-<section style="padding:clamp(52px,7vw,96px) clamp(22px,5vw,80px) clamp(80px,12vw,140px);background:var(--bg)">
+{%- liquid
+  assign show_current = section.settings.show_current
+  if show_current
+    capture live_csv
+      render 'residence-handles', col: collections['for-sale'], group: 'live'
+    endcapture
+    assign live_handles = live_csv | split: ','
+    capture sold_csv
+      render 'residence-handles', col: collections['sold'], group: 'sold'
+    endcapture
+    assign sold_handles = sold_csv | split: ','
+    assign current_handles = live_handles | concat: sold_handles
+  endif
+  assign sid = section.id
+-%}
+{%- if show_current and section.settings.show_filter -%}
+<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px clamp(22px,5vw,80px)">
+  <div class="inner" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap" data-port-filter="{{ sid }}">
+    <span style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)">{{ section.settings.filter_label }}</span>
+    <button class="pfilter on" type="button" data-filter="all">{{ section.settings.filter_all }}</button>
+    <button class="pfilter" type="button" data-filter="live">{{ section.settings.filter_live }}</button>
+    <button class="pfilter" type="button" data-filter="sold">{{ section.settings.filter_sold }}</button>
+    <button class="pfilter" type="button" data-filter="done">{{ section.settings.filter_done }}</button>
+  </div>
+</div>
+{%- endif -%}
+<section style="padding:clamp(52px,7vw,96px) clamp(22px,5vw,80px) clamp(80px,12vw,140px);background:var(--bg)" id="port-{{ sid }}">
   <div class="inner">
     <div class="portfolio-grid">
       {%- assign pdelays = ',d1,d2' | split: ',' -%}
+      {%- assign ci = 0 -%}
+      {%- if show_current -%}
+        {%- for h in current_handles -%}
+          {%- for product in collections.all.products -%}
+            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+            {%- assign di = ci | modulo: 3 -%}
+            {%- assign ci = ci | plus: 1 -%}
+            {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
+            {%- assign grp = 'live' -%}
+            {%- if pstatus contains 'Sold' -%}{%- assign grp = 'sold' -%}{%- endif -%}
+            <a href="{{ product.url }}" class="port-card reveal {{ pdelays[di] }}" data-port-card data-group="{{ grp }}">
+              <div class="port-img-wrap">
+                {%- if product.featured_image -%}
+                  <img src="{{ product.featured_image | image_url: width: 800, height: 600, crop: 'center' }}" alt="{{ product.title | escape }}" width="800" height="600" loading="lazy" decoding="async">
+                {%- endif -%}
+                <span class="port-film-tag">{{ pstatus }}</span>
+              </div>
+              <div class="port-name">{{ product.title }} <span style="color:var(--ink);font-weight:400">&rarr;</span></div>
+              <div class="port-loc">{{ product.metafields.custom.suburb.value }}{% if product.metafields.custom.suburb.value != blank %} QLD, Australia{% endif %}</div>
+            </a>
+            {%- break -%}
+          {%- endfor -%}
+        {%- endfor -%}
+      {%- endif -%}
       {%- for block in section.blocks -%}
-        {%- assign di = forloop.index0 | modulo: 3 -%}
+        {%- assign di = ci | modulo: 3 -%}
+        {%- assign ci = ci | plus: 1 -%}
         {%- capture card_inner -%}
           <div class="port-img-wrap">
             {%- if block.settings.image -%}
@@ -35,16 +87,43 @@
           <div class="port-loc">{{ block.settings.loc }}</div>
         {%- endcapture -%}
         {%- if block.settings.link != blank -%}
-          <a href="{{ block.settings.link }}" class="port-card reveal {{ pdelays[di] }}" data-port-card {{ block.shopify_attributes }}>{{ card_inner }}</a>
+          <a href="{{ block.settings.link }}" class="port-card reveal {{ pdelays[di] }}" data-port-card data-group="done" {{ block.shopify_attributes }}>{{ card_inner }}</a>
         {%- else -%}
-          <div class="port-card reveal {{ pdelays[di] }}" data-port-card {{ block.shopify_attributes }}>{{ card_inner }}</div>
+          <div class="port-card reveal {{ pdelays[di] }}" data-port-card data-group="done" {{ block.shopify_attributes }}>{{ card_inner }}</div>
         {%- endif -%}
       {%- endfor -%}
     </div>
   </div>
 </section>
 
+<style>
+  .pfilter{font-size:11px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--taupe-d);transition:color .3s;background:none;border:none;cursor:pointer;padding:0 0 1px;border-bottom:1px solid transparent;font-family:var(--font-u)}
+  .pfilter:hover{color:var(--ink)}
+  .pfilter.on{color:var(--ink);border-bottom-color:var(--ink)}
+</style>
+
 <script>
+  (function () {
+    var bar = document.querySelector('[data-port-filter="{{ sid }}"]');
+    var grid = document.getElementById('port-{{ sid }}');
+    if (bar && grid && !bar.dataset.filterInit) {
+      bar.dataset.filterInit = '1';
+      var buttons = bar.querySelectorAll('.pfilter');
+      var cards = grid.querySelectorAll('[data-port-card]');
+      buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          buttons.forEach(function (b) { b.classList.remove('on'); });
+          btn.classList.add('on');
+          var f = btn.dataset.filter;
+          cards.forEach(function (c) {
+            var show = f === 'all' || c.dataset.group === f;
+            c.style.display = show ? '' : 'none';
+            if (show) c.classList.add('vis');
+          });
+        });
+      });
+    }
+  })();
   (function () {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     document.querySelectorAll('[data-port-card]').forEach(function (card) {
@@ -69,8 +148,30 @@
   "settings": [
     {
       "type": "header",
+      "content": "Current residences"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_current",
+      "label": "Show the For Sale and Sold residences first",
+      "default": true,
+      "info": "Pulled straight from Products (their Status decides the group). Turn off to show only the completed Residence blocks below."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter",
+      "label": "Show the filter bar (All / For Sale / Sold / Completed)",
+      "default": true
+    },
+    {
+      "type": "header",
       "content": "Wording"
     },
+    { "type": "text", "id": "filter_label", "label": "Filter label", "default": "Filter:" },
+    { "type": "text", "id": "filter_all", "label": "Filter — all", "default": "All" },
+    { "type": "text", "id": "filter_live", "label": "Filter — for sale", "default": "For Sale" },
+    { "type": "text", "id": "filter_sold", "label": "Filter — sold", "default": "Sold" },
+    { "type": "text", "id": "filter_done", "label": "Filter — completed", "default": "Completed" },
     {
       "type": "text",
       "id": "film_tag",

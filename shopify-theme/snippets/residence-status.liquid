@@ -1,0 +1,25 @@
+{%- comment -%}
+  Prints a residence's status word exactly as it reads on the site.
+
+  Source of truth: Products › the residence › Status (metafield
+  custom.status — a dropdown: For Sale, Under Offer, Coming Soon, Sold
+  Prior to Completion, Sold; the list of choices is editable at
+  Settings › Custom data › Products › Status).
+
+  Residences without a Status fall back to the old "sold" tag, so nothing
+  changes until the field is filled in. Any status containing "Sold" sits
+  in the Sold group; everything else is live (listed under For Sale).
+
+  Usage: {% capture st %}{% render 'residence-status', product: p %}{% endcapture %}
+{%- endcomment -%}
+{%- liquid
+  assign st = product.metafields.custom.status.value | default: '' | strip
+  if st == blank
+    if product.tags contains 'sold'
+      assign st = 'Sold Prior to Completion'
+    else
+      assign st = 'For Sale'
+    endif
+  endif
+  echo st
+-%}

@@ -79,8 +79,28 @@
   {%- endif -%}
   <div class="h-overlay"></div>
 
-  <div class="h-mid">
+  {%- liquid
+    assign hold = 0
+    assign wpos = section.settings.words_position | default: 'centre'
+    assign show_mark = false
+    assign mark_hold = 0
+    if use_video
+      assign hold = section.settings.words_delay | default: 0
+      if section.settings.show_wordmark
+        assign show_mark = true
+        assign mark_hold = section.settings.wordmark_delay | default: 0
+      endif
+    endif
+    assign mark_src = 'logo.png' | asset_url
+    if settings.logo
+      assign mark_src = settings.logo | image_url: width: 800
+    endif
+  -%}
+  <div class="h-mid{% if wpos == 'low' %} h-mid-low{% elsif wpos == 'high' %} h-mid-high{% endif %}" style="{% if hold > 0 %}--h-hold:{{ hold }}s;{% endif %}{% if show_mark %}--h-mark-hold:{{ mark_hold }}s;--h-mark-h:{{ section.settings.wordmark_size | default: 44 }}px;{% endif %}">
     <div class="h-mid-content">
+      {%- if show_mark -%}
+        <img class="h-mark" src="{{ mark_src }}" alt="{{ settings.site_name | default: 'Sabdia' }}" width="800" height="160" loading="eager">
+      {%- endif -%}
       <h1 class="h-title">
         {%- assign words = section.settings.words | split: ',' -%}
         {%- for word in words -%}
@@ -178,8 +198,45 @@
       "info": "Shown while the video loads. Leave empty to use the first slide."
     },
     {
+      "type": "range",
+      "id": "words_delay",
+      "label": "Hold the words back (video only)",
+      "min": 0, "max": 15, "step": 0.5, "unit": "s", "default": 0,
+      "info": "If the film carries its own SABDIA wordmark, wait this many seconds before the title words and eyebrow fade in — so they appear after that moment rather than on top of it."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wordmark",
+      "label": "Show the SABDIA wordmark over the film",
+      "default": false,
+      "info": "Video only. Draws the site logo in the hero (Theme settings › Brand › Logo) and fades it in after the delay below — set the delay to the moment the film's own wordmark disappears, so ours takes its place and stays. The title words sit underneath."
+    },
+    {
+      "type": "range",
+      "id": "wordmark_delay",
+      "label": "Wordmark fades in after",
+      "min": 0, "max": 15, "step": 0.5, "unit": "s", "default": 4
+    },
+    {
+      "type": "range",
+      "id": "wordmark_size",
+      "label": "Wordmark height",
+      "min": 24, "max": 120, "step": 4, "unit": "px", "default": 44
+    },
+    {
       "type": "header",
       "content": "Words"
+    },
+    {
+      "type": "select",
+      "id": "words_position",
+      "label": "Where the words sit",
+      "options": [
+        { "value": "centre", "label": "Centre" },
+        { "value": "low", "label": "Lower (clear of a centred wordmark)" },
+        { "value": "high", "label": "Upper" }
+      ],
+      "default": "centre"
     },
     {
       "type": "text",

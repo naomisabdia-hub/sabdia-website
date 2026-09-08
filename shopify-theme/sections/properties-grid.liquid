@@ -1,11 +1,20 @@
 {%- comment -%}
   Port of the homepage properties section — one hero card, two small
-  cards, then a row of remaining for-sale plus sold residences. Fed by
-  two collections chosen in the customizer.
+  cards, then a row of remaining live plus sold residences. Which group
+  a residence is in comes from its Status (see residence-status); the two
+  collections chosen in the customizer set the order.
 {%- endcomment -%}
 {%- liquid
   assign for_sale = collections[section.settings.for_sale_collection]
   assign sold = collections[section.settings.sold_collection]
+  capture live_csv
+    render 'residence-handles', col: for_sale, group: 'live'
+  endcapture
+  assign live_handles = live_csv | split: ','
+  capture sold_csv
+    render 'residence-handles', col: sold, group: 'sold'
+  endcapture
+  assign sold_handles = sold_csv | split: ','
 -%}
 <section id="properties" style="padding:0 0 clamp(80px,12vw,160px)">
   <div class="inner" style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px) clamp(44px,5vw,60px)">
@@ -20,28 +29,41 @@
 
   <div class="inner" style="padding:0 clamp(22px,5vw,80px)">
     <div class="proj-grid proj-grid-main">
-      {%- for product in for_sale.products limit: 3 -%}
-        {%- if forloop.first -%}
-          {% render 'property-card', product: product, class: 'pc-hero reveal-wipe', img_w: 1400, img_h: 900, show_cars: true %}
-        {%- elsif forloop.index == 2 -%}
-          {% render 'property-card', product: product, class: 'pc-sm-a reveal-wipe d1', style: 'aspect-ratio:4/3', img_w: 900, img_h: 680 %}
-        {%- else -%}
-          {% render 'property-card', product: product, class: 'pc-sm-b reveal-wipe d2', style: 'aspect-ratio:4/3', img_w: 900, img_h: 680 %}
-        {%- endif -%}
+      {%- for h in live_handles limit: 3 -%}
+        {%- assign i = forloop.index -%}
+        {%- for product in collections.all.products -%}
+          {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+          {%- if i == 1 -%}
+            {% render 'property-card', product: product, class: 'pc-hero reveal-wipe', img_w: 1400, img_h: 900, show_cars: true %}
+          {%- elsif i == 2 -%}
+            {% render 'property-card', product: product, class: 'pc-sm-a reveal-wipe d1', style: 'aspect-ratio:4/3', img_w: 900, img_h: 680 %}
+          {%- else -%}
+            {% render 'property-card', product: product, class: 'pc-sm-b reveal-wipe d2', style: 'aspect-ratio:4/3', img_w: 900, img_h: 680 %}
+          {%- endif -%}
+          {%- break -%}
+        {%- endfor -%}
       {%- endfor -%}
     </div>
 
-    {%- assign rest_count = for_sale.products.size | minus: 3 -%}
-    {%- if rest_count > 0 or sold.products.size > 0 -%}
+    {%- assign rest_count = live_handles.size | minus: 3 -%}
+    {%- if rest_count > 0 or sold_handles.size > 0 -%}
       <div class="proj-grid-3" style="margin-top:10px">
-        {%- for product in for_sale.products offset: 3 -%}
-          {% render 'property-card', product: product, class: 'reveal-wipe', style: 'aspect-ratio:16/10', img_w: 900, img_h: 560 %}
+        {%- for h in live_handles offset: 3 -%}
+          {%- for product in collections.all.products -%}
+            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+            {% render 'property-card', product: product, class: 'reveal-wipe', style: 'aspect-ratio:16/10', img_w: 900, img_h: 560 %}
+            {%- break -%}
+          {%- endfor -%}
         {%- endfor -%}
         {%- assign sold_delays = 'd1,d2' | split: ',' -%}
-        {%- for product in sold.products -%}
+        {%- for h in sold_handles -%}
           {%- assign di = forloop.index0 | modulo: 2 -%}
           {%- assign sold_class = 'reveal-wipe ' | append: sold_delays[di] -%}
-          {% render 'sold-card', product: product, class: sold_class, img_w: 800, img_h: 500, show_suburb: false %}
+          {%- for product in collections.all.products -%}
+            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+            {% render 'sold-card', product: product, class: sold_class, img_w: 800, img_h: 500, show_suburb: false %}
+            {%- break -%}
+          {%- endfor -%}
         {%- endfor -%}
       </div>
     {%- endif -%}
@@ -56,8 +78,9 @@
     { "type": "html", "id": "heading_html", "label": "Heading" },
     { "type": "text", "id": "cta_label", "label": "Button label", "default": "View All" },
     { "type": "text", "id": "cta_link", "label": "Button link", "default": "/collections/for-sale" },
-    { "type": "collection", "id": "for_sale_collection", "label": "For Sale collection" },
-    { "type": "collection", "id": "sold_collection", "label": "Sold collection" }
+    { "type": "paragraph", "content": "Which residences are live and which are sold is set on each residence: Products › the residence › Status. The collections below only decide the order (Products › Collections › sort Manually, drag). The first live residence is the large card." },
+    { "type": "collection", "id": "for_sale_collection", "label": "For Sale collection (order)" },
+    { "type": "collection", "id": "sold_collection", "label": "Sold collection (order)" }
   ],
   "presets": [{ "name": "Properties grid" }]
 }

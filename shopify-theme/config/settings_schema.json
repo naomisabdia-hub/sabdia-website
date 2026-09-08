@@ -253,13 +253,15 @@
         "type": "text",
         "id": "label_for_sale",
         "label": "For-sale chip",
-        "default": "For Sale"
+        "default": "For Sale",
+        "info": "Wording on cards whose Status is For Sale. Other statuses (Under Offer, Coming Soon…) print their own word — Products › the residence › Status."
       },
       {
         "type": "text",
         "id": "label_sold_badge",
         "label": "Sold badge",
-        "default": "Sold Prior to Completion"
+        "default": "Sold Prior to Completion",
+        "info": "Wording on cards whose Status is Sold Prior to Completion. A residence whose Status is plain Sold prints Sold."
       }
     ]
   }

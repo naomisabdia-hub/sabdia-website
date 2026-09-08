@@ -1,11 +1,20 @@
 {%- comment -%}
-  Projects — filter bar plus the Current / Sold Prior groups, fed by the
-  for-sale and sold collections. Year comes from custom.year; specs line
-  mirrors the site's "4 Bed · 4 Bath · 2 Garage · 716m²+".
+  Projects — filter bar plus the Current / Sold groups. Which group a
+  residence sits in comes from its Status (see residence-status); the
+  for-sale and sold collections only set the order. Year comes from
+  custom.year; specs line mirrors "4 Bed · 4 Bath · 2 Garage · 716m²+".
 {%- endcomment -%}
 {%- liquid
   assign current_col = section.settings.current_collection | default: collections['for-sale']
   assign sold_col = section.settings.sold_collection | default: collections['sold']
+  capture live_csv
+    render 'residence-handles', col: current_col, group: 'live'
+  endcapture
+  assign live_handles = live_csv | split: ','
+  capture sold_csv
+    render 'residence-handles', col: sold_col, group: 'sold'
+  endcapture
+  assign sold_handles = sold_csv | split: ','
 -%}
 
 <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px clamp(22px,5vw,80px)">
@@ -21,21 +30,26 @@
   <div class="inner">
     <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.current_label }}</div>
     <div class="projects-grid">
-      {%- for product in current_col.products -%}
-        {%- assign mfp = product.metafields.custom -%}
+      {%- for h in live_handles -%}
         {%- assign odd = forloop.index0 | modulo: 2 -%}
-        <a href="{{ product.url }}" class="proj-card reveal {% if odd == 1 %}d1{% endif %}">
-          {%- if product.featured_image -%}
-            <img src="{{ product.featured_image | image_url: width: 1200, height: 750, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="750" loading="lazy" decoding="async">
-          {%- endif -%}
-          <div class="proj-card-ov"></div>
-          <div class="proj-card-info">
-            <div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}For Sale</div>
-            <div class="proj-card-name">{{ product.title }}</div>
-            <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD — {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
-          </div>
-          <div class="pc-arrow">&rarr;</div>
-        </a>
+        {%- for product in collections.all.products -%}
+          {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+          {%- assign mfp = product.metafields.custom -%}
+          {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
+          <a href="{{ product.url }}" class="proj-card reveal {% if odd == 1 %}d1{% endif %}">
+            {%- if product.featured_image -%}
+              <img src="{{ product.featured_image | image_url: width: 1200, height: 750, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="750" loading="lazy" decoding="async">
+            {%- endif -%}
+            <div class="proj-card-ov"></div>
+            <div class="proj-card-info">
+              <div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}{{ pstatus }}</div>
+              <div class="proj-card-name">{{ product.title }}</div>
+              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD — {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
+            </div>
+            <div class="pc-arrow">&rarr;</div>
+          </a>
+          {%- break -%}
+        {%- endfor -%}
       {%- endfor -%}
     </div>
   </div>
@@ -45,21 +59,28 @@
   <div class="inner">
     <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.sold_label }}</div>
     <div class="projects-grid">
-      {%- for product in sold_col.products -%}
-        {%- assign mfp = product.metafields.custom -%}
+      {%- for h in sold_handles -%}
         {%- assign odd = forloop.index0 | modulo: 2 -%}
-        <a href="{{ product.url }}" class="proj-card reveal {% if odd == 1 %}d1{% endif %}">
-          {%- if product.featured_image -%}
-            <img src="{{ product.featured_image | image_url: width: 1200, height: 750, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="750" loading="lazy" decoding="async">
-          {%- endif -%}
-          <div class="proj-card-ov"></div>
-          <div class="sc-badge">{{ section.settings.sold_badge }}</div>
-          <div class="proj-card-info">
-            <div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}Sold</div>
-            <div class="proj-card-name">{{ product.title }}</div>
-            <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD — {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
-          </div>
-        </a>
+        {%- for product in collections.all.products -%}
+          {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+          {%- assign mfp = product.metafields.custom -%}
+          {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
+          {%- assign badge = pstatus -%}
+          {%- if pstatus == 'Sold Prior to Completion' and section.settings.sold_badge != blank -%}{%- assign badge = section.settings.sold_badge -%}{%- endif -%}
+          <a href="{{ product.url }}" class="proj-card reveal {% if odd == 1 %}d1{% endif %}">
+            {%- if product.featured_image -%}
+              <img src="{{ product.featured_image | image_url: width: 1200, height: 750, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="750" loading="lazy" decoding="async">
+            {%- endif -%}
+            <div class="proj-card-ov"></div>
+            <div class="sc-badge">{{ badge }}</div>
+            <div class="proj-card-info">
+              <div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}Sold</div>
+              <div class="proj-card-name">{{ product.title }}</div>
+              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD — {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
+            </div>
+          </a>
+          {%- break -%}
+        {%- endfor -%}
       {%- endfor -%}
     </div>
   </div>
@@ -94,15 +115,16 @@
 {
   "name": "Projects grid",
   "settings": [
-    { "type": "collection", "id": "current_collection", "label": "Current collection", "info": "Defaults to for-sale" },
-    { "type": "collection", "id": "sold_collection", "label": "Sold collection", "info": "Defaults to sold" },
+    { "type": "paragraph", "content": "Which group a residence appears in is set on the residence itself: Products › the residence › Status. The collections below only decide the order (Products › Collections › sort Manually, drag)." },
+    { "type": "collection", "id": "current_collection", "label": "Current collection (order)", "info": "Defaults to for-sale" },
+    { "type": "collection", "id": "sold_collection", "label": "Sold collection (order)", "info": "Defaults to sold" },
     { "type": "text", "id": "filter_label", "label": "Filter label", "default": "Filter:" },
     { "type": "text", "id": "filter_all", "label": "Filter — all", "default": "All" },
     { "type": "text", "id": "filter_current", "label": "Filter — current", "default": "Current" },
     { "type": "text", "id": "filter_sold", "label": "Filter — sold", "default": "Sold" },
     { "type": "text", "id": "current_label", "label": "Current group label", "default": "For Sale — Current" },
     { "type": "text", "id": "sold_label", "label": "Sold group label", "default": "Sold Prior to Completion" },
-    { "type": "text", "id": "sold_badge", "label": "Sold card badge", "default": "Sold Prior to Completion" }
+    { "type": "text", "id": "sold_badge", "label": "Sold card badge", "default": "Sold Prior to Completion", "info": "Wording for residences whose Status is Sold Prior to Completion. Other statuses print their own word." }
   ],
   "presets": [{ "name": "Projects grid" }]
 }

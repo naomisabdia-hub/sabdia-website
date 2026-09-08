@@ -1,25 +1,37 @@
 {%- comment -%}
   Property page — the "Explore more Sabdia residences" row: up to three
-  other for-sale residences (never the one being viewed). The heading
-  switches when this residence is sold.
+  other live residences (never the one being viewed), in the For Sale
+  collection's order. The heading switches when this residence's Status
+  is in the Sold group.
 {%- endcomment -%}
 {%- liquid
   assign col = section.settings.related_collection | default: collections['for-sale']
+  capture pstatus
+    render 'residence-status', product: product
+  endcapture
   assign sold = false
-  if product.tags contains 'sold'
+  if pstatus contains 'Sold'
     assign sold = true
   endif
+  capture live_csv
+    render 'residence-handles', col: col, group: 'live'
+  endcapture
+  assign live_handles = live_csv | split: ','
 -%}
 {%- capture cards -%}
   {%- assign shown = 0 -%}
-  {%- for p in col.products -%}
-    {%- if p.id == product.id or shown >= 3 -%}{%- continue -%}{%- endif -%}
-    {%- assign shown = shown | plus: 1 -%}
-    {%- case shown -%}
-      {%- when 1 -%}{% render 'property-card', product: p, class: 'reveal', style: 'aspect-ratio:4/3', img_w: 600, img_h: 400, show_cars: true, show_land: false %}
-      {%- when 2 -%}{% render 'property-card', product: p, class: 'reveal d1', style: 'aspect-ratio:4/3', img_w: 600, img_h: 400, show_cars: true, show_land: false %}
-      {%- else -%}{% render 'property-card', product: p, class: 'reveal d2', style: 'aspect-ratio:4/3', img_w: 600, img_h: 400, show_cars: true, show_land: false %}
-    {%- endcase -%}
+  {%- for h in live_handles -%}
+    {%- if shown >= 3 -%}{%- break -%}{%- endif -%}
+    {%- for p in collections.all.products -%}
+      {%- if p.handle != h or p.id == product.id -%}{%- continue -%}{%- endif -%}
+      {%- assign shown = shown | plus: 1 -%}
+      {%- case shown -%}
+        {%- when 1 -%}{% render 'property-card', product: p, class: 'reveal', style: 'aspect-ratio:4/3', img_w: 600, img_h: 400, show_cars: true, show_land: false %}
+        {%- when 2 -%}{% render 'property-card', product: p, class: 'reveal d1', style: 'aspect-ratio:4/3', img_w: 600, img_h: 400, show_cars: true, show_land: false %}
+        {%- else -%}{% render 'property-card', product: p, class: 'reveal d2', style: 'aspect-ratio:4/3', img_w: 600, img_h: 400, show_cars: true, show_land: false %}
+      {%- endcase -%}
+      {%- break -%}
+    {%- endfor -%}
   {%- endfor -%}
 {%- endcapture -%}
 {%- assign cards_stripped = cards | strip -%}
@@ -34,7 +46,7 @@
 {
   "name": "Related residences",
   "settings": [
-    { "type": "collection", "id": "related_collection", "label": "Collection", "info": "Defaults to for-sale; the residence being viewed is never shown" },
+    { "type": "collection", "id": "related_collection", "label": "Collection", "info": "Defaults to for-sale; sets the order. Any residence whose Status is live is included; the one being viewed is never shown" },
     { "type": "html", "id": "heading_html", "label": "Heading (HTML)", "default": "Explore more <em>Sabdia residences<\/em>" },
     { "type": "html", "id": "heading_sold_html", "label": "Heading when sold (HTML)", "default": "Properties <em>for sale now<\/em>" }
   ],

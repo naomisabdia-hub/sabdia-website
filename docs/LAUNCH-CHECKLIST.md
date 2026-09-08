@@ -20,6 +20,15 @@ In order. ☐ = you click it in the admin; ✎ = Claude does it once you say so.
 14. ☐ **Ten minutes on your own phone** on the preview: home, a residence, contact form.
 15. ☐ **Publish** the duplicate — ⋯ › Publish.
 
+## Added 9 Sep 2026 — one Status field per residence (so Tamsin can move houses)
+
+Lands with the next push. Then, in the admin (5 minutes):
+1. ☐ **Set Status on all six residences** — Products › each › scroll to Metafields › **Status**: QASR, SOLACE, SIERRA, CASPIAN = *For Sale*; CAPRI, AETHER = *Sold Prior to Completion* (or whatever is true today — AETHER back to *For Sale* if that sale fell through). Save each. Until this is done the old `sold` tag still decides, so nothing breaks either way.
+2. ☐ **Make the two collections automatic** so membership follows Status and nobody has to add/remove products by hand. The API token is not allowed to, so: Products › Collections › **For Sale** › ⋯ delete it; **Create collection** › title *For Sale*, type **Automated**, "any condition": Product metafield › Status › is equal to *For Sale*; + *Under Offer*; + *Coming Soon* › Search engine listing › edit › URL handle **for-sale** › Save › Sort **Manually**, drag the order. Same for **Sold** (handle **sold**, conditions *Sold Prior to Completion* + *Sold*). Do it in one sitting: while a collection is missing, its page 404s. (If you'd rather I do it: allow the Bash rule for `python3 …/scratchpad/*.py` and say so.)
+3. ☐ **Put Status at the top of the metafield list** — Settings › Custom data › Products › drag **Status** to the top so it is the first thing Tamsin sees.
+4. ✎ Done by API on 9 Sep: **Projects removed from the main menu** (Collection now shows everything), `/pages/projects` → `/pages/collection` redirect, and the new product fields **Status**, **Show the scroll walkthrough**, **Build size (m²)** created. The Projects page itself still exists (Content › Pages) if you ever want it back in Content › Menus.
+5. ☐ **Tamsin's login** — Settings › Users › Add staff: Online Store (themes + customizer), Products, Content (pages, files, blog). Not Settings/Billing.
+
 ## Thursday — go-live
 
 16. ☐ **Connect the domain** — Settings › Domains › Connect existing domain › `sabdiaconstructions.com.au`. Shopify shows two DNS records: an **A record** for the root → `23.227.38.65` and a **CNAME** for `www` → `shops.myshopify.com`. Enter them at the registrar (where the Wix DNS is now). Wait for "Connected"; HTTPS issues itself within an hour.

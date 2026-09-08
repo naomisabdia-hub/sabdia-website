@@ -1,11 +1,19 @@
 {%- comment -%}
-  Port of SoldCard.astro, fed by a product from the sold collection.
+  Port of SoldCard.astro, fed by a residence whose Status is in the Sold
+  group (see residence-status). The badge prints that Status word.
   Params: product, class, img_w, img_h, show_suburb (default false here)
 {%- endcomment -%}
 {%- liquid
   assign mf = product.metafields.custom
   assign img_w2 = img_w | times: 2
   assign img_h2 = img_h | times: 2
+  capture pstatus
+    render 'residence-status', product: product
+  endcapture
+  assign badge = pstatus
+  if pstatus == 'Sold Prior to Completion' and settings.label_sold_badge != blank
+    assign badge = settings.label_sold_badge
+  endif
 -%}
 <a href="{{ product.url }}" class="sc-card {{ class }}">
   {%- if product.featured_image -%}
@@ -15,7 +23,7 @@
       alt="{{ product.title | escape }}" loading="lazy" decoding="async" width="{{ img_w }}" height="{{ img_h }}">
   {%- endif -%}
   <div class="sc-ov"></div>
-  <div class="sc-badge">{{ settings.label_sold_badge | default: "Sold Prior to Completion" }}</div>
+  <div class="sc-badge">{{ badge }}</div>
   <div class="sc-info">
     <div class="sc-name">{{ product.title }}</div>
     {%- if show_suburb and mf.suburb.value != blank -%}

@@ -16,8 +16,8 @@ footage. See the repo root `CLAUDE.md`.
 | Content | Where |
 | --- | --- |
 | Page copy, hero slides, films, stats… | Theme customizer (sections & blocks) |
-| Properties (QASR, SOLACE, …) | **Products** — title, description, gallery, tags (`sold`), metafields below |
-| For Sale / Sold groupings | Collections with handles `for-sale` and `sold` |
+| Properties (QASR, SOLACE, …) | **Products** — title, description, gallery, **Status** dropdown + metafields below |
+| For Sale / Sold groupings | Follow each product's **Status** (`custom.status`). Collections `for-sale` and `sold` only set the drag-order; ideally automated on Status (see `docs/HOW-TO-EDIT.md`) |
 | The Journal | Native Shopify **Blog** with handle `journal` |
 | Nav / footer links | Navigation menus (`main-menu`, footer menus) |
 | Logo, socials, contact, endpoints | Theme settings |
@@ -48,6 +48,7 @@ default 38px; mobile scales in step).
 
 | Key | Type |
 | --- | --- |
+| `status` | Single line text, choices: For Sale · Under Offer · Coming Soon · Sold Prior to Completion · Sold. **The one field that moves a residence between lists.** Any value containing "Sold" is the Sold group; everything else is live. Missing → falls back to the legacy `sold` tag. Read through `snippets/residence-status.liquid`; ordered lists via `snippets/residence-handles.liquid` (collection order first, then a sweep of every product whose Status belongs, so a list can never disagree with the field). |
 | `suburb`, `state`, `headline` | Single line text |
 | `beds`, `baths`, `cars`, `land` | Integer |
 | `land_over` | Boolean |

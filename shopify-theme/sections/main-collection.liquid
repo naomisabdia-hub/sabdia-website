@@ -1,12 +1,33 @@
 {%- comment -%}
   For Sale — faithful port of properties/index.astro: photographic hero,
   refine/sort toolbar, the featured-residence banner, the residence grid,
-  the sold-prior band, and the enquiry CTA. Filters read each residence's
-  metafields; sort order follows the collection's manual order.
+  the sold band, and the enquiry CTA. Filters read each residence's
+  metafields. On /collections/for-sale and /collections/sold the list is
+  driven by each residence's Status (see residence-status): the
+  collection's manual order leads, then any other residence whose Status
+  belongs here is swept in. Other collections list their own products.
 {%- endcomment -%}
 {%- liquid
-  assign prods = collection.products
-  assign count = prods.size
+  if collection.handle == 'for-sale' or collection.handle == 'sold'
+    assign group = 'live'
+    if collection.handle == 'sold'
+      assign group = 'sold'
+    endif
+    capture list_csv
+      render 'residence-handles', col: collection, group: group
+    endcapture
+  else
+    capture list_csv
+      for p in collection.products
+        unless forloop.first
+          echo ','
+        endunless
+        echo p.handle
+      endfor
+    endcapture
+  endif
+  assign handles = list_csv | split: ','
+  assign count = handles.size
   case count
     when 1
       assign count_word = 'One'
@@ -35,8 +56,25 @@
   if collection.handle == 'sold'
     assign show_rich = false
   endif
-  assign featured = prods.first
-  assign sold_col = collections['sold']
+  assign has_build = false
+  for p in collections.all.products
+    if p.metafields.custom.build_size.value != blank
+      assign has_build = true
+      break
+    endif
+  endfor
+  assign featured = false
+  assign first_handle = handles.first
+  for p in collections.all.products
+    if p.handle == first_handle
+      assign featured = p
+      break
+    endif
+  endfor
+  capture sold_csv
+    render 'residence-handles', col: collections['sold'], group: 'sold'
+  endcapture
+  assign sold_handles = sold_csv | split: ','
 -%}
 
 <section class="page-hero">
@@ -60,7 +98,7 @@
     <select class="ptool-sel" id="fSuburb" aria-label="Filter by suburb">
       <option value="">{{ section.settings.all_suburbs }}</option>
       {%- capture suburb_list -%}
-        {%- for product in prods -%}{{ product.metafields.custom.suburb.value }}¦{%- endfor -%}
+        {%- for h in handles -%}{%- for product in collections.all.products -%}{%- if product.handle == h -%}{{ product.metafields.custom.suburb.value }}¦{%- break -%}{%- endif -%}{%- endfor -%}{%- endfor -%}
       {%- endcapture -%}
       {%- assign suburbs = suburb_list | strip | split: '¦' | uniq | sort -%}
       {%- for s in suburbs -%}
@@ -80,6 +118,14 @@
       <option value="600-800">600&ndash;800m&sup2;</option>
       <option value="800-">800m&sup2;+</option>
     </select>
+    {%- if has_build -%}
+    <select class="ptool-sel" id="fBuild" aria-label="Build size">
+      <option value="">{{ section.settings.filter_any_build | default: "Any Build Size" }}</option>
+      <option value="0-450">Up to 450m&sup2;</option>
+      <option value="450-600">450&ndash;600m&sup2;</option>
+      <option value="600-">600m&sup2;+</option>
+    </select>
+    {%- endif -%}
     <select class="ptool-sel" id="fSort" aria-label="Sort properties">
       <option value="featured">{{ section.settings.sort_featured_label | default: "Sort — Featured" }}</option>
       <option value="land">{{ section.settings.filter_land_label | default: "Land Size" }}</option>
@@ -92,6 +138,8 @@
 
 {%- if featured -%}
   {%- assign fmf = featured.metafields.custom -%}
+  {%- capture fstatus -%}{% render 'residence-status', product: featured %}{%- endcapture -%}
+  {%- if fstatus == 'For Sale' and settings.label_for_sale != blank -%}{%- assign fstatus = settings.label_for_sale -%}{%- endif -%}
   <section style="padding:clamp(40px,5vw,64px) clamp(22px,5vw,80px) 0;background:var(--bg)" id="featuredWrap">
     <div class="inner">
       <a href="{{ featured.url }}" class="reveal" style="display:block;position:relative;overflow:hidden;height:clamp(400px,52vw,680px);cursor:pointer;text-decoration:none">
@@ -102,8 +150,8 @@
         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(31,27,20,.88) 0%,rgba(31,27,20,.1) 50%,transparent 100%);transition:opacity .4s"></div>
         <div style="position:absolute;bottom:0;left:0;right:0;padding:clamp(28px,4vw,52px)">
           <div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
-            <div style="width:5px;height:5px;border-radius:50%;background:var(--gold2);animation:pulse 2s ease-in-out infinite;flex-shrink:0"></div>
-            <span style="font-size:10.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2)">{{ settings.label_for_sale | default: "For Sale" }}</span>
+            <div style="width:5px;height:5px;border-radius:50%;background:var(--gold2);{% if fstatus == 'For Sale' or fstatus == settings.label_for_sale %}animation:pulse 2s ease-in-out infinite;{% endif %}flex-shrink:0"></div>
+            <span style="font-size:10.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2)">{{ fstatus }}</span>
           </div>
           <div style="font-family:var(--font-d);font-size:clamp(44px,8vw,110px);font-weight:300;line-height:.88;letter-spacing:-.04em;color:var(--white);margin-bottom:10px">{{ featured.title }}</div>
           <div style="font-size:11.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(253,251,246,.78);margin-bottom:18px">{{ fmf.suburb.value }}, {{ fmf.state.value | default: 'QLD' }}</div>
@@ -127,19 +175,25 @@
 <section style="padding:clamp(8px,1vw,10px) clamp(22px,5vw,80px) 0;background:var(--bg)">
   <div class="inner">
     <div class="proj-grid-3" id="propGrid" {% unless show_rich %}style="padding-top:clamp(32px,4vw,56px)"{% endunless %}>
-      {%- for product in prods -%}
-        {%- assign mfp = product.metafields.custom -%}
+      {%- for h in handles -%}
         {%- assign delay = forloop.index0 | modulo: 3 -%}
+        {%- assign is_first = forloop.first -%}
+        {%- assign order = forloop.index -%}
+        {%- for product in collections.all.products -%}
+        {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+        {%- assign mfp = product.metafields.custom -%}
+        {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
         <div
           data-prop-card
-          {% if show_rich and forloop.first %}data-featured="1" style="display:none"{% endif %}
+          {% if show_rich and is_first %}data-featured="1" style="display:none"{% endif %}
           data-suburb="{{ mfp.suburb.value | escape }}"
           data-cars="{{ mfp.cars.value }}"
           data-land="{{ mfp.land.value }}"
+          data-build="{{ mfp.build_size.value }}"
           data-name="{{ product.title | escape }}"
-          data-order="{{ forloop.index }}"
+          data-order="{{ order }}"
         >
-          {%- if product.tags contains 'sold' -%}
+          {%- if pstatus contains 'Sold' -%}
             {% render 'sold-card', product: product, class: 'reveal-wipe', img_w: 800, img_h: 500, show_suburb: true %}
           {%- elsif delay == 1 -%}
             {% render 'property-card', product: product, class: 'reveal d1', style: 'aspect-ratio:16/10', img_w: 900, img_h: 562, show_cars: true %}
@@ -149,24 +203,30 @@
             {% render 'property-card', product: product, class: 'reveal', style: 'aspect-ratio:16/10', img_w: 900, img_h: 562, show_cars: true %}
           {%- endif -%}
         </div>
+        {%- break -%}
+        {%- endfor -%}
       {%- endfor -%}
     </div>
     <p id="fEmpty" style="display:none;padding:56px 0;text-align:center;font-family:var(--font-d);font-size:22px;font-weight:300;font-style:italic;color:var(--taupe-d)">{{ section.settings.empty_text }}</p>
   </div>
 </section>
 
-{%- if show_rich and sold_col.products.size > 0 -%}
+{%- if show_rich and sold_handles.size > 0 -%}
   <section style="padding:clamp(64px,8vw,100px) clamp(22px,5vw,80px) clamp(80px,10vw,120px);background:var(--bg)">
     <div class="inner">
       <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.sold_label }}</div>
       <div class="proj-grid-sold" style="margin-top:0">
-        {%- for product in sold_col.products -%}
+        {%- for h in sold_handles -%}
           {%- assign sdelay = forloop.index0 | modulo: 2 -%}
-          {%- if sdelay == 1 -%}
-            {% render 'sold-card', product: product, class: 'reveal d1', img_w: 900, img_h: 560 %}
-          {%- else -%}
-            {% render 'sold-card', product: product, class: 'reveal', img_w: 900, img_h: 560 %}
-          {%- endif -%}
+          {%- for product in collections.all.products -%}
+            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+            {%- if sdelay == 1 -%}
+              {% render 'sold-card', product: product, class: 'reveal d1', img_w: 900, img_h: 560 %}
+            {%- else -%}
+              {% render 'sold-card', product: product, class: 'reveal', img_w: 900, img_h: 560 %}
+            {%- endif -%}
+            {%- break -%}
+          {%- endfor -%}
         {%- endfor -%}
       </div>
     </div>
@@ -200,6 +260,7 @@
     var suburb = document.getElementById('fSuburb');
     var cars = document.getElementById('fCars');
     var land = document.getElementById('fLand');
+    var build = document.getElementById('fBuild');
     var sort = document.getElementById('fSort');
     var count = document.getElementById('fCount');
     var empty = document.getElementById('fEmpty');
@@ -210,7 +271,7 @@
     var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-prop-card]'));
 
     function apply() {
-      var isDefault = !suburb.value && !cars.value && !land.value && sort.value === 'featured';
+      var isDefault = !suburb.value && !cars.value && !land.value && !(build && build.value) && sort.value === 'featured';
       if (featuredWrap) featuredWrap.style.display = isDefault ? '' : 'none';
 
       var visible = 0;
@@ -225,6 +286,13 @@
           var hi = range[1] ? Number(range[1]) : Infinity;
           var sqm = Number(c.dataset.land);
           if (sqm < lo || sqm >= hi) ok = false;
+        }
+        if (ok && build && build.value) {
+          var br = build.value.split('-');
+          var blo = Number(br[0] || 0);
+          var bhi = br[1] ? Number(br[1]) : Infinity;
+          var bsqm = Number(c.dataset.build);
+          if (!bsqm || bsqm < blo || bsqm >= bhi) ok = false;
         }
         c.style.display = ok ? '' : 'none';
         if (ok) visible++;
@@ -246,8 +314,8 @@
         : visible + (visible === 1 ? ' Residence' : ' Residences');
     }
 
-    [suburb, cars, land, sort].forEach(function (el) {
-      el.addEventListener('change', apply);
+    [suburb, cars, land, build, sort].forEach(function (el) {
+      if (el) el.addEventListener('change', apply);
     });
   })();
 </script>
@@ -304,6 +372,10 @@
       "id": "empty_text",
       "label": "No-matches text",
       "default": "No residences match your criteria — try widening your search."
+    },
+    {
+      "type": "paragraph",
+      "content": "Which residences appear here, and whether a card reads For Sale, Under Offer or Sold, is set on each residence: Products › the residence › Status. Drag the order at Products › Collections › For Sale (sort Manually)."
     },
     {
       "type": "text",
@@ -401,6 +473,13 @@
       "id": "filter_any_land",
       "label": "Land: any",
       "default": "Any Land Size"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_build",
+      "label": "Build size: any",
+      "default": "Any Build Size",
+      "info": "The Build size filter appears once at least one residence has a Build size (m²) in its Metafields."
     }
   ]
 }

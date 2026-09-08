@@ -124,6 +124,10 @@ def product_metafields(r):
         mf("film_poster", "single_line_text_field", film.get("poster")),
         mf("scrollwalk_folder", "single_line_text_field", wt.get("scrollwalk")),
         mf("year", "number_integer", r.get("year")),
+        # Status — the one field that decides For Sale / Sold on the site
+        # (dropdown; the theme's residence-status snippet reads it).
+        mf("status", "single_line_text_field",
+           "Sold Prior to Completion" if r.get("status") == "sold" else "For Sale"),
         # The Series — real captures of the residence's Instagram posts
         # (date/thumb/caption/video), rendered by sections/series-strip.
         mf("series_posts", "json", series_by.get(slug)),
@@ -232,12 +236,18 @@ print(f"  published {len(product_ids)} products")
 
 print("── Collections ──")
 def ensure_collection(title, handle, member_ids):
-    d = gql("query($q: String!) { collections(first: 5, query: $q) { nodes { id handle } } }",
+    d = gql("query($q: String!) { collections(first: 5, query: $q) { nodes { id handle ruleSet { rules { column } } } } }",
             {"q": f"handle:{handle}"})
     nodes = [n for n in d["collections"]["nodes"] if n["handle"] == handle]
     if nodes:
         cid = nodes[0]["id"]
-        print(f"  {handle}: exists")
+        if nodes[0].get("ruleSet"):
+            # Automated collection (fills itself from the Status field) —
+            # products cannot be added by hand, and there is no need to.
+            print(f"  {handle}: exists (automated — membership follows Status)")
+            member_ids = []
+        else:
+            print(f"  {handle}: exists")
     else:
         d = gql("""mutation($input: CollectionInput!) {
             collectionCreate(input: $input) { collection { id } userErrors { field message } } }""",

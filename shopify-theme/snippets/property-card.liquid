@@ -2,6 +2,7 @@
   Port of PropertyCard.astro, fed by a product. Specs come from the
   product's metafields (custom.beds / baths / cars / land / land_over /
   suburb); the image crops around the focal point set on it in Shopify.
+  The chip prints the residence's Status word (see residence-status).
 
   Params: product, class, style, img_w, img_h, show_cars (optional), show_land (default true)
 {%- endcomment -%}
@@ -9,6 +10,19 @@
   assign mf = product.metafields.custom
   assign img_w2 = img_w | times: 2
   assign img_h2 = img_h | times: 2
+  capture pstatus
+    render 'residence-status', product: product
+  endcapture
+  assign chip = pstatus
+  if pstatus == 'For Sale' and settings.label_for_sale != blank
+    assign chip = settings.label_for_sale
+  endif
+  assign dot_class = ''
+  if pstatus contains 'Sold'
+    assign dot_class = 'sold'
+  elsif pstatus != 'For Sale'
+    assign dot_class = 'still'
+  endif
 -%}
 <a href="{{ product.url }}" class="pc {{ class }}" {% if style != blank %}style="{{ style }}"{% endif %}>
   {%- if product.featured_image -%}
@@ -18,7 +32,7 @@
       alt="{{ product.title | escape }}" loading="lazy" decoding="async" width="{{ img_w }}" height="{{ img_h }}">
   {%- endif -%}
   <div class="pc-ov"></div>
-  <div class="pc-status-chip"><span class="pc-dot"></span>{{ settings.label_for_sale | default: "For Sale" }}</div>
+  <div class="pc-status-chip"><span class="pc-dot {{ dot_class }}"></span>{{ chip }}</div>
   <div class="pc-info">
     <div class="pc-name">{{ product.title }}</div>
     {%- if mf.suburb.value != blank -%}

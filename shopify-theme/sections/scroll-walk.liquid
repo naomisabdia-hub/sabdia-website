@@ -16,6 +16,14 @@
   if folder == blank and template.name == 'product'
     assign folder = product.metafields.custom.scrollwalk_folder.value
   endif
+  # Per-residence switch: Products › the residence › "Show the scroll
+  # walkthrough". Off hides it even when a folder is set; unset = on.
+  if template.name == 'product'
+    assign sw_switch = product.metafields.custom.show_walkthrough
+    if sw_switch != blank and sw_switch.value == false
+      assign folder = blank
+    endif
+  endif
   assign wt_name = section.settings.name
   if wt_name == blank and template.name == 'product'
     assign wt_name = product.title
@@ -278,6 +286,7 @@
 {
   "name": "Scroll walkthrough",
   "settings": [
+    { "type": "paragraph", "content": "On a residence page the frames come from Products › the residence › Scroll walkthrough folder, and the switch \"Show the scroll walkthrough\" (Metafields) turns it on or off for that residence. Not every residence has one — leave the folder empty or the switch off and the section simply does not appear." },
     {
       "type": "paragraph",
       "content": "⛔ Frame sets must be 100% real visualiser footage — never AI-generated architecture, in any form."
