@@ -24,7 +24,6 @@
     assign live_rest = live_handles | slice: 3, 60
     assign rest_handles = live_rest | concat: sold_handles
   endif
-  assign admin_base = 'https://admin.shopify.com/store/' | append: shop.permanent_domain | remove: '.myshopify.com' | append: '/products/'
 -%}
 <section id="properties" style="padding:0 0 clamp(80px,12vw,160px)">
   <div class="inner" style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px) clamp(44px,5vw,60px)">
@@ -38,12 +37,6 @@
   </div>
 
   <div class="inner" style="padding:0 clamp(22px,5vw,80px)">
-    {%- if request.design_mode -%}
-      {%- comment -%} Editor-only: For Sale / Sold is each residence's Status field, so link straight to it. {%- endcomment -%}
-      <div class="editor-note">
-        <strong>For Sale / Sold is set on each residence, not here.</strong> Open one, change <em>Status</em> near the bottom, Save - every page follows.
-        {%- assign all_handles = live_handles | concat: sold_handles -%}
-        {%- for h in all_handles -%}{%- for product in collections.all.products -%}{%- if product.handle != h -%}{%- continue -%}{%- endif -%}
           <a href="{{ admin_base }}{{ product.id }}" target="_blank" rel="noopener">{{ product.title }}: {% render 'residence-status', product: product %} &#8599;</a>
         {%- break -%}{%- endfor -%}{%- endfor -%}
       </div>
