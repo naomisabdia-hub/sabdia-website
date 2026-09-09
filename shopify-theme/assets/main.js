@@ -263,7 +263,11 @@ function thanksText(form) {
 function thanksHeading(form) {
   const e = form.querySelector('[name="contact[First name]"], [name="contact[first_name]"], [name="first-name"]');
   const first = e ? String(e.value || '').trim().split(/\s+/)[0] : '';
-  return first ? 'Thank you, ' + first.charAt(0).toUpperCase() + first.slice(1) : null;
+  /* Greeting the way Sabdia's replies open ("Good morning Mark,"); the
+     message below carries the thank-you, so the heading never repeats it. */
+  const hr = new Date().getHours();
+  const greet = hr < 12 ? 'Good morning' : (hr < 17 ? 'Good afternoon' : 'Good evening');
+  return first ? greet + ', ' + first.charAt(0).toUpperCase() + first.slice(1) : greet;
 }
 function mirrorEnquiry(form) {
   const url = window.SabdiaForms && window.SabdiaForms.mirror;
