@@ -43,7 +43,8 @@
           {%- if form.posted_successfully? -%}
             <p class="nl-done">{{ section.settings.nl_success }}</p>
           {%- else -%}
-            <input type="hidden" name="contact[tags]" value="newsletter">
+            {%- comment -%} On a residence page the subscriber is also tagged with that house, so Customers › Segments can filter "customer_tags CONTAINS 'qasr'". {%- endcomment -%}
+            <input type="hidden" name="contact[tags]" value="newsletter{% if product %}, {{ product.handle }}{% endif %}">
             <label class="sr-only" for="nlEmail">Email address</label>
             <input class="nl-in" id="nlEmail" type="email" name="contact[email]" placeholder="{{ section.settings.nl_placeholder | escape }}" autocomplete="email" required>
             <button class="nl-btn" type="submit">{{ section.settings.nl_button }}</button>
