@@ -35,7 +35,9 @@ The full illustrated guide is *Sabdia Website Guide.pdf* on the Desktop.
 | Share image, Google description | Theme settings › **Search & sharing** | |
 | Your photo library | **Content › Files** | Drag folders in; every picker's "Select image" browses it |
 | A set of photos on any page | Customize › **+ Add section › Photo gallery** | Up to 50; two/three/four-across or editorial |
-| Where enquiries go | Theme settings › Site plumbing › **Enquiry handling** | Sabdia API (Leads Inbox) or Shopify (email + Customers) |
+| Where enquiries go | Theme settings › Site plumbing › **Enquiry handling** | Leave on **Sabdia API**: every enquiry lands in the Leads Inbox, monday.com, the alert email *and* Shopify › Customers (tagged `residence:QASR`, `type:…`, `form:…`, `newsletter`) once the customer scopes are on |
+| See enquiries inside Shopify | **Customers** › filter › Tagged with `website` (or `residence:QASR`, `agent`, `newsletter`) | The message and date are on the customer's note |
+| Send the Journal or a newsletter | **Marketing › Shopify Email** › create campaign › segment: tag `newsletter` (or a residence tag for one house's enquirers) | No export needed; the list keeps itself from the forms |
 
 ## The three things that confuse everyone
 

@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { createClient } from '@supabase/supabase-js';
+import { upsertShopifyCustomer, enquiryTags } from '../../lib/shopify-customers';
 
 export const prerender = false;
 
@@ -240,7 +241,28 @@ const handlePost: APIRoute = async ({ request }) => {
 
   /* Hand the lead on. Failures are logged, never surfaced: the enquiry is
      already stored, and the visitor should not see a third party's outage. */
-  await Promise.allSettled([pushToMonday(record, details), pushToWebhook(record, details)]);
+  const noteLine = [
+    record.property && `Residence: ${record.property}`,
+    record.enquiry_type && `Enquiry: ${record.enquiry_type}`,
+    `via ${record.form_name} form`,
+    record.agency && `Agency: ${record.agency}`,
+    record.message && `"${String(record.message).slice(0, 600)}"`,
+  ].filter(Boolean).join(' · ');
+  await Promise.allSettled([
+    pushToMonday(record, details),
+    pushToWebhook(record, details),
+    /* Shopify › Customers is the copy Naomi works from: tagged by residence,
+       enquiry type and form, note carries the message. */
+    upsertShopifyCustomer({
+      email: String(record.email),
+      firstName: record.first_name as string | null,
+      lastName: record.last_name as string | null,
+      phone: record.phone as string | null,
+      tags: enquiryTags(record),
+      noteLine,
+      marketing: /^(yes|on|true|1)$/i.test(String(fields['newsletter'] ?? fields['consent'] ?? '')),
+    }),
+  ]);
 
   return json({ ok: true });
 };

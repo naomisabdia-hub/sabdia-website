@@ -1,5 +1,17 @@
 # Where an enquiry goes
 
+## Shopify is the front door (added 9 September 2026)
+
+Every enquiry and newsletter signup is now also written into **Shopify › Customers**: the person is created or updated, tagged `website`, `form:<which form>`, `residence:QASR` (etc.), `type:<enquiry type>`, `agent` for agent applications, `newsletter` for signups, and the dated message goes on the customer's note. Newsletter signups are marked as subscribed to email marketing. That gives you, inside Shopify:
+
+- **Customers › filter by tag** - a per-residence list (`residence:QASR`), all website leads (`website`), all agents (`agent`).
+- **Marketing › Shopify Email** - segments from those same tags, so the Journal or a release announcement goes to exactly the right people without exporting anything.
+
+Supabase (Leads Inbox), monday.com and the email alert all still receive the same enquiry - Shopify is the copy you work from, the others are the record and the pipeline.
+
+**To switch it on (one-time):** in Shopify admin › Settings › Apps and sales channels › Develop apps › the Sabdia app › Configuration › Admin API scopes: add `read_customers` and `write_customers`, save, then in Vercel › sabdia-website › Environment Variables add `SHOPIFY_STORE` (`b91p0j-f4.myshopify.com`) and `SHOPIFY_ADMIN_TOKEN` (the app's Admin API access token - if Shopify issues a new one after the scope change, use that) and redeploy. Until then the hand-off logs one line and skips; nothing else is affected.
+
+
 ## Today (verified 8 September 2026 by submitting a real test enquiry from the storefront's own request and finding it in the database)
 
 ```

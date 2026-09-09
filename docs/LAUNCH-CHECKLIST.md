@@ -32,7 +32,8 @@ Lands with the next push. Then, in the admin (5 minutes):
    python3 shopify-app/humanise-copy.py dry
    ```
    then `python3 shopify-app/humanise-copy.py staging` (preview it), `python3 shopify-app/humanise-copy.py live`, and `python3 shopify-app/humanise-copy.py products` (CAPRI / AETHER sold notices, and every long dash in product and Collection-page text becomes a plain hyphen). Every mode also swaps the long dash for a hyphen in the customizer wording. The list of before → after sentences is `shopify-app/copy-rewrites.json` — edit any line there first if you want different words. Instagram captions and legal pages are never touched. The home testimonial is now short but still anonymous ("Satisfied Client") — swap in a real quote when you have one (Customize › Home › Testimonial).
-6. ☐ **Tamsin's login** — Settings › Users › Add staff: Online Store (themes + customizer), Products, Content (pages, files, blog). Not Settings/Billing.
+6. ☐ **Enquiries into Shopify Customers** - Shopify admin › Settings › Apps and sales channels › Develop apps › the Sabdia app › Configuration › add Admin API scopes `read_customers` + `write_customers` › Save. Then Vercel › sabdia-website › Environment Variables: `SHOPIFY_STORE` = `b91p0j-f4.myshopify.com`, `SHOPIFY_ADMIN_TOKEN` = the app's Admin API token › Redeploy. From then on every enquiry and newsletter signup appears under Customers, tagged by residence and form, and Shopify Email can write to them (see ENQUIRY-FLOW.md).
+7. ☐ **Tamsin's login** — Settings › Users › Add staff: Online Store (themes + customizer), Products, Content (pages, files, blog). Not Settings/Billing.
 
 ## Thursday — go-live
 

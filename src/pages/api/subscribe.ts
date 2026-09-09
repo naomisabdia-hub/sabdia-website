@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { upsertShopifyCustomer } from '../../lib/shopify-customers';
 import { createClient } from '@supabase/supabase-js';
 
 export const prerender = false;
@@ -72,6 +73,10 @@ const handlePost: APIRoute = async ({ request }) => {
   recent.push(now);
   rateLog.set(ip, recent);
   if (rateLog.size > 1000) rateLog.clear();
+
+  /* Shopify › Customers first: subscribed, tagged newsletter, so Marketing ›
+     Shopify Email can send the Journal. Never blocks the signup. */
+  upsertShopifyCustomer({ email, tags: ['website', 'newsletter'], noteLine: 'Newsletter signup via website', marketing: true }).catch(() => {});
 
   const mlKey = env('MAILERLITE_API_KEY');
   const mlGroup = env('MAILERLITE_GROUP_ID');
