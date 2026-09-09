@@ -495,6 +495,22 @@ function initPage() {
     document.querySelectorAll(revealSel).forEach((el) => el.classList.add('vis'));
   }
 
+  /* Theme editor. The customizer injects and re-renders sections without
+     reloading, so they arrive after the observer was wired up and stay
+     hidden (opacity 0 / clipped) until a refresh. Reveal whatever the
+     editor adds or touches straight away. Never runs for visitors. */
+  if (window.Shopify && window.Shopify.designMode) {
+    const showAll = (root) => {
+      if (!root || root.nodeType !== 1) return;
+      if (root.matches(revealSel)) root.classList.add('vis', 'fastin');
+      root.querySelectorAll(revealSel).forEach((el) => el.classList.add('vis', 'fastin'));
+    };
+    ['shopify:section:load', 'shopify:section:select', 'shopify:section:reorder', 'shopify:block:select']
+      .forEach((ev) => document.addEventListener(ev, (e) => showAll(e.target)));
+    new MutationObserver((muts) => muts.forEach((m) => m.addedNodes.forEach(showAll)))
+      .observe(document.body, { childList: true, subtree: true });
+  }
+
   // ── STATS COUNTERS ────────────────────────────────────────
   // Count-up animation removed intentionally (owner decision): the numbers
   // render static at their final values. The markup also ships the final

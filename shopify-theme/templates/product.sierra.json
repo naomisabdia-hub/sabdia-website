@@ -1,0 +1,29 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-property",
+      "settings": {
+        "sold_notice": "This residence has been sold. View our current properties for sale below.",
+        "cta_text": "Inspections are by private appointment. Leave your details and we will be in touch within a business day."
+      }
+    },
+    "walkthrough": {
+      "type": "scroll-walk",
+      "settings": {}
+    },
+    "series": {
+      "type": "series-strip",
+      "settings": {}
+    },
+    "related": {
+      "type": "related-properties",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main",
+    "walkthrough",
+    "series",
+    "related"
+  ]
+}

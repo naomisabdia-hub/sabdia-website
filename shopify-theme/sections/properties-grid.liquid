@@ -15,6 +15,16 @@
     render 'residence-handles', col: sold, group: 'sold'
   endcapture
   assign sold_handles = sold_csv | split: ','
+  # Everything after the first three live residences flows into rows of
+  # three (live first, then sold), capped by "Most residences to show".
+  assign max_cards = section.settings.max_cards | default: 12
+  assign rest_limit = max_cards | minus: 3
+  assign rest_handles = sold_handles
+  if live_handles.size > 3
+    assign live_rest = live_handles | slice: 3, 60
+    assign rest_handles = live_rest | concat: sold_handles
+  endif
+  assign admin_base = 'https://admin.shopify.com/store/' | append: shop.permanent_domain | remove: '.myshopify.com' | append: '/products/'
 -%}
 <section id="properties" style="padding:0 0 clamp(80px,12vw,160px)">
   <div class="inner" style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px) clamp(44px,5vw,60px)">
@@ -28,6 +38,16 @@
   </div>
 
   <div class="inner" style="padding:0 clamp(22px,5vw,80px)">
+    {%- if request.design_mode -%}
+      {%- comment -%} Editor-only: For Sale / Sold is each residence's Status field, so link straight to it. {%- endcomment -%}
+      <div class="editor-note">
+        <strong>For Sale / Sold is set on each residence, not here.</strong> Open one, change <em>Status</em> near the bottom, Save - every page follows.
+        {%- assign all_handles = live_handles | concat: sold_handles -%}
+        {%- for h in all_handles -%}{%- for product in collections.all.products -%}{%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+          <a href="{{ admin_base }}{{ product.id }}" target="_blank" rel="noopener">{{ product.title }}: {% render 'residence-status', product: product %} &#8599;</a>
+        {%- break -%}{%- endfor -%}{%- endfor -%}
+      </div>
+    {%- endif -%}
     <div class="proj-grid proj-grid-main">
       {%- for h in live_handles limit: 3 -%}
         {%- assign i = forloop.index -%}
@@ -45,23 +65,20 @@
       {%- endfor -%}
     </div>
 
-    {%- assign rest_count = live_handles.size | minus: 3 -%}
-    {%- if rest_count > 0 or sold_handles.size > 0 -%}
-      <div class="proj-grid-3" style="margin-top:10px">
-        {%- for h in live_handles offset: 3 -%}
+    {%- if rest_handles.size > 0 and rest_limit > 0 -%}
+      <div class="proj-grid-3 proj-grid-flow" style="margin-top:10px">
+        {%- assign delays = ',d1,d2' | split: ',' -%}
+        {%- for h in rest_handles limit: rest_limit -%}
+          {%- assign di = forloop.index0 | modulo: 3 -%}
+          {%- assign card_class = 'pc-row reveal-wipe ' | append: delays[di] -%}
           {%- for product in collections.all.products -%}
             {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
-            {% render 'property-card', product: product, class: 'reveal-wipe', style: 'aspect-ratio:16/10', img_w: 900, img_h: 560 %}
-            {%- break -%}
-          {%- endfor -%}
-        {%- endfor -%}
-        {%- assign sold_delays = 'd1,d2' | split: ',' -%}
-        {%- for h in sold_handles -%}
-          {%- assign di = forloop.index0 | modulo: 2 -%}
-          {%- assign sold_class = 'reveal-wipe ' | append: sold_delays[di] -%}
-          {%- for product in collections.all.products -%}
-            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
-            {% render 'sold-card', product: product, class: sold_class, img_w: 800, img_h: 500, show_suburb: false %}
+            {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
+            {%- if pstatus contains 'Sold' -%}
+              {% render 'sold-card', product: product, class: card_class, img_w: 900, img_h: 560, show_suburb: false %}
+            {%- else -%}
+              {% render 'property-card', product: product, class: card_class, img_w: 900, img_h: 560 %}
+            {%- endif -%}
             {%- break -%}
           {%- endfor -%}
         {%- endfor -%}
@@ -78,9 +95,13 @@
     { "type": "html", "id": "heading_html", "label": "Heading" },
     { "type": "text", "id": "cta_label", "label": "Button label", "default": "View All" },
     { "type": "text", "id": "cta_link", "label": "Button link", "default": "/collections/for-sale" },
-    { "type": "paragraph", "content": "Which residences are live and which are sold is set on each residence: Products › the residence › Status. The collections below only decide the order (Products › Collections › sort Manually, drag). The first live residence is the large card." },
-    { "type": "collection", "id": "for_sale_collection", "label": "For Sale collection (order)" },
-    { "type": "collection", "id": "sold_collection", "label": "Sold collection (order)" }
+    { "type": "header", "content": "Which residences" },
+    { "type": "paragraph", "content": "For Sale or Sold is NOT chosen here. It is each residence's Status field: Products › the residence › Status (near the bottom) › Save. Every page follows it. The first three live residences fill the large layout; the rest flow in rows of three, live first, then sold." },
+    { "type": "range", "id": "max_cards", "label": "Most residences to show", "min": 3, "max": 30, "step": 1, "default": 12, "info": "Past this number the button above leads to the full list." },
+    { "type": "header", "content": "Order" },
+    { "type": "paragraph", "content": "These two pickers only set the drag order (Products › Collections › the collection › sort Manually). They never move a house between For Sale and Sold." },
+    { "type": "collection", "id": "for_sale_collection", "label": "Order of For Sale cards" },
+    { "type": "collection", "id": "sold_collection", "label": "Order of Sold cards" }
   ],
   "presets": [{ "name": "Properties grid" }]
 }

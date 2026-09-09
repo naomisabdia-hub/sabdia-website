@@ -60,10 +60,12 @@
           <p class="about-p reveal d2" {{ block.shopify_attributes }}>{{ block.settings.text }}</p>
         {%- endif -%}
       {%- endfor -%}
+      {%- if section.settings.sig_name != blank -%}
       <div class="sig reveal d3">
         <div class="sig-name">{{ section.settings.sig_name }}</div>
         <div class="sig-title">{{ section.settings.sig_title }}</div>
       </div>
+      {%- endif -%}
       <div class="about-vals reveal d4">
         {%- for block in section.blocks -%}
           {%- if block.type == 'value' -%}
@@ -150,7 +152,8 @@
     {
       "type": "text",
       "id": "sig_name",
-      "label": "Signature name"
+      "label": "Signature name",
+      "info": "A person, e.g. the founder. Leave empty to hide the signature; a company name here reads as a stray label."
     },
     {
       "type": "text",

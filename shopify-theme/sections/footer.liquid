@@ -78,9 +78,16 @@
           {%- for link in for_sale_menu.links -%}
             <li><a href="{{ link.url }}">{{ link.title }}</a></li>
           {%- endfor -%}
-        {%- elsif for_sale_collection.products.size > 0 -%}
-          {%- for p in for_sale_collection.products limit: 6 -%}
-            <li><a href="{{ p.url }}">{{ p.title }}{% if p.metafields.custom.suburb.value != blank %} - {{ p.metafields.custom.suburb.value }}{% endif %}</a></li>
+        {%- else -%}
+          {%- comment -%} Same source as every other list: each residence's Status (residence-handles), the collection only orders. {%- endcomment -%}
+          {%- capture live_csv -%}{% render 'residence-handles', col: for_sale_collection, group: 'live' %}{%- endcapture -%}
+          {%- assign live_handles = live_csv | split: ',' -%}
+          {%- for h in live_handles limit: 8 -%}
+            {%- for p in collections.all.products -%}
+              {%- if p.handle != h -%}{%- continue -%}{%- endif -%}
+              <li><a href="{{ p.url }}">{{ p.title }}{% if p.metafields.custom.suburb.value != blank %} - {{ p.metafields.custom.suburb.value }}{% endif %}</a></li>
+              {%- break -%}
+            {%- endfor -%}
           {%- endfor -%}
         {%- endif -%}
         <li><a href="/collections/for-sale">{{ section.settings.view_all_label | default: "View All Properties" }}</a></li>
@@ -96,7 +103,6 @@
         {%- else -%}
           <li><a href="/pages/about">About Sabdia</a></li>
           <li><a href="/pages/services">Services</a></li>
-          <li><a href="/pages/projects">Projects</a></li>
           <li><a href="/pages/collection">Collection</a></li>
           <li><a href="/pages/agent-access">Agent Access</a></li>
           <li><a href="/blogs/journal">The Journal</a></li>

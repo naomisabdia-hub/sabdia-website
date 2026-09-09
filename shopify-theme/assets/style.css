@@ -350,18 +350,19 @@ html.js .slabel.reveal.vis::before{width:24px}
    8.4s run covers the 6.2s slide interval plus the 2.2s crossfade,
    so outgoing slides keep drifting as they fade. JS restarts the
    animation when a slide re-activates. */
-.h-slide img{width:100%;height:100%;object-fit:cover;filter:brightness(.86) saturate(.98);animation:kburns 8.4s linear forwards}
+.h-slide img{width:100%;height:100%;object-fit:cover;filter:brightness(calc(1 - var(--h-dim,.55) * .25)) saturate(.98);animation:kburns 8.4s linear forwards}
 @keyframes kburns{from{transform:scale(1)}to{transform:scale(1.055)}}
 /* Film header: same crop and grade as the slides so the scrim,
    type and CTAs sit identically over either. */
 .h-video{position:absolute;inset:0}
-.h-video video{width:100%;height:100%;object-fit:cover;filter:brightness(.86) saturate(.98);display:block}
+.h-video video{width:100%;height:100%;object-fit:cover;filter:brightness(calc(1 - var(--h-dim,.55) * .25)) saturate(.98);display:block}
 /* Scrim is targeted, not global: a soft ellipse behind the centred
    wordmark and a firm band under the description/CTA bar. The rest of
    the photograph stays bright. Slides vary a lot in exposure, so these
    two zones are what guarantee the white type stays legible — the old
    flat brightness(.6) crushed the whole house to do the same job. */
-.h-overlay{position:absolute;inset:0;background:radial-gradient(ellipse 86% 58% at 50% 42%,rgba(31,27,20,.46) 0%,rgba(31,27,20,.16) 62%,transparent 100%),linear-gradient(to top,rgba(31,27,20,.78) 0%,rgba(31,27,20,.22) 32%,transparent 58%);z-index:2}
+/* One dial (Customize › Home › Hero › Darken the film) drives both the veil and the footage brightness */
+.h-overlay{position:absolute;inset:0;background:radial-gradient(ellipse 86% 58% at 50% 42%,rgba(31,27,20,.46) 0%,rgba(31,27,20,.16) 62%,transparent 100%),linear-gradient(to top,rgba(31,27,20,.78) 0%,rgba(31,27,20,.22) 32%,transparent 58%);opacity:calc(var(--h-dim,.55) / .75);z-index:2}
 
 /* Three-zone layout */
 .h-mid{position:relative;z-index:4;flex:1;display:flex;align-items:center;justify-content:center;padding-top:var(--nav-h);padding-bottom:clamp(20px,3vw,40px)}
@@ -427,7 +428,12 @@ html.js .slabel.reveal.vis::before{width:24px}
 .about-h em{font-style:italic;color:var(--ink)}
 .about-p{font-size:var(--t-body);font-weight:300;line-height:var(--lh-body);color:var(--ink3);letter-spacing:.018em;max-width:560px}
 .about-p + .about-p{margin-top:20px}
-.sig{margin-top:40px;padding-top:32px;border-top:1px solid var(--border)}
+/* One reading order: heading, lead line, detail, then the three proofs */
+.about-p:first-of-type{font-size:var(--t-lead);line-height:1.5;letter-spacing:0;color:var(--ink);max-width:620px}
+.about-p:first-of-type + .about-p{margin-top:26px}
+.sig{margin-top:40px;padding-top:28px;border-top:1px solid var(--border);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.sig + .about-vals{margin-top:36px}
+.sig + .about-vals .about-val:first-child{border-top:0;padding-top:0}
 /* Capitalised name lockup (Tamsin, 2026-09-01) — set in Jost caps, the
    kit's label style, because the brand kit forbids the display serif in
    all-caps ("Never set in all-caps", brandkit.pdf p.5). */
@@ -439,8 +445,8 @@ html.js .slabel.reveal.vis::before{width:24px}
 .about-vals{margin-top:56px}
 .about-val{display:flex;gap:20px;padding:22px 0;border-bottom:1px solid var(--border)}
 .about-val:first-child{border-top:1px solid var(--border)}
-.about-val-n{font-family:var(--font-u);font-size:var(--t-label);font-weight:400;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe-d);width:24px;flex-shrink:0;padding-top:5px}
-.about-val-t{font-family:var(--font-d);font-size:var(--t-h3);font-weight:300;color:var(--ink);margin-bottom:6px}
+.about-val-n{font-family:var(--font-u);font-size:var(--t-label);font-weight:400;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe-d);width:24px;flex-shrink:0;padding-top:7px}
+.about-val-t{font-family:var(--font-d);font-size:clamp(19px,1.6vw,23px);font-weight:400;line-height:1.25;color:var(--ink);margin-bottom:4px}
 .about-val-d{font-size:var(--t-body);font-weight:300;line-height:var(--lh-body);color:var(--ink3);letter-spacing:.018em}
 
 /* ── PROPERTIES ── */
@@ -493,6 +499,23 @@ html.js .slabel.reveal.vis::before{width:24px}
    class with a tablet step so it can actually respond. */
 .proj-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media(max-width:1100px){.proj-grid-3{grid-template-columns:repeat(2,1fr)}}
+/* Home grid past six residences: rows of three; a two-card last row shares the width, a lone last card runs wide */
+.pc-row{aspect-ratio:16/10}
+.proj-grid-flow{grid-template-columns:repeat(6,1fr)}
+.proj-grid-flow>*{grid-column:span 2}
+@media(min-width:1101px){
+  .proj-grid-flow>:nth-last-child(2):nth-child(3n+1),.proj-grid-flow>:nth-last-child(2):nth-child(3n+1)+*{grid-column:span 3}
+  .proj-grid-flow>:last-child:nth-child(3n+1){grid-column:span 6;aspect-ratio:21/9}
+}
+@media(min-width:769px) and (max-width:1100px){
+  .proj-grid-flow{grid-template-columns:repeat(4,1fr)}
+  .proj-grid-flow>:last-child:nth-child(2n+1){grid-column:span 4;aspect-ratio:21/9}
+}
+@media(max-width:768px){.proj-grid-flow{grid-template-columns:1fr}.proj-grid-flow>*{grid-column:auto}}
+/* Theme-editor-only helper (request.design_mode): where a residence's Status lives */
+.editor-note{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 14px;padding:12px 16px;border:1px dashed var(--gold);background:rgba(168,135,74,.08);font-family:var(--font-u);font-size:12px;line-height:1.5;color:var(--ink)}
+.editor-note a{padding:4px 10px;border:1px solid var(--gold);border-radius:var(--r-sm);color:var(--ink);text-decoration:none;font-size:11px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.editor-note a:hover{background:var(--gold);color:var(--white)}
 /* 2-col sold grid */
 .proj-grid-sold{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:64px}
 .sold-label{font-size:var(--t-label);font-weight:300;letter-spacing:.36em;text-transform:uppercase;color:var(--taupe-d);padding-bottom:20px;display:flex;align-items:center;gap:12px;margin-bottom:0}
@@ -753,7 +776,12 @@ footer{background:var(--dark);padding-top:0}
 /* Editorial gallery — the lead portrait drives the height of the first
    two rows; the right column splits that height evenly. Bottom rows tile
    in thirds. gn-N variants adapt the grid to the number of photos. */
-.prop-gallery-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;margin-top:40px}
+.prop-gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:40px}
+.gallery-tile{aspect-ratio:4/3;position:relative}
+.gallery-video::after{content:'';position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(31,27,20,.55) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z' fill='%23D8C48E'/%3E%3C/svg%3E") center/22px no-repeat;border:1px solid rgba(216,196,142,.5);backdrop-filter:blur(6px);pointer-events:none}
+.lb video{max-width:calc(100vw - clamp(80px,12vw,180px));max-height:calc(100vh - 140px);background:#000;box-shadow:0 30px 90px rgba(0,0,0,.6)}
+.gn-1 .gallery-tile{grid-column:1/-1;aspect-ratio:21/9}
+.gn-2 .gallery-tile:first-child{grid-column:1/3}
 .gallery-a{grid-column:1/8;grid-row:1/3;aspect-ratio:4/5;min-height:0}
 .gallery-b{grid-column:8/13;grid-row:1;min-height:0}
 .gallery-c{grid-column:8/13;grid-row:2;min-height:0}
@@ -824,7 +852,8 @@ footer{background:var(--dark);padding-top:0}
   .testi-q-mark{font-size:100px}
   .prop-layout{grid-template-columns:1fr;gap:56px}
   .prop-desc{position:static}
-  .prop-gallery-grid{grid-template-columns:repeat(6,1fr)}
+  .prop-gallery-grid{grid-template-columns:repeat(2,1fr)}
+  .gn-2 .gallery-tile:first-child{grid-column:auto}
   .gallery-a{grid-column:1/7;grid-row:auto;aspect-ratio:16/10;min-height:0}
   .gallery-b{grid-column:1/4;grid-row:auto;aspect-ratio:4/3}
   .gallery-c{grid-column:4/7;grid-row:auto;aspect-ratio:4/3}
@@ -1132,6 +1161,8 @@ h1 em, h2 em, h3 em,
 .lb-meta{position:absolute;bottom:26px;left:0;right:0;display:flex;justify-content:center;gap:26px;font-size:var(--t-micro);font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:rgba(253,251,246,.6)}
 .lb-cap{color:var(--gold2)}
 .gallery-item{cursor:pointer}
+.gallery-more{display:flex;justify-content:center;margin-top:28px}
+.lb-meta{padding:0 70px}
 .gallery-item:hover .gallery-img{filter:saturate(1) brightness(1.03)}
 
 /* ── COLLECTION PORTFOLIO GRID ── */

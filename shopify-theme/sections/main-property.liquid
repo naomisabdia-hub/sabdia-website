@@ -25,10 +25,7 @@
     assign sold = true
   endif
   assign state = mf.state.value | default: 'QLD'
-  assign gallery_count = product.images.size | minus: 1
-  if gallery_count > 6
-    assign gallery_count = 6
-  endif
+  assign tiles = section.settings.gallery_tiles | default: 9
 -%}
 
 <section class="prop-hero">
@@ -185,44 +182,102 @@
   </div>
 </div>
 
+{%- liquid
+  # Gallery source: Photo / Video blocks picked in Customize (this residence's
+  # own template), or, when none are added, the residence's photos from
+  # Products › Media in order. Either way the grid shows the first few and
+  # the viewer carries the lot.
+  assign use_blocks = false
+  if section.blocks.size > 0
+    assign use_blocks = true
+    assign all_count = section.blocks.size
+  else
+    assign all_count = product.images.size | minus: 1
+  endif
+  assign gallery_count = all_count
+  if gallery_count > tiles
+    assign gallery_count = tiles
+  endif
+-%}
 {%- if gallery_count > 0 -%}
   <div class="prop-gallery inner">
     <div class="slabel reveal">{{ section.settings.gallery_label }}</div>
     <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, product.title }}</h2>
     <div class="prop-gallery-grid gn-{{ gallery_count }}" id="galleryGrid">
-      {%- assign slots = 'a,b,c,d,e,f' | split: ',' -%}
-      {%- assign gdelays = ',d1,d2,d1,d2,d3' | split: ',' -%}
-      {%- for image in product.images offset: 1 limit: 6 -%}
-        {%- liquid
-          assign i = forloop.index0
-          assign slot = slots[i]
-          if i > 2
-            assign si = i | minus: 3 | modulo: 3 | plus: 3
-            assign slot = slots[si]
-          endif
-          if slot == 'a'
-            assign gw = 1200
-            assign gh = 1500
-          elsif slot == 'b' or slot == 'c'
-            assign gw = 1100
-            assign gh = 900
-          else
-            assign gw = 900
-            assign gh = 560
-          endif
-          assign gw2 = gw | times: 1.5 | round
-          assign gh2 = gh | times: 1.5 | round
-        -%}
-        <div class="gallery-item gallery-{{ slot }} reveal-wipe {{ gdelays[i] | default: 'd3' }}" data-lb-item data-src="{{ image | image_url: width: gw2, height: gh2, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}" role="button" tabindex="0" aria-label="View photo: {{ image.alt | default: product.title | escape }}">
-          <img class="gallery-img" src="{{ image | image_url: width: gw, height: gh, crop: 'center' }}" alt="{{ image.alt | default: product.title | escape }}" width="{{ gw }}" height="{{ gh }}" loading="lazy" decoding="async">
-        </div>
-      {%- endfor -%}
+      {%- assign gdelays = ',d1,d2' | split: ',' -%}
+      {%- if use_blocks -%}
+        {%- for block in section.blocks -%}
+          {%- assign i = forloop.index0 | modulo: 3 -%}
+          {%- assign in_grid = true -%}
+          {%- if forloop.index > tiles -%}{%- assign in_grid = false -%}{%- endif -%}
+          {%- liquid
+            assign cap = block.settings.caption
+            assign vid = ''
+            assign pic = block.settings.image
+            if block.type == 'video'
+              assign pic = block.settings.poster
+              if block.settings.video != blank
+                for src in block.settings.video.sources
+                  if src.format == 'mp4'
+                    assign vid = src.url
+                  endif
+                endfor
+                if pic == blank
+                  assign pic = block.settings.video.preview_image
+                endif
+              elsif block.settings.video_url != blank
+                assign vid = block.settings.video_url
+              endif
+            endif
+            if cap == blank
+              if pic != blank and pic.alt != blank
+                assign cap = pic.alt
+              else
+                assign cap = product.title
+              endif
+            endif
+          -%}
+          {%- if pic == blank and vid == blank -%}{%- continue -%}{%- endif -%}
+          {%- if in_grid -%}
+            <div class="gallery-item gallery-tile reveal-wipe {{ gdelays[i] }}{% if vid != blank %} gallery-video{% endif %}" data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 1800, height: 1350, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}" role="button" tabindex="0" aria-label="{% if vid != blank %}Play video{% else %}View photo{% endif %}: {{ cap | escape }}" {{ block.shopify_attributes }}>
+              {%- if pic != blank -%}
+                <img class="gallery-img" src="{{ pic | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ cap | escape }}" width="900" height="675" loading="lazy" decoding="async">
+              {%- else -%}
+                <video class="gallery-img" src="{{ vid }}" muted playsinline preload="metadata"></video>
+              {%- endif -%}
+            </div>
+          {%- else -%}
+            <span hidden data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}"></span>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for image in product.images offset: 1 limit: tiles -%}
+          {%- assign i = forloop.index0 | modulo: 3 -%}
+          <div class="gallery-item gallery-tile reveal-wipe {{ gdelays[i] }}" data-lb-item data-src="{{ image | image_url: width: 1800, height: 1350, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}" role="button" tabindex="0" aria-label="View photo: {{ image.alt | default: product.title | escape }}">
+            <img class="gallery-img" src="{{ image | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ image.alt | default: product.title | escape }}" width="900" height="675" loading="lazy" decoding="async">
+          </div>
+        {%- endfor -%}
+        {%- if all_count > tiles -%}
+          <div hidden>
+            {%- assign extra_offset = tiles | plus: 1 -%}
+            {%- for image in product.images offset: extra_offset -%}
+              <span data-lb-item data-src="{{ image | image_url: width: 2000, height: 1400, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}"></span>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- endif -%}
     </div>
+    {%- if all_count > 1 -%}
+      <div class="gallery-more reveal d2">
+        <button type="button" class="btn-g" id="galleryAll">{{ section.settings.gallery_all_label | default: "View all photos" }} ({{ all_count }}) &rarr;</button>
+      </div>
+    {%- endif -%}
   </div>
 {%- endif -%}
 
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
   <img id="lbImg" src="" alt="">
+  <video id="lbVideo" controls playsinline hidden></video>
   <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&larr;</button>
   <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&rarr;</button>
   <button class="lb-close" id="lbClose" aria-label="Close">&#10005;</button>
@@ -237,14 +292,33 @@
     if (!items.length) return;
     var img = document.getElementById('lbImg'), cap = document.getElementById('lbCap'), count = document.getElementById('lbCount');
     var i = 0, lastFocus = null;
+    var house = {{ product.handle | json }};
+    /* Photos are named house-room-NN; alt text arrives as "SOLACE - solace-kitchen-01"
+       or "SOLACE - Kitchen 01". Show just the room, and say when it is a render. */
+    function caption(alt) {
+      var s = (alt || '').split(' - ').pop().toLowerCase().replace(/\.[a-z]+$/, '');
+      if (s.indexOf(house + '-') === 0) s = s.slice(house.length + 1);
+      var render = /(^|-)render(-|$)/.test(s);
+      s = s.replace(/(^|-)render(-|$)/, '$1').replace(/[-_]?\d+$/, '').replace(/[-_]+/g, ' ').trim();
+      if (!s || s === house) s = {{ product.title | json }};
+      s = s.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+      return render ? s + ' \u00b7 Artist impression' : s;
+    }
     function show(n) {
       i = (n + items.length) % items.length;
       var it = items[i];
-      img.src = it.getAttribute('data-src');
+      var vid = document.getElementById('lbVideo'), vsrc = it.getAttribute('data-video');
+      if (vsrc) {
+        img.hidden = true; img.removeAttribute('src');
+        vid.hidden = false; if (vid.getAttribute('src') !== vsrc) vid.src = vsrc; vid.play().catch(function () {});
+      } else {
+        vid.pause(); vid.hidden = true;
+        img.hidden = false; img.src = it.getAttribute('data-src');
+      }
       img.alt = it.getAttribute('data-alt') || '';
-      cap.textContent = it.getAttribute('data-alt') || '';
+      cap.textContent = caption(it.getAttribute('data-alt'));
       count.textContent = (i + 1) + ' / ' + items.length;
-      [i + 1, i - 1].forEach(function (k) { var p = new Image(); p.src = items[(k + items.length) % items.length].getAttribute('data-src'); });
+      [i + 1, i - 1].forEach(function (k) { var n = items[(k + items.length) % items.length]; if (!n.getAttribute('data-video') && n.getAttribute('data-src')) { var p = new Image(); p.src = n.getAttribute('data-src'); } });
     }
     function open(n) {
       lastFocus = document.activeElement;
@@ -255,6 +329,7 @@
       document.getElementById('lbClose').focus();
     }
     function close() {
+      document.getElementById('lbVideo').pause();
       lb.classList.remove('open');
       document.documentElement.style.overflow = '';
       setTimeout(function () { lb.hidden = true; }, 350);
@@ -264,6 +339,16 @@
       it.addEventListener('click', function () { open(n); });
       it.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(n); } });
     });
+    var allBtn = document.getElementById('galleryAll');
+    if (allBtn) allBtn.addEventListener('click', function () { open(0); });
+    /* Swipe to page on touch screens */
+    var tx = null;
+    lb.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].clientX; }, { passive: true });
+    lb.addEventListener('touchend', function (e) {
+      if (tx === null) return;
+      var dx = e.changedTouches[0].clientX - tx; tx = null;
+      if (Math.abs(dx) > 40) show(dx < 0 ? i + 1 : i - 1);
+    }, { passive: true });
     document.getElementById('lbPrev').addEventListener('click', function () { show(i - 1); });
     document.getElementById('lbNext').addEventListener('click', function () { show(i + 1); });
     document.getElementById('lbClose').addEventListener('click', close);
@@ -367,7 +452,32 @@
 {% schema %}
 {
   "name": "Property page",
+  "max_blocks": 80,
+  "blocks": [
+    {
+      "type": "photo",
+      "name": "Photo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Photo" },
+        { "type": "text", "id": "caption", "label": "Caption", "info": "Shown in the viewer, e.g. Kitchen. Leave empty to use the photo's alt text." }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        { "type": "video", "id": "video", "label": "Video (uploaded to Shopify)" },
+        { "type": "text", "id": "video_url", "label": "or video file URL", "info": "A direct .mp4 link, used when no Shopify video is picked." },
+        { "type": "image_picker", "id": "poster", "label": "Poster (optional)" },
+        { "type": "text", "id": "caption", "label": "Caption" }
+      ]
+    }
+  ],
   "settings": [
+    {
+      "type": "paragraph",
+      "content": "Gallery: add Photo and Video blocks (⊕ Add block) to hand-pick this residence's gallery. With no blocks it shows the photos from Products › this residence › Media, in order. Each residence has its own template, so blocks picked here belong to this residence only."
+    },
     {
       "type": "paragraph",
       "content": "Shared framing text for every property page. Write {name} wherever the residence's name should appear."
@@ -453,6 +563,23 @@
       "id": "gallery_label",
       "label": "Gallery label",
       "default": "The Residence"
+    },
+    {
+      "type": "range",
+      "id": "gallery_tiles",
+      "label": "Photos in the grid",
+      "min": 3,
+      "max": 12,
+      "step": 3,
+      "default": 9,
+      "info": "Small even tiles; the rest open in the viewer."
+    },
+    {
+      "type": "text",
+      "id": "gallery_all_label",
+      "label": "View all photos button",
+      "default": "View all photos",
+      "info": "The photo count is added automatically. Every photo on the residence (Products › the residence › Media) opens in the viewer; the grid shows the first six after the hero."
     },
     {
       "type": "html",

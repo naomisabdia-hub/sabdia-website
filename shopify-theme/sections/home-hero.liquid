@@ -39,7 +39,8 @@
     endif
   endif
 -%}
-<section class="hero{% if use_video %} hero-video{% endif %}" id="hero">
+{%- assign dim = section.settings.overlay | default: 55 | divided_by: 100.0 -%}
+<section class="hero{% if use_video %} hero-video{% endif %}" id="hero" style="--h-dim:{{ dim }}">
   {%- if use_video -%}
   <div class="h-video" id="hVideo">
     <video
@@ -227,6 +228,17 @@
       "id": "video_poster",
       "label": "Video poster",
       "info": "Shown while the video loads. Leave empty to use the first slide."
+    },
+    {
+      "type": "range",
+      "id": "overlay",
+      "label": "Darken the film",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 55,
+      "info": "Lower = brighter footage. The words stay readable down to about 40%."
     },
     {
       "type": "range",
