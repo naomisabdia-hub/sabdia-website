@@ -37,10 +37,6 @@
   </div>
 
   <div class="inner" style="padding:0 clamp(22px,5vw,80px)">
-          <a href="{{ admin_base }}{{ product.id }}" target="_blank" rel="noopener">{{ product.title }}: {% render 'residence-status', product: product %} &#8599;</a>
-        {%- break -%}{%- endfor -%}{%- endfor -%}
-      </div>
-    {%- endif -%}
     <div class="proj-grid proj-grid-main">
       {%- for h in live_handles limit: 3 -%}
         {%- assign i = forloop.index -%}
