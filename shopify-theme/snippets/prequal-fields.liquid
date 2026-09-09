@@ -1,0 +1,48 @@
+{%- comment -%} Pre-qualification: budget range, timeline, flexibility. Optional
+    dropdowns inside an enquiry form. mode: 'shopify' (contact[...] names,
+    goes into the Shopify email + Customers tags) or 'vercel' (plain names,
+    kept in the API record). Options are section settings, one per line.
+    Usage: {% render 'prequal-fields', mode: 'shopify', s: section.settings %} {%- endcomment -%}
+{%- liquid
+  assign b_opts = "Under $4m|$4m - $5m|$5m - $6m|$6m - $8m|$8m+|Prefer not to say" | split: '|'
+  if s.prequal_budget != blank
+    assign b_opts = s.prequal_budget | newline_to_br | split: '<br />'
+  endif
+  assign t_opts = "Ready now|1 - 3 months|3 - 6 months|6 - 12 months|Just researching" | split: '|'
+  if s.prequal_timeline != blank
+    assign t_opts = s.prequal_timeline | newline_to_br | split: '<br />'
+  endif
+  assign f_opts = "Only this residence|Open to other Sabdia residences|Open to upcoming releases" | split: '|'
+  if s.prequal_flex != blank
+    assign f_opts = s.prequal_flex | newline_to_br | split: '<br />'
+  endif
+  if mode == 'vercel'
+    assign n_b = 'budget'
+    assign n_t = 'timeline'
+    assign n_f = 'flexibility'
+  else
+    assign n_b = 'contact[Budget range]'
+    assign n_t = 'contact[Timeline]'
+    assign n_f = 'contact[Flexibility]'
+  endif
+-%}
+<div class="prequal" data-prequal>
+  <div class="frow prequal-row">
+    <div class="fg"><label class="fl" for="pq-budget-{{ mode }}">{{ s.prequal_budget_label | default: "Budget range" }}</label>
+      <select class="fsel" id="pq-budget-{{ mode }}" name="{{ n_b }}" data-prequal-budget>
+        <option value="">{{ s.prequal_select | default: "Select…" }}</option>
+        {%- for o in b_opts -%}{%- assign oo = o | strip -%}{%- if oo != blank -%}<option>{{ oo }}</option>{%- endif -%}{%- endfor -%}
+      </select></div>
+    <div class="fg"><label class="fl" for="pq-time-{{ mode }}">{{ s.prequal_timeline_label | default: "Timeline to purchase" }}</label>
+      <select class="fsel" id="pq-time-{{ mode }}" name="{{ n_t }}" data-prequal-timeline>
+        <option value="">{{ s.prequal_select | default: "Select…" }}</option>
+        {%- for o in t_opts -%}{%- assign oo = o | strip -%}{%- if oo != blank -%}<option>{{ oo }}</option>{%- endif -%}{%- endfor -%}
+      </select></div>
+  </div>
+  <div class="fg"><label class="fl" for="pq-flex-{{ mode }}">{{ s.prequal_flex_label | default: "Location and flexibility" }}</label>
+    <select class="fsel" id="pq-flex-{{ mode }}" name="{{ n_f }}" data-prequal-flex>
+      <option value="">{{ s.prequal_select | default: "Select…" }}</option>
+      {%- for o in f_opts -%}{%- assign oo = o | strip -%}{%- if oo != blank -%}<option>{{ oo }}</option>{%- endif -%}{%- endfor -%}
+    </select></div>
+  <span hidden data-prequal-ask>{{ s.prequal_ask | default: "Thank you for your interest! We appreciate you reaching out. To help us provide the most relevant information, could you please share your approximate budget range and your intended timeline for purchase? Once we have a better understanding, we'll be happy to provide further details on the home." }}</span>
+</div>

@@ -1373,3 +1373,7 @@ h1 em, h2 em, h3 em,
 .shopify-challenge__container .g-recaptcha,.shopify-challenge__container .h-captcha{display:flex;justify-content:center;margin:0 0 22px}
 .shopify-challenge__button{display:inline-block;padding:14px 30px;border:1px solid var(--gold);background:var(--gold);color:#fff;font-family:var(--font-u);font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase;cursor:pointer;transition:background .25s,color .25s}
 .shopify-challenge__button:hover{background:transparent;color:var(--ink)}
+
+/* Pre-qualification dropdowns inside enquiry forms */
+.prequal-row{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media (max-width:640px){.prequal-row{grid-template-columns:1fr}}

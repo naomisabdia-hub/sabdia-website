@@ -254,6 +254,9 @@ function thanksText(form) {
   for (let k = 0; k < replies.length; k++) {
     try { if (new RegExp(replies[k].match, 'i').test(asked)) return replies[k].text; } catch (e) { /* bad pattern */ }
   }
+  /* Buyer enquiry with the pre-qualification left blank: ask for budget and timeline (Naomi's wording). */
+  const ask = form.querySelector('[data-prequal-ask]');
+  if (ask && (!v('contact[Budget range]') || !v('contact[Timeline]'))) return ask.textContent.trim();
   const el = form.querySelector('[data-thanks]');
   return (el && el.textContent.trim()) || form.getAttribute('data-thanks') || null;
 }
@@ -423,6 +426,8 @@ function fileCustomer(form, saved) {
   residences.forEach((h) => { if (!seen[h] && new RegExp('\\b' + h + '\\b').test(blob)) { tags.push(h); seen[h] = 1; } });
   const etype = val('contact[Enquiry type]') || val('contact[Interest]');
   if (etype) tags.push(slug(etype).slice(0, 40));
+  if (val('contact[Budget range]')) tags.push('budget-' + slug(val('contact[Budget range]')).slice(0, 30));
+  if (val('contact[Timeline]')) tags.push('timeline-' + slug(val('contact[Timeline]')).slice(0, 30));
   const optin = form.querySelector('[data-optin]');
   if (optin && optin.checked) tags.push('newsletter');
   const payload = { email, first: val('contact[First name]') || val('contact[first_name]'), last: val('contact[Last name]') || val('contact[last_name]'), tags: tags.join(', ') };
@@ -444,6 +449,9 @@ function stashCustomer(form) {
     const blob = Array.from(form.elements).map((el) => (el.type === 'checkbox' && !el.checked) ? '' : String(el.value || '')).join(' ').toLowerCase();
     ((window.SabdiaForms && window.SabdiaForms.residences) || []).forEach((h) => { if (tags.indexOf(h) === -1 && new RegExp('\\b' + h + '\\b').test(blob)) tags.push(h); });
     if (etype) tags.push(etype.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40));
+    const sl = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    if (val('contact[Budget range]')) tags.push('budget-' + sl(val('contact[Budget range]')).slice(0, 30));
+    if (val('contact[Timeline]')) tags.push('timeline-' + sl(val('contact[Timeline]')).slice(0, 30));
     if (optin && optin.checked) tags.push('newsletter');
     sessionStorage.setItem('sabdia-file-customer', JSON.stringify({ email: val('contact[email]'), first: val('contact[First name]'), last: val('contact[Last name]'), tags: tags.join(', '), t: Date.now() }));
   } catch (e) { /* storage unavailable */ }

@@ -70,6 +70,7 @@
             {%- if block.settings.thanks != blank -%}<span hidden data-thanks-for="{{ block.settings.text | escape }}">{{ block.settings.thanks }}</span>{%- endif -%}
           {%- endfor -%}
         </div>
+        {% render 'prequal-fields', mode: 'vercel', s: section.settings %}
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
@@ -110,6 +111,7 @@
             {%- if block.settings.thanks != blank -%}<span hidden data-thanks-for="{{ block.settings.text | escape }}">{{ block.settings.thanks }}</span>{%- endif -%}
           {%- endfor -%}
         </div>
+        {% render 'prequal-fields', mode: 'shopify', s: section.settings %}
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           {% render 'form-optin', label: section.settings.optin_label %}
@@ -217,6 +219,15 @@
       "label": "Success message (Shopify mode)",
       "default": "Thank you - we've received your enquiry and will be in touch within one business day."
     },
+    { "type": "header", "content": "Pre-qualification (budget, timeline, flexibility)" },
+    { "type": "paragraph", "content": "Three optional dropdowns on the form. Answers arrive in the enquiry email, and budget and timeline become tags on the person in Customers (budget-5m-6m, timeline-ready-now) for segments. If they skip them, the thank-you asks for budget and timeline in your words." },
+    { "type": "text", "id": "prequal_budget_label", "label": "Budget label", "default": "Budget range" },
+    { "type": "textarea", "id": "prequal_budget", "label": "Budget options (one per line)", "default": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say" },
+    { "type": "text", "id": "prequal_timeline_label", "label": "Timeline label", "default": "Timeline to purchase" },
+    { "type": "textarea", "id": "prequal_timeline", "label": "Timeline options (one per line)", "default": "Ready now\n1 - 3 months\n3 - 6 months\n6 - 12 months\nJust researching" },
+    { "type": "text", "id": "prequal_flex_label", "label": "Flexibility label", "default": "Location and flexibility" },
+    { "type": "textarea", "id": "prequal_flex", "label": "Flexibility options (one per line)", "default": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases" },
+    { "type": "textarea", "id": "prequal_ask", "label": "Thank-you when budget or timeline is left blank", "default": "Thank you for your interest! We appreciate you reaching out. To help us provide the most relevant information, could you please share your approximate budget range and your intended timeline for purchase? Once we have a better understanding, we'll be happy to provide further details on the home." },
     { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
     {
       "type": "header",
