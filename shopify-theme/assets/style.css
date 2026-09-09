@@ -1388,3 +1388,8 @@ h1 em, h2 em, h3 em,
 .chip input:disabled+span{opacity:.75}
 .chip-home span::before{content:'\2713  ';color:var(--gold)}
 .prequal .fl [data-prequal-req]{margin-left:2px}
+
+/* Header: nav links and Enquire a touch larger (logo unchanged) */
+.nav-center{gap:40px}
+.nav-center a{font-size:calc(var(--t-label) + 2px);letter-spacing:.22em}
+.nav-cta{font-size:calc(var(--t-label) + 1.5px);padding:12px 28px;letter-spacing:.22em}

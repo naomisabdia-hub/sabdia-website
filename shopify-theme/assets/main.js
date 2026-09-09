@@ -414,7 +414,7 @@ function fileCustomer(form, saved) {
   };
   const setM = (n, v) => { const el = mirror.querySelector('[name="' + n + '"]'); if (el) el.value = v; };
   if (saved) {
-    setM('contact[email]', saved.email); setM('contact[first_name]', saved.first); setM('contact[last_name]', saved.last); setM('contact[tags]', saved.tags);
+    setM('contact[email]', saved.email); setM('contact[first_name]', saved.first); setM('contact[last_name]', saved.last); setM('contact[tags]', saved.tags); setM('contact[note]', saved.note || ''); setM('contact[phone]', saved.phone || '');
     submitMirror();
     return;
   }
@@ -435,8 +435,19 @@ function fileCustomer(form, saved) {
   val('contact[Preferred locations]').split(',').map((x) => x.trim()).filter(Boolean).forEach((x) => tags.push('loc-' + slug(x).slice(0, 30)));
   const optin = form.querySelector('[data-optin]');
   if (optin && optin.checked) tags.push('newsletter');
-  const payload = { email, first: val('contact[First name]') || val('contact[first_name]'), last: val('contact[Last name]') || val('contact[last_name]'), tags: tags.join(', ') };
-  setM('contact[email]', payload.email); setM('contact[first_name]', payload.first); setM('contact[last_name]', payload.last); setM('contact[tags]', payload.tags);
+  const noteOf = () => [
+    val('contact[Property]') && 'Residence: ' + val('contact[Property]'),
+    (val('contact[Enquiry type]') || val('contact[Interest]')) && 'Interest: ' + (val('contact[Enquiry type]') || val('contact[Interest]')),
+    val('contact[Budget range]') && 'Budget: ' + val('contact[Budget range]'),
+    val('contact[Timeline]') && 'Timeline: ' + val('contact[Timeline]'),
+    val('contact[Preferred locations]') && 'Locations: ' + val('contact[Preferred locations]'),
+    val('contact[Flexibility]') && 'Flexibility: ' + val('contact[Flexibility]'),
+    val('contact[Agency]') && 'Agency: ' + val('contact[Agency]'),
+    val('contact[body]') && 'Message: ' + val('contact[body]'),
+    'Via ' + (location.pathname || '/') + ' on ' + new Date().toLocaleDateString('en-AU')
+  ].filter(Boolean).join('\n');
+  const payload = { email, first: val('contact[First name]') || val('contact[first_name]'), last: val('contact[Last name]') || val('contact[last_name]'), tags: tags.join(', '), note: noteOf(), phone: val('contact[Phone]') };
+  setM('contact[email]', payload.email); setM('contact[first_name]', payload.first); setM('contact[last_name]', payload.last); setM('contact[tags]', payload.tags); setM('contact[note]', payload.note); setM('contact[phone]', payload.phone);
   try { sessionStorage.removeItem('sabdia-file-customer'); } catch (e) {}
   submitMirror();
 }
@@ -459,7 +470,8 @@ function stashCustomer(form) {
     if (val('contact[Timeline]')) tags.push('timeline-' + sl(val('contact[Timeline]')).slice(0, 30));
     val('contact[Preferred locations]').split(',').map((x) => x.trim()).filter(Boolean).forEach((x) => tags.push('loc-' + sl(x).slice(0, 30)));
     if (optin && optin.checked) tags.push('newsletter');
-    sessionStorage.setItem('sabdia-file-customer', JSON.stringify({ email: val('contact[email]'), first: val('contact[First name]'), last: val('contact[Last name]'), tags: tags.join(', '), t: Date.now() }));
+    const note = ['Residence: ' + val('contact[Property]'), 'Interest: ' + etype, 'Budget: ' + val('contact[Budget range]'), 'Timeline: ' + val('contact[Timeline]'), 'Locations: ' + val('contact[Preferred locations]'), 'Message: ' + val('contact[body]')].filter((l) => !/: $/.test(l)).join('\n');
+    sessionStorage.setItem('sabdia-file-customer', JSON.stringify({ email: val('contact[email]'), first: val('contact[First name]'), last: val('contact[Last name]'), tags: tags.join(', '), note, phone: val('contact[Phone]'), t: Date.now() }));
   } catch (e) { /* storage unavailable */ }
 }
 
