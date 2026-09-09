@@ -432,6 +432,7 @@ function fileCustomer(form, saved) {
   if (etype) tags.push(slug(etype).slice(0, 40));
   if (val('contact[Budget range]')) tags.push('budget-' + slug(val('contact[Budget range]')).slice(0, 30));
   if (val('contact[Timeline]')) tags.push('timeline-' + slug(val('contact[Timeline]')).slice(0, 30));
+  val('contact[Preferred locations]').split(',').map((x) => x.trim()).filter(Boolean).forEach((x) => tags.push('loc-' + slug(x).slice(0, 30)));
   const optin = form.querySelector('[data-optin]');
   if (optin && optin.checked) tags.push('newsletter');
   const payload = { email, first: val('contact[First name]') || val('contact[first_name]'), last: val('contact[Last name]') || val('contact[last_name]'), tags: tags.join(', ') };
@@ -456,6 +457,7 @@ function stashCustomer(form) {
     const sl = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     if (val('contact[Budget range]')) tags.push('budget-' + sl(val('contact[Budget range]')).slice(0, 30));
     if (val('contact[Timeline]')) tags.push('timeline-' + sl(val('contact[Timeline]')).slice(0, 30));
+    val('contact[Preferred locations]').split(',').map((x) => x.trim()).filter(Boolean).forEach((x) => tags.push('loc-' + sl(x).slice(0, 30)));
     if (optin && optin.checked) tags.push('newsletter');
     sessionStorage.setItem('sabdia-file-customer', JSON.stringify({ email: val('contact[email]'), first: val('contact[First name]'), last: val('contact[Last name]'), tags: tags.join(', '), t: Date.now() }));
   } catch (e) { /* storage unavailable */ }
@@ -544,8 +546,68 @@ function nativeFormInit() {
   });
 }
 
+
+/* Pre-qualification. The Interest choice decides what else is asked:
+   a residence (QASR - Coorparoo) or For Sale opens budget, timeline and
+   locations; anything else (custom build, agent, media, general) hides
+   them. Budget and timeline become required when shown; locations are
+   required for a general For Sale enquiry and optional for a residence,
+   whose suburb is pre-selected. Residence pages always show the block. */
+function prequalInit() {
+  const map = (window.SabdiaForms && window.SabdiaForms.residenceMap) || [];
+  document.querySelectorAll('[data-prequal]').forEach((wrap) => {
+    if (wrap.dataset.pqInit) return;
+    wrap.dataset.pqInit = '1';
+    const form = wrap.closest('form');
+    if (!form) return;
+    const sel = form.querySelector('select[name="contact[Interest]"], select[name="contact[Enquiry type]"], select[name="enquiry-type"]');
+    const budget = wrap.querySelector('[data-prequal-budget]'), time = wrap.querySelector('[data-prequal-timeline]');
+    const chips = Array.from(wrap.querySelectorAll('[data-prequal-loc]')), hiddenLoc = wrap.querySelector('[data-prequal-locations]');
+    const locLabel = wrap.querySelector('[data-prequal-loclabel]'), locReq = locLabel && locLabel.querySelector('[data-prequal-req]');
+    const pageSuburb = wrap.getAttribute('data-residence-suburb') || '';
+    const norm = (t) => String(t || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const residenceFor = (value) => {
+      const v = norm(value);
+      if (!v) return null;
+      return map.find((r) => v.indexOf(norm(r.title)) !== -1 || (r.handle && new RegExp('\\b' + r.handle + '\\b').test(v))) || null;
+    };
+    const syncLoc = () => {
+      if (hiddenLoc) hiddenLoc.value = chips.filter((c) => c.checked).map((c) => c.value).join(', ');
+      if (chips.length) chips[0].setCustomValidity(wrap.dataset.locRequired === '1' && !chips.some((c) => c.checked) ? 'Please choose at least one location' : '');
+    };
+    chips.forEach((c) => c.addEventListener('change', syncLoc));
+    const apply = () => {
+      let mode = 'none', suburb = '';
+      if (pageSuburb) { mode = 'residence'; suburb = pageSuburb; }
+      else if (sel) {
+        const r = residenceFor(sel.value);
+        if (r) { mode = 'residence'; suburb = r.suburb || ''; }
+        else if (/for sale|current propert|purchase|buy|residence|home for|off.?market|upcoming|release/i.test(sel.value)) mode = 'forsale';
+      } else { mode = 'forsale'; }
+      const show = mode !== 'none';
+      wrap.hidden = !show;
+      if (budget) budget.required = show;
+      if (time) time.required = show;
+      chips.forEach((c) => { if (c.dataset.locked === '1') { c.checked = false; c.disabled = false; c.dataset.locked = ''; c.parentNode.classList.remove('chip-home'); } });
+      if (mode === 'residence' && suburb) {
+        const home = chips.find((c) => norm(c.value) === norm(suburb));
+        if (home) { home.checked = true; home.dataset.locked = '1'; home.parentNode.classList.add('chip-home'); }
+      }
+      wrap.dataset.locRequired = mode === 'forsale' ? '1' : '0';
+      if (locLabel) {
+        locLabel.firstChild.textContent = mode === 'residence' ? locLabel.getAttribute('data-label-residence') : locLabel.getAttribute('data-label-forsale');
+        if (locReq) locReq.hidden = mode !== 'forsale';
+      }
+      syncLoc();
+    };
+    if (sel) sel.addEventListener('change', apply);
+    apply();
+  });
+}
+
 function initPage() {
   nativeFormInit();
+  prequalInit();
   if (window.SabdiaForms) window.SabdiaForms.preview = { thanksText, thanksHeading }; // lets staff test replies from the console
   /* After Shopify accepts an enquiry it reloads the page with
      ?contact_posted=true. Show the thank-you where the form was and bring

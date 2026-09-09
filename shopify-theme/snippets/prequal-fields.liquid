@@ -1,8 +1,11 @@
-{%- comment -%} Pre-qualification: budget range, timeline, flexibility. Optional
-    dropdowns inside an enquiry form. mode: 'shopify' (contact[...] names,
-    goes into the Shopify email + Customers tags) or 'vercel' (plain names,
-    kept in the API record). Options are section settings, one per line.
-    Usage: {% render 'prequal-fields', mode: 'shopify', s: section.settings %} {%- endcomment -%}
+{%- comment -%} Pre-qualification: budget, timeline, preferred locations,
+    flexibility. Shown when the Interest is a residence or For Sale (main.js
+    prequalInit decides from the select); on a residence page always shown
+    with that suburb pre-selected. Budget and timeline are then required;
+    locations required for a general For Sale enquiry.
+    mode: 'shopify' (contact[...] names) | 'vercel' (plain names).
+    residence_suburb: the page's residence suburb (residence pages only).
+    Usage: {% render 'prequal-fields', mode: 'shopify', s: section.settings, residence_suburb: mf.suburb.value %} {%- endcomment -%}
 {%- liquid
   assign b_opts = "Under $4m|$4m - $5m|$5m - $6m|$6m - $8m|$8m+|Prefer not to say" | split: '|'
   if s.prequal_budget != blank
@@ -16,30 +19,57 @@
   if s.prequal_flex != blank
     assign f_opts = s.prequal_flex | newline_to_br | split: '<br />'
   endif
+  assign l_opts = ''
+  if s.prequal_locations != blank
+    assign l_opts = s.prequal_locations | newline_to_br | split: '<br />'
+  else
+    assign seen = ''
+    for p in collections.all.products
+      if p.tags contains 'property' and p.metafields.custom.suburb.value != blank
+        assign sub = p.metafields.custom.suburb.value | strip
+        assign key = sub | append: ','
+        unless seen contains key
+          assign seen = seen | append: key
+        endunless
+      endif
+    endfor
+    assign l_opts = seen | append: 'Other inner Brisbane' | split: ','
+  endif
   if mode == 'vercel'
     assign n_b = 'budget'
     assign n_t = 'timeline'
     assign n_f = 'flexibility'
+    assign n_l = 'preferred-locations'
   else
     assign n_b = 'contact[Budget range]'
     assign n_t = 'contact[Timeline]'
     assign n_f = 'contact[Flexibility]'
+    assign n_l = 'contact[Preferred locations]'
   endif
 -%}
-<div class="prequal" data-prequal>
+<div class="prequal" data-prequal{% if residence_suburb != blank %} data-residence-suburb="{{ residence_suburb | escape }}"{% endif %} hidden>
   <div class="frow prequal-row">
-    <div class="fg"><label class="fl" for="pq-budget-{{ mode }}">{{ s.prequal_budget_label | default: "Budget range" }}</label>
+    <div class="fg"><label class="fl" for="pq-budget-{{ mode }}">{{ s.prequal_budget_label | default: "Budget range" }}<span data-prequal-req>*</span></label>
       <select class="fsel" id="pq-budget-{{ mode }}" name="{{ n_b }}" data-prequal-budget>
         <option value="">{{ s.prequal_select | default: "Select…" }}</option>
         {%- for o in b_opts -%}{%- assign oo = o | strip -%}{%- if oo != blank -%}<option>{{ oo }}</option>{%- endif -%}{%- endfor -%}
       </select></div>
-    <div class="fg"><label class="fl" for="pq-time-{{ mode }}">{{ s.prequal_timeline_label | default: "Timeline to purchase" }}</label>
+    <div class="fg"><label class="fl" for="pq-time-{{ mode }}">{{ s.prequal_timeline_label | default: "Timeline to purchase" }}<span data-prequal-req>*</span></label>
       <select class="fsel" id="pq-time-{{ mode }}" name="{{ n_t }}" data-prequal-timeline>
         <option value="">{{ s.prequal_select | default: "Select…" }}</option>
         {%- for o in t_opts -%}{%- assign oo = o | strip -%}{%- if oo != blank -%}<option>{{ oo }}</option>{%- endif -%}{%- endfor -%}
       </select></div>
   </div>
-  <div class="fg"><label class="fl" for="pq-flex-{{ mode }}">{{ s.prequal_flex_label | default: "Location and flexibility" }}</label>
+  <div class="fg" data-prequal-locwrap>
+    <span class="fl" data-prequal-loclabel data-label-forsale="{{ s.prequal_loc_label | default: "Preferred locations" | escape }}" data-label-residence="{{ s.prequal_loc_label_other | default: "Other locations you would also consider (optional)" | escape }}">{{ s.prequal_loc_label | default: "Preferred locations" }}<span data-prequal-req>*</span></span>
+    <div class="chips" role="group" aria-label="{{ s.prequal_loc_label | default: "Preferred locations" | escape }}">
+      {%- for o in l_opts -%}{%- assign oo = o | strip -%}{%- if oo != blank -%}
+        <label class="chip"><input type="checkbox" value="{{ oo | escape }}" data-prequal-loc><span>{{ oo }}</span></label>
+      {%- endif -%}{%- endfor -%}
+    </div>
+    <input type="hidden" name="{{ n_l }}" value="" data-prequal-locations>
+  </div>
+  <div class="fg"><label class="fl" for="pq-flex-{{ mode }}">{{ s.prequal_flex_label | default: "Flexibility" }}</label>
     <select class="fsel" id="pq-flex-{{ mode }}" name="{{ n_f }}" data-prequal-flex>
       <option value="">{{ s.prequal_select | default: "Select…" }}</option>
       {%- for o in f_opts -%}{%- assign oo = o | strip -%}{%- if oo != blank -%}<option>{{ oo }}</option>{%- endif -%}{%- endfor -%}

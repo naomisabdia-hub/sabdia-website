@@ -53,7 +53,7 @@
           <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
         </div>
         <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email Address*" }}</label><input type="email" id="cf-email" name="email" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
-        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone Number" }}</label><input type="tel" id="cf-phone" name="phone" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
+        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone Number" }}</label><input type="tel" id="cf-phone" name="phone" class="fi" required placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
         <div class="fg">
           <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "How can we help?*" }}</label>
           <select class="fsel" id="cf-interest" name="enquiry-type" required>
@@ -94,7 +94,7 @@
           <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="contact[Last name]" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
         </div>
         <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email Address*" }}</label><input type="email" id="cf-email" name="contact[email]" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
-        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone Number" }}</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
+        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone Number" }}</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" required placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
         <div class="fg">
           <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "How can we help?*" }}</label>
           <select class="fsel" id="cf-interest" name="contact[Enquiry type]" required>
@@ -228,6 +228,9 @@
     { "type": "text", "id": "prequal_flex_label", "label": "Flexibility label", "default": "Location and flexibility" },
     { "type": "textarea", "id": "prequal_flex", "label": "Flexibility options (one per line)", "default": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases" },
     { "type": "textarea", "id": "prequal_ask", "label": "Thank-you when budget or timeline is left blank", "default": "Thank you for your interest! We appreciate you reaching out. To help us provide the most relevant information, could you please share your approximate budget range and your intended timeline for purchase? Once we have a better understanding, we'll be happy to provide further details on the home." },
+    { "type": "text", "id": "prequal_loc_label", "label": "Locations label (For Sale enquiry)", "default": "Preferred locations" },
+    { "type": "text", "id": "prequal_loc_label_other", "label": "Locations label (residence enquiry)", "default": "Other locations you would also consider (optional)" },
+    { "type": "textarea", "id": "prequal_locations", "label": "Location options (one per line)", "info": "Leave empty to list the suburbs of the residences for sale plus Other inner Brisbane." },
     { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
     {
       "type": "header",

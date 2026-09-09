@@ -1377,3 +1377,14 @@ h1 em, h2 em, h3 em,
 /* Pre-qualification dropdowns inside enquiry forms */
 .prequal-row{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
 @media (max-width:640px){.prequal-row{grid-template-columns:1fr}}
+
+/* Pre-qualification chips (preferred locations) */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{position:relative;cursor:pointer}
+.chip input{position:absolute;opacity:0;width:1px;height:1px}
+.chip span{display:inline-block;padding:8px 14px;border:1px solid var(--taupe-d);font-family:var(--font-u);font-size:var(--t-small);font-weight:300;color:var(--ink3);letter-spacing:.02em;transition:border-color .2s,color .2s,background .2s}
+.chip input:checked+span{border-color:var(--gold);color:var(--ink);background:var(--bg2)}
+.chip input:focus-visible+span{outline:2px solid var(--gold2);outline-offset:2px}
+.chip input:disabled+span{opacity:.75}
+.chip-home span::before{content:'\2713  ';color:var(--gold)}
+.prequal .fl [data-prequal-req]{margin-left:2px}

@@ -26,15 +26,25 @@
           <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
         </div>
         <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email*" }}</label><input type="email" id="cf-email" name="email" class="fi" placeholder="{{ section.settings.f_email_ph | default: "Email address" }}" autocomplete="email" required></div>
-        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="cf-phone" name="phone" class="fi" placeholder="{{ section.settings.f_phone_ph | default: "Phone number" }}" autocomplete="tel"></div>
+        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="cf-phone" name="phone" class="fi" required placeholder="{{ section.settings.f_phone_ph | default: "Phone number" }}" autocomplete="tel"></div>
         <div class="fg">
           <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "Interest" }}</label>
-          <select class="fsel" id="cf-interest" name="enquiry-type">
+          <select class="fsel" id="cf-interest" name="enquiry-type" required>
+            <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
             {%- assign interests = section.settings.interests | newline_to_br | split: '<br />' -%}
             {%- for opt in interests -%}
               {%- assign parts = opt | split: '|' -%}
               {%- assign o = parts[0] | strip -%}
               {%- if o != blank -%}<option>{{ o }}</option>{%- endif -%}
+              {%- if forloop.first -%}
+                {%- comment -%} The residences for sale, same as the Contact page, so both forms behave alike. {%- endcomment -%}
+                {%- for product in collections.all.products -%}
+                  {%- unless product.tags contains 'property' -%}{%- continue -%}{%- endunless -%}
+                  {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
+                  {%- if pstatus contains 'Sold' -%}{%- continue -%}{%- endif -%}
+                  <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
+                {%- endfor -%}
+              {%- endif -%}
             {%- endfor -%}
           </select>
           {%- for opt in interests -%}
@@ -42,6 +52,7 @@
             {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | escape }}">{{ parts[1] | strip }}</span>{%- endif -%}
           {%- endfor -%}
         </div>
+        {% render 'prequal-fields', mode: 'vercel', s: section.settings %}
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Message*" }}</label><textarea class="fta" id="cf-message" name="message" placeholder="{{ section.settings.f_message_ph | default: "Tell us about your interest..." }}" required></textarea></div>
         <button type="submit" class="fsub" id="fsub">{{ section.settings.f_submit | default: "Submit" }} &rarr;</button>
         <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
@@ -62,15 +73,25 @@
           <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="contact[Last name]" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
         </div>
         <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email*" }}</label><input type="email" id="cf-email" name="contact[email]" class="fi" placeholder="{{ section.settings.f_email_ph | default: "Email address" }}" autocomplete="email" required></div>
-        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" placeholder="{{ section.settings.f_phone_ph | default: "Phone number" }}" autocomplete="tel"></div>
+        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" required placeholder="{{ section.settings.f_phone_ph | default: "Phone number" }}" autocomplete="tel"></div>
         <div class="fg">
           <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "Interest" }}</label>
-          <select class="fsel" id="cf-interest" name="contact[Interest]">
+          <select class="fsel" id="cf-interest" name="contact[Interest]" required>
+            <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
             {%- assign interests = section.settings.interests | newline_to_br | split: '<br />' -%}
             {%- for opt in interests -%}
               {%- assign parts = opt | split: '|' -%}
               {%- assign o = parts[0] | strip -%}
               {%- if o != blank -%}<option>{{ o }}</option>{%- endif -%}
+              {%- if forloop.first -%}
+                {%- comment -%} The residences for sale, same as the Contact page, so both forms behave alike. {%- endcomment -%}
+                {%- for product in collections.all.products -%}
+                  {%- unless product.tags contains 'property' -%}{%- continue -%}{%- endunless -%}
+                  {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
+                  {%- if pstatus contains 'Sold' -%}{%- continue -%}{%- endif -%}
+                  <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
+                {%- endfor -%}
+              {%- endif -%}
             {%- endfor -%}
           </select>
           {%- for opt in interests -%}
@@ -78,6 +99,7 @@
             {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | escape }}">{{ parts[1] | strip }}</span>{%- endif -%}
           {%- endfor -%}
         </div>
+        {% render 'prequal-fields', mode: 'shopify', s: section.settings %}
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="{{ section.settings.f_message_ph | default: "Tell us about your interest..." }}" required></textarea></div>
         {% render 'form-optin', label: section.settings.optin_label %}
         <button type="submit" class="fsub" id="fsub">{{ section.settings.f_submit | default: "Submit" }} &rarr;</button>
@@ -123,6 +145,19 @@
       "label": "Note under the button"
     },
     { "type": "text", "id": "success_text", "label": "Thank you message (Shopify mode)", "default": "Thank you - we will be in touch within a business day." },
+    { "type": "text", "id": "f_interest_ph", "label": "Interest placeholder", "default": "Select an enquiry type…" },
+    { "type": "header", "content": "Pre-qualification (budget, timeline, locations)" },
+    { "type": "paragraph", "content": "Appears when the Interest is a residence or For Sale. Budget and timeline are then required; locations are required for a For Sale enquiry and optional for a residence (its suburb is pre-selected). Same behaviour as the Contact page." },
+    { "type": "text", "id": "prequal_budget_label", "label": "Budget label", "default": "Budget range" },
+    { "type": "textarea", "id": "prequal_budget", "label": "Budget options (one per line)", "default": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say" },
+    { "type": "text", "id": "prequal_timeline_label", "label": "Timeline label", "default": "Timeline to purchase" },
+    { "type": "textarea", "id": "prequal_timeline", "label": "Timeline options (one per line)", "default": "Ready now\n1 - 3 months\n3 - 6 months\n6 - 12 months\nJust researching" },
+    { "type": "text", "id": "prequal_flex_label", "label": "Flexibility label", "default": "Flexibility" },
+    { "type": "textarea", "id": "prequal_flex", "label": "Flexibility options (one per line)", "default": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases" },
+    { "type": "textarea", "id": "prequal_ask", "label": "Thank-you when budget or timeline is left blank", "default": "Thank you for your interest! We appreciate you reaching out. To help us provide the most relevant information, could you please share your approximate budget range and your intended timeline for purchase? Once we have a better understanding, we'll be happy to provide further details on the home." },
+    { "type": "text", "id": "prequal_loc_label", "label": "Locations label (For Sale enquiry)", "default": "Preferred locations" },
+    { "type": "text", "id": "prequal_loc_label_other", "label": "Locations label (residence enquiry)", "default": "Other locations you would also consider (optional)" },
+    { "type": "textarea", "id": "prequal_locations", "label": "Location options (one per line)", "info": "Leave empty to list the suburbs of the residences for sale plus Other inner Brisbane." },
     { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
     {
       "type": "header",
