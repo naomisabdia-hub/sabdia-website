@@ -534,6 +534,7 @@ function nativeFormInit() {
 
 function initPage() {
   nativeFormInit();
+  if (window.SabdiaForms) window.SabdiaForms.preview = { thanksText, thanksHeading }; // lets staff test replies from the console
   /* After Shopify accepts an enquiry it reloads the page with
      ?contact_posted=true. Show the thank-you where the form was and bring
      it into view (the form sits below the fold on most pages). */
