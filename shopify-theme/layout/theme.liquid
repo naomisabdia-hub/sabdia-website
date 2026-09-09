@@ -109,7 +109,12 @@ try {
 
 {% sections 'footer-group' %}
 {%- capture res_handles -%}{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{{ p.handle }},{%- endif -%}{%- endfor -%}{%- endcapture -%}
-<script>window.SabdiaForms={residences:{{ res_handles | split: ',' | compact | json }},mode:{{ settings.form_backend | json }},mirror:{% if settings.forms_endpoint != blank %}{{ settings.forms_endpoint | append: '/api/contact' | json }}{% else %}null{% endif %},thanks:{"heading":"Thank you","text":"We have your enquiry and will be in touch within a business day."}};</script>
+<script>window.SabdiaForms={residences:{{ res_handles | split: ',' | compact | json }},mode:{{ settings.form_backend | json }},mirror:{% if settings.forms_endpoint != blank %}{{ settings.forms_endpoint | append: '/api/contact' | json }}{% else %}null{% endif %},thanks:{"heading":"Thank you","text":"Thank you for your interest - we appreciate you reaching out. A member of our team will be in touch with you as soon as possible."},replies:[
+{"match":"renovat|custom|client build|build (my|our|a) |our block|my block|our land|my land|knock ?down|extension|quote","text":"Thank you so much for reaching out and for thinking of us for your project. At the moment we aren't taking on client builds or renovations - our focus is solely on designing and building our own development projects. We really appreciate your interest and support, and hopefully our paths cross in the future."},
+{"match":"agent|agency|licen","text":"Thank you for reaching out. We will review your details and be in touch about agent access as soon as possible."},
+{"match":"inspect|view|walk ?through|open home","text":"Thank you for your interest - we appreciate you reaching out. Inspections are by private appointment, and a member of our team will be in touch as soon as possible to arrange a time."},
+{"match":"price|guide|cost|how much","text":"Thank you for your interest - we appreciate you reaching out. A member of our team will be in touch as soon as possible with the price guide and details."}
+]};</script>
 <script src="{{ 'main.js' | asset_url }}"></script>
 </body>
 </html>

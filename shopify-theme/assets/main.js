@@ -245,8 +245,22 @@ function thanksText(form) {
     const special = Array.from(form.querySelectorAll('[data-thanks-for]')).find((s) => s.getAttribute('data-thanks-for') === sel.value);
     if (special && special.textContent.trim()) return special.textContent.trim();
   }
+  /* Otherwise pick Sabdia's reply by what the person asked for: the chosen
+     option plus their message (a "General" enquiry about a renovation still
+     gets the client-build reply). */
+  const replies = (window.SabdiaForms && window.SabdiaForms.replies) || [];
+  const v = (n) => { const e = form.querySelector('[name="' + n + '"]'); return e ? String(e.value || '') : ''; };
+  const asked = ((sel ? sel.value : '') + ' ' + v('contact[body]') + ' ' + v('contact[Agency]') + ' ' + (form.getAttribute('data-form-name') || '')).toLowerCase();
+  for (let k = 0; k < replies.length; k++) {
+    try { if (new RegExp(replies[k].match, 'i').test(asked)) return replies[k].text; } catch (e) { /* bad pattern */ }
+  }
   const el = form.querySelector('[data-thanks]');
   return (el && el.textContent.trim()) || form.getAttribute('data-thanks') || null;
+}
+function thanksHeading(form) {
+  const e = form.querySelector('[name="contact[First name]"], [name="contact[first_name]"], [name="first-name"]');
+  const first = e ? String(e.value || '').trim().split(/\s+/)[0] : '';
+  return first ? 'Thank you, ' + first.charAt(0).toUpperCase() + first.slice(1) : null;
 }
 function mirrorEnquiry(form) {
   const url = window.SabdiaForms && window.SabdiaForms.mirror;
@@ -293,7 +307,7 @@ document.addEventListener('submit', async (e) => {
       const detail = await res.json().catch(() => null);
       throw new Error((detail && detail.error) || `Form submit failed: ${res.status}`);
     }
-    showThanks(cform, null, thanksText(cform));
+    showThanks(cform, thanksHeading(cform), thanksText(cform));
   } catch (err) {
     const msg = (err && err.message && !/^Form submit failed|Failed to fetch|NetworkError/.test(err.message))
       ? err.message
@@ -479,7 +493,7 @@ function nativeFormInit() {
         form.innerHTML = '<p class="nl-done">' + ((doneEl && doneEl.textContent.trim()) || 'Thank you — you\'re subscribed.') + '</p>';
       } else {
         mirrorEnquiry(form);
-        showThanks(form, null, thanksText(form));
+        showThanks(form, thanksHeading(form), thanksText(form));
       }
     };
     const send = async () => {
