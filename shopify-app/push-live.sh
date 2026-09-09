@@ -11,6 +11,9 @@ shopify theme push --store $STORE --path shopify-theme --theme $THEME --allow-li
 # The per-residence page templates ship on their first push only. After that
 # the store copy (Naomi's picked gallery blocks) is the source of truth, so
 # they join .shopifyignore like the other templates.
+# Theme settings (Enquiry handling = Shopify) ship once too; afterwards the
+# customizer copy is the source of truth, so never overwrite it again.
+grep -q "^config/settings_data.json" shopify-theme/.shopifyignore || echo "config/settings_data.json" >> shopify-theme/.shopifyignore
 for h in qasr solace sierra caspian aether capri; do
   grep -q "^templates/product.$h.json" shopify-theme/.shopifyignore || echo "templates/product.$h.json" >> shopify-theme/.shopifyignore
 done

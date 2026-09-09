@@ -17,6 +17,7 @@
       </ul>
     </div>
     <div>
+      {%- if settings.form_backend == 'vercel' -%}
       <form class="cform reveal d1" id="cform" name="contact" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
         <input type="hidden" name="form-name" value="contact">
         <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
@@ -41,6 +42,36 @@
         <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
         <p class="form-note">{{ section.settings.note }}</p>
       </form>
+      {%- else -%}
+      {%- comment -%} Shopify-native: emails the store's sender address and files the enquirer under Customers. {%- endcomment -%}
+      {% form 'contact', id: 'cform', class: 'cform reveal d1' %}
+        {%- if form.posted_successfully? -%}
+          <p class="form-note" role="status" style="font-size:13px;color:var(--ink)">{{ section.settings.success_text | default: "Thank you - we will be in touch within a business day." }}</p>
+        {%- endif -%}
+        {%- if form.errors -%}
+          <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
+        {%- endif -%}
+        <div class="frow">
+          <div class="fg"><label class="fl" for="cf-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="contact[First name]" class="fi" placeholder="{{ section.settings.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="contact[Last name]" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
+        </div>
+        <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email*" }}</label><input type="email" id="cf-email" name="contact[email]" class="fi" placeholder="{{ section.settings.f_email_ph | default: "Email address" }}" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" placeholder="{{ section.settings.f_phone_ph | default: "Phone number" }}" autocomplete="tel"></div>
+        <div class="fg">
+          <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "Interest" }}</label>
+          <select class="fsel" id="cf-interest" name="contact[Interest]">
+            {%- assign interests = section.settings.interests | newline_to_br | split: '<br />' -%}
+            {%- for opt in interests -%}
+              {%- assign o = opt | strip -%}
+              {%- if o != blank -%}<option>{{ o }}</option>{%- endif -%}
+            {%- endfor -%}
+          </select>
+        </div>
+        <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="{{ section.settings.f_message_ph | default: "Tell us about your interest..." }}" required></textarea></div>
+        <button type="submit" class="fsub" id="fsub">{{ section.settings.f_submit | default: "Submit" }} &rarr;</button>
+        <p class="form-note">{{ section.settings.note }}</p>
+      {% endform %}
+      {%- endif -%}
     </div>
   </div>
 </section>
@@ -76,6 +107,7 @@
       "id": "note",
       "label": "Note under the button"
     },
+    { "type": "text", "id": "success_text", "label": "Thank you message (Shopify mode)", "default": "Thank you - we will be in touch within a business day." },
     {
       "type": "header",
       "content": "Form wording"
