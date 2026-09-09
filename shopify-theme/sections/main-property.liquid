@@ -125,10 +125,15 @@
               <select class="fsel" id="pe-type" name="enquiry-type">
                 {%- assign etypes = section.settings.enquiry_types | newline_to_br | split: '<br />' -%}
                 {%- for t in etypes -%}
-                  {%- assign tt = t | strip -%}
+                  {%- assign parts = t | split: '|' -%}
+                  {%- assign tt = parts[0] | strip -%}
                   {%- if tt != blank -%}<option>{{ tt }}</option>{%- endif -%}
                 {%- endfor -%}
               </select>
+              {%- for t in etypes -%}
+                {%- assign parts = t | split: '|' -%}
+                {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | escape }}">{{ parts[1] | strip }}</span>{%- endif -%}
+              {%- endfor -%}
             </div>
           {%- endunless -%}
           <div class="fg"><label class="fl" for="pe-message">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" id="pe-message" name="message" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
@@ -158,17 +163,24 @@
               <select class="fsel" id="pe-type" name="contact[Enquiry type]">
                 {%- assign etypes = section.settings.enquiry_types | newline_to_br | split: '<br />' -%}
                 {%- for t in etypes -%}
-                  {%- assign tt = t | strip -%}
+                  {%- assign parts = t | split: '|' -%}
+                  {%- assign tt = parts[0] | strip -%}
                   {%- if tt != blank -%}<option>{{ tt }}</option>{%- endif -%}
                 {%- endfor -%}
               </select>
+              {%- for t in etypes -%}
+                {%- assign parts = t | split: '|' -%}
+                {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | escape }}">{{ parts[1] | strip }}</span>{%- endif -%}
+              {%- endfor -%}
             </div>
           {%- endunless -%}
           <div class="fg"><label class="fl" for="pe-message">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" id="pe-message" name="contact[body]" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
           <p class="form-note">{% render 'privacy-link', note: section.settings.privacy_note %}</p>
+          {% render 'form-optin', label: section.settings.optin_label %}
           <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
         {%- endif -%}
           {% endform %}
+          {%- assign cm_uid = 'cm-' | append: section.id -%}{% render 'customer-mirror', uid: cm_uid, residence: product.handle %}
         {%- endif -%}
       </div>
       <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
@@ -651,6 +663,7 @@
       "type": "textarea",
       "id": "enquiry_types",
       "label": "Enquiry types (one per line)",
+      "info": "Add a tailored thank-you after a | on the same line, e.g. Custom home design | Thank you. Sabdia designs and builds every residence in-house, so we do not take on custom commissions - but we will be in touch about our current and upcoming releases.",
       "default": "Register Interest\nArrange Private Inspection\nRequest Price Guide\nGeneral Enquiry"
     },
     {
@@ -699,6 +712,7 @@
       "label": "Success message (Shopify mode)",
       "default": "Thank you - we've received your enquiry and will be in touch within one business day."
     },
+    { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
     {
       "type": "text",
       "id": "share_label",

@@ -66,6 +66,9 @@
               <option {{ block.shopify_attributes }}>{{ block.settings.text }}</option>
             {%- endfor -%}
           </select>
+          {%- for block in section.blocks -%}
+            {%- if block.settings.thanks != blank -%}<span hidden data-thanks-for="{{ block.settings.text | escape }}">{{ block.settings.thanks }}</span>{%- endif -%}
+          {%- endfor -%}
         </div>
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
@@ -103,14 +106,19 @@
               <option {{ block.shopify_attributes }}>{{ block.settings.text }}</option>
             {%- endfor -%}
           </select>
+          {%- for block in section.blocks -%}
+            {%- if block.settings.thanks != blank -%}<span hidden data-thanks-for="{{ block.settings.text | escape }}">{{ block.settings.thanks }}</span>{%- endif -%}
+          {%- endfor -%}
         </div>
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          {% render 'form-optin', label: section.settings.optin_label %}
           <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
           <p class="form-note" style="margin:0">{% render 'privacy-link', note: section.settings.form_note %}</p>
         </div>
       {%- endif -%}
         {% endform %}
+        {%- assign cm_uid = 'cm-' | append: section.id -%}{% render 'customer-mirror', uid: cm_uid, residence: '' %}
       {%- endif -%}
     </div>
   </div>
@@ -209,6 +217,7 @@
       "label": "Success message (Shopify mode)",
       "default": "Thank you - we've received your enquiry and will be in touch within one business day."
     },
+    { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
     {
       "type": "header",
       "content": "Form wording"
@@ -363,6 +372,12 @@
           "type": "text",
           "id": "text",
           "label": "Option"
+        },
+        {
+          "type": "textarea",
+          "id": "thanks",
+          "label": "Thank-you for this option",
+          "info": "Shown instead of the usual thank-you when this option is chosen, e.g. for Custom home design: everything at Sabdia is designed and built in-house, so we do not take on custom commissions."
         }
       ]
     }

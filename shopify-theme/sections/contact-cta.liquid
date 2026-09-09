@@ -32,10 +32,15 @@
           <select class="fsel" id="cf-interest" name="enquiry-type">
             {%- assign interests = section.settings.interests | newline_to_br | split: '<br />' -%}
             {%- for opt in interests -%}
-              {%- assign o = opt | strip -%}
+              {%- assign parts = opt | split: '|' -%}
+              {%- assign o = parts[0] | strip -%}
               {%- if o != blank -%}<option>{{ o }}</option>{%- endif -%}
             {%- endfor -%}
           </select>
+          {%- for opt in interests -%}
+            {%- assign parts = opt | split: '|' -%}
+            {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | escape }}">{{ parts[1] | strip }}</span>{%- endif -%}
+          {%- endfor -%}
         </div>
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Message*" }}</label><textarea class="fta" id="cf-message" name="message" placeholder="{{ section.settings.f_message_ph | default: "Tell us about your interest..." }}" required></textarea></div>
         <button type="submit" class="fsub" id="fsub">{{ section.settings.f_submit | default: "Submit" }} &rarr;</button>
@@ -63,16 +68,23 @@
           <select class="fsel" id="cf-interest" name="contact[Interest]">
             {%- assign interests = section.settings.interests | newline_to_br | split: '<br />' -%}
             {%- for opt in interests -%}
-              {%- assign o = opt | strip -%}
+              {%- assign parts = opt | split: '|' -%}
+              {%- assign o = parts[0] | strip -%}
               {%- if o != blank -%}<option>{{ o }}</option>{%- endif -%}
             {%- endfor -%}
           </select>
+          {%- for opt in interests -%}
+            {%- assign parts = opt | split: '|' -%}
+            {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | escape }}">{{ parts[1] | strip }}</span>{%- endif -%}
+          {%- endfor -%}
         </div>
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="{{ section.settings.f_message_ph | default: "Tell us about your interest..." }}" required></textarea></div>
+        {% render 'form-optin', label: section.settings.optin_label %}
         <button type="submit" class="fsub" id="fsub">{{ section.settings.f_submit | default: "Submit" }} &rarr;</button>
         <p class="form-note">{{ section.settings.note }}</p>
       {%- endif -%}
         {% endform %}
+        {%- assign cm_uid = 'cm-' | append: section.id -%}{% render 'customer-mirror', uid: cm_uid, residence: '' %}
       {%- endif -%}
     </div>
   </div>
@@ -102,6 +114,7 @@
       "type": "textarea",
       "id": "interests",
       "label": "Interest options",
+      "info": "One option per line. Add a tailored thank-you after a | on the same line, e.g. Custom home design | Thank you. Everything at Sabdia is designed and built in-house, so we do not take on custom commissions - we will be in touch about our releases.",
       "info": "One option per line."
     },
     {
@@ -110,6 +123,7 @@
       "label": "Note under the button"
     },
     { "type": "text", "id": "success_text", "label": "Thank you message (Shopify mode)", "default": "Thank you - we will be in touch within a business day." },
+    { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
     {
       "type": "header",
       "content": "Form wording"

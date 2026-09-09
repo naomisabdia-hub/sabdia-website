@@ -58,9 +58,11 @@
           <input type="text" id="aa-suburbs" name="contact[Suburb markets]" class="fi" placeholder="e.g. Coorparoo, Camp Hill, New Farm…">
         </div>
         <div class="fg"><label class="fl" for="aa-message">{{ section.settings.f_message | default: "Additional Information" }}</label><textarea class="fta" id="aa-message" name="contact[body]" placeholder="Tell us about your client base, experience with luxury property, or any other relevant information…"></textarea></div>
+        {% render 'form-optin', label: section.settings.optin_label %}
         <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
       {%- endif -%}
         {% endform %}
+        {%- assign cm_uid = 'cm-' | append: section.id -%}{% render 'customer-mirror', uid: cm_uid, residence: '' %}
       {%- endif -%}
     </div>
   </div>
@@ -114,6 +116,7 @@
       "label": "Success message (Shopify mode)",
       "default": "Thank you - your application has been received. We'll be in touch within one business day."
     },
+    { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
     {
       "type": "header",
       "content": "Wording"

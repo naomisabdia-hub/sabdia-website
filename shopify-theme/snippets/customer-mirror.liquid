@@ -1,0 +1,14 @@
+{%- comment -%} Hidden Shopify signup that files each enquirer under Customers.
+    Shopify's contact form only emails; it never creates a customer. After an
+    enquiry is accepted, main.js copies the name and email here, sets the
+    tags (enquiry · residence · enquiry type · newsletter when opted in) and
+    submits it in the background. Render once per enquiry form; pass
+    residence: product.handle on a residence page. {%- endcomment -%}
+<div class="customer-mirror" data-customer-mirror{% if residence != blank %} data-residence="{{ residence }}"{% endif %} aria-hidden="true">
+  {% form 'customer', id: uid %}
+    <input type="hidden" name="contact[first_name]" value="">
+    <input type="hidden" name="contact[last_name]" value="">
+    <input type="email" name="contact[email]" value="" tabindex="-1" autocomplete="off">
+    <input type="hidden" name="contact[tags]" value="enquiry">
+  {% endform %}
+</div>

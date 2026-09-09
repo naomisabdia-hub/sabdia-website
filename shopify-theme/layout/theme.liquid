@@ -108,7 +108,8 @@ try {
 </main>
 
 {% sections 'footer-group' %}
-<script>window.SabdiaForms={mode:{{ settings.form_backend | json }},mirror:{% if settings.forms_endpoint != blank %}{{ settings.forms_endpoint | append: '/api/contact' | json }}{% else %}null{% endif %},thanks:{"heading":"Thank you","text":"We have your enquiry and will be in touch within a business day."}};</script>
+{%- capture res_handles -%}{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{{ p.handle }},{%- endif -%}{%- endfor -%}{%- endcapture -%}
+<script>window.SabdiaForms={residences:{{ res_handles | split: ',' | compact | json }},mode:{{ settings.form_backend | json }},mirror:{% if settings.forms_endpoint != blank %}{{ settings.forms_endpoint | append: '/api/contact' | json }}{% else %}null{% endif %},thanks:{"heading":"Thank you","text":"We have your enquiry and will be in touch within a business day."}};</script>
 <script src="{{ 'main.js' | asset_url }}"></script>
 </body>
 </html>

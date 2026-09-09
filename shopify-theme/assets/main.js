@@ -239,6 +239,12 @@ function showThanks(form, heading, text) {
   setTimeout(() => { panel.scrollIntoView({ behavior: 'smooth', block: 'center' }); panel.focus({ preventScroll: true }); }, 60);
 }
 function thanksText(form) {
+  /* A tailored thank-you for the chosen enquiry type wins (Customize: "Option | text"). */
+  const sel = form.querySelector('select[name="contact[Enquiry type]"], select[name="contact[Interest]"]');
+  if (sel && sel.value) {
+    const special = Array.from(form.querySelectorAll('[data-thanks-for]')).find((s) => s.getAttribute('data-thanks-for') === sel.value);
+    if (special && special.textContent.trim()) return special.textContent.trim();
+  }
   const el = form.querySelector('[data-thanks]');
   return (el && el.textContent.trim()) || form.getAttribute('data-thanks') || null;
 }
@@ -368,6 +374,65 @@ document.addEventListener('submit', async (e) => {
    ============================================================ */
 
 
+
+/* File the enquirer under Customers. Shopify's contact form only emails, so
+   the accepted enquiry is copied into the hidden signup form next to it
+   (snippet customer-mirror) and that is submitted in the background:
+   Customers then holds the person, tagged enquiry · residence · enquiry
+   type · newsletter (when "Keep me updated" was ticked). Segments in the
+   admin can then be built on those tags. */
+function fileCustomer(form, saved) {
+  const wrap = form.parentNode && form.parentNode.querySelector('[data-customer-mirror]');
+  const mirror = wrap && wrap.querySelector('form');
+  if (!mirror) return;
+  const submitMirror = () => {
+    const em = mirror.querySelector('[name="contact[email]"]');
+    em.dispatchEvent(new Event('focusin', { bubbles: true }));
+    em.dispatchEvent(new Event('change', { bubbles: true }));
+    setTimeout(() => { if (mirror.requestSubmit) mirror.requestSubmit(); else mirror.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); }, 1500);
+  };
+  const setM = (n, v) => { const el = mirror.querySelector('[name="' + n + '"]'); if (el) el.value = v; };
+  if (saved) {
+    setM('contact[email]', saved.email); setM('contact[first_name]', saved.first); setM('contact[last_name]', saved.last); setM('contact[tags]', saved.tags);
+    submitMirror();
+    return;
+  }
+  const val = (n) => { const el = form.querySelector('[name="' + n + '"]'); return el ? String(el.value || '').trim() : ''; };
+  const email = val('contact[email]');
+  if (!email) return;
+  const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const tags = ['enquiry'];
+  const residences = (window.SabdiaForms && window.SabdiaForms.residences) || [];
+  const seen = {};
+  if (wrap.getAttribute('data-residence')) { tags.push(wrap.getAttribute('data-residence')); seen[wrap.getAttribute('data-residence')] = 1; }
+  const blob = Array.from(form.elements).map((el) => (el.type === 'checkbox' && !el.checked) ? '' : String(el.value || '')).join(' ').toLowerCase();
+  residences.forEach((h) => { if (!seen[h] && new RegExp('\\b' + h + '\\b').test(blob)) { tags.push(h); seen[h] = 1; } });
+  const etype = val('contact[Enquiry type]') || val('contact[Interest]');
+  if (etype) tags.push(slug(etype).slice(0, 40));
+  const optin = form.querySelector('[data-optin]');
+  if (optin && optin.checked) tags.push('newsletter');
+  const payload = { email, first: val('contact[First name]') || val('contact[first_name]'), last: val('contact[Last name]') || val('contact[last_name]'), tags: tags.join(', ') };
+  setM('contact[email]', payload.email); setM('contact[first_name]', payload.first); setM('contact[last_name]', payload.last); setM('contact[tags]', payload.tags);
+  try { sessionStorage.removeItem('sabdia-file-customer'); } catch (e) {}
+  submitMirror();
+}
+/* Called when an enquiry is about to leave for Shopify's visible challenge
+   page: keep what Customers needs, and file it when the visitor returns. */
+function stashCustomer(form) {
+  try {
+    const val = (n) => { const el = form.querySelector('[name="' + n + '"]'); return el ? String(el.value || '').trim() : ''; };
+    const wrap = form.parentNode && form.parentNode.querySelector('[data-customer-mirror]');
+    if (!wrap || !val('contact[email]')) return;
+    const optin = form.querySelector('[data-optin]');
+    const etype = val('contact[Enquiry type]') || val('contact[Interest]');
+    const tags = ['enquiry'];
+    if (wrap.getAttribute('data-residence')) tags.push(wrap.getAttribute('data-residence'));
+    if (etype) tags.push(etype.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40));
+    if (optin && optin.checked) tags.push('newsletter');
+    sessionStorage.setItem('sabdia-file-customer', JSON.stringify({ email: val('contact[email]'), first: val('contact[First name]'), last: val('contact[Last name]'), tags: tags.join(', '), t: Date.now() }));
+  } catch (e) { /* storage unavailable */ }
+}
+
 /* Shopify-native forms ({% form 'contact' %} and {% form 'customer' %}, both
    posting to /contact) without leaving the page. Shopify's spam script
    (hCaptcha) binds to these forms, and on submit it fetches a token and then
@@ -382,18 +447,21 @@ function nativeFormInit() {
     if (!/^\/contact/.test(form.getAttribute('action') || '')) return;
     form.dataset.nativeWired = '1';
     const isNews = form.id === 'nlForm';
+    const silent = !!form.closest('[data-customer-mirror]');
     const btn = form.querySelector('#fsub, .fsub, .nl-btn, [type="submit"]');
     const status = form.querySelector('[data-form-status]');
     const announce = (msg) => { if (status) status.textContent = msg; };
     let pending = false, label = btn ? btn.textContent : '';
     const busy = () => {
       pending = true;
+      if (silent) return;
       const err = form.querySelector('.form-error'); if (err) err.remove();
       if (btn) { label = btn.textContent; btn.textContent = isNews ? '…' : 'Sending…'; btn.style.background = '#6B6860'; }
       announce('Sending…');
     };
     const fail = (msg) => {
       pending = false;
+      if (silent) return;
       if (btn) { btn.textContent = label; btn.style.background = ''; }
       announce(msg);
       let note = form.querySelector('.form-error');
@@ -402,6 +470,8 @@ function nativeFormInit() {
     };
     const done = () => {
       pending = false;
+      if (silent) return;
+      if (!isNews) fileCustomer(form);
       if (isNews) {
         const doneEl = form.querySelector('[data-nl-success]');
         form.innerHTML = '<p class="nl-done">' + ((doneEl && doneEl.textContent.trim()) || 'Thank you — you\'re subscribed.') + '</p>';
@@ -419,7 +489,7 @@ function nativeFormInit() {
           credentials: 'same-origin',
           redirect: 'follow'
         });
-        if (/\/challenge/.test(res.url)) { location.assign(res.url); return; } // Shopify wants its visible check; it holds the enquiry and returns here
+        if (/\/challenge/.test(res.url)) { if (!isNews && !silent) stashCustomer(form); location.assign(res.url); return; } // Shopify's visible check; it holds the enquiry and returns here
         const ok = isNews ? /customer_posted=true/.test(res.url) : /contact_posted=true/.test(res.url);
         if (ok) { done(); return; }
         const html = await res.text();
@@ -460,6 +530,11 @@ function initPage() {
       thanks.innerHTML = '<div class="form-thanks-k" aria-hidden="true">&#10003;</div><h3 class="form-thanks-h">Thank you</h3><p class="form-thanks-p">We have your answers and will be in touch within a business day.</p>';
       fyh.parentNode.insertBefore(thanks, fyh); fyh.hidden = true;
     }
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('sabdia-file-customer') || 'null');
+      const cform = document.getElementById('cform') || document.querySelector('form.cform');
+      if (saved && cform && Date.now() - saved.t < 30 * 60 * 1000) { sessionStorage.removeItem('sabdia-file-customer'); setTimeout(() => fileCustomer(cform, saved), 800); }
+    } catch (e) { /* no storage */ }
     if (thanks) {
       thanks.classList.add('vis');
       setTimeout(function () { thanks.scrollIntoView({ behavior: 'smooth', block: 'center' }); thanks.focus({ preventScroll: true }); }, 250);

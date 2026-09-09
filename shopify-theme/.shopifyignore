@@ -25,3 +25,10 @@ templates/page.contact.json
 templates/page.agent-access.json
 templates/page.find-your-home.json
 templates/page.collection-item.json
+templates/product.qasr.json
+templates/product.solace.json
+templates/product.sierra.json
+templates/product.caspian.json
+templates/product.aether.json
+templates/product.capri.json
+config/settings_data.json

@@ -1359,3 +1359,17 @@ h1 em, h2 em, h3 em,
   .pg-rooms{gap:2px 16px}
 }
 @media (prefers-reduced-motion: reduce){.pg-img.is-on{animation:none;transform:none}}
+
+/* Keep-me-updated box + hidden customer signup */
+.form-optin{display:flex;align-items:flex-start;gap:10px;margin:14px 0 18px;font-size:var(--t-small);font-weight:300;color:var(--ink3);cursor:pointer;line-height:1.4}
+.form-optin input{appearance:none;-webkit-appearance:none;width:16px;height:16px;flex:0 0 16px;margin-top:2px;border:1px solid var(--gold);background:transparent;cursor:pointer;position:relative}
+.form-optin input:checked::after{content:'';position:absolute;inset:3px;background:var(--gold)}
+.form-optin input:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.customer-mirror{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);left:-9999px}
+
+/* Shopify's spam challenge page (/challenge) - shown only when Shopify is unsure a submission is human */
+.shopify-challenge__container{max-width:520px;margin:0 auto;padding:clamp(140px,18vw,220px) 22px clamp(80px,10vw,140px);text-align:center;font-family:var(--font-u)}
+.shopify-challenge__message{font-family:var(--font-d);font-size:var(--t-h3);font-weight:300;color:var(--ink);margin:0 0 22px;letter-spacing:-.01em}
+.shopify-challenge__container .g-recaptcha,.shopify-challenge__container .h-captcha{display:flex;justify-content:center;margin:0 0 22px}
+.shopify-challenge__button{display:inline-block;padding:14px 30px;border:1px solid var(--gold);background:var(--gold);color:#fff;font-family:var(--font-u);font-size:var(--t-micro);letter-spacing:.22em;text-transform:uppercase;cursor:pointer;transition:background .25s,color .25s}
+.shopify-challenge__button:hover{background:transparent;color:var(--ink)}
