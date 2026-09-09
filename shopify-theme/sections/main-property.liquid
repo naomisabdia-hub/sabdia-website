@@ -200,11 +200,13 @@
   if gallery_count > tiles
     assign gallery_count = tiles
   endif
+  assign glayout = section.settings.gallery_layout | default: 'stage'
 -%}
 {%- if gallery_count > 0 -%}
   <div class="prop-gallery inner">
     <div class="slabel reveal">{{ section.settings.gallery_label }}</div>
     <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, product.title }}</h2>
+    {%- if glayout == 'grid' -%}
     <div class="prop-gallery-grid gn-{{ gallery_count }}" id="galleryGrid">
       {%- assign gdelays = ',d1,d2' | split: ',' -%}
       {%- if use_blocks -%}
@@ -274,6 +276,65 @@
         <button type="button" class="btn-g" id="galleryAll">{{ section.settings.gallery_all_label | default: "View all photos" }} ({{ all_count }}) &rarr;</button>
       </div>
     {%- endif -%}
+    {%- else -%}
+    {%- comment -%} Stage + filmstrip. Every photo (blocks or Products › Media) is
+        listed once as data; the stage, the strip, the room index and the
+        full-screen viewer all read from it. {%- endcomment -%}
+    <div hidden id="pgData">
+      {%- if use_blocks -%}
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign cap = block.settings.caption
+            assign vid = ''
+            assign pic = block.settings.image
+            if block.type == 'video'
+              assign pic = block.settings.poster
+              if block.settings.video != blank
+                for src in block.settings.video.sources
+                  if src.format == 'mp4'
+                    assign vid = src.url
+                  endif
+                endfor
+                if pic == blank
+                  assign pic = block.settings.video.preview_image
+                endif
+              elsif block.settings.video_url != blank
+                assign vid = block.settings.video_url
+              endif
+            endif
+            if cap == blank
+              if pic != blank and pic.alt != blank
+                assign cap = pic.alt
+              else
+                assign cap = product.title
+              endif
+            endif
+          -%}
+          {%- if pic == blank and vid == blank -%}{%- continue -%}{%- endif -%}
+          <span data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}{% endif %}" data-stage="{% if pic != blank %}{{ pic | image_url: width: 1800 }}{% endif %}" data-thumb="{% if pic != blank %}{{ pic | image_url: width: 320, height: 240, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}" {{ block.shopify_attributes }}></span>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for image in product.images offset: 1 -%}
+          <span data-lb-item data-src="{{ image | image_url: width: 2000, height: 1400, crop: 'center' }}" data-stage="{{ image | image_url: width: 1800 }}" data-thumb="{{ image | image_url: width: 320, height: 240, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}"></span>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+    <div class="pg reveal d1" id="pg" data-house="{{ product.title | escape }}">
+      <div class="pg-stage" id="pgStage" tabindex="0" aria-roledescription="carousel" aria-label="{{ product.title | escape }} photos">
+        <img class="pg-img" id="pgImgA" alt="" decoding="async">
+        <img class="pg-img" id="pgImgB" alt="" decoding="async">
+        <video class="pg-vid" id="pgVid" muted playsinline loop preload="none" hidden></video>
+        <div class="pg-veil" aria-hidden="true"></div>
+        <div class="pg-top"><span class="pg-house">{{ product.title }}{% if mf.suburb.value != blank %} &middot; {{ mf.suburb.value }}{% endif %}</span><span class="pg-count" id="pgCount"></span></div>
+        <div class="pg-cap" id="pgCap" aria-live="polite"></div>
+        <button type="button" class="pg-arrow pg-prev" id="pgPrev" aria-label="Previous photo">&larr;</button>
+        <button type="button" class="pg-arrow pg-next" id="pgNext" aria-label="Next photo">&rarr;</button>
+        <button type="button" class="pg-expand" id="pgExpand"><span aria-hidden="true">&#x2922;</span> {{ section.settings.gallery_all_label | default: "View all photos" }} ({{ all_count }})</button>
+      </div>
+      <div class="pg-strip" id="pgStrip" role="tablist" aria-label="Photo thumbnails"></div>
+      <div class="pg-rooms" id="pgRooms" aria-label="Rooms"></div>
+    </div>
+    {%- endif -%}
   </div>
 {%- endif -%}
 
@@ -299,7 +360,7 @@
        or "SOLACE - Kitchen 01". Show just the room, and say when it is a render. */
     function caption(alt) {
       var s = (alt || '').split(' - ').pop().toLowerCase().replace(/\.[a-z]+$/, '');
-      if (s.indexOf(house + '-') === 0) s = s.slice(house.length + 1);
+      if (s.indexOf(house + '-') === 0 || s.indexOf(house + ' ') === 0) s = s.slice(house.length + 1);
       var render = /(^|-)render(-|$)/.test(s);
       s = s.replace(/(^|-)render(-|$)/, '$1').replace(/[-_]?\d+$/, '').replace(/[-_]+/g, ' ').trim();
       if (!s || s === house) s = {{ product.title | json }};
@@ -341,6 +402,7 @@
       it.addEventListener('click', function () { open(n); });
       it.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(n); } });
     });
+    lb.__open = open; lb.__caption = caption;
     var allBtn = document.getElementById('galleryAll');
     if (allBtn) allBtn.addEventListener('click', function () { open(0); });
     /* Swipe to page on touch screens */
@@ -361,6 +423,95 @@
       else if (e.key === 'ArrowRight') show(i + 1);
       else if (e.key === 'ArrowLeft') show(i - 1);
     });
+  })();
+</script>
+<script>
+  (function () {
+    var pg = document.getElementById('pg');
+    if (!pg || pg.dataset.init) return;
+    pg.dataset.init = '1';
+    var data = Array.prototype.slice.call(document.querySelectorAll('#pgData [data-lb-item]'));
+    if (!data.length) { pg.hidden = true; return; }
+    var lb = document.getElementById('lb');
+    var imgs = [document.getElementById('pgImgA'), document.getElementById('pgImgB')];
+    var vid = document.getElementById('pgVid'), cap = document.getElementById('pgCap'), count = document.getElementById('pgCount');
+    var strip = document.getElementById('pgStrip'), rooms = document.getElementById('pgRooms'), stage = document.getElementById('pgStage');
+    var i = 0, on = 0, reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function capOf(n) { var a = data[n].getAttribute('data-alt') || ''; return (lb && lb.__caption) ? lb.__caption(a) : a; }
+    function roomOf(n) { return capOf(n).replace(/\s*·.*$/, ''); }
+    /* Filmstrip */
+    data.forEach(function (el, n) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'pg-thumb' + (el.getAttribute('data-video') ? ' pg-thumb-video' : '');
+      b.setAttribute('role', 'tab'); b.setAttribute('aria-label', capOf(n));
+      var im = document.createElement('img'); im.loading = 'lazy'; im.decoding = 'async'; im.alt = '';
+      im.src = el.getAttribute('data-thumb') || el.getAttribute('data-src'); b.appendChild(im);
+      b.addEventListener('click', function () { show(n); });
+      strip.appendChild(b);
+    });
+    /* Room index: one entry per room, in photo order */
+    /* Group by the full caption ("Kitchen", "Master Suite"); when photos are
+       named more finely than that ("Pool Night", "Pool Day"), group by the
+       first word so the index stays a short row of rooms. */
+    /* One index entry per room. Photo names carry the room ("kitchen-01",
+       "pool-night-03", "formal-living-fireplace-01"); this maps them onto a
+       short list of rooms so the index reads like a floor plan. */
+    var ROOMS = [['walk in robe', 'Walk-in Robe'], ['robe', 'Walk-in Robe'], ['master', 'Master Suite'], ['ensuite', 'Ensuite'], ['bedroom', 'Bedrooms'], ['bed ', 'Bedrooms'], ['bathroom', 'Bathrooms'], ['bath', 'Bathrooms'], ['powder', 'Powder Room'], ['kitchen', 'Kitchen'], ['butler', 'Kitchen'], ['pantry', 'Kitchen'], ['dining', 'Dining'], ['living', 'Living'], ['lounge', 'Living'], ['family', 'Living'], ['games', 'Games Room'], ['media', 'Media Room'], ['cinema', 'Cinema'], ['study', 'Study'], ['office', 'Study'], ['gym', 'Gym'], ['sauna', 'Wellness'], ['spa', 'Wellness'], ['cellar', 'Cellar'], ['laundry', 'Laundry'], ['mud', 'Mud Room'], ['garage', 'Garage'], ['pool', 'Pool'], ['cabana', 'Pool'], ['alfresco', 'Alfresco'], ['terrace', 'Terrace'], ['balcony', 'Balcony'], ['rooftop', 'Rooftop'], ['courtyard', 'Courtyard'], ['garden', 'Garden'], ['entry', 'Entry'], ['foyer', 'Entry'], ['hall', 'Entry'], ['stair', 'Staircase'], ['facade', 'Exterior'], ['exterior', 'Exterior'], ['street', 'Exterior'], ['front', 'Exterior'], ['rear', 'Exterior'], ['aerial', 'Aerial'], ['interior', 'Interior']];
+    var house = (pg.getAttribute('data-house') || '').toLowerCase();
+    var roomKey = function (n) {
+      var c = roomOf(n).toLowerCase();
+      for (var k = 0; k < ROOMS.length; k++) { if (c.indexOf(ROOMS[k][0]) !== -1) return ROOMS[k][1]; }
+      var w = c.replace(/\b\d+\b/g, '').trim().split(/\s+/).filter(function (x) { return x && x !== house; });
+      return w.length ? w.slice(0, 2).join(' ').replace(/\b\w/g, function (ch) { return ch.toUpperCase(); }) : '';
+    };
+    var roomAt = {}, roomKeys = [];
+    data.forEach(function (el, n) { var r = roomKey(n); if (r && !(r in roomAt)) { roomAt[r] = n; roomKeys.push(r); } });
+    if (roomKeys.length > 1 && roomKeys.length <= 16) {
+      roomKeys.forEach(function (r) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'pg-room'; b.textContent = r;
+        b.addEventListener('click', function () { show(roomAt[r]); });
+        rooms.appendChild(b);
+      });
+    } else { rooms.hidden = true; }
+    function show(n, instant) {
+      i = (n + data.length) % data.length;
+      var el = data[i], v = el.getAttribute('data-video');
+      if (v) {
+        imgs.forEach(function (im) { im.classList.remove('is-on'); });
+        vid.hidden = false; if (vid.getAttribute('src') !== v) vid.src = v; vid.play().catch(function () {});
+      } else {
+        vid.pause(); vid.hidden = true;
+        var nxt = imgs[1 - on], src = el.getAttribute('data-stage') || el.getAttribute('data-src');
+        var swap = function () { imgs[on].classList.remove('is-on'); nxt.classList.add('is-on'); on = 1 - on; nxt.onload = null; };
+        nxt.alt = capOf(i);
+        if (nxt.getAttribute('src') === src && nxt.complete) swap();
+        else { nxt.onload = swap; nxt.src = src; }
+      }
+      cap.textContent = capOf(i); count.textContent = (i + 1) + ' / ' + data.length;
+      var th = strip.children;
+      for (var k = 0; k < th.length; k++) { th[k].classList.toggle('is-on', k === i); th[k].setAttribute('aria-selected', k === i ? 'true' : 'false'); }
+      if (th[i]) strip.scrollTo({ left: th[i].offsetLeft - strip.clientWidth / 2 + th[i].offsetWidth / 2, behavior: (instant || reduce) ? 'auto' : 'smooth' });
+      var rk = roomKey(i);
+      Array.prototype.forEach.call(rooms.children, function (b) { b.classList.toggle('is-on', b.textContent === rk); });
+      [i + 1, i - 1].forEach(function (k) { var e = data[(k + data.length) % data.length]; if (!e.getAttribute('data-video')) { var p = new Image(); p.src = e.getAttribute('data-stage') || e.getAttribute('data-src'); } });
+    }
+    document.getElementById('pgPrev').addEventListener('click', function (e) { e.stopPropagation(); show(i - 1); });
+    document.getElementById('pgNext').addEventListener('click', function (e) { e.stopPropagation(); show(i + 1); });
+    var openFull = function (e) { if (e) e.stopPropagation(); if (lb && lb.__open) lb.__open(i); };
+    document.getElementById('pgExpand').addEventListener('click', openFull);
+    stage.addEventListener('click', function (e) { if (e.target.closest('button')) return; openFull(); });
+    stage.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(i + 1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); show(i - 1); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFull(); }
+    });
+    var tx = null;
+    stage.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].clientX; }, { passive: true });
+    stage.addEventListener('touchend', function (e) {
+      if (tx === null) return; var dx = e.changedTouches[0].clientX - tx; tx = null;
+      if (Math.abs(dx) > 40) show(dx < 0 ? i + 1 : i - 1);
+    }, { passive: true });
+    show(0, true);
   })();
 </script>
 
@@ -567,9 +718,20 @@
       "default": "The Residence"
     },
     {
+      "type": "select",
+      "id": "gallery_layout",
+      "label": "Gallery layout",
+      "default": "stage",
+      "options": [
+        { "value": "stage", "label": "Stage + filmstrip" },
+        { "value": "grid", "label": "Grid of tiles" }
+      ],
+      "info": "Stage: arrows, swipe and keyboard move through every photo; the room names under the strip jump straight to a room; the photo opens full screen on click."
+    },
+    {
       "type": "range",
       "id": "gallery_tiles",
-      "label": "Photos in the grid",
+      "label": "Photos in the grid (Grid layout only)",
       "min": 3,
       "max": 12,
       "step": 3,
