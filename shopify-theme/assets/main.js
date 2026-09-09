@@ -427,6 +427,8 @@ function stashCustomer(form) {
     const etype = val('contact[Enquiry type]') || val('contact[Interest]');
     const tags = ['enquiry'];
     if (wrap.getAttribute('data-residence')) tags.push(wrap.getAttribute('data-residence'));
+    const blob = Array.from(form.elements).map((el) => (el.type === 'checkbox' && !el.checked) ? '' : String(el.value || '')).join(' ').toLowerCase();
+    ((window.SabdiaForms && window.SabdiaForms.residences) || []).forEach((h) => { if (tags.indexOf(h) === -1 && new RegExp('\\b' + h + '\\b').test(blob)) tags.push(h); });
     if (etype) tags.push(etype.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40));
     if (optin && optin.checked) tags.push('newsletter');
     sessionStorage.setItem('sabdia-file-customer', JSON.stringify({ email: val('contact[email]'), first: val('contact[First name]'), last: val('contact[Last name]'), tags: tags.join(', '), t: Date.now() }));
