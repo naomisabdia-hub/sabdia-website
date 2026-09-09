@@ -37,9 +37,10 @@
       </form>
       {%- else -%}
       {% form 'contact', id: 'cform', class: 'cform reveal d1' %}
+        <span hidden data-thanks>{{ section.settings.success_text }}</span>
         {%- if form.posted_successfully? -%}
-          <p class="form-note" role="status" style="color:var(--ink)">{{ section.settings.success_text }}</p>
-        {%- endif -%}
+          {% render 'form-thanks', text: section.settings.success_text %}
+        {%- else -%}
         {%- if form.errors -%}
           <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
         {%- endif -%}
@@ -58,7 +59,8 @@
         </div>
         <div class="fg"><label class="fl" for="aa-message">{{ section.settings.f_message | default: "Additional Information" }}</label><textarea class="fta" id="aa-message" name="contact[body]" placeholder="Tell us about your client base, experience with luxury property, or any other relevant information…"></textarea></div>
         <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
-      {% endform %}
+      {%- endif -%}
+        {% endform %}
       {%- endif -%}
     </div>
   </div>

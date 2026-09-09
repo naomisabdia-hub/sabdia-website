@@ -45,9 +45,10 @@
       {%- else -%}
       {%- comment -%} Shopify-native: emails the store's sender address and files the enquirer under Customers. {%- endcomment -%}
       {% form 'contact', id: 'cform', class: 'cform reveal d1' %}
+        <span hidden data-thanks>{{ section.settings.success_text | default: "Thank you - we will be in touch within a business day." }}</span>
         {%- if form.posted_successfully? -%}
-          <p class="form-note" role="status" style="font-size:13px;color:var(--ink)">{{ section.settings.success_text | default: "Thank you - we will be in touch within a business day." }}</p>
-        {%- endif -%}
+          {% render 'form-thanks', text: section.settings.success_text %}
+        {%- else -%}
         {%- if form.errors -%}
           <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
         {%- endif -%}
@@ -70,7 +71,8 @@
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="{{ section.settings.f_message_ph | default: "Tell us about your interest..." }}" required></textarea></div>
         <button type="submit" class="fsub" id="fsub">{{ section.settings.f_submit | default: "Submit" }} &rarr;</button>
         <p class="form-note">{{ section.settings.note }}</p>
-      {% endform %}
+      {%- endif -%}
+        {% endform %}
       {%- endif -%}
     </div>
   </div>

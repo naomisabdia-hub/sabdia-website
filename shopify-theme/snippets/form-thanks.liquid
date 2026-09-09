@@ -1,0 +1,8 @@
+{%- comment -%} Thank-you panel shown in place of an enquiry form after Shopify
+    accepts it (the page reloads with ?contact_posted=true; main.js scrolls here).
+    Usage: {% render 'form-thanks', text: section.settings.success_text %} {%- endcomment -%}
+<div class="form-thanks" id="formThanks" role="status" tabindex="-1">
+  <div class="form-thanks-k" aria-hidden="true">&#10003;</div>
+  <h3 class="form-thanks-h">{{ heading | default: "Thank you" }}</h3>
+  <p class="form-thanks-p">{{ text | default: "We have your enquiry and will be in touch within a business day." }}</p>
+</div>

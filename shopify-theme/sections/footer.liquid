@@ -40,6 +40,7 @@
         {%- comment -%} Shopify-native signup: files the subscriber under
             Customers with email marketing consent. {%- endcomment -%}
         {% form 'customer', class: 'nl-form', id: 'nlForm' %}
+          <span hidden data-nl-success>{{ section.settings.nl_success }}</span>
           {%- if form.posted_successfully? -%}
             <p class="nl-done">{{ section.settings.nl_success }}</p>
           {%- else -%}

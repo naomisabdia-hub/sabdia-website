@@ -78,9 +78,10 @@
       {%- comment -%} Shopify-native: emails the store's sender address and
           files the enquirer under Customers. {%- endcomment -%}
       {% form 'contact', id: 'cform', class: 'cform reveal d1', style: 'margin-top:12px' %}
+        <span hidden data-thanks>{{ section.settings.success_text }}</span>
         {%- if form.posted_successfully? -%}
-          <p class="form-note" role="status" style="font-size:13px;color:var(--ink)">{{ section.settings.success_text }}</p>
-        {%- endif -%}
+          {% render 'form-thanks', text: section.settings.success_text %}
+        {%- else -%}
         {%- if form.errors -%}
           <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
         {%- endif -%}
@@ -108,7 +109,8 @@
           <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
           <p class="form-note" style="margin:0">{% render 'privacy-link', note: section.settings.form_note %}</p>
         </div>
-      {% endform %}
+      {%- endif -%}
+        {% endform %}
       {%- endif -%}
     </div>
   </div>

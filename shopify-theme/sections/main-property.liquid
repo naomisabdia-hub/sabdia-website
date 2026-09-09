@@ -138,9 +138,10 @@
         </form>
         {%- else -%}
         {% form 'contact', id: 'cform', class: 'cform' %}
+          <span hidden data-thanks>{{ section.settings.success_text }}</span>
           {%- if form.posted_successfully? -%}
-            <p class="form-note" role="status" style="color:var(--ink)">{{ section.settings.success_text }}</p>
-          {%- endif -%}
+            {% render 'form-thanks', text: section.settings.success_text %}
+          {%- else -%}
           {%- if form.errors -%}
             <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
           {%- endif -%}
@@ -166,7 +167,8 @@
           <div class="fg"><label class="fl" for="pe-message">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" id="pe-message" name="contact[body]" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
           <p class="form-note">{% render 'privacy-link', note: section.settings.privacy_note %}</p>
           <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
-        {% endform %}
+        {%- endif -%}
+          {% endform %}
         {%- endif -%}
       </div>
       <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">

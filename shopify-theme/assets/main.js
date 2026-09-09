@@ -220,46 +220,85 @@ document.addEventListener('click', (e) => {
   });
 });
 
-// ── CONTACT FORMS (delegated) — submit to /api/contact ──────
+// ── CONTACT FORMS (delegated) ──────────────────────────────
+// Two backends, one behaviour: the visitor never leaves the page.
+//  • Shopify mode: POST to Shopify's /contact in the background (it emails
+//    the store), then swap the form for the thank-you panel. Shopify's
+//    spam challenge, if it ever fires, falls back to a normal submit.
+//  • Sabdia API mode: POST to /api/contact as before.
+// In Shopify mode the enquiry is also mirrored to the API (Customers,
+// leads inbox) when Theme settings › Site plumbing has an endpoint.
+const THANKS_HTML = (h, t) => '<div class="form-thanks" id="formThanks" role="status" tabindex="-1"><div class="form-thanks-k" aria-hidden="true">&#10003;</div><h3 class="form-thanks-h">' + h + '</h3><p class="form-thanks-p">' + t + '</p></div>';
+function showThanks(form, heading, text) {
+  const cfg = (window.SabdiaForms && window.SabdiaForms.thanks) || {};
+  const wrap = document.createElement('div');
+  wrap.innerHTML = THANKS_HTML(heading || cfg.heading || 'Thank you', text || cfg.text || 'We will be in touch within a business day.');
+  const panel = wrap.firstChild;
+  form.replaceWith(panel);
+  panel.classList.add('vis');
+  setTimeout(() => { panel.scrollIntoView({ behavior: 'smooth', block: 'center' }); panel.focus({ preventScroll: true }); }, 60);
+}
+function thanksText(form) {
+  const el = form.querySelector('[data-thanks]');
+  return (el && el.textContent.trim()) || form.getAttribute('data-thanks') || null;
+}
+function mirrorEnquiry(form) {
+  const url = window.SabdiaForms && window.SabdiaForms.mirror;
+  if (!url) return;
+  const out = { 'form-name': form.getAttribute('data-form-name') || 'contact' };
+  new FormData(form).forEach((v, k) => {
+    const m = /^contact\[(.+)\]$/.exec(k);
+    if (!m || k === 'contact[tags]') return;
+    let key = m[1].toLowerCase().replace(/\s+/g, '-');
+    if (key === 'body') key = 'message';
+    if (key === 'interest') key = 'enquiry-type';
+    out[key] = String(v);
+  });
+  try {
+    fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(out), keepalive: true, mode: 'cors' }).catch(() => {});
+  } catch (err) { /* mirror is best-effort */ }
+}
 document.addEventListener('submit', async (e) => {
   const cform = e.target.closest && e.target.closest('form#cform, form.cform');
   if (!cform) return;
-  // Native Shopify forms ({% form %} → /contact) submit the Shopify way;
-  // only the external-API forms are AJAX'd.
-  if (!/\/api\//.test(cform.getAttribute('action') || '')) return;
+  const action = cform.getAttribute('action') || '';
+  if (!/\/api\//.test(action)) return; // Shopify-native forms post into a hidden frame (nativeFormInit)
+  const native = false;
   e.preventDefault();
   const btn = cform.querySelector('#fsub, .fsub');
   if (!btn || btn.disabled) return;
   const status = cform.querySelector('[data-form-status]');
   const announce = (msg) => { if (status) status.textContent = msg; };
+  const label = btn.textContent;
   btn.textContent = 'Sending…';
+  btn.disabled = true;
   btn.style.background = '#6B6860';
   announce('Sending your enquiry…');
   try {
     const body = new URLSearchParams(new FormData(cform)).toString();
-    const res = await fetch(cform.getAttribute('action') || '/api/contact', {
+    const res = await fetch(action, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'text/html' },
+      body,
+      credentials: 'same-origin',
+      redirect: 'follow'
     });
-    /* The endpoint explains WHY it refused (bad address, empty enquiry,
-       too many attempts); show that instead of a generic failure, so a
-       visitor with a typo can fix it rather than give up. */
     if (!res.ok) {
       const detail = await res.json().catch(() => null);
       throw new Error((detail && detail.error) || `Form submit failed: ${res.status}`);
     }
-    btn.textContent = 'Thank you — we\'ll be in touch shortly.';
-    btn.style.background = 'var(--ink2)';
-    btn.disabled = true;
-    announce('Thank you — your enquiry was sent. We\'ll be in touch shortly.');
+    showThanks(cform, null, thanksText(cform));
   } catch (err) {
     const msg = (err && err.message && !/^Form submit failed|Failed to fetch|NetworkError/.test(err.message))
       ? err.message
       : 'Something went wrong — please try again.';
-    btn.textContent = msg;
+    btn.textContent = label;
+    btn.disabled = false;
     btn.style.background = '';
     announce(msg);
+    let note = cform.querySelector('.form-error');
+    if (!note) { note = document.createElement('p'); note.className = 'form-note form-error'; note.setAttribute('role', 'alert'); btn.insertAdjacentElement('afterend', note); }
+    note.textContent = msg;
   }
 });
 
@@ -281,7 +320,9 @@ document.addEventListener('click', async (e) => {
 document.addEventListener('submit', async (e) => {
   const form = e.target.closest('#nlForm');
   if (!form) return;
-  if (!/\/api\//.test(form.getAttribute('action') || '')) return;
+  const nlAction = form.getAttribute('action') || '';
+  if (!/\/api\//.test(nlAction)) return; // native newsletter posts into a hidden frame (nativeFormInit)
+  const nlNative = false;
   e.preventDefault();
   const btn = form.querySelector('.nl-btn');
   const status = form.querySelector('[data-form-status]');
@@ -291,16 +332,26 @@ document.addEventListener('submit', async (e) => {
   btn.textContent = '…';
   btn.disabled = true;
   try {
-    const res = await fetch(form.getAttribute('action') || '/api/subscribe', {
+    const res = await fetch(nlAction || '/api/subscribe', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(new FormData(form)).toString()
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'text/html' },
+      body: new URLSearchParams(new FormData(form)).toString(),
+      credentials: 'same-origin',
+      redirect: 'follow'
     });
-    if (!res.ok) {
+    if (nlNative) {
+      if (/\/challenge/.test(res.url)) { btn.disabled = false; form.submit(); return; }
+      if (!(/customer_posted=true/.test(res.url) || res.redirected)) {
+        const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+        const err = doc.querySelector('#nlForm [role="status"], #nlForm .errors');
+        throw new Error((err && err.textContent.trim()) || 'subscribe failed');
+      }
+    } else if (!res.ok) {
       const detail = await res.json().catch(() => null);
       throw new Error((detail && detail.error) || 'subscribe failed: ' + res.status);
     }
-    const done = form.getAttribute('data-success') || 'Thank you — you\'re subscribed.';
+    const doneEl = form.querySelector('[data-nl-success]');
+    const done = (doneEl && doneEl.textContent.trim()) || form.getAttribute('data-success') || 'Thank you — you\'re subscribed.';
     form.innerHTML = '<p class="nl-done">' + done + '</p>';
     announce(done);
   } catch (err) {
@@ -316,7 +367,106 @@ document.addEventListener('submit', async (e) => {
    PER PAGE — re-run on every astro:page-load
    ============================================================ */
 
+
+/* Shopify-native forms ({% form 'contact' %} and {% form 'customer' %}, both
+   posting to /contact) without leaving the page. Shopify's spam script
+   (hCaptcha) binds to these forms, and on submit it fetches a token and then
+   calls form.submit(). That call is intercepted here and sent in the
+   background instead; Shopify validates and emails as usual, and the
+   visitor sees the thank-you in place. If Shopify still insists on its
+   visible challenge page, the real navigation happens and the thank-you
+   shows after the return (see the contact_posted handler in initPage). */
+function nativeFormInit() {
+  document.querySelectorAll('form').forEach((form) => {
+    if (form.dataset.nativeWired) return;
+    if (!/^\/contact/.test(form.getAttribute('action') || '')) return;
+    form.dataset.nativeWired = '1';
+    const isNews = form.id === 'nlForm';
+    const btn = form.querySelector('#fsub, .fsub, .nl-btn, [type="submit"]');
+    const status = form.querySelector('[data-form-status]');
+    const announce = (msg) => { if (status) status.textContent = msg; };
+    let pending = false, label = btn ? btn.textContent : '';
+    const busy = () => {
+      pending = true;
+      const err = form.querySelector('.form-error'); if (err) err.remove();
+      if (btn) { label = btn.textContent; btn.textContent = isNews ? '…' : 'Sending…'; btn.style.background = '#6B6860'; }
+      announce('Sending…');
+    };
+    const fail = (msg) => {
+      pending = false;
+      if (btn) { btn.textContent = label; btn.style.background = ''; }
+      announce(msg);
+      let note = form.querySelector('.form-error');
+      if (!note) { note = document.createElement('p'); note.className = isNews ? 'sr-status form-error' : 'form-note form-error'; note.setAttribute('role', 'alert'); (btn || form).insertAdjacentElement('afterend', note); }
+      note.textContent = msg;
+    };
+    const done = () => {
+      pending = false;
+      if (isNews) {
+        const doneEl = form.querySelector('[data-nl-success]');
+        form.innerHTML = '<p class="nl-done">' + ((doneEl && doneEl.textContent.trim()) || 'Thank you — you\'re subscribed.') + '</p>';
+      } else {
+        mirrorEnquiry(form);
+        showThanks(form, null, thanksText(form));
+      }
+    };
+    const send = async () => {
+      try {
+        const res = await fetch(form.getAttribute('action').split('#')[0], {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'text/html' },
+          body: new URLSearchParams(new FormData(form)).toString(),
+          credentials: 'same-origin',
+          redirect: 'follow'
+        });
+        if (/\/challenge/.test(res.url)) { location.assign(res.url); return; } // Shopify wants its visible check; it holds the enquiry and returns here
+        const ok = isNews ? /customer_posted=true/.test(res.url) : /contact_posted=true/.test(res.url);
+        if (ok) { done(); return; }
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const alert = doc.querySelector((isNews ? '#nlForm' : '#cform') + ' [role="alert"], .errors');
+        if (alert && alert.textContent.trim()) throw new Error(alert.textContent.trim());
+        if (/CAPTCHA/i.test(doc.title || '')) throw new Error('The spam check did not pass — please press the button again.');
+        if (res.ok && !alert && !/\/contact/.test(res.url)) { done(); return; }
+        throw new Error('Something went wrong — please try again.');
+      } catch (err) {
+        fail((err && err.message && !/Failed to fetch|NetworkError/.test(err.message)) ? err.message : 'Something went wrong — please try again.');
+      }
+    };
+    /* Shopify's spam script ends with form.submit(); take it from here. */
+    form.submit = function () { if (!pending) busy(); send(); };
+    form.addEventListener('submit', (e) => {
+      if (pending) { e.preventDefault(); return; }
+      if (!form.checkValidity()) return;
+      busy();
+      /* Not under Shopify's spam script (protection off, or its script did
+         not load): post directly. Otherwise let it run; it calls submit(). */
+      if (!form.dataset.cptcha && !form.dataset.hcaptchaBound && !form.dataset.recaptchaBound) { e.preventDefault(); send(); }
+    });
+  });
+}
+
 function initPage() {
+  nativeFormInit();
+  /* After Shopify accepts an enquiry it reloads the page with
+     ?contact_posted=true. Show the thank-you where the form was and bring
+     it into view (the form sits below the fold on most pages). */
+  if (/[?&]contact_posted=true/.test(location.search)) {
+    var thanks = document.getElementById('formThanks');
+    var fyh = document.querySelector('form[data-fyh]');
+    if (!thanks && fyh) {
+      thanks = document.createElement('div');
+      thanks.className = 'form-thanks'; thanks.id = 'formThanks'; thanks.setAttribute('role', 'status'); thanks.tabIndex = -1;
+      thanks.innerHTML = '<div class="form-thanks-k" aria-hidden="true">&#10003;</div><h3 class="form-thanks-h">Thank you</h3><p class="form-thanks-p">We have your answers and will be in touch within a business day.</p>';
+      fyh.parentNode.insertBefore(thanks, fyh); fyh.hidden = true;
+    }
+    if (thanks) {
+      thanks.classList.add('vis');
+      setTimeout(function () { thanks.scrollIntoView({ behavior: 'smooth', block: 'center' }); thanks.focus({ preventScroll: true }); }, 250);
+      try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
+    }
+  }
+
   // Refresh the cursor element refs for this page's Nav.
   curDot = document.getElementById('cur');
   curRing = document.getElementById('cur-r');
