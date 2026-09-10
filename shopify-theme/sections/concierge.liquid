@@ -27,15 +27,19 @@
   data-thanks="{{ section.settings.thanks | escape }}"
   data-person="{{ section.settings.person_label | escape }}"
   data-buttons="{{ section.settings.opening_count }}"
-  data-open-delay="{{ section.settings.open_delay }}">
-  <script type="application/json" data-concierge-qa>[
-    {%- for block in section.blocks -%}
-      {{ block.settings.question | json }}{{ ',' }}{{ block.settings.keywords | json }}{{ ',' }}{{ block.settings.answer | json }}{{ ',' }}{{ block.settings.link | json }}{%- unless forloop.last -%},{%- endunless -%}
-    {%- endfor -%}
-  ]</script>
-  <button type="button" class="cc-launch" id="ccLaunch" aria-expanded="false" aria-controls="ccPanel">
-    <span class="cc-launch-dot" aria-hidden="true"></span><span>{{ section.settings.launch_label }}</span>
-  </button>
+  data-open-delay="{{ section.settings.open_delay }}"
+  data-menu="{{ section.settings.menu_mode | default: 'categories' }}"
+  data-cats="{{ section.settings.cat_about | default: 'About Sabdia' | escape }}|{{ section.settings.cat_residences | default: 'Our residences' | escape }}|{{ section.settings.cat_buying | default: 'Buying and inspections' | escape }}|{{ section.settings.cat_builds | default: 'Client builds and renovations' | escape }}|{{ section.settings.cat_agents | default: 'Agents' | escape }}|{{ section.settings.cat_other | default: 'Something else' | escape }}">
+  {%- capture qa_json -%}{%- for block in section.blocks -%}{%- if block.type == 'qa' -%}{{ block.settings.question | json }},{{ block.settings.keywords | json }},{{ block.settings.answer | json }},{{ block.settings.link | json }},{{ block.settings.category | default: 'other' | json }},0,{%- endif -%}{%- endfor -%}{%- endcapture -%}
+  {%- capture fr_json -%}{%- for block in section.blocks -%}{%- if block.type == 'form_reply' -%}{{ block.settings.match | json }},{{ block.settings.text | json }},{%- endif -%}{%- endfor -%}{%- endcapture -%}
+  <script type="application/json" data-concierge-qa>[{{ qa_json | replace_last: ',', '' }}]</script>
+  <script type="application/json" data-form-replies>[{{ fr_json | replace_last: ',', '' }}]</script>
+  <div class="cc-pill">
+    <button type="button" class="cc-launch" id="ccLaunch" aria-expanded="false" aria-controls="ccPanel">
+      <span class="cc-launch-dot" aria-hidden="true"></span><span>{{ section.settings.launch_label }}</span>
+    </button>
+    <button type="button" class="cc-dismiss" id="ccDismiss" aria-label="Hide chat" title="Hide">&#10005;</button>
+  </div>
   <div class="cc-panel" id="ccPanel" role="dialog" aria-label="{{ section.settings.title | escape }}" hidden>
     <div class="cc-head">
       <div><div class="cc-title">{{ section.settings.title }}</div><div class="cc-sub">{{ section.settings.subtitle }}</div></div>
@@ -70,10 +74,18 @@
 
 {% schema %}
 {
-  "name": "Concierge chat",
+  "name": "Sabdia replies",
   "settings": [
     { "type": "checkbox", "id": "enabled", "label": "Show the concierge chat", "default": true },
-    { "type": "paragraph", "content": "Sabdia's own chat: opening questions, answers matched to what people type, live residence facts, and an enquiry taken step by step inside the chat (emailed to the store and filed in Customers with tags, like the forms). Add or edit questions as blocks below." },
+    { "type": "paragraph", "content": "One place for every reply, in two kinds. CHAT ANSWER blocks feed the Ask Sabdia chat, filed under a category; typed questions match the closest answer. FORM THANK-YOU blocks are separate: what a page enquiry form shows after sending when the option or message matches their words. Neither affects the other. Residence facts come from Products. Inbox instant answers are pasted from docs/INBOX-ANSWERS.md." },
+    { "type": "select", "id": "menu_mode", "label": "Chat opens with", "default": "categories", "options": [ { "value": "categories", "label": "Categories, then questions" }, { "value": "questions", "label": "The first questions directly" } ] },
+    { "type": "header", "content": "Category names" },
+    { "type": "text", "id": "cat_about", "label": "About", "default": "About Sabdia" },
+    { "type": "text", "id": "cat_residences", "label": "Residences", "default": "Our residences" },
+    { "type": "text", "id": "cat_buying", "label": "Buying", "default": "Buying and inspections" },
+    { "type": "text", "id": "cat_builds", "label": "Client builds", "default": "Client builds and renovations" },
+    { "type": "text", "id": "cat_agents", "label": "Agents", "default": "Agents" },
+    { "type": "text", "id": "cat_other", "label": "Other", "default": "Something else" },
     { "type": "text", "id": "launch_label", "label": "Button label", "default": "Ask Sabdia" },
     { "type": "text", "id": "title", "label": "Chat title", "default": "Sabdia" },
     { "type": "text", "id": "subtitle", "label": "Chat subtitle", "default": "Ask us anything about our residences" },
@@ -90,9 +102,18 @@
   ],
   "blocks": [
     {
-      "type": "qa",
-      "name": "Question",
+      "type": "form_reply",
+      "name": "Form thank-you",
       "settings": [
+        { "type": "text", "id": "match", "label": "Words that trigger it", "info": "Space-separated. Checked against the enquiry type chosen and the message typed on the page forms only." },
+        { "type": "textarea", "id": "text", "label": "Thank-you shown after sending" }
+      ]
+    },
+    {
+      "type": "qa",
+      "name": "Chat answer",
+      "settings": [
+        { "type": "select", "id": "category", "label": "Category", "default": "other", "options": [ { "value": "about", "label": "About Sabdia" }, { "value": "residences", "label": "Our residences" }, { "value": "buying", "label": "Buying and inspections" }, { "value": "builds", "label": "Client builds and renovations" }, { "value": "agents", "label": "Agents" }, { "value": "other", "label": "Something else" } ] },
         { "type": "text", "id": "question", "label": "Question (as shown on the button)" },
         { "type": "text", "id": "keywords", "label": "Words that match it", "info": "Space-separated words people might type. The question itself always counts too." },
         { "type": "textarea", "id": "answer", "label": "Answer" },
@@ -102,16 +123,21 @@
   ],
   "default": {
     "blocks": [
-{"type": "qa", "settings": {"question": "Tell me more about Sabdia", "keywords": "sabdia company history story team builder developer boutique", "answer": "Sabdia is a boutique Brisbane developer. We started in 2013 and do everything in-house: architecture, interiors, development management and construction, one team from the first sketch to handover. More than 100 homes later, we still take on only a few projects a year so each one gets our full attention.", "link": ""}},
-{"type": "qa", "settings": {"question": "Which residences are for sale?", "keywords": "for sale available residences homes houses what do you have listings current", "answer": "Right now: QASR in Coorparoo, SOLACE in Camp Hill, SIERRA in Holland Park West, CASPIAN in Ascot and AETHER in Hendra. Ask me about any of them by name, or tell me a little about what you are looking for.", "link": "/collections/for-sale"}},
-{"type": "qa", "settings": {"question": "I want to enquire", "keywords": "enquire enquiry interested register interest contact call me get in touch", "answer": "We would love to hear from you. I will take a few details here so the right person can get back to you.", "link": "enquire"}},
-{"type": "qa", "settings": {"question": "How do I inspect a residence?", "keywords": "inspect inspection viewing view open home walk through appointment visit see it", "answer": "Inspections are by private appointment. Tell me which residence and a little about your budget and timeline, and a member of our team will arrange a time.", "link": "enquire"}},
-{"type": "qa", "settings": {"question": "What is the price?", "keywords": "price pricing cost how much guide value offers range budget", "answer": "We talk through pricing directly rather than publishing a guide. So we can give you the most relevant information, share your approximate budget range and timeline to purchase and a member of our team will be in touch.", "link": "enquire"}},
-{"type": "qa", "settings": {"question": "Do you take on client builds or renovations?", "keywords": "custom build client renovation renovate renovating block land knockdown extension quote design", "answer": "Thank you so much for thinking of us. At the moment we aren't taking on client builds or renovations, our focus is solely on designing and building our own development projects. We would be happy to keep you posted on our releases.", "link": "enquire"}},
-{"type": "qa", "settings": {"question": "When is your next release?", "keywords": "next release upcoming coming soon new project future launch", "answer": "We release a small number of residences each year. Leave your details and we will let you know first.", "link": "enquire"}},
-{"type": "qa", "settings": {"question": "I am a real estate agent", "keywords": "agent agency real estate commission pre-launch conjunction", "answer": "Thank you for reaching out. Apply on our Agent Access page and a member of our team will be in touch.", "link": "/pages/agent-access"}},
-{"type": "qa", "settings": {"question": "Where are you based?", "keywords": "where located address office brisbane suburbs area", "answer": "Brisbane. Our residences are in the inner suburbs: Coorparoo, Camp Hill, Holland Park West, Ascot and Hendra.", "link": ""}},
-{"type": "qa", "settings": {"question": "Can I see floor plans?", "keywords": "floor plan plans layout drawings brochure pdf", "answer": "Leave your details and the residence you mean, and a member of our team will send the floor plans and details through.", "link": "enquire"}}
+{"type": "qa", "settings": {"question": "Tell me more about Sabdia", "keywords": "sabdia company history story team builder developer boutique", "answer": "Sabdia is a boutique Brisbane developer. We started in 2013 and do everything in-house: architecture, interiors, development management and construction, one team from the first sketch to handover. More than 100 homes later, we still take on only a few projects a year so each one gets our full attention.", "link": "", "category": "about"}},
+{"type": "qa", "settings": {"question": "Which residences are for sale?", "keywords": "for sale available residences homes houses what do you have listings current", "answer": "Right now: QASR in Coorparoo, SOLACE in Camp Hill, SIERRA in Holland Park West, CASPIAN in Ascot and AETHER in Hendra. Ask me about any of them by name, or tell me a little about what you are looking for.", "link": "/collections/for-sale", "category": "residences"}},
+{"type": "qa", "settings": {"question": "I want to enquire", "keywords": "enquire enquiry interested register interest contact call me get in touch", "answer": "We would love to hear from you. I will take a few details here so the right person can get back to you.", "link": "enquire", "category": "buying"}},
+{"type": "qa", "settings": {"question": "How do I inspect a residence?", "keywords": "inspect inspection viewing view open home walk through appointment visit see it", "answer": "Inspections are by private appointment. Tell me which residence and a little about your budget and timeline, and a member of our team will arrange a time.", "link": "enquire", "category": "buying"}},
+{"type": "qa", "settings": {"question": "What is the price?", "keywords": "price pricing cost how much guide value offers range budget", "answer": "We talk through pricing directly rather than publishing a guide. So we can give you the most relevant information, share your approximate budget range and timeline to purchase and a member of our team will be in touch.", "link": "enquire", "category": "buying"}},
+{"type": "qa", "settings": {"question": "Do you take on client builds or renovations?", "keywords": "custom build client renovation renovate renovating block land knockdown extension quote design", "answer": "Thank you so much for thinking of us. At the moment we aren't taking on client builds or renovations, our focus is solely on designing and building our own development projects. We would be happy to keep you posted on our releases.", "link": "enquire", "category": "builds"}},
+{"type": "qa", "settings": {"question": "When is your next release?", "keywords": "next release upcoming coming soon new project future launch", "answer": "We release a small number of residences each year. Leave your details and we will let you know first.", "link": "enquire", "category": "residences"}},
+{"type": "qa", "settings": {"question": "I am a real estate agent", "keywords": "agent agency real estate commission pre-launch conjunction", "answer": "Thank you for reaching out. Apply on our Agent Access page and a member of our team will be in touch.", "link": "/pages/agent-access", "category": "agents"}},
+{"type": "qa", "settings": {"question": "Where are you based?", "keywords": "where located address office brisbane suburbs area", "answer": "Brisbane. Our residences are in the inner suburbs: Coorparoo, Camp Hill, Holland Park West, Ascot and Hendra.", "link": "", "category": "about"}},
+{"type": "qa", "settings": {"question": "Can I see floor plans?", "keywords": "floor plan plans layout drawings brochure pdf", "answer": "Leave your details and the residence you mean, and a member of our team will send the floor plans and details through.", "link": "enquire", "category": "residences"}}
+,
+{"type": "form_reply", "settings": {"match": "renovation renovate renovating custom build client builder block land knockdown extension quote", "text": "Thank you so much for reaching out and for thinking of us for your project. At the moment we aren't taking on client builds or renovations - our focus is solely on designing and building our own development projects. We really appreciate your interest and support, and hopefully our paths cross in the future."}},
+{"type": "form_reply", "settings": {"match": "agent agency licence commission", "text": "Thank you for reaching out. We will review your details and be in touch about agent access as soon as possible."}},
+{"type": "form_reply", "settings": {"match": "inspect inspection viewing appointment walk through open home", "text": "Thank you for your interest - we appreciate you reaching out. Inspections are by private appointment. To help us provide the most relevant information, could you please share your approximate budget range and your intended timeline for purchase? A member of our team will then be in touch to arrange a time."}},
+{"type": "form_reply", "settings": {"match": "price pricing cost guide how much budget", "text": "Thank you for your interest - we appreciate you reaching out. We talk through pricing directly rather than publishing a guide. To help us provide the most relevant information, could you please share your approximate budget range and your intended timeline for purchase? A member of our team will then be in touch with you as soon as possible."}}
     ]
   }
 }

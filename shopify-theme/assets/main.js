@@ -245,6 +245,20 @@ function thanksText(form) {
     const special = Array.from(form.querySelectorAll('[data-thanks-for]')).find((s) => s.getAttribute('data-thanks-for') === sel.value);
     if (special && special.textContent.trim()) return special.textContent.trim();
   }
+  /* Form thank-you blocks (Customize › Sabdia replies › Form thank-you) win next. */
+  const v0 = (n) => { const e = form.querySelector('[name="' + n + '"]'); return e ? String(e.value || '') : ''; };
+  const askedText = ((sel ? sel.value : '') + ' ' + v0('contact[body]') + ' ' + v0('contact[Agency]')).toLowerCase();
+  const frEl = document.querySelector('[data-form-replies]');
+  let central = [];
+  try { const arr = JSON.parse(frEl ? frEl.textContent : '[]'); for (let i = 0; i + 1 < arr.length; i += 2) central.push({ k: arr[i] || '', q: '', a: arr[i + 1] || '' }); } catch (e) { central = []; }
+  if (central.length) {
+    const STOPF = new Set('you your can could the and for are with this that what how does have has any our its get from into will would like want need please hello hey thanks tell more about there here they them then than some just also very really when where which who why yes not but all one two new house home homes property properties sabdia'.split(' '));
+    const wordsF = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9$\s]/g, ' ').split(/\s+/).filter((w) => w.length > 2 && !STOPF.has(w));
+    const hitF = (bag, w) => bag.some((b) => b === w || (w.length > 4 && b.length > 4 && (b.indexOf(w.slice(0, 5)) === 0 || w.indexOf(b.slice(0, 5)) === 0)));
+    const ws = wordsF(askedText); let best = null, bestScore = 0;
+    central.forEach((item) => { const kw = wordsF(item.k), qw = wordsF(item.q); let sc = 0; ws.forEach((w) => { if (hitF(kw, w)) sc += 2; else if (hitF(qw, w)) sc += 1; }); if (sc > bestScore) { bestScore = sc; best = item; } });
+    if (best && bestScore >= 2) return best.a;
+  }
   /* Otherwise pick Sabdia's reply by what the person asked for: the chosen
      option plus their message (a "General" enquiry about a renovation still
      gets the client-build reply). */
@@ -630,7 +644,7 @@ function conciergeInit() {
   const forSale = residences.filter((r) => !/sold/i.test(r.status || ''));
   const raw = parseJSON((cc.querySelector('[data-concierge-qa]') || {}).textContent || '[]', []);
   const qa = [];
-  for (let i = 0; i + 3 < raw.length + 1 && i < raw.length; i += 4) qa.push({ q: raw[i] || '', k: raw[i + 1] || '', a: raw[i + 2] || '', link: raw[i + 3] || '' });
+  for (let i = 0; i < raw.length; i += 6) qa.push({ q: raw[i] || '', k: raw[i + 1] || '', a: raw[i + 2] || '', link: raw[i + 3] || '', cat: raw[i + 4] || 'other' });
   const locations = (cc.getAttribute('data-locations') || '').split(',').map((x) => x.trim()).filter(Boolean);
   const budgets = (cc.getAttribute('data-budgets') || '').split('|').map((x) => x.trim()).filter(Boolean);
   const timelines = (cc.getAttribute('data-timelines') || '').split('|').map((x) => x.trim()).filter(Boolean);
@@ -755,16 +769,43 @@ function conciergeInit() {
     else if (m.link) { say('<a href="' + esc(m.link) + '">Open ' + esc(m.link) + '</a>'); options(['Leave an enquiry', 'Back to questions'], (label, n) => { if (n === 0) startEnquiry(r); else showOpening(); }); }
     else options(['Leave an enquiry', 'Back to questions'], (label, n) => { if (n === 0) startEnquiry(r); else showOpening(); });
   };
+  const CATS = ['about', 'residences', 'buying', 'builds', 'agents', 'other'];
+  const catNames = (cc.getAttribute('data-cats') || '').split('|');
+  const person = cc.getAttribute('data-person') || 'Chat with a person';
+  const askItem = (item) => { say(esc(item.q), 'me'); typing(400).then(() => { say(linkify(item.a)); afterAnswer(item, null); }); };
+  const showQuestions = (list, back) => {
+    const items = list.map((x) => x.q).concat([back ? 'Back' : person]);
+    options(items, (label, n) => { if (n === items.length - 1) { if (back) { showOpening(); } else { say(esc(label), 'me'); handOver(); } return; } askItem(list[n]); }, true);
+  };
   const showOpening = () => {
     const count = parseInt(cc.getAttribute('data-buttons') || '5', 10);
-    const items = qa.slice(0, count).map((x) => x.q).concat([cc.getAttribute('data-person') || 'Chat with a person']);
-    options(items, (label, n) => { if (n === items.length - 1) { say(esc(label), 'me'); handOver(); return; } const item = qa[n]; say(esc(label), 'me'); typing(400).then(() => { say(linkify(item.a)); afterAnswer(item, null); }); }, true);
+    if ((cc.getAttribute('data-menu') || 'categories') !== 'categories') { showQuestions(qa.slice(0, count), false); return; }
+    const present = CATS.filter((c) => qa.some((x) => x.cat === c));
+    const items = present.map((c) => catNames[CATS.indexOf(c)] || c).concat([person]);
+    options(items, (label, n) => {
+      if (n === items.length - 1) { say(esc(label), 'me'); handOver(); return; }
+      say(esc(label), 'me');
+      const c = present[n];
+      if (c === 'residences') {
+        /* Residences: one button per home for sale, plus the residence questions. */
+        const homes = forSale.map((r) => r.title + ' - ' + r.suburb);
+        const qs = qa.filter((x) => x.cat === c);
+        const list = homes.concat(qs.map((x) => x.q)).concat(['Back']);
+        options(list, (lab, i) => { if (i === list.length - 1) { showOpening(); return; } if (i < homes.length) { const r = forSale[i]; say(esc(lab), 'me'); typing(400).then(() => { say(linkify(residenceText(r))); options(['Enquire about ' + r.title, 'Arrange an inspection', 'Back'], (l2, k) => { if (k === 2) { showOpening(); return; } state.intent = k === 1 ? 'Arrange Private Inspection' : 'Register Interest'; startEnquiry(r); }); }); return; } askItem(qs[i - homes.length]); }, true);
+        return;
+      }
+      showQuestions(qa.filter((x) => x.cat === c), true);
+    }, true);
   };
   let opened = false;
   const openPanel = () => { panel.hidden = false; cc.classList.add('open'); launch.setAttribute('aria-expanded', 'true'); if (!opened) { opened = true; say(esc(cc.getAttribute('data-greeting') || 'Hello.')); showOpening(); } setTimeout(() => input.focus(), 100); };
   const closePanel = () => { panel.hidden = true; cc.classList.remove('open'); launch.setAttribute('aria-expanded', 'false'); };
   launch.addEventListener('click', openPanel);
   cc.querySelector('#ccClose').addEventListener('click', closePanel);
+  const dismiss = cc.querySelector('#ccDismiss');
+  if (dismiss) dismiss.addEventListener('click', () => { closePanel(); cc.classList.add('hidden-by-user'); try { sessionStorage.setItem('cc-hidden', '1'); } catch (e) {} });
+  try { if (sessionStorage.getItem('cc-hidden')) cc.classList.add('hidden-by-user'); } catch (e) {}
+  document.addEventListener('click', (e) => { if (!panel.hidden && !cc.contains(e.target)) closePanel(); });
   chatForm.addEventListener('submit', (e) => { e.preventDefault(); const t = input.value.trim(); if (!t) return; input.value = ''; handle(t); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) closePanel(); });
   const delay = parseInt(cc.getAttribute('data-open-delay') || '0', 10);

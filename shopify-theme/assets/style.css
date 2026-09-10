@@ -1423,3 +1423,10 @@ h1 em, h2 em, h3 em,
 /* Hide Shopify Inbox's own bubble while the concierge is on; "Chat with a person" opens it */
 body:has(.cc) #ShopifyChat, body:has(.cc) shopify-chat, body:has(.cc) [id^="shopify-chat"], body:has(.cc) .shopify-chat-launcher{opacity:0;pointer-events:none}
 body:has(.cc.handoff) #ShopifyChat, body:has(.cc.handoff) shopify-chat, body:has(.cc.handoff) [id^="shopify-chat"], body:has(.cc.handoff) .shopify-chat-launcher{opacity:1;pointer-events:auto}
+
+.cc-pill{position:relative;display:inline-block}
+.cc-dismiss{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;border:1px solid var(--gold);background:var(--bg);color:var(--ink);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+.cc-pill:hover .cc-dismiss,.cc-dismiss:focus-visible{opacity:1}
+@media (hover:none){.cc-dismiss{opacity:1}}
+.cc.hidden-by-user{display:none}
+.cc-cat{font-size:var(--t-micro);letter-spacing:.18em;text-transform:uppercase;color:var(--taupe-d);align-self:flex-start;margin-top:4px}
