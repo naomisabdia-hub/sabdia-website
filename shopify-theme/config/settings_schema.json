@@ -135,8 +135,8 @@
         "max": 18,
         "step": 1,
         "unit": "%",
-        "default": 12,
-        "info": "12% matches the generous margins Naomi marked on 11 Sep 2026. 5% was the old tight setting."
+        "default": 8,
+        "info": "8% since 11 Sep 2026 (Naomi). 5% was the original tight setting; 12% was too much."
       },
       {
         "type": "range",
@@ -146,7 +146,7 @@
         "max": 320,
         "step": 8,
         "unit": "px",
-        "default": 240
+        "default": 200
       },
       {
         "type": "range",

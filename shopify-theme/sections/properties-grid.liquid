@@ -45,9 +45,9 @@
           {%- if i == 1 -%}
             {% render 'property-card', product: product, class: 'pc-hero reveal-wipe', img_w: 1400, img_h: 900, show_cars: true %}
           {%- elsif i == 2 -%}
-            {% render 'property-card', product: product, class: 'pc-sm-a reveal-wipe d1', style: 'aspect-ratio:4/3', img_w: 900, img_h: 680 %}
+            {% render 'property-card', product: product, class: 'pc-sm-a reveal-wipe d1', img_w: 900, img_h: 680 %}
           {%- else -%}
-            {% render 'property-card', product: product, class: 'pc-sm-b reveal-wipe d2', style: 'aspect-ratio:4/3', img_w: 900, img_h: 680 %}
+            {% render 'property-card', product: product, class: 'pc-sm-b reveal-wipe d2', img_w: 900, img_h: 680 %}
           {%- endif -%}
           {%- break -%}
         {%- endfor -%}
