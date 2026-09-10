@@ -92,6 +92,10 @@
 
 <section class="pf-wrap" id="port-{{ sid }}">
   <div class="inner">
+    {%- if section.settings.intro != blank -%}
+      {%- assign count_token = '{' | append: 'count' | append: '}' -%}
+      <p class="pf-intro reveal">{{ section.settings.intro | replace: count_token, section.blocks.size }}</p>
+    {%- endif -%}
     <div class="pf-grid" id="pfGrid-{{ sid }}">
       {%- if show_current -%}
         {%- for h in current_handles -%}
@@ -142,6 +146,28 @@
             endif
           endif
           assign r_link = block.settings.link | default: rp.url
+          # A small taste before the whole house: the Teaser line, else the
+          # Headline, else the first strong Instagram caption, kept short.
+          assign r_teaser = block.settings.teaser | default: rp.metafields.custom.teaser.value
+          if r_teaser == blank and rp.metafields.custom.headline.value != blank
+            assign r_teaser = rp.metafields.custom.headline.value | strip_html
+          endif
+          if r_teaser == blank
+            for post in rp.metafields.custom.series_posts.value
+              assign cap_l = post.caption | downcase
+              assign skip = false
+              if cap_l contains 'sold' or cap_l contains 'handed over'
+                assign skip = true
+              endif
+              if post.caption.size > 60 and post.hidden != true and skip == false
+                assign r_teaser = post.caption | strip_html | split: '. ' | first | split: ' - ' | first | split: ' — ' | first | split: ' – ' | first | truncatewords: 16, '…'
+                break
+              endif
+            endfor
+          endif
+          assign r_beds = rp.metafields.custom.beds.value
+          assign r_baths = rp.metafields.custom.baths.value
+          assign r_land = rp.metafields.custom.land.value
           assign pcount = pcount | plus: 1
           assign di = forloop.index0 | modulo: 3
         -%}
@@ -164,6 +190,18 @@
             <div class="pf-name">{{ r_name }}{% if r_link != blank %} <span aria-hidden="true">&rarr;</span>{% endif %}</div>
             <div class="pf-meta">{{ r_suburb }}{% if r_style != blank %} <i>&middot;</i> {{ r_style }}{% endif %}{% if r_year != blank %} <i>&middot;</i> {{ r_year }}{% endif %}</div>
           </div>
+          {%- if section.settings.show_teaser and r_teaser != blank -%}
+            <p class="pf-teaser">{{ r_teaser }}</p>
+          {%- endif -%}
+          {%- if section.settings.show_facts -%}
+            {%- if r_beds != blank or r_baths != blank or r_land != blank -%}
+            <div class="pf-facts">
+              {%- if r_beds != blank -%}<span>{{ r_beds }} {{ section.settings.word_bed | default: "Bed" }}</span>{%- endif -%}
+              {%- if r_baths != blank -%}<span>{{ r_baths }} {{ section.settings.word_bath | default: "Bath" }}</span>{%- endif -%}
+              {%- if r_land != blank -%}<span>{{ r_land }}m&sup2;</span>{%- endif -%}
+            </div>
+            {%- endif -%}
+          {%- endif -%}
         {%- endcapture -%}
         {%- if r_link != blank -%}
           <a href="{{ r_link }}" class="pf-card reveal{% if di == 1 %} d1{% elsif di == 2 %} d2{% endif %}" data-port-card data-style="{{ r_style | escape }}" data-suburb="{{ r_suburb | escape }}" {{ block.shopify_attributes }}>{{ card_inner }}</a>
@@ -188,17 +226,9 @@
     var count = document.getElementById('pfCount-{{ sid }}');
     var empty = document.getElementById('pfEmpty-{{ sid }}');
     var style = '';
-    /* Editorial rhythm: of every seven visible tiles the first and the
-       last run wide (two columns); the rest stand portrait. Recomputed
-       after each filter so the pattern never breaks on a hidden card. */
     function layout() {
       var n = 0;
-      cards.forEach(function (c) {
-        if (c.hidden) return;
-        var k = n % 7;
-        c.classList.toggle('is-wide', k === 0 || k === 6);
-        n++;
-      });
+      cards.forEach(function (c) { if (!c.hidden) n++; });
       return n;
     }
     function apply() {
@@ -243,6 +273,12 @@
     { "type": "header", "content": "Filter bar" },
     { "type": "checkbox", "id": "show_filter", "label": "Show the filter bar", "default": true, "info": "Style chips come from each residence page's Style field; the suburb list from its Location line. Appears once there are four or more residences." },
     { "type": "checkbox", "id": "style_on_card", "label": "Show the style on the photo on hover", "default": true },
+    { "type": "header", "content": "A taste before the whole house" },
+    { "type": "textarea", "id": "intro", "label": "Line above the grid", "default": "{count} completed residences across inner Brisbane. Choose a style, or browse them all.", "info": "{count} becomes the number of residences. Leave empty to hide." },
+    { "type": "checkbox", "id": "show_teaser", "label": "One-line teaser under each name", "default": true, "info": "From the page's Teaser line (Content › Pages › the residence › Metafields), else its Headline, else its first Instagram caption." },
+    { "type": "checkbox", "id": "show_facts", "label": "Bed · bath · land under the teaser", "default": true, "info": "Shows whatever the page has filled in." },
+    { "type": "text", "id": "word_bed", "label": "Word after bedrooms", "default": "Bed" },
+    { "type": "text", "id": "word_bath", "label": "Word after bathrooms", "default": "Bath" },
     { "type": "text", "id": "filter_label", "label": "Filter label", "default": "Style" },
     { "type": "text", "id": "filter_all", "label": "All chip", "default": "All" },
     { "type": "text", "id": "all_suburbs", "label": "All-suburbs option", "default": "All Suburbs" },
@@ -263,6 +299,7 @@
         { "type": "text", "id": "name", "label": "Name", "info": "Leave empty to use the page title." },
         { "type": "text", "id": "loc", "label": "Location line" },
         { "type": "text", "id": "style", "label": "Style (override)", "info": "Normally set on the page itself (Metafields › Style) so the residence page shows it too." },
+        { "type": "text", "id": "teaser", "label": "Teaser line (override)", "info": "Normally the page's Teaser line." },
         { "type": "image_picker", "id": "image", "label": "Image" },
         { "type": "text", "id": "image_ext", "label": "Current photo (URL)", "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field." },
         { "type": "video", "id": "video_file", "label": "Hover film (upload, optional)" },

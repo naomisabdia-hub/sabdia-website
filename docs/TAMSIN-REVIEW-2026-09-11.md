@@ -71,7 +71,7 @@ Legend: ✅ done on staging · 🟡 built, needs Naomi's content or a tick in Cu
 | 4.3 | Hero banner. | ✅ HERMOSA facade as the banner (Customize › Collection › Page header › Banner to change; a film can go there too) |
 | 4.4 | Remove For Sale / Sold / Completed buttons; for-sale homes out. | ✅ the page shows completed residences only |
 | 4.5 | Style categories. | 🟡 filter chips read each page's **Style** field. Pre-filled from captions/photos for Tamsin to confirm: MILOS, AMMOS, CALLE, ELYSIUM, ALHAMBRA, HERMOSA = Mediterranean · ENCANTO = Palm Springs · FRASER = Hamptons · PETRA, KIRRA = Contemporary · NERO = blank. Suburb dropdown too |
-| 4.6 | Tiles bigger, scroll effect kept. | ✅ |
+| 4.6 | Tiles bigger, scroll effect kept. | ✅ then trimmed on 11 Sep (Naomi): uniform three-across tiles, a one-line teaser and bed · bath · land under each name, and a small line above the grid. Teaser = the page's new **Teaser line** field, else Headline, else the first Instagram caption. ENCANTO, NERO, FRASER, HERMOSA, KIRRA have no caption to draw on - fill their Teaser line |
 | — | Per-house facts. | 🟡 New page fields (Content › Pages › the residence › Metafields): Style, Completed (year), Bedrooms, Bathrooms, Garages, Land size, Headline, Story, Key features. Years pre-filled for MILOS/AMMOS/ELYSIUM (2025) and CALLE (2026) from the Instagram dates — confirm. Numbers are empty until Naomi fills them; the bar simply shows what exists |
 | — | NERO | ☐ has no photos of its own and no film (its old hero was a HERMOSA photo). Needs a photo set before it looks like the others |
 | — | MILOS / AMMOS / ELYSIUM heroes | ✅ switched from the portrait reel posters to real facade photos |
