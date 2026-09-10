@@ -61,6 +61,7 @@
   --page-pad:  clamp(22px,12vw,240px);
   --page-max:  1400px;
   --sp-scale:  1;
+  --t-slabel:  13px;
 }
 
 /* ── TYPE SCALE ─────────────────────────────────────────────
@@ -308,7 +309,9 @@ html.js .fastin.d4,html.js .fastin.d5{transition-delay:.18s!important}
 html.js .slabel.fastin.reveal::before{transition-delay:.1s}
 
 /* Section labels */
-.slabel{font-size:var(--t-label);font-weight:500;letter-spacing:.34em;text-transform:uppercase;color:var(--ink);margin-bottom:16px;display:flex;align-items:center;gap:14px}
+/* Section labels (ABOUT SABDIA, THE SABDIA STORY…) lead every section, so they
+   carry their own size - Theme settings › Layout › Section label size. */
+.slabel{font-size:var(--t-slabel,13px);font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--ink);margin-bottom:18px;display:flex;align-items:center;gap:14px}
 .slabel::before{content:'';display:inline-block;width:24px;height:1px;background:var(--gold);flex-shrink:0}
 html.js .slabel.reveal::before{width:0;transition:width .9s var(--ease) .35s}
 html.js .slabel.reveal.vis::before{width:24px}
