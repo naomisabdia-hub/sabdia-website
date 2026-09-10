@@ -25,31 +25,9 @@
         <a href="{{ section.settings.cta_link }}" class="btn-g btn-g-light reveal d3">{{ section.settings.cta_label }} &rarr;</a>
       {%- endif -%}
     </div>
-    <div class="reveal d2">
-      <div class="film-frame" data-film>
-        <video
-          src="{{ film_src }}"
-          {% if section.settings.poster %}poster="{{ section.settings.poster | image_url: width: 900 }}"{% elsif section.settings.poster_ext != blank %}poster="{{ section.settings.poster_ext }}"{% endif %}
-          muted
-          loop
-          playsinline
-          preload="none"
-        ></video>
-        <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-          <span data-sound-label>{{ section.settings.sound_label | default: "Sound On" }}</span>
-        </button>
-      </div>
-      {%- if section.settings.caption_left != blank or section.settings.caption_right != blank -%}
-        <div class="film-caption">
-          <span><b>{{ section.settings.caption_left }}</b></span>
-          <span>{{ section.settings.caption_right }}</span>
-        </div>
-      {%- endif -%}
-    </div>
     {%- if panels.size > 0 -%}
-    {%- comment -%} Beside the reel: up to three photos or a second film, stacked
-        (Tamsin, 10 Sep 2026: the portrait reel alone looked skinny). {%- endcomment -%}
+    {%- comment -%} Between the copy and the reel: up to three photos or a second film,
+        side by side, the second a touch smaller (Tamsin's sketch, 11 Sep 2026). {%- endcomment -%}
     <div class="film-panels reveal d3">
       {%- for block in panels limit: 3 -%}
         {%- if block.type == 'photo' -%}
@@ -87,26 +65,45 @@
       {%- endfor -%}
     </div>
     {%- endif -%}
+    <div class="reveal d2">
+      <div class="film-frame" data-film>
+        <video
+          src="{{ film_src }}"
+          {% if section.settings.poster %}poster="{{ section.settings.poster | image_url: width: 900 }}"{% elsif section.settings.poster_ext != blank %}poster="{{ section.settings.poster_ext }}"{% endif %}
+          muted
+          loop
+          playsinline
+          preload="none"
+        ></video>
+        <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+          <span data-sound-label>{{ section.settings.sound_label | default: "Sound On" }}</span>
+        </button>
+      </div>
+      {%- if section.settings.caption_left != blank or section.settings.caption_right != blank -%}
+        <div class="film-caption">
+          <span><b>{{ section.settings.caption_left }}</b></span>
+          <span>{{ section.settings.caption_right }}</span>
+        </div>
+      {%- endif -%}
+    </div>
   </div>
 </section>
 <style>
-  /* The reel's edges sit on the content width like the band above it. */
-  .film-grid{padding-left:clamp(22px,5vw,80px);padding-right:clamp(22px,5vw,80px)}
-  .film-grid .film-frame{margin-left:auto;margin-right:0}
-  .film-grid.has-panels{grid-template-columns:4fr 3fr 3fr;align-items:center}
-  .film-grid.has-panels .film-frame{margin:0 auto}
-  .film-panels{display:grid;gap:14px;align-content:center}
-  .film-panel{margin:0;overflow:hidden;background:var(--dark3);border:1px solid rgba(195,164,94,.18)}
-  .film-panel img{width:100%;height:100%;object-fit:cover;display:block;aspect-ratio:4/5;filter:saturate(.92)}
-  .film-panels .film-panel:nth-child(2) img{aspect-ratio:4/3}
-  .film-panel figcaption,.film-panel .film-caption{margin-top:10px}
-  .film-panel figcaption{font-size:var(--t-label);font-weight:300;letter-spacing:.26em;text-transform:uppercase;color:rgba(253,251,246,.48);padding:10px 0 0}
-  .film-panel-film{background:none;border:0}
-  .film-frame-sm{max-height:min(48vh,420px)}
+  .film-grid.has-panels{grid-template-columns:5fr 3fr 4fr;gap:clamp(28px,4vw,64px)}
+  .film-panels{display:flex;gap:12px;align-items:center;justify-content:center}
+  .film-panel{margin:0;overflow:hidden;background:var(--dark3);border:1px solid rgba(195,164,94,.18);flex:1 1 0;max-height:min(62vh,560px);aspect-ratio:9/16}
+  .film-panel:nth-child(2){flex:.8 1 0;max-height:min(50vh,450px)}
+  .film-panel:nth-child(3){flex:.66 1 0;max-height:min(42vh,380px)}
+  .film-panel img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.92)}
+  .film-panel figcaption{display:none}
+  .film-panel-film{background:none;border:0;aspect-ratio:auto;max-height:none;display:flex;flex-direction:column;justify-content:center}
+  .film-panel-film .film-caption{display:none}
+  .film-frame-sm{max-height:min(50vh,450px);width:100%}
   @media(max-width:900px){
     .film-grid.has-panels{grid-template-columns:1fr}
-    .film-panels{grid-template-columns:1fr 1fr}
-    .film-panel img,.film-panels .film-panel:nth-child(2) img{aspect-ratio:4/3}
+    .film-panels{order:3}
+    .film-panel,.film-panel:nth-child(2),.film-panel:nth-child(3){max-height:44vh}
   }
 </style>
 
@@ -190,7 +187,7 @@ sabdiaFilmInit();
     }
   ],
   "settings": [
-    { "type": "paragraph", "content": "The reel alone reads narrow. Add up to three blocks (⊕ Add block) - photos or a second film - and they sit beside it." },
+    { "type": "paragraph", "content": "The reel alone reads narrow. Add up to three blocks (⊕ Add block) - photos or a second film - and they sit between the words and the reel, each a little smaller than the last." },
     {
       "type": "text",
       "id": "anchor",
