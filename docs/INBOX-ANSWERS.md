@@ -17,10 +17,10 @@ Thank you so much for thinking of us. At the moment we aren't taking on client b
 QASR in Coorparoo, SOLACE in Camp Hill, SIERRA in Holland Park West, CASPIAN in Ascot and AETHER in Hendra. Tell us which one interests you and we will send the details.
 
 **How do I inspect a residence?**
-Inspections are by private appointment. Let us know which residence and your preferred days, with your name and email, and a member of our team will arrange a time.
+Inspections are by private appointment. Let us know which residence, your approximate budget range and timeline to purchase, and your preferred days, with your name, email and phone, and a member of our team will arrange a time.
 
 **What is the price?**
-We talk through pricing directly rather than publishing a guide. Leave your name and email and which residence you mean, and a member of our team will be in touch.
+We talk through pricing directly rather than publishing a guide. So we can give you the most relevant information, could you share your approximate budget range and your timeline to purchase, along with your name, email and the residence you mean? A member of our team will then be in touch.
 
 **When is your next release?**
 We release a small number of residences each year. Leave your email and we will let you know first.
@@ -28,8 +28,11 @@ We release a small number of residences each year. Leave your email and we will 
 **I am a real estate agent.**
 Thank you for reaching out. Apply for agent access on our Agent Access page and a member of our team will be in touch.
 
+**I want to enquire.**
+We would love to hear from you. Please share your name, email, phone, the residence you are interested in, your approximate budget range, your timeline to purchase and any preferred locations, and a member of our team will be in touch as soon as possible.
+
 **How do I buy one of your homes?**
-Tell us which residence and leave your name and email. A member of our team will walk you through the process, from a private inspection to settlement.
+Tell us which residence, your approximate budget range and your timeline to purchase, and leave your name, email and phone. A member of our team will walk you through the process, from a private inspection to settlement.
 
 ## Key features, per residence
 
