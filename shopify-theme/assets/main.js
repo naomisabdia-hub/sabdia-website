@@ -632,8 +632,8 @@ function conciergeInit() {
   const qa = [];
   for (let i = 0; i + 3 < raw.length + 1 && i < raw.length; i += 4) qa.push({ q: raw[i] || '', k: raw[i + 1] || '', a: raw[i + 2] || '', link: raw[i + 3] || '' });
   const locations = (cc.getAttribute('data-locations') || '').split(',').map((x) => x.trim()).filter(Boolean);
-  const budgets = (cc.getAttribute('data-budgets') || '').split('|').filter(Boolean);
-  const timelines = (cc.getAttribute('data-timelines') || '').split('|').filter(Boolean);
+  const budgets = (cc.getAttribute('data-budgets') || '').split('|').map((x) => x.trim()).filter(Boolean);
+  const timelines = (cc.getAttribute('data-timelines') || '').split('|').map((x) => x.trim()).filter(Boolean);
   const log = cc.querySelector('#ccLog'), panel = cc.querySelector('#ccPanel'), launch = cc.querySelector('#ccLaunch');
   const input = cc.querySelector('#ccText'), chatForm = cc.querySelector('#ccForm');
   const contact = cc.querySelector('#ccContact');
@@ -738,8 +738,8 @@ function conciergeInit() {
     else say('You can reach the team at <a href="/pages/contact">/pages/contact</a> or sales@sabdia.com.au.');
   };
   const handle = async (text) => {
+    if (step) { await answerStep(text); return; }
     say(esc(text), 'me');
-    if (step) { const v = text; step && await answerStep(v); return; }
     await typing(500);
     const r = findResidence(text);
     if (personIntent.test(text) && !enquiryIntent.test(text)) { handOver(); return; }
