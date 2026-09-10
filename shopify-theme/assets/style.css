@@ -1431,3 +1431,11 @@ body:has(.cc.handoff) #ShopifyChat, body:has(.cc.handoff) shopify-chat, body:has
 @media (hover:none){.cc-dismiss{opacity:1}}
 .cc.hidden-by-user{display:none}
 .cc-cat{font-size:var(--t-micro);letter-spacing:.18em;text-transform:uppercase;color:var(--taupe-d);align-self:flex-start;margin-top:4px}
+
+/* Header: links centred on the page, not between logo and Enquire */
+@media (min-width:1024px){
+  #mainNav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+  #mainNav .nav-logo{justify-self:start}
+  #mainNav .nav-center{justify-self:center;margin:0}
+  #mainNav .nav-right{justify-self:end;margin-left:0}
+}
