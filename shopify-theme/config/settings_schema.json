@@ -135,8 +135,8 @@
         "max": 18,
         "step": 1,
         "unit": "%",
-        "default": 8,
-        "info": "8% since 11 Sep 2026 (Naomi). 5% was the original tight setting; 12% was too much."
+        "default": 10,
+        "info": "10% since 11 Sep 2026 (Naomi). 5% was the original tight setting."
       },
       {
         "type": "range",
