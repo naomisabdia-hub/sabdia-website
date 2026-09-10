@@ -95,6 +95,14 @@ try {
 {%- if settings.design_override -%}
 <style>:root{--bg:{{ settings.c_bg }};--bg2:{{ settings.c_bg2 }};--dark:{{ settings.c_dark }};--ink:{{ settings.c_ink }};--gold:{{ settings.c_gold }};--gold2:{{ settings.c_gold2 }}}</style>
 {%- endif -%}
+{%- comment -%} Theme settings › Layout: side margins, content width, section spacing. {%- endcomment -%}
+{%- liquid
+  assign lay_pad = settings.page_pad | default: 80
+  assign lay_pad_m = settings.page_pad_mobile | default: 22
+  assign lay_max = settings.page_max | default: 1400
+  assign lay_sp = settings.section_space | default: 100
+-%}
+<style>:root{--page-pad:clamp({{ lay_pad_m }}px,5vw,{{ lay_pad }}px);--page-max:{{ lay_max }}px;--sp-scale:{{ lay_sp | divided_by: 100.0 }}}</style>
 {{ content_for_header }}
 </head>
 <body>

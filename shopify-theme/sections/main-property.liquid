@@ -79,7 +79,7 @@
 </section>
 
 {%- if sold -%}
-  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:22px clamp(22px,5vw,80px)">
+  <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:22px var(--page-pad)">
     <div class="inner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <div style="padding:7px 16px;background:rgba(168,135,74,.14);border:1px solid rgba(168,135,74,.4);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--ink)">{{ pstatus }}</div>
       <span style="font-size:13.5px;font-weight:400;color:var(--ink3)">{{ section.settings.sold_notice }}</span>
@@ -606,7 +606,7 @@
   </section>
 {%- endunless -%}
 
-<section style="padding:0 clamp(22px,5vw,80px) clamp(48px,6vw,72px)">
+<section style="padding:0 var(--page-pad) clamp(48px,6vw,72px)">
   <div class="inner" style="display:flex;justify-content:center">
     {%- assign share_url = shop.url | append: product.url -%}
     {%- assign share_title = product.title | append: ' - ' | append: mf.suburb.value | append: ' | Sabdia Constructions' -%}

@@ -26,7 +26,7 @@
   endif
 -%}
 <section id="properties" style="padding:0 0 clamp(80px,12vw,160px)">
-  <div class="inner" style="padding:clamp(80px,12vw,160px) clamp(22px,5vw,80px) clamp(44px,5vw,60px)">
+  <div class="inner" style="padding:clamp(80px,12vw,160px) var(--page-pad) clamp(44px,5vw,60px)">
     <div class="proj-hdr">
       <div>
         <div class="slabel reveal">{{ section.settings.label }}</div>
@@ -36,7 +36,7 @@
     </div>
   </div>
 
-  <div class="inner" style="padding:0 clamp(22px,5vw,80px)">
+  <div class="inner" style="padding:0 var(--page-pad)">
     <div class="proj-grid proj-grid-main">
       {%- for h in live_handles limit: 3 -%}
         {%- assign i = forloop.index -%}

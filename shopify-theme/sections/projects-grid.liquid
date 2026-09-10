@@ -17,7 +17,7 @@
   assign sold_handles = sold_csv | split: ','
 -%}
 
-<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px clamp(22px,5vw,80px)">
+<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px var(--page-pad)">
   <div class="inner" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
     <span style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)">{{ section.settings.filter_label }}</span>
     <button class="pfilter on" data-filter="all">{{ section.settings.filter_all }}</button>

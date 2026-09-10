@@ -65,7 +65,7 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "Colours flow into every page of the site. Off = the built-in Sabdia palette. Spacing and page layouts are part of the brand system and live in the theme code - the guide explains how those changes are made."
+        "content": "Colours flow into every page of the site. Off = the built-in Sabdia palette. Side margins, content width and section spacing are in the Layout group below."
       },
       {
         "type": "font_picker",
@@ -117,6 +117,58 @@
         "id": "c_gold2",
         "label": "Gold - text on dark",
         "default": "#C3A45E"
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "One place for the whole site's spacing. Every section reads these, so a change here moves every page together."
+      },
+      {
+        "type": "range",
+        "id": "page_pad",
+        "label": "Side margins (desktop)",
+        "min": 40,
+        "max": 200,
+        "step": 4,
+        "unit": "px",
+        "default": 80,
+        "info": "Space between the edge of the window and the content on wide screens. The built-in value is 80."
+      },
+      {
+        "type": "range",
+        "id": "page_pad_mobile",
+        "label": "Side margins (phones)",
+        "min": 14,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "default": 22
+      },
+      {
+        "type": "range",
+        "id": "page_max",
+        "label": "Content width",
+        "min": 1100,
+        "max": 1800,
+        "step": 20,
+        "unit": "px",
+        "default": 1400,
+        "info": "The widest the content runs before it centres with space either side. The built-in value is 1400."
+      },
+      {
+        "type": "range",
+        "id": "section_space",
+        "label": "Space above and below sections",
+        "min": 60,
+        "max": 140,
+        "step": 5,
+        "unit": "%",
+        "default": 100,
+        "info": "100 = as designed. Lower is tighter, higher is airier."
       }
     ]
   },
@@ -215,19 +267,19 @@
         "default": "https://sabdia-website.vercel.app",
         "info": "Enquiries and subscriptions post here, into the Sabdia leads inbox."
       },
-    {
-      "type": "text",
-      "id": "privacy_link_label",
-      "label": "Privacy link beside forms",
-      "default": "Privacy Policy",
-      "info": "Shown after the note under every enquiry form. Leave blank to hide."
-    },
-    {
-      "type": "url",
-      "id": "privacy_link_url",
-      "label": "Privacy link goes to",
-      "info": "Defaults to /pages/privacy."
-    },
+      {
+        "type": "text",
+        "id": "privacy_link_label",
+        "label": "Privacy link beside forms",
+        "default": "Privacy Policy",
+        "info": "Shown after the note under every enquiry form. Leave blank to hide."
+      },
+      {
+        "type": "url",
+        "id": "privacy_link_url",
+        "label": "Privacy link goes to",
+        "info": "Defaults to /pages/privacy."
+      },
       {
         "type": "text",
         "id": "media_base",
