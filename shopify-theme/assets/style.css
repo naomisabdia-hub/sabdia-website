@@ -58,7 +58,7 @@
   --ease2:     cubic-bezier(0.4,0,0.2,1);
   --nav-h:     80px;
   /* Layout - overridden from Theme settings › Layout (theme.liquid) */
-  --page-pad:  clamp(22px,5vw,80px);
+  --page-pad:  clamp(22px,12vw,240px);
   --page-max:  1400px;
   --sp-scale:  1;
 }

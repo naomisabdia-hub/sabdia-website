@@ -125,23 +125,33 @@
     "settings": [
       {
         "type": "paragraph",
-        "content": "One place for the whole site's spacing. Every section reads these, so a change here moves every page together."
+        "content": "One place for the whole site's spacing. Every section reads these, so a change here moves every page together. The side margin is a share of the window, held between the phone and desktop limits, so a laptop and a large monitor read the same."
+      },
+      {
+        "type": "range",
+        "id": "page_pad_vw",
+        "label": "Side margins (share of the window)",
+        "min": 4,
+        "max": 18,
+        "step": 1,
+        "unit": "%",
+        "default": 12,
+        "info": "12% matches the generous margins Naomi marked on 11 Sep 2026. 5% was the old tight setting."
       },
       {
         "type": "range",
         "id": "page_pad",
-        "label": "Side margins (desktop)",
+        "label": "Side margins, most on a large screen",
         "min": 40,
-        "max": 200,
-        "step": 4,
+        "max": 320,
+        "step": 8,
         "unit": "px",
-        "default": 80,
-        "info": "Space between the edge of the window and the content on wide screens. The built-in value is 80."
+        "default": 240
       },
       {
         "type": "range",
         "id": "page_pad_mobile",
-        "label": "Side margins (phones)",
+        "label": "Side margins, least on a phone",
         "min": 14,
         "max": 40,
         "step": 2,
@@ -157,7 +167,7 @@
         "step": 20,
         "unit": "px",
         "default": 1400,
-        "info": "The widest the content runs before it centres with space either side. The built-in value is 1400."
+        "info": "The widest the content runs before it centres with space either side."
       },
       {
         "type": "range",

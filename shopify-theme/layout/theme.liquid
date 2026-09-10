@@ -97,12 +97,13 @@ try {
 {%- endif -%}
 {%- comment -%} Theme settings › Layout: side margins, content width, section spacing. {%- endcomment -%}
 {%- liquid
-  assign lay_pad = settings.page_pad | default: 80
+  assign lay_pad = settings.page_pad | default: 240
+  assign lay_pad_vw = settings.page_pad_vw | default: 12
   assign lay_pad_m = settings.page_pad_mobile | default: 22
   assign lay_max = settings.page_max | default: 1400
   assign lay_sp = settings.section_space | default: 100
 -%}
-<style>:root{--page-pad:clamp({{ lay_pad_m }}px,5vw,{{ lay_pad }}px);--page-max:{{ lay_max }}px;--sp-scale:{{ lay_sp | divided_by: 100.0 }}}</style>
+<style>:root{--page-pad:clamp({{ lay_pad_m }}px,{{ lay_pad_vw }}vw,{{ lay_pad }}px);--page-max:{{ lay_max }}px;--sp-scale:{{ lay_sp | divided_by: 100.0 }}}</style>
 {{ content_for_header }}
 </head>
 <body>
