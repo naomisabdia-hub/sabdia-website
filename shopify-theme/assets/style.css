@@ -439,7 +439,7 @@ html.js .slabel.reveal.vis::before{width:24px}
 /* Hierarchy (Tamsin, 10 Sep 2026): the heading clearly leads; the three
    value titles are sub-headings, set in the label caps so they read as one
    level below it rather than competing with it. */
-.about-h{font-family:var(--font-d);font-size:clamp(44px,5.6vw,78px);font-weight:300;line-height:1;color:var(--ink);letter-spacing:-.025em;margin-bottom:32px}
+.about-h{font-family:var(--font-d);font-size:clamp(40px,4.6vw,70px);font-weight:300;line-height:1;color:var(--ink);letter-spacing:-.025em;margin-bottom:32px}
 .about-h em{font-style:italic;color:var(--ink)}
 .about-p{font-size:var(--t-body);font-weight:300;line-height:var(--lh-body);color:var(--ink3);letter-spacing:.018em;max-width:560px}
 .about-p + .about-p{margin-top:20px}
