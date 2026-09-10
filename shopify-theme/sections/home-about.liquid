@@ -85,7 +85,7 @@
         {%- endif -%}
       {%- endfor -%}
       {%- if section.settings.sig_name != blank -%}
-      <div class="sig reveal d3">
+      <div class="sig reveal d3" style="--sig-size:{{ section.settings.sig_size | default: 14 }}px">
         <div class="sig-name">{{ section.settings.sig_name }}</div>
         <div class="sig-title">{{ section.settings.sig_title }}</div>
       </div>
@@ -234,6 +234,17 @@
       "type": "text",
       "id": "sig_title",
       "label": "Signature title"
+    },
+    {
+      "type": "range",
+      "id": "sig_size",
+      "label": "Signature size",
+      "min": 10,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 14,
+      "info": "Naomi, 11 Sep 2026: bigger than the 10.5px labels."
     },
     {
       "type": "text",
