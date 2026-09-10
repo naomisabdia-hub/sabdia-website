@@ -24,10 +24,6 @@
             assign strip_cols = '1fr'
             assign w1 = 1400
             assign w2 = 1400
-          when 'carousel'
-            assign strip_cols = 'carousel'
-            assign w1 = 700
-            assign w2 = 700
           else
             assign strip_cols = '2fr 1fr'
             assign w1 = 900
@@ -36,27 +32,30 @@
         # Request the crop at twice the display height for retina screens.
         assign ih = strip_h | times: 2.5 | round
       -%}
-      {%- if strip_cols == 'carousel' -%}
-      {%- comment -%} Every Strip image, gliding sideways on a slow loop (the set
-          is drawn twice so the loop is seamless). Pauses on hover. {%- endcomment -%}
+      {%- comment -%} Two photo slots, as before. With "Rotate" on and more than two
+          Strip images, each slot crossfades through the set - always two
+          photos showing, always changing. {%- endcomment -%}
       {%- assign strip_imgs = section.blocks | where: 'type', 'image' -%}
-      {%- assign glide = strip_imgs.size | times: 9 | at_least: 24 -%}
-      <div class="about-img-strip about-strip-carousel reveal-wipe d2" style="--strip-h:{{ strip_h }}px;--strip-h-m:{{ strip_hm }}px;--strip-gap:{{ strip_gap }}px;--strip-glide:{{ glide }}s" aria-label="Sabdia homes">
-        <div class="about-strip-track">
-          {%- for pass in (1..2) -%}
-            {%- for block in strip_imgs -%}
-              {%- assign focus = block.settings.focus | default: 'center' -%}
-              {%- if block.settings.image -%}
-                <img src="{{ block.settings.image | image_url: width: 700, height: ih, crop: focus }}" alt="{% if pass == 1 %}{{ block.settings.alt | escape }}{% endif %}" loading="lazy" decoding="async" width="700" height="{{ ih }}" style="object-position:{{ focus }}"{% if pass == 2 %} aria-hidden="true"{% endif %} {% if pass == 1 %}{{ block.shopify_attributes }}{% endif %}>
-              {%- elsif block.settings.ext != blank -%}
-                <img src="{% render 'ext-variant', src: block.settings.ext, w: 700, h: ih %}" alt="{% if pass == 1 %}{{ block.settings.alt | escape }}{% endif %}" loading="lazy" decoding="async" width="700" height="{{ ih }}" style="object-position:{{ focus }}"{% if pass == 2 %} aria-hidden="true"{% endif %} {% if pass == 1 %}{{ block.shopify_attributes }}{% endif %}>
-              {%- endif -%}
-            {%- endfor -%}
+      {%- assign rotate = false -%}
+      {%- if section.settings.strip_rotate and strip_imgs.size > 2 and strip_cols != '1fr' -%}{%- assign rotate = true -%}{%- endif -%}
+      <div class="about-img-strip reveal-wipe d2{% if rotate %} about-strip-rotate{% endif %}" style="--strip-h:{{ strip_h }}px;--strip-h-m:{{ strip_hm }}px;--strip-gap:{{ strip_gap }}px;--strip-cols:{{ strip_cols }}"{% if rotate %} data-about-rotate data-every="{{ section.settings.strip_every | default: 5 }}"{% endif %}>
+        {%- if rotate -%}
+          {%- for slot in (0..1) -%}
+            {%- if slot == 0 -%}{%- assign iw = w1 -%}{%- else -%}{%- assign iw = w2 -%}{%- endif -%}
+            <div class="about-slot" data-slot="{{ slot }}">
+              {%- for block in strip_imgs -%}
+                {%- assign focus = block.settings.focus | default: 'center' -%}
+                {%- assign on = false -%}
+                {%- if forloop.index0 == slot -%}{%- assign on = true -%}{%- endif -%}
+                {%- if block.settings.image -%}
+                  <img class="about-slide{% if on %} is-on{% endif %}" src="{{ block.settings.image | image_url: width: iw, height: ih, crop: focus }}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {% if slot == 0 %}{{ block.shopify_attributes }}{% endif %}>
+                {%- elsif block.settings.ext != blank -%}
+                  <img class="about-slide{% if on %} is-on{% endif %}" src="{% render 'ext-variant', src: block.settings.ext, w: iw, h: ih %}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {% if slot == 0 %}{{ block.shopify_attributes }}{% endif %}>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
           {%- endfor -%}
-        </div>
-      </div>
-      {%- else -%}
-      <div class="about-img-strip reveal-wipe d2" style="--strip-h:{{ strip_h }}px;--strip-h-m:{{ strip_hm }}px;--strip-gap:{{ strip_gap }}px;--strip-cols:{{ strip_cols }}">
+        {%- else -%}
         {%- assign img_i = 0 -%}
         {%- for block in section.blocks -%}
           {%- if block.type == 'image' -%}
@@ -76,8 +75,8 @@
             {%- endif -%}
           {%- endif -%}
         {%- endfor -%}
+        {%- endif -%}
       </div>
-      {%- endif -%}
     </div>
     <div>
       {%- for block in section.blocks -%}
@@ -107,6 +106,33 @@
     </div>
   </div>
 </section>
+
+<script>
+  (function () {
+    document.querySelectorAll('[data-about-rotate]').forEach(function (strip) {
+      if (strip.dataset.init) return;
+      strip.dataset.init = '1';
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var slots = strip.querySelectorAll('.about-slot');
+      var n = slots[0] ? slots[0].querySelectorAll('.about-slide').length : 0;
+      if (n < 3) return;
+      var every = (Number(strip.dataset.every) || 5) * 1000, offset = 0, timer = null;
+      function show() {
+        slots.forEach(function (slot, k) {
+          var imgs = slot.querySelectorAll('.about-slide');
+          for (var i = 0; i < imgs.length; i++) imgs[i].classList.toggle('is-on', i === (offset + k) % n);
+        });
+      }
+      function tick() { offset = (offset + 1) % n; show(); }
+      function start() { if (!timer) timer = setInterval(tick, every); }
+      function stop() { clearInterval(timer); timer = null; }
+      strip.addEventListener('mouseenter', stop);
+      strip.addEventListener('mouseleave', start);
+      document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+      start();
+    });
+  })();
+</script>
 
 {% schema %}
 {
@@ -142,11 +168,27 @@
         { "value": "large-small", "label": "Large + small (2:1)" },
         { "value": "equal", "label": "Two equal" },
         { "value": "small-large", "label": "Small + large (1:2)" },
-        { "value": "single", "label": "One image, full width" },
-        { "value": "carousel", "label": "Carousel - every image glides past on a loop" }
+        { "value": "single", "label": "One image, full width" }
       ],
-      "default": "carousel",
-      "info": "Carousel shows every Strip image block, gliding sideways as the visitor scrolls the section (Tamsin, 10 Sep 2026: more images, carousel feel). The other layouts show the first one or two."
+      "default": "large-small",
+      "info": "With one image selected, only the first Strip image block shows."
+    },
+    {
+      "type": "checkbox",
+      "id": "strip_rotate",
+      "label": "Rotate through every Strip image",
+      "default": true,
+      "info": "Two photos always show; with three or more Strip image blocks they crossfade through the set (Tamsin, 10 Sep 2026: more images, carousel feel). Off = the first two stay put."
+    },
+    {
+      "type": "range",
+      "id": "strip_every",
+      "label": "Change every",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "unit": "s",
+      "default": 5
     },
     {
       "type": "range",

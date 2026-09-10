@@ -214,11 +214,31 @@
             "title": "Boutique & Personal",
             "desc": "A few projects a year, so each one gets our full attention."
           }
+        },
+        "image-9": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/sierra-living-view-01.jpg",
+            "ext": "",
+            "alt": "Sabdia living room with a city view",
+            "focus": "center"
+          }
+        },
+        "image-10": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/sierra-aerial-dusk-01.jpg",
+            "ext": "",
+            "alt": "A Sabdia residence at dusk, from above",
+            "focus": "center"
+          }
         }
       },
       "block_order": [
         "image-1",
         "image-2",
+        "image-9",
+        "image-10",
         "paragraph-3",
         "paragraph-4",
         "paragraph-5",
@@ -229,14 +249,16 @@
       "settings": {
         "label": "About Sabdia",
         "heading_html": "Beautiful homes, <em>built properly</em>.",
-        "strip_split": "carousel",
+        "strip_split": "large-small",
         "strip_height": 240,
         "strip_height_mobile": 160,
         "strip_gap": 8,
         "sig_name": "Sabdia",
         "sig_title": "Founder & Principal",
         "cta_label": "Our Full Story",
-        "cta_link": "/pages/about"
+        "cta_link": "/pages/about",
+        "strip_rotate": true,
+        "strip_every": 5
       }
     },
     "film": {
