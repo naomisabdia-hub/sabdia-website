@@ -19,10 +19,10 @@ Thank you for thinking of us. At the moment we aren't taking on client builds or
 QASR in Coorparoo, SOLACE in Camp Hill, SIERRA in Holland Park West, CASPIAN in Ascot and AETHER in Hendra. Tell us which one interests you, with your budget range and timeline, and we will send the details.
 
 **How do I inspect a residence?**
-Inspections are by private appointment. Tell us the residence, your approximate budget range and timeline to purchase, plus your name, email and phone, and a member of our team will arrange a time.
+Inspections are by private appointment. Reply here with: 1. the residence 2. your phone number 3. approximate budget range 4. timeline to purchase 5. preferred days. A member of our team will arrange a time.
 
 **What is the price?**
-We talk through pricing directly rather than publishing a guide. Share your approximate budget range and timeline to purchase, with your name, email and the residence you mean, and a member of our team will be in touch.
+We talk through pricing directly rather than publishing a guide. Reply here with: 1. the residence 2. your phone number 3. approximate budget range 4. timeline to purchase. A member of our team will be in touch.
 
 **When is your next release?**
 We release a small number of residences each year. Leave your email and we will let you know first.
@@ -31,13 +31,13 @@ We release a small number of residences each year. Leave your email and we will 
 Thank you for reaching out. Apply on our Agent Access page (sabdia.com.au/pages/agent-access) and a member of our team will be in touch.
 
 **I want to enquire about a residence.**
-Wonderful. Please share your name, email, phone and which residence (QASR, SOLACE, SIERRA, CASPIAN or AETHER), plus your approximate budget range, timeline to purchase and preferred locations. A member of our team will be in touch as soon as possible.
+Wonderful. Reply here with: 1. the residence (QASR, SOLACE, SIERRA, CASPIAN or AETHER) 2. your phone number 3. approximate budget range 4. timeline to purchase 5. other locations you would consider. A member of our team will be in touch as soon as possible.
 
 **I am looking for a home, not sure which.**
-Happy to help you find the right one. Share your name, email, phone, your approximate budget range, timeline to purchase and the suburbs you would consider, and a member of our team will come back with the residences that fit.
+Happy to help you find the right one. Reply here with: 1. your phone number 2. approximate budget range 3. timeline to purchase 4. the suburbs you would consider 5. bedrooms needed. A member of our team will come back with the residences that fit.
 
 **General enquiry.**
-Of course. Share your name, email, phone and a few words about how we can help, and a member of our team will be in touch as soon as possible.
+Of course. Reply here with: 1. your phone number 2. a few words about how we can help. A member of our team will be in touch as soon as possible.
 
 **How do I buy one of your homes?**
 Tell us the residence, your budget range and timeline, with your name, email and phone. A member of our team will walk you through it, from a private inspection to settlement.
