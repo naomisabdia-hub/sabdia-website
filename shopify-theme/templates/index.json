@@ -2,20 +2,12 @@
   "sections": {
     "hero": {
       "type": "home-hero",
-      "settings": {
-        "words": "Design, Develop, Construct",
-        "eyebrow": "Boutique Luxury Home Builder & Developer - Brisbane",
-        "description": "Redefining luxury through design, detail, and craftsmanship. For over ten years, Sabdia has delivered award-winning residences that set a new benchmark for contemporary living in Brisbane.",
-        "award": "Award-Winning Luxury Residences.",
-        "cta1_label": "View Properties",
-        "cta1_link": "/collections/for-sale",
-        "cta2_label": "Begin a Conversation",
-        "cta2_link": "/pages/contact"
-      },
       "blocks": {
         "slide-1": {
           "type": "slide",
+          "disabled": true,
           "settings": {
+            "image": "shopify://shop_images/sierra-exterior-front-dusk-01.jpg",
             "ext": "/images/home-hero-1.jpg",
             "alt": "Sabdia luxury home"
           }
@@ -23,6 +15,7 @@
         "slide-2": {
           "type": "slide",
           "settings": {
+            "image": "shopify://shop_images/solace-exterior-front-dusk-01.jpg",
             "ext": "/images/home-hero-2.jpg",
             "alt": "Sabdia luxury home"
           }
@@ -30,6 +23,7 @@
         "slide-3": {
           "type": "slide",
           "settings": {
+            "image": "shopify://shop_images/sierra-living-view-01.jpg",
             "ext": "/images/solace-hero.jpg",
             "alt": "Sabdia luxury home"
           }
@@ -39,11 +33,31 @@
         "slide-1",
         "slide-2",
         "slide-3"
-      ]
+      ],
+      "settings": {
+        "media": "video",
+        "video": "shopify://files/videos/Sienna Sabdia normal crop.mp4",
+        "video_url": "",
+        "video_poster": "shopify://shop_images/sierra-exterior-front-dusk-01.jpg",
+        "words_delay": 18,
+        "show_wordmark": true,
+        "wordmark_delay": 18,
+        "words_loop": true,
+        "words_fade_lead": 9.5,
+        "wordmark_size": 40,
+        "words_position": "centre",
+        "words": "",
+        "eyebrow": "Boutique Luxury Home Builder & Developer — Brisbane",
+        "description": "",
+        "award": "Award-Winning Luxury Residences.",
+        "cta1_label": "View Properties",
+        "cta1_link": "/collections/for-sale",
+        "cta2_label": "Begin a Conversation",
+        "cta2_link": "/pages/contact"
+      }
     },
     "stats": {
       "type": "stats-band",
-      "settings": {},
       "blocks": {
         "stat-1": {
           "type": "stat",
@@ -87,22 +101,18 @@
         "stat-2",
         "stat-3",
         "stat-4"
-      ]
+      ],
+      "settings": {
+        "size": "compact"
+      }
     },
     "marquee": {
       "type": "marquee",
-      "settings": {},
       "blocks": {
         "item-1": {
           "type": "item",
           "settings": {
             "text": "Multi-Award Winning"
-          }
-        },
-        "item-2": {
-          "type": "item",
-          "settings": {
-            "text": "Design · Develop · Construct"
           }
         },
         "item-3": {
@@ -126,53 +136,49 @@
       },
       "block_order": [
         "item-1",
-        "item-2",
         "item-3",
         "item-4",
         "item-5"
-      ]
+      ],
+      "settings": {}
     },
     "about": {
       "type": "home-about",
-      "settings": {
-        "label": "About Sabdia",
-        "heading_html": "Crafting <em>Exquisite</em><br>Living Spaces.",
-        "sig_name": "Sabdia",
-        "sig_title": "Founder & Principal",
-        "cta_label": "Our Full Story",
-        "cta_link": "/pages/about"
-      },
       "blocks": {
         "image-1": {
           "type": "image",
           "settings": {
+            "image": "shopify://shop_images/sierra-living-kitchen-01.jpg",
             "ext": "/images/home-hero-1.jpg",
-            "alt": "Sabdia craftsmanship"
+            "alt": "Detail of a Sabdia home",
+            "focus": "center"
           }
         },
         "image-2": {
           "type": "image",
           "settings": {
             "ext": "/images/home-hero-2.jpg",
-            "alt": "Sabdia detail"
+            "alt": "Sabdia detail",
+            "focus": "center",
+            "image": "shopify://shop_images/solace-kitchen-01.jpg"
           }
         },
         "paragraph-3": {
           "type": "paragraph",
           "settings": {
-            "text": "At Sabdia, we manage every step of the residential development journey in-house - from visionary design through to expert construction. This integrated approach allows us to maintain meticulous control over quality, timing, and innovation, delivering homes that stand the test of time."
+            "text": "Sabdia has designed and built award-winning homes in inner Brisbane since 2013. Every Sabdia home is designed in-house and built by our own team. One team answers for the whole job, so the quality holds and so does the program."
           }
         },
         "paragraph-4": {
           "type": "paragraph",
           "settings": {
-            "text": "With a focus on creating exceptional living spaces, Sabdia Constructions is dedicated to shaping the future of residential developments through innovation, quality, and unparalleled craftsmanship. Every project begins with a deep understanding of both the site and the clients who will call it home."
+            "text": "Every project starts with the site and the people who will live there. We take time to understand both before a line is drawn."
           }
         },
         "paragraph-5": {
           "type": "paragraph",
           "settings": {
-            "text": "We are not merely builders - we are creators of legacy. Each residence we deliver is conceived as a singular work of architecture, thoughtfully designed to complement its surroundings and exceed every expectation of luxury living."
+            "text": "We build homes people keep. Each one is designed for its street and its owners, and finished to a standard that does not date."
           }
         },
         "value-6": {
@@ -180,15 +186,15 @@
           "settings": {
             "n": "i.",
             "title": "Integrated Delivery",
-            "desc": "Design, develop, and construct under one roof - seamless from concept to keys."
+            "desc": "We design the home and build it ourselves, under one roof."
           }
         },
         "value-7": {
           "type": "value",
           "settings": {
             "n": "ii.",
-            "title": "Uncompromising Quality",
-            "desc": "Only the finest materials, master tradespeople, and meticulous attention to detail."
+            "title": "Quality without shortcuts",
+            "desc": "The best materials, the best trades, and attention to every detail."
           }
         },
         "value-8": {
@@ -209,21 +215,34 @@
         "value-6",
         "value-7",
         "value-8"
-      ]
+      ],
+      "settings": {
+        "label": "About Sabdia",
+        "heading_html": "Beautiful homes, <em>built properly</em>.",
+        "strip_split": "carousel",
+        "strip_height": 240,
+        "strip_height_mobile": 160,
+        "strip_gap": 8,
+        "sig_name": "Sabdia",
+        "sig_title": "Founder & Principal",
+        "cta_label": "Our Full Story",
+        "cta_link": "/pages/about"
+      }
     },
     "film": {
       "type": "film-band",
       "settings": {
         "anchor": "story",
         "label": "The Sabdia Story",
-        "heading_html": "Crafted moments,<br><em>captured on film</em>.",
-        "text": "A look at the residences, the craftsmanship, and the people behind every Sabdia home.",
+        "heading_html": "Our homes, <em>on film</em>.",
+        "text": "The residences, the people who build them, and the work that goes into every Sabdia home.",
         "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand.mp4",
         "poster_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand-poster.jpg",
-        "caption_left": "Sabdia - On Film",
+        "caption_left": "Sabdia — On Film",
         "caption_right": "Brisbane, QLD",
         "cta_label": "Explore the Collection",
-        "cta_link": "/pages/collection"
+        "cta_link": "/pages/collection",
+        "sound_label": "Sound On"
       }
     },
     "properties": {
@@ -233,19 +252,13 @@
         "heading_html": "<em>Current</em> Properties",
         "cta_label": "View All",
         "cta_link": "/collections/for-sale",
+        "max_cards": 12,
         "for_sale_collection": "for-sale",
-        "sold_collection": "sold"
+        "sold_collection": "for-sale"
       }
     },
     "services": {
       "type": "services-dark",
-      "settings": {
-        "label": "What We Do",
-        "heading_html": "Full-spectrum<br><em>development</em><br>expertise.",
-        "text": "From site acquisition through to final handover, Sabdia manages every element in-house - ensuring seamless delivery and uncompromising quality at every stage.",
-        "cta_label": "Explore Services",
-        "cta_link": "/pages/services"
-      },
       "blocks": {
         "service-1": {
           "type": "service",
@@ -289,13 +302,17 @@
         "service-2",
         "service-3",
         "service-4"
-      ]
+      ],
+      "settings": {
+        "label": "What We Do",
+        "heading_html": "Full-spectrum<br><em>development</em><br>expertise.",
+        "text": "Sabdia handles every stage of a project in-house, and one team is responsible for all of it. Nothing is lost between trades and the standard never drops.",
+        "cta_label": "Explore Services",
+        "cta_link": "/pages/services"
+      }
     },
     "process": {
       "type": "process-steps",
-      "settings": {
-        "label": "Our Process"
-      },
       "blocks": {
         "step-1": {
           "type": "step",
@@ -331,29 +348,20 @@
         "step-2",
         "step-3",
         "step-4"
-      ]
+      ],
+      "settings": {
+        "label": "Our Process"
+      }
     },
     "testimonial": {
       "type": "testimonial",
       "settings": {
         "quote": "One team did the design and the build, so nothing was lost in between. The house is exactly what we asked for, and better made.",
-        "attribution": "Satisfied Client - Inner Brisbane Residence"
+        "attribution": "Satisfied Client — Inner Brisbane Residence"
       }
     },
     "agent": {
       "type": "agent-access",
-      "settings": {
-        "image_ext": "/images/agent-portrait.jpg",
-        "image_alt": "Agent Access",
-        "badge": "Exclusive Access",
-        "label": "For Real Estate Professionals",
-        "heading_html": "Exclusive <em>Agent</em><br>Access.",
-        "text": "Agents on our list hear about new releases first, with plans and pricing before launch.",
-        "cta1_label": "Apply for Access",
-        "cta1_link": "/pages/agent-access",
-        "cta2_label": "Start a Conversation",
-        "cta2_link": "/pages/agent-access"
-      },
       "blocks": {
         "feature-1": {
           "type": "feature",
@@ -399,7 +407,20 @@
         "feature-4",
         "feature-5",
         "feature-6"
-      ]
+      ],
+      "settings": {
+        "image_ext": "/images/agent-portrait.jpg",
+        "image_alt": "Agent Access",
+        "badge": "Exclusive Access",
+        "label": "For Real Estate Professionals",
+        "heading_html": "Exclusive <em>Agent</em><br>Access.",
+        "text": "Agents on our list hear about new releases first, with plans and pricing before launch.",
+        "cta1_label": "Apply for Access",
+        "cta1_link": "/pages/agent-access",
+        "cta2_label": "Start a Conversation",
+        "cta2_link": "/pages/agent-access"
+      },
+      "disabled": true
     },
     "contact": {
       "type": "contact-cta",
@@ -407,8 +428,26 @@
         "label": "Get In Touch",
         "heading_html": "Let's start<br>a <em>conversation</em>.",
         "text": "Leave your details and we will call or email within a business day.",
-        "interests": "For Sale - Current Properties\nCustom Home Design\nDevelopment Partnership\nAgent Access\nGeneral Enquiry",
-        "note": "We typically respond within one business day."
+        "interests": "For Sale — Current Properties\nCustom Home Design\nDevelopment Partnership\nAgent Access\nGeneral Enquiry",
+        "note": "We typically respond within one business day.",
+        "f_first": "First Name*",
+        "f_first_ph": "First name",
+        "f_last": "Last Name*",
+        "f_last_ph": "Last name",
+        "f_email": "Email*",
+        "f_email_ph": "Email address",
+        "f_phone": "Phone",
+        "f_phone_ph": "Phone number",
+        "f_interest": "Interest",
+        "f_message": "Message*",
+        "f_message_ph": "Tell us about your interest...",
+        "f_submit": "Submit",
+        "d_location": "Location",
+        "d_instagram": "Instagram",
+        "d_facebook": "Facebook",
+        "d_facebook_v": "Sabdia Constructions",
+        "d_linkedin": "LinkedIn",
+        "d_linkedin_v": "Sabdia Constructions"
       }
     }
   },

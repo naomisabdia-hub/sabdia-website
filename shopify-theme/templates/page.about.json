@@ -5,16 +5,17 @@
       "settings": {
         "label": "Our Story",
         "title_html": "About<br><em>Sabdia</em>",
-        "sub": "A decade of redefining luxury residential development in inner Brisbane.",
+        "sub": "Designed and built in-house, in inner Brisbane, since 2013.",
         "image_ext": "/images/home-hero-1.jpg",
-        "image_alt": "Sabdia Constructions"
+        "image_alt": "Sabdia living room with city view",
+        "image": "shopify://shop_images/sierra-living-view-01.jpg"
       }
     },
     "mission": {
       "type": "about-mission",
       "settings": {
         "label": "Mission",
-        "heading_html": "Built on <em>vision</em>,<br>delivered with<br>precision.",
+        "heading_html": "Designed with <em>care</em>, built with precision.",
         "sig_name": "Sabdia",
         "sig_title": "Founder & Principal"
       },
@@ -22,7 +23,7 @@
         "paragraph-1": {
           "type": "paragraph",
           "settings": {
-            "text": "Founded in 2013, Sabdia Constructions was born from a singular conviction: that the residential development industry in Brisbane deserved a boutique operator who refused to compromise. One that would bring together exceptional design, rigorous development management, and master-level construction under a single, unified vision."
+            "text": "Sabdia Constructions started in 2013 because Brisbane needed a boutique developer that would not cut corners, one that would do the design and the development itself and then build the house with its own team."
           }
         },
         "paragraph-2": {
@@ -34,7 +35,7 @@
         "paragraph-3": {
           "type": "paragraph",
           "settings": {
-            "text": "We remain boutique by choice. By limiting the number of projects we undertake each year, we ensure that every development receives the full force of our attention, creativity, and craftsmanship. We do not build in volume. We build in detail."
+            "text": "We stay small on purpose. We take on a few projects a year so each one gets our full attention. We do not build in volume. We build in detail."
           }
         }
       },
@@ -55,7 +56,7 @@
           "settings": {
             "numeral": "i.",
             "title": "Integrity",
-            "desc": "We say what we do, and we do what we say. Transparency with our clients is non-negotiable at every stage of the journey."
+            "desc": "We say what we do, and we do what we say. Clients hear the truth about cost and timing at every stage."
           }
         },
         "value-2": {
@@ -63,7 +64,7 @@
           "settings": {
             "numeral": "ii.",
             "title": "Innovation",
-            "desc": "We push the boundaries of design and construction, constantly seeking better ways to create residences that will stand the test of time."
+            "desc": "We keep looking for better ways to design and build, so the homes last."
           }
         },
         "value-3": {
@@ -71,7 +72,7 @@
           "settings": {
             "numeral": "iii.",
             "title": "Excellence",
-            "desc": "We do not accept 'good enough'. Every detail, from the grandest architectural gesture to the smallest finishing touch, must be exceptional."
+            "desc": "We do not accept 'good enough'. Every detail, the roofline down to the door handles, has to be right."
           }
         }
       },
@@ -86,7 +87,7 @@
       "settings": {
         "label": "Our Journey",
         "heading_html": "A decade of<br><em>milestones</em>.",
-        "text": "From a single vision to over 100 delivered residences, each year has brought new achievements and raised the bar for what luxury living in Brisbane can be."
+        "text": "The company started with one project. It has now completed more than 100 homes, and each year the standard has gone up."
       },
       "blocks": {
         "milestone-1": {
@@ -94,7 +95,7 @@
           "settings": {
             "year": "2013",
             "title": "Founded",
-            "desc": "Sabdia Constructions established with a vision to redefine boutique luxury residential development in inner Brisbane."
+            "desc": "Sabdia Constructions opens in Brisbane, designing and building its own homes."
           }
         },
         "milestone-2": {
@@ -110,7 +111,7 @@
           "settings": {
             "year": "2017",
             "title": "50 Residences Delivered",
-            "desc": "A major milestone - 50 homes delivered to satisfied clients across inner Brisbane's most prestigious suburbs."
+            "desc": "50 homes delivered across inner Brisbane."
           }
         },
         "milestone-4": {
@@ -126,15 +127,15 @@
           "settings": {
             "year": "2023",
             "title": "100+ Residences",
-            "desc": "Surpassed 100 completed residences - a testament to a decade of consistency, quality, and unwavering commitment to excellence."
+            "desc": "More than 100 residences completed, ten years in, with the same team and the same standard."
           }
         },
         "milestone-6": {
           "type": "milestone",
           "settings": {
             "year": "2025",
-            "title": "QASR - Flagship Release",
-            "desc": "The launch of QASR, Coorparoo - Sabdia's most ambitious and extraordinary residence to date, representing a new pinnacle of Brisbane luxury."
+            "title": "QASR — Flagship Release",
+            "desc": "QASR launches in Coorparoo, the largest home Sabdia has built."
           }
         }
       },
@@ -182,7 +183,7 @@
           "type": "award",
           "settings": {
             "year": "2021",
-            "title": "Residential Interior Design - Luxury",
+            "title": "Residential Interior Design — Luxury",
             "org": "IDEA Awards"
           }
         },
@@ -190,7 +191,7 @@
           "type": "award",
           "settings": {
             "year": "2020",
-            "title": "Custom Home of the Year - QLD",
+            "title": "Custom Home of the Year — QLD",
             "org": "Master Builders Queensland"
           }
         },
@@ -198,7 +199,7 @@
           "type": "award",
           "settings": {
             "year": "2019",
-            "title": "Best Luxury Home Builder - Brisbane",
+            "title": "Best Luxury Home Builder — Brisbane",
             "org": "REIQ Awards for Excellence"
           }
         }
@@ -215,12 +216,12 @@
     "cta": {
       "type": "cta-centered",
       "settings": {
-        "label": "Get in Touch",
-        "heading_html": "Ready to create something <em>extraordinary</em>?",
-        "text": "Whether you're seeking a current property for sale or have a vision for a bespoke home, we'd love to begin a conversation.",
-        "cta1_label": "View Properties",
+        "label": "Now Selling",
+        "heading_html": "See what is <em>for sale</em> now.",
+        "text": "Every Sabdia residence is designed and built by the one team, from the first sketch to handover.",
+        "cta1_label": "View Current Properties",
         "cta1_link": "/collections/for-sale",
-        "cta2_label": "Get In Touch",
+        "cta2_label": "Get in Touch",
         "cta2_link": "/pages/contact"
       }
     }

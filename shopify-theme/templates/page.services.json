@@ -3,30 +3,31 @@
     "hero": {
       "type": "page-hero",
       "settings": {
-        "label": "What We Offer",
-        "title_html": "Our<br><em>Services</em>",
-        "sub": "Design, development and construction, all in-house.",
+        "label": "How We Work",
+        "title_html": "Our<br><em>Process</em>",
+        "sub": "Design, development and construction, one team, all in-house.",
         "image_ext": "/images/aether-hero.jpg",
-        "image_alt": "Services"
+        "image_alt": "SOLACE at dusk",
+        "image": "shopify://shop_images/solace-exterior-front-dusk-01.jpg"
       }
     },
     "intro": {
       "type": "services-intro",
       "settings": {
-        "label": "Integrated Approach",
+        "label": "In-House, End to End",
         "heading_html": "Every element,<br><em>under one roof</em>."
       },
       "blocks": {
         "paragraph-1": {
           "type": "paragraph",
           "settings": {
-            "text": "At Sabdia, we believe the best residential developments are those where design, development, and construction work as one seamless system - not as separate, disconnected disciplines. Our fully integrated in-house model is our defining advantage."
+            "text": "Good developments happen when the people who design a home are the same people who build it. At Sabdia they are. Every discipline is in-house, one team, one standard."
           }
         },
         "paragraph-2": {
           "type": "paragraph",
           "settings": {
-            "text": "From the first sketch to the final handover, every decision is made by the same team, with the same vision, and the same commitment to excellence."
+            "text": "The same people make every decision, on the first sketch and on handover day. Nothing is handed off and nothing gets lost."
           }
         }
       },
@@ -49,7 +50,8 @@
             "image_ext": "/images/home-hero-1.jpg",
             "image_alt": "Luxury Residential Design",
             "paragraphs": "Our architecture and design team is in-house. Each home starts with the site, the street and the client, before anything is drawn.\nThe result is a home that belongs to its site and its owners.",
-            "bullets": "Architectural concept and schematic design\nDesign development and documentation\nPlanning approvals and DA management\nLandscape architecture\nMaterial and finishes specification\n3D visualisation and virtual walkthroughs"
+            "bullets": "Architectural concept and schematic design\nDesign development and documentation\nPlanning approvals and DA management\nLandscape architecture\nMaterial and finishes specification\n3D visualisation and virtual walkthroughs",
+            "image": "shopify://shop_images/solace-staircase-02.jpg"
           }
         },
         "service-2": {
@@ -62,7 +64,8 @@
             "image_ext": "/images/solace-hero.jpg",
             "image_alt": "Development Management",
             "paragraphs": "Development management is everything between the land and the keys: town planning, engineering, approvals, finance, sales and delivery.\nWe do all of it in-house. Fewer hand-offs means fewer delays and a tighter budget.",
-            "bullets": "Site acquisition analysis and due diligence\nFeasibility modelling and investment structuring\nTown planning strategy and DA management\nEngineering and civil coordination\nSales and marketing strategy\nProject reporting and stakeholder management"
+            "bullets": "Site acquisition analysis and due diligence\nFeasibility modelling and investment structuring\nTown planning strategy and DA management\nEngineering and civil coordination\nSales and marketing strategy\nProject reporting and stakeholder management",
+            "image": "shopify://shop_images/sierra-exterior-front-01.jpg"
           }
         },
         "service-3": {
@@ -75,7 +78,8 @@
             "image_ext": "/images/sierra-hero.jpg",
             "image_alt": "Interior Architecture",
             "paragraphs": "Our interior architects work with the architecture team from day one, so the inside of the house is planned with the same care as the outside.\nKitchens, bathrooms, bedrooms and living rooms are designed together, so light, materials and proportion carry through the whole house.",
-            "bullets": "Interior concept and spatial design\nCustom joinery design and specification\nMaterial, finish, and hardware selection\nLighting design and coordination\nFF&E procurement and styling\nKitchen and bathroom design"
+            "bullets": "Interior concept and spatial design\nCustom joinery design and specification\nMaterial, finish, and hardware selection\nLighting design and coordination\nFF&E procurement and styling\nKitchen and bathroom design",
+            "image": "shopify://shop_images/solace-kitchen-01.jpg"
           }
         },
         "service-4": {
@@ -88,7 +92,8 @@
             "image_ext": "/images/caspian-hero.jpg",
             "image_alt": "Expert Construction",
             "paragraphs": "Our own team builds every home. Many of the trades have worked with Sabdia for years and hold the same standard we do.\nGood materials from suppliers we trust, and no shortcuts. The house should look right at handover and still be right in twenty years.",
-            "bullets": "Full residential construction management\nPremium material sourcing and procurement\nMaster tradesperson coordination\nQuality assurance and defect management\nClient reporting and site access\nPost-completion aftercare and warranty"
+            "bullets": "Full residential construction management\nPremium material sourcing and procurement\nMaster tradesperson coordination\nQuality assurance and defect management\nClient reporting and site access\nPost-completion aftercare and warranty",
+            "image": "shopify://shop_images/sierra-exterior-rear-dusk-01.jpg"
           }
         }
       },
@@ -145,14 +150,15 @@
       "type": "cta-centered",
       "settings": {
         "label": "Start Your Project",
-        "heading_html": "Ready to build something <em style=\"color:var(--gold2)\">remarkable</em>?",
-        "text": "Whether you have a site, a vision, or simply a desire for exceptional living - we'd love to hear from you.",
+        "heading_html": "Have a <em style=\"color:var(--gold2)\">site</em>, or an idea?",
+        "text": "If you have a site or an idea, we would like to hear from you.",
         "cta1_label": "Begin a Conversation",
         "cta1_link": "/pages/contact",
         "cta2_label": "View Properties",
         "cta2_link": "/collections/for-sale",
         "dark": true
-      }
+      },
+      "disabled": true
     }
   },
   "order": [

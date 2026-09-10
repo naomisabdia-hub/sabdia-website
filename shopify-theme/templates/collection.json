@@ -1,7 +1,33 @@
 {
   "sections": {
     "main": {
-      "type": "main-collection"
+      "type": "main-collection",
+      "settings": {
+        "label": "For Sale",
+        "heading_html": "<em>Current</em><br>Properties.",
+        "intro_template": "{count} homes in inner Brisbane, each designed and built by Sabdia.",
+        "image_ext": "",
+        "refine_label": "Refine:",
+        "all_suburbs": "All Suburbs",
+        "empty_text": "Nothing matches those filters. Try widening them.",
+        "sold_label": "Sold Prior to Completion",
+        "cta_label": "Private Enquiry",
+        "cta_heading_html": "Interested in a<br><em>private viewing</em>?",
+        "cta_text": "Inspections are by private appointment. Tell us when suits you.",
+        "cta1_label": "Request a Viewing",
+        "cta1_link": "",
+        "cta2_label": "Agent Enquiries",
+        "cta2_link": "",
+        "cta3_label": "Guided Match",
+        "cta3_link": "",
+        "filter_land_label": "Land Size",
+        "filter_garage_label": "Garage Spaces",
+        "sort_featured_label": "Sort - Featured",
+        "sort_name_label": "Name A–Z",
+        "filter_any_garage": "Any Garage",
+        "filter_any_land": "Any Land Size",
+        "filter_any_build": "Any Build Size"
+      }
     }
   },
   "order": [

@@ -18,8 +18,9 @@ for h in qasr solace sierra caspian aether capri; do
   grep -q "^templates/product.$h.json" shopify-theme/.shopifyignore || echo "templates/product.$h.json" >> shopify-theme/.shopifyignore
 done
 if [ -d "$HOME/Desktop/sabdia-store-templates/templates" ]; then
-  echo "== page templates (home, about, services, contact images)"
+  echo "== page templates (home, about, services, contact, collection, for-sale, agent - Tamsin review edits 10 Sep 2026)"
   shopify theme push --store $STORE --path "$HOME/Desktop/sabdia-store-templates" --theme $THEME --allow-live --nodelete \
-    --only templates/index.json --only templates/page.about.json --only templates/page.services.json --only templates/page.contact.json
+    --only templates/index.json --only templates/page.about.json --only templates/page.services.json --only templates/page.contact.json \
+    --only templates/page.collection.json --only templates/page.collection-item.json --only templates/collection.json --only templates/page.agent-access.json
 fi
 echo "Done."

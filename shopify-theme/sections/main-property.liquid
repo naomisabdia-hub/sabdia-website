@@ -28,6 +28,41 @@
   assign tiles = section.settings.gallery_tiles | default: 9
 -%}
 
+{%- liquid
+  # The residence's own display font (its brochure face): a Google Fonts
+  # family by name, or a font file uploaded to Content › Files. Applied to
+  # the name wherever it appears on this page.
+  assign nf = section.settings.name_font | strip
+  assign nf_file = section.settings.name_font_file | strip
+  assign nf_weight = section.settings.name_font_weight | default: 400
+-%}
+{%- if nf != blank or nf_file != blank -%}
+  {%- if nf_file != blank -%}
+    {%- assign nf_family = nf | default: 'ResidenceFace' -%}
+    {%- liquid
+      assign nf_fmt = 'woff2'
+      if nf_file contains '.ttf'
+        assign nf_fmt = 'truetype'
+      elsif nf_file contains '.otf'
+        assign nf_fmt = 'opentype'
+      elsif nf_file contains '.woff2'
+        assign nf_fmt = 'woff2'
+      elsif nf_file contains '.woff'
+        assign nf_fmt = 'woff'
+      endif
+    -%}
+    <style>@font-face{font-family:'{{ nf_family }}';src:url('{{ nf_file }}') format('{{ nf_fmt }}');font-weight:{{ nf_weight }};font-display:swap}</style>
+  {%- else -%}
+    {%- assign nf_family = nf -%}
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family={{ nf | replace: ' ', '+' }}:wght@{{ nf_weight }}&display=swap">
+  {%- endif -%}
+  <style>
+    .prop-name,.psb-name,.prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house{font-family:'{{ nf_family }}',var(--font-d);font-weight:{{ nf_weight }}{% if section.settings.name_font_caps %};text-transform:uppercase{% endif %}}
+    .prop-name{font-size:calc(var(--t-display-xl) * {{ section.settings.name_font_scale | default: 100 | divided_by: 100.0 }});letter-spacing:{{ section.settings.name_font_tracking | default: -4 | divided_by: 100.0 }}em;line-height:.95}
+  </style>
+{%- endif -%}
+
 <section class="prop-hero">
   {%- if product.featured_image -%}
     <img src="{{ product.featured_image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="{{ product.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:{% if sold %}brightness(.72) saturate(.9){% else %}brightness(.78) saturate(.96){% endif %}">
@@ -727,6 +762,14 @@
     { "type": "text", "id": "prequal_loc_label_other", "label": "Locations label (residence enquiry)", "default": "Other locations you would also consider (optional)" },
     { "type": "textarea", "id": "prequal_locations", "label": "Location options (one per line)", "info": "Leave empty to list the suburbs of the residences for sale plus Other inner Brisbane." },
     { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
+    { "type": "header", "content": "Residence name font" },
+    { "type": "paragraph", "content": "Each residence has its own template, so the face set here belongs to this residence only - use the face from its brochure (Tamsin, 10 Sep 2026). Either type a Google Fonts family (fonts.google.com, e.g. Cinzel, Cormorant, Inter, Marcellus) or upload the brochure's font file to Content › Files and paste its link below." },
+    { "type": "text", "id": "name_font", "label": "Google Fonts family", "info": "Exactly as written on fonts.google.com. Leave empty to keep the site serif." },
+    { "type": "text", "id": "name_font_file", "label": "Font file link (.woff2 / .woff / .ttf / .otf)", "info": "From Content › Files. When set, the family above is only the name the file is given." },
+    { "type": "text", "id": "name_font_weight", "label": "Weight", "default": "400", "info": "A number the face has: 300, 400, 500, 600, 700." },
+    { "type": "range", "id": "name_font_scale", "label": "Name size", "min": 50, "max": 130, "step": 5, "unit": "%", "default": 100 },
+    { "type": "range", "id": "name_font_tracking", "label": "Letter spacing", "min": -8, "max": 30, "step": 1, "unit": "%", "default": -4, "info": "Hundredths of an em: -4 is the site's tight serif; 10 to 20 suits a spaced capitals face." },
+    { "type": "checkbox", "id": "name_font_caps", "label": "Set the name in capitals", "default": false },
     {
       "type": "text",
       "id": "share_label",

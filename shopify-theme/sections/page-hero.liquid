@@ -19,8 +19,19 @@
       assign ph_hm = '50vh'
   endcase
 -%}
+{%- liquid
+  assign ph_video = section.settings.video_url
+  if section.settings.video
+    assign phmp4 = section.settings.video.sources | where: 'format', 'mp4' | first
+    if phmp4
+      assign ph_video = phmp4.url
+    endif
+  endif
+-%}
 <section class="page-hero ph-sized" style="--ph-h:{{ ph_h }};--ph-hm:{{ ph_hm }}">
-  {%- if section.settings.image -%}
+  {%- if ph_video != blank -%}
+    <video class="page-hero-video" src="{{ ph_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if section.settings.image %} poster="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: focus }}"{% elsif section.settings.image_ext != blank %} poster="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}"{% endif %}></video>
+  {%- elsif section.settings.image -%}
     <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: focus }}" alt="{{ section.settings.image_alt | default: page.title | escape }}" loading="eager" width="1920" height="1080" style="object-position:{{ focus }}">
   {%- elsif section.settings.image_ext != blank -%}
     <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}" alt="{{ section.settings.image_alt | default: page.title | escape }}" loading="eager" width="1920" height="1080" style="object-position:{{ focus }}">
@@ -28,13 +39,25 @@
   <div class="page-hero-ov"></div>
   <div class="page-hero-content inner">
     <div class="slabel slabel-dark">{{ section.settings.label }}</div>
-    <h1 class="page-h">{{ section.settings.title_html }}</h1>
+    {%- if section.settings.show_logo -%}
+      {%- liquid
+        assign ph_logo = 'logo.png' | asset_url
+        if settings.logo
+          assign ph_logo = settings.logo | image_url: width: 1200
+        endif
+      -%}
+      <h1 class="page-h page-h-logo"><img src="{{ ph_logo }}" alt="{{ section.settings.title_html | strip_html | default: settings.site_name | escape }}" width="1200" height="240" style="height:{{ section.settings.logo_size | default: 72 }}px;width:auto;max-width:82vw;filter:invert(1) brightness(10) drop-shadow(0 1px 18px rgba(31,27,20,.5))"></h1>
+    {%- else -%}
+      <h1 class="page-h">{{ section.settings.title_html }}</h1>
+    {%- endif -%}
     <p class="page-hero-sub">{{ section.settings.sub }}</p>
   </div>
 </section>
 
 <style>
   .page-hero.ph-sized{min-height:max(380px,var(--ph-h,60vh))}
+  .page-hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.74) saturate(.95)}
+  @media(prefers-reduced-motion:reduce){.page-hero-video{display:none}}
   @media(max-width:900px){.page-hero.ph-sized{height:auto;min-height:max(320px,var(--ph-hm,50vh))}}
 </style>
 
@@ -73,6 +96,21 @@
       "id": "image_alt",
       "label": "Image alt text"
     },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Hero film (upload)",
+      "info": "Plays silently on a loop behind the title (Tamsin, 10 Sep 2026: a film behind the Services banner). The hero image becomes its poster."
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Current hero film (URL)",
+      "info": "A direct .mp4 link, used when no film is uploaded above."
+    },
+    { "type": "header", "content": "Wordmark instead of the title" },
+    { "type": "checkbox", "id": "show_logo", "label": "Show the Sabdia wordmark in place of the title", "default": false, "info": "Uses Theme settings › Brand › Logo. The title above still names the page for search engines and screen readers." },
+    { "type": "range", "id": "logo_size", "label": "Wordmark height", "min": 32, "max": 160, "step": 4, "unit": "px", "default": 72 },
     { "type": "header", "content": "Size" },
     {
       "type": "select",

@@ -61,3 +61,11 @@ Still yours to do in the Shopify admin:
 4. ☐ **GA4 + Search Console** — Online Store › Preferences.
 5. ☐ **Password page copy** — Customize › Password page (default copy is a placeholder "Something considered is on its way").
 6. ☐ Optional: spam captcha (Settings › Customer privacy › "Enable reCAPTCHA" covers Shopify forms only; the Sabdia API forms rely on honeypot + rate limit).
+
+## Added 10 Sep 2026 — Tamsin's review (see docs/TAMSIN-REVIEW-2026-09-11.md)
+
+Everything from the review is on the **staging theme** (#150783361126): the Collection rebuilt (completed residences only, style/suburb filters, residence pages laid out like For Sale with no enquiry flow and a Similar residences row), For Sale fixes (2+/3+ garages, AETHER first, no sold band, hero never doubles the banner), homepage (title words off, eyebrow after the wordmark, About hierarchy + carousel strip, film-band side panels, footer without the Design/Develop band), residence name font per house, pronounced walkthrough room rail, password page film.
+
+1. ☐ Preview on staging, then run `zsh shopify-app/push-live.sh` — it now also pushes `page.collection.json`, `page.collection-item.json`, `collection.json` and `page.agent-access.json` from `~/Desktop/sabdia-store-templates`.
+2. ☐ **Content › Menus › Main menu › remove Agent Access** (the API token may not edit menus).
+3. ☐ New page fields for the Collection residences are live in the admin already: Content › Pages › the residence › Metafields (Style, Completed, Bedrooms, Bathrooms, Garages, Land size, Headline, Story, Key features). Style and year were pre-filled for Tamsin to confirm.

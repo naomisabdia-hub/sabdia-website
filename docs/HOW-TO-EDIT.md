@@ -70,3 +70,10 @@ The full illustrated guide is *Sabdia Website Guide.pdf* on the Desktop.
 2. Tell Claude the copy's name; code is pushed to the copy, never to the live theme.
 3. Preview the copy (⋯ › Preview), check on your phone.
 4. ⋯ › **Publish**. The previous theme stays in the list as a rollback.
+
+## The Collection (completed residences) — since 10 Sep 2026
+
+- **Which houses show**: Customize › Collection › Collection grid › one Residence block per house, each pointing at its page. For-sale homes never appear here (they have their own page).
+- **Everything about a house** lives on its page: Content › Pages › e.g. CALLE › Metafields — Hero image, Film, Gallery photos, **Style** (drives the filter chips), Completed (year), Bedrooms/Bathrooms/Garages/Land size (the specs bar shows only what is filled), Headline, Story (one paragraph per line; empty = stitched from its Instagram captions), Key features.
+- **Similar residences** at the foot of each page pick themselves: same style first, then the same suburb.
+- The page header's **Banner** (photo or film) is set at Customize › Collection › Page header.

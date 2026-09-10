@@ -33,6 +33,9 @@
   .tl-title{font-family:var(--font-d);font-size:var(--t-h3);font-weight:300;color:var(--ink);margin-bottom:6px}
   .tl-desc{font-size:var(--t-body);font-weight:300;line-height:var(--lh-body);color:var(--ink3)}
   .journey-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start}
+  /* The heading column holds while the milestones move past it (Tamsin, 10 Sep 2026). */
+  .journey-grid>div:first-child{position:sticky;top:calc(var(--nav-h) + 40px)}
+  @media(max-width:900px){.journey-grid>div:first-child{position:static}}
   @media(max-width:900px){.journey-grid{grid-template-columns:1fr;gap:48px}}
 </style>
 

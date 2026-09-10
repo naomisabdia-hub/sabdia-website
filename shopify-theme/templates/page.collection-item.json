@@ -10,7 +10,8 @@
             "name": "MILOS",
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos-poster.jpg",
-            "link": "/pages/collection-milos"
+            "link": "/pages/collection-milos",
+            "page": "collection-milos"
           }
         },
         "residence-2": {
@@ -19,7 +20,8 @@
             "name": "AMMOS",
             "loc": "Taringa QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos-poster.jpg",
-            "link": "/pages/collection-ammos"
+            "link": "/pages/collection-ammos",
+            "page": "collection-ammos"
           }
         },
         "residence-3": {
@@ -28,7 +30,8 @@
             "name": "CALLE",
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "/images/collection-calle.jpg",
-            "link": "/pages/collection-calle"
+            "link": "/pages/collection-calle",
+            "page": "collection-calle"
           }
         },
         "residence-4": {
@@ -37,7 +40,8 @@
             "name": "ELYSIUM",
             "loc": "Holland Park QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium-poster.jpg",
-            "link": "/pages/collection-elysium"
+            "link": "/pages/collection-elysium",
+            "page": "collection-elysium"
           }
         },
         "residence-5": {
@@ -46,7 +50,8 @@
             "name": "ALHAMBRA",
             "loc": "Brisbane QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra-poster.jpg",
-            "link": "/pages/collection-alhambra"
+            "link": "/pages/collection-alhambra",
+            "page": "collection-alhambra"
           }
         },
         "residence-6": {
@@ -55,7 +60,8 @@
             "name": "ENCANTO",
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "/images/collection-encanto.jpg",
-            "link": "/pages/collection-encanto"
+            "link": "/pages/collection-encanto",
+            "page": "collection-encanto"
           }
         },
         "residence-7": {
@@ -64,7 +70,8 @@
             "name": "NERO",
             "loc": "Rochedale QLD, Australia",
             "image_ext": "/images/collection-nero.jpg",
-            "link": "/pages/collection-nero"
+            "link": "/pages/collection-nero",
+            "page": "collection-nero"
           }
         },
         "residence-8": {
@@ -73,7 +80,8 @@
             "name": "HERMOSA",
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "/images/collection-hermosa.jpg",
-            "link": "/pages/collection-hermosa"
+            "link": "/pages/collection-hermosa",
+            "page": "collection-hermosa"
           }
         },
         "residence-9": {
@@ -82,7 +90,8 @@
             "name": "FRASER",
             "loc": "Graceville QLD, Australia",
             "image_ext": "/images/collection-fraser.jpg",
-            "link": "/pages/collection-fraser"
+            "link": "/pages/collection-fraser",
+            "page": "collection-fraser"
           }
         },
         "residence-10": {
@@ -91,7 +100,8 @@
             "name": "PETRA",
             "loc": "Taringa QLD, Australia",
             "image_ext": "/images/collection-petra.jpg",
-            "link": "/pages/collection-petra"
+            "link": "/pages/collection-petra",
+            "page": "collection-petra"
           }
         },
         "residence-11": {
@@ -100,7 +110,8 @@
             "name": "KIRRA",
             "loc": "Brisbane QLD, Australia",
             "image_ext": "/images/caspian-hero.jpg",
-            "link": "/pages/collection-kirra"
+            "link": "/pages/collection-kirra",
+            "page": "collection-kirra"
           }
         }
       },

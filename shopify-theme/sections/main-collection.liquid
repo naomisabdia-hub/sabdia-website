@@ -75,13 +75,45 @@
     render 'residence-handles', col: collections['sold'], group: 'sold'
   endcapture
   assign sold_handles = sold_csv | split: ','
+  # Hero film (uploaded or URL) beats the hero photo. With neither chosen the
+  # hero shows a different residence from the featured banner underneath
+  # (the second in the order; else the featured home's second photo), so the
+  # page never opens on the same house twice.
+  assign hero_video = section.settings.hero_video_url
+  if section.settings.hero_video
+    assign hmp4 = section.settings.hero_video.sources | where: 'format', 'mp4' | first
+    if hmp4
+      assign hero_video = hmp4.url
+    endif
+  endif
+  assign hero_auto = false
+  if section.settings.image == blank and section.settings.image_ext == blank and featured
+    assign second_handle = handles[1]
+    for p in collections.all.products
+      if p.handle == second_handle and p.featured_image
+        assign hero_auto = p.featured_image
+        break
+      endif
+    endfor
+    if hero_auto == false
+      if featured.images.size > 1
+        assign hero_auto = featured.images[1]
+      else
+        assign hero_auto = featured.featured_image
+      endif
+    endif
+  endif
 -%}
 
 <section class="page-hero">
-  {%- if section.settings.image -%}
+  {%- if hero_video != blank -%}
+    <video class="page-hero-video" src="{{ hero_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if section.settings.image %} poster="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}"{% endif %}></video>
+  {%- elsif section.settings.image -%}
     <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
   {%- elsif section.settings.image_ext != blank -%}
     <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}" alt="" loading="eager" width="1920" height="1080">
+  {%- elsif hero_auto -%}
+    <img src="{{ hero_auto | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
   {%- endif -%}
   <div class="page-hero-ov"></div>
   <div class="page-hero-content inner">
@@ -108,9 +140,10 @@
     </select>
     <select class="ptool-sel" id="fCars" aria-label="Minimum garage spaces">
       <option value="">{{ section.settings.filter_any_garage | default: "Any Garage" }}</option>
+      <option value="2">2+ Cars</option>
+      <option value="3">3+ Cars</option>
       <option value="4">4+ Cars</option>
       <option value="6">6+ Cars</option>
-      <option value="8">8+ Cars</option>
     </select>
     <select class="ptool-sel" id="fLand" aria-label="Land size">
       <option value="">{{ section.settings.filter_any_land | default: "Any Land Size" }}</option>
@@ -211,7 +244,7 @@
   </div>
 </section>
 
-{%- if show_rich and sold_handles.size > 0 -%}
+{%- if show_rich and section.settings.show_sold_band and sold_handles.size > 0 -%}
   <section style="padding:clamp(64px,8vw,100px) clamp(22px,5vw,80px) clamp(80px,10vw,120px);background:var(--bg)">
     <div class="inner">
       <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.sold_label }}</div>
@@ -239,7 +272,7 @@
     <h2 class="reveal d1" style="font-family:var(--font-d);font-size:clamp(32px,5vw,64px);font-weight:300;color:var(--ink);margin-bottom:20px;letter-spacing:-.02em">{{ section.settings.cta_heading_html }}</h2>
     <p class="reveal d2" style="font-size:13px;font-weight:300;color:var(--ink3);max-width:420px;margin:0 auto 36px;line-height:1.85">{{ section.settings.cta_text }}</p>
     <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <a href="{{ section.settings.cta1_link | default: '/pages/contact' }}" class="btn-p">{{ section.settings.cta1_label }} &rarr;</a>
+      <a href="{{ section.settings.cta1_link | default: '/pages/contact?interest=Request%20a%20Viewing' }}" class="btn-p">{{ section.settings.cta1_label }} &rarr;</a>
       <a href="{{ section.settings.cta2_link | default: '/pages/agent-access' }}" class="btn-g">{{ section.settings.cta2_label }}</a>
       <a href="{{ section.settings.cta3_link | default: '/pages/find-your-home' }}" class="btn-g btn-g-gold">{{ section.settings.cta3_label }}</a>
     </div>
@@ -247,6 +280,8 @@
 </section>
 
 <style>
+  .page-hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.74) saturate(.95)}
+  @media(prefers-reduced-motion:reduce){.page-hero-video{display:none}}
   .prop-toolbar{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:18px clamp(22px,5vw,80px);background:var(--bg2);border-bottom:1px solid var(--border)}
   .prop-toolbar-inner{display:flex;gap:28px;align-items:center;flex-wrap:wrap;max-width:1400px;margin:0 auto;width:100%}
   .ptool-l{font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)}
@@ -352,8 +387,19 @@
       "type": "text",
       "id": "image_ext",
       "label": "Current photo (URL)",
-      "default": "/images/qasr-hero.jpg",
-      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field."
+      "info": "Leave the photo and this field empty and the hero shows a different residence from the featured banner below it, so the page never opens on the same house twice."
+    },
+    {
+      "type": "video",
+      "id": "hero_video",
+      "label": "Hero film (upload)",
+      "info": "A mash-up of the residences, playing silently on a loop behind the title. Beats the photo when set."
+    },
+    {
+      "type": "text",
+      "id": "hero_video_url",
+      "label": "Current hero film (URL)",
+      "info": "A direct .mp4 link, used when no film is uploaded above."
     },
     {
       "type": "text",
@@ -376,6 +422,13 @@
     {
       "type": "paragraph",
       "content": "Which residences appear here, and whether a card reads For Sale, Under Offer or Sold, is set on each residence: Products › the residence › Status. Drag the order at Products › Collections › For Sale (sort Manually)."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sold_band",
+      "label": "Show the sold band under the grid",
+      "default": false,
+      "info": "Off by default - with one sold home it looked odd (Tamsin, 10 Sep 2026). Sold residences still appear on the Collection page and at /collections/sold."
     },
     {
       "type": "text",

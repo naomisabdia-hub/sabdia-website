@@ -1,76 +1,76 @@
 {%- comment -%}
-  Collection - everything Sabdia has built, in one grid: the current
-  residences (For Sale / Sold, straight from Products and their Status)
-  followed by the completed portfolio (the Residence blocks). A filter
-  bar narrows to one group. Cards play their film on hover; a card with
-  a link navigates.
+  Collection - the completed residences only (For Sale has its own page;
+  sold and completed are the same thing here). One editorial grid: wide
+  and portrait tiles alternate, films play on hover, and a filter bar
+  narrows by architectural style (Mediterranean, Palm Springs, Hamptons,
+  Contemporary, Moroccan…) and by suburb.
+
+  Each Residence block points at the residence's page (Content › Pages,
+  template "collection-item"); its name, location, style, completed
+  year, photo and film all come from that page's metafields, so a page
+  edited in Pages updates the card too. The block's own fields only
+  override.
 {%- endcomment -%}
 {%- liquid
-  assign show_current = section.settings.show_current
-  assign scope = section.settings.current_scope | default: 'sold'
-  assign show_live = false
-  if show_current
-    assign live_handles = '' | split: ','
-    if scope == 'all'
-      assign show_live = true
-      capture live_csv
-        render 'residence-handles', col: collections['for-sale'], group: 'live'
-      endcapture
-      assign live_handles = live_csv | split: ','
-    endif
-    capture sold_csv
-      render 'residence-handles', col: collections['sold'], group: 'sold'
-    endcapture
-    assign sold_handles = sold_csv | split: ','
-    assign current_handles = live_handles | concat: sold_handles
-  endif
   assign sid = section.id
+  assign pcount = 0
+  capture styles_raw
+    for block in section.blocks
+      assign rp = block.settings.page
+      if rp == blank and block.settings.link contains '/pages/'
+        assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
+        assign rp = pages[rp_handle]
+      endif
+      assign r_style = block.settings.style | default: rp.metafields.custom.style.value | strip
+      if r_style != blank
+        echo r_style | append: '¦'
+      endif
+    endfor
+  endcapture
+  assign styles = styles_raw | strip | split: '¦' | uniq | sort
+  capture suburbs_raw
+    for block in section.blocks
+      assign rp = block.settings.page
+      if rp == blank and block.settings.link contains '/pages/'
+        assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
+        assign rp = pages[rp_handle]
+      endif
+      assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
+      assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+      if r_suburb != blank
+        echo r_suburb | append: '¦'
+      endif
+    endfor
+  endcapture
+  assign suburbs = suburbs_raw | strip | split: '¦' | uniq | sort
 -%}
-{%- if show_current and section.settings.show_filter -%}
-<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px clamp(22px,5vw,80px)">
-  <div class="inner" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap" data-port-filter="{{ sid }}">
-    <span style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)">{{ section.settings.filter_label }}</span>
-    <button class="pfilter on" type="button" data-filter="all">{{ section.settings.filter_all }}</button>
-    {%- if show_live -%}<button class="pfilter" type="button" data-filter="live">{{ section.settings.filter_live }}</button>{%- endif -%}
-    <button class="pfilter" type="button" data-filter="sold">{{ section.settings.filter_sold }}</button>
-    <button class="pfilter" type="button" data-filter="done">{{ section.settings.filter_done }}</button>
+
+{%- if section.settings.show_filter and section.blocks.size > 3 -%}
+<div class="pf-bar" data-pf-bar="{{ sid }}">
+  <div class="inner pf-bar-inner">
+    <div class="pf-chips" role="group" aria-label="Filter by style">
+      <span class="pf-bar-l">{{ section.settings.filter_label }}</span>
+      <button type="button" class="pfilter on" data-style="">{{ section.settings.filter_all }}</button>
+      {%- for s in styles -%}
+        <button type="button" class="pfilter" data-style="{{ s | escape }}">{{ s }}</button>
+      {%- endfor -%}
+    </div>
+    {%- if suburbs.size > 1 -%}
+    <select class="pf-sel" id="pfSuburb-{{ sid }}" aria-label="Filter by suburb">
+      <option value="">{{ section.settings.all_suburbs | default: "All Suburbs" }}</option>
+      {%- for s in suburbs -%}<option value="{{ s | escape }}">{{ s }}</option>{%- endfor -%}
+    </select>
+    {%- endif -%}
+    <span class="pf-count" id="pfCount-{{ sid }}" aria-live="polite"></span>
   </div>
 </div>
 {%- endif -%}
-<section style="padding:clamp(52px,7vw,96px) clamp(22px,5vw,80px) clamp(80px,12vw,140px);background:var(--bg)" id="port-{{ sid }}">
+
+<section class="pf-wrap" id="port-{{ sid }}">
   <div class="inner">
-    <div class="portfolio-grid">
-      {%- assign pdelays = ',d1,d2' | split: ',' -%}
-      {%- assign ci = 0 -%}
-      {%- if show_current -%}
-        {%- for h in current_handles -%}
-          {%- for product in collections.all.products -%}
-            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
-            {%- assign di = ci | modulo: 3 -%}
-            {%- assign ci = ci | plus: 1 -%}
-            {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
-            {%- assign grp = 'live' -%}
-            {%- if pstatus contains 'Sold' -%}{%- assign grp = 'sold' -%}{%- endif -%}
-            <a href="{{ product.url }}" class="port-card reveal {{ pdelays[di] }}" data-port-card data-group="{{ grp }}">
-              <div class="port-img-wrap">
-                {%- if product.featured_image -%}
-                  <img src="{{ product.featured_image | image_url: width: 800, height: 600, crop: 'center' }}" alt="{{ product.title | escape }}" width="800" height="600" loading="lazy" decoding="async">
-                {%- endif -%}
-                <span class="port-film-tag">{{ pstatus }}</span>
-              </div>
-              <div class="port-name">{{ product.title }} <span style="color:var(--ink);font-weight:400">&rarr;</span></div>
-              <div class="port-loc">{{ product.metafields.custom.suburb.value }}{% if product.metafields.custom.suburb.value != blank %} QLD, Australia{% endif %}</div>
-            </a>
-            {%- break -%}
-          {%- endfor -%}
-        {%- endfor -%}
-      {%- endif -%}
+    <div class="pf-grid" id="pfGrid-{{ sid }}">
       {%- for block in section.blocks -%}
-        {%- assign di = ci | modulo: 3 -%}
-        {%- assign ci = ci | plus: 1 -%}
         {%- liquid
-          # A picked Residence page supplies name, location, photo, film and
-          # link from its own metafields; the block's fields only override.
           assign rp = block.settings.page
           if rp == blank and block.settings.link contains '/pages/'
             assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
@@ -78,198 +78,150 @@
           endif
           assign r_name = block.settings.name | default: rp.title
           assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
-          # The residence page's own photo wins over the address typed into the
-          # block (the block's picked Image still beats both).
+          assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+          assign r_style = block.settings.style | default: rp.metafields.custom.style.value | strip
+          assign r_year = rp.metafields.custom.year.value
           assign r_image_ext = rp.metafields.custom.image.value | default: block.settings.image_ext
-          if r_image_ext == blank and rp.metafields.custom.gallery.value.size > 0
-            assign r_image_ext = rp.metafields.custom.gallery.value | first
+          if rp.metafields.custom.gallery.value.size > 0
+            if r_image_ext == blank or r_image_ext contains '/films/'
+              assign r_image_ext = rp.metafields.custom.gallery.value | first
+            endif
           endif
           assign r_video = block.settings.video | default: rp.metafields.custom.video.value
+          if block.settings.video_file
+            assign pmp4 = block.settings.video_file.sources | where: 'format', 'mp4' | first
+            if pmp4
+              assign r_video = pmp4.url
+            endif
+          endif
           assign r_link = block.settings.link | default: rp.url
+          assign pcount = pcount | plus: 1
+          assign di = forloop.index0 | modulo: 3
         -%}
         {%- capture card_inner -%}
-          <div class="port-img-wrap">
+          <div class="pf-media">
             {%- if block.settings.image -%}
-              <img src="{{ block.settings.image | image_url: width: 800, height: 600, crop: 'center' }}" alt="{{ r_name | escape }}" width="800" height="600" loading="lazy" decoding="async">
+              <img src="{{ block.settings.image | image_url: width: 1200, height: 900, crop: 'center' }}" alt="{{ r_name | escape }}{% if r_suburb != blank %}, {{ r_suburb | escape }}{% endif %}" width="1200" height="900" loading="lazy" decoding="async">
             {%- elsif r_image_ext != blank -%}
-              <img src="{% render 'ext-variant', src: r_image_ext, w: 800, h: 600 %}" alt="{{ r_name | escape }}" width="800" height="600" loading="lazy" decoding="async">
+              <img src="{% render 'ext-variant', src: r_image_ext, w: 1200, h: 900 %}" alt="{{ r_name | escape }}{% if r_suburb != blank %}, {{ r_suburb | escape }}{% endif %}" width="1200" height="900" loading="lazy" decoding="async">
             {%- endif -%}
-            {%- liquid
-              assign port_vid = r_video
-              if block.settings.video_file
-                assign pmp4 = block.settings.video_file.sources | where: 'format', 'mp4' | first
-                if pmp4
-                  assign port_vid = pmp4.url
-                endif
-              endif
-            -%}
-            {%- if port_vid != blank -%}
-              <video src="{{ port_vid }}" muted loop playsinline preload="none" data-port-video></video>
+            {%- if r_video != blank -%}
+              <video src="{{ r_video }}" muted loop playsinline preload="none" data-port-video></video>
               <span class="port-film-tag">{{ section.settings.film_tag | default: "Film" }}</span>
             {%- endif -%}
+            {%- if r_style != blank and section.settings.style_on_card -%}
+              <span class="pf-style">{{ r_style }}</span>
+            {%- endif -%}
           </div>
-          <div class="port-name">{{ r_name }}{% if r_link != blank %} <span style="color:var(--ink);font-weight:400">&rarr;</span>{% endif %}</div>
-          <div class="port-loc">{{ r_loc }}</div>
+          <div class="pf-info">
+            <div class="pf-name">{{ r_name }}{% if r_link != blank %} <span aria-hidden="true">&rarr;</span>{% endif %}</div>
+            <div class="pf-meta">{{ r_suburb }}{% if r_style != blank %} <i>&middot;</i> {{ r_style }}{% endif %}{% if r_year != blank %} <i>&middot;</i> {{ r_year }}{% endif %}</div>
+          </div>
         {%- endcapture -%}
         {%- if r_link != blank -%}
-          <a href="{{ r_link }}" class="port-card reveal {{ pdelays[di] }}" data-port-card data-group="done" {{ block.shopify_attributes }}>{{ card_inner }}</a>
+          <a href="{{ r_link }}" class="pf-card reveal{% if di == 1 %} d1{% elsif di == 2 %} d2{% endif %}" data-port-card data-style="{{ r_style | escape }}" data-suburb="{{ r_suburb | escape }}" {{ block.shopify_attributes }}>{{ card_inner }}</a>
         {%- else -%}
-          <div class="port-card reveal {{ pdelays[di] }}" data-port-card data-group="done" {{ block.shopify_attributes }}>{{ card_inner }}</div>
+          <div class="pf-card reveal{% if di == 1 %} d1{% elsif di == 2 %} d2{% endif %}" data-port-card data-style="{{ r_style | escape }}" data-suburb="{{ r_suburb | escape }}" {{ block.shopify_attributes }}>{{ card_inner }}</div>
         {%- endif -%}
       {%- endfor -%}
     </div>
+    <p class="pf-empty" id="pfEmpty-{{ sid }}" hidden>{{ section.settings.empty_text }}</p>
   </div>
 </section>
 
-<style>
-  .pfilter{font-size:11px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--taupe-d);transition:color .3s;background:none;border:none;cursor:pointer;padding:0 0 1px;border-bottom:1px solid transparent;font-family:var(--font-u)}
-  .pfilter:hover{color:var(--ink)}
-  .pfilter.on{color:var(--ink);border-bottom-color:var(--ink)}
-</style>
-
 <script>
   (function () {
-    var bar = document.querySelector('[data-port-filter="{{ sid }}"]');
-    var grid = document.getElementById('port-{{ sid }}');
-    if (bar && grid && !bar.dataset.filterInit) {
-      bar.dataset.filterInit = '1';
-      var buttons = bar.querySelectorAll('.pfilter');
-      var cards = grid.querySelectorAll('[data-port-card]');
-      buttons.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          buttons.forEach(function (b) { b.classList.remove('on'); });
-          btn.classList.add('on');
-          var f = btn.dataset.filter;
-          cards.forEach(function (c) {
-            var show = f === 'all' || c.dataset.group === f;
-            c.style.display = show ? '' : 'none';
-            if (show) c.classList.add('vis');
-          });
-        });
+    var grid = document.getElementById('pfGrid-{{ sid }}');
+    if (!grid || grid.dataset.init) return;
+    grid.dataset.init = '1';
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-port-card]'));
+    var bar = document.querySelector('[data-pf-bar="{{ sid }}"]');
+    var chips = bar ? Array.prototype.slice.call(bar.querySelectorAll('.pfilter')) : [];
+    var suburb = document.getElementById('pfSuburb-{{ sid }}');
+    var count = document.getElementById('pfCount-{{ sid }}');
+    var empty = document.getElementById('pfEmpty-{{ sid }}');
+    var style = '';
+    /* Editorial rhythm: of every seven visible tiles the first and the
+       last run wide (two columns); the rest stand portrait. Recomputed
+       after each filter so the pattern never breaks on a hidden card. */
+    function layout() {
+      var n = 0;
+      cards.forEach(function (c) {
+        if (c.hidden) return;
+        var k = n % 7;
+        c.classList.toggle('is-wide', k === 0 || k === 6);
+        n++;
       });
+      return n;
     }
-  })();
-  (function () {
+    function apply() {
+      var sub = suburb ? suburb.value : '';
+      cards.forEach(function (c) {
+        var ok = true;
+        if (style && c.dataset.style !== style) ok = false;
+        if (ok && sub && c.dataset.suburb !== sub) ok = false;
+        c.hidden = !ok;
+        if (ok) c.classList.add('vis');
+      });
+      var n = layout();
+      if (empty) empty.hidden = n > 0;
+      if (count) count.textContent = (style || sub) ? n + (n === 1 ? ' Residence' : ' Residences') : '';
+    }
+    chips.forEach(function (b) {
+      b.addEventListener('click', function () {
+        chips.forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        style = b.dataset.style || '';
+        apply();
+      });
+    });
+    if (suburb) suburb.addEventListener('change', apply);
+    layout();
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    document.querySelectorAll('[data-port-card]').forEach(function (card) {
-      if (card.dataset.portInit) return;
-      card.dataset.portInit = '1';
+    cards.forEach(function (card) {
       var video = card.querySelector('[data-port-video]');
       if (!video) return;
-      card.addEventListener('mouseenter', function () {
-        video.play().then(function () { video.classList.add('playing'); }).catch(function () {});
-      });
-      card.addEventListener('mouseleave', function () {
-        video.pause();
-        video.classList.remove('playing');
-      });
+      card.addEventListener('mouseenter', function () { video.play().then(function () { video.classList.add('playing'); }).catch(function () {}); });
+      card.addEventListener('mouseleave', function () { video.pause(); video.classList.remove('playing'); });
     });
   })();
 </script>
 
+
 {% schema %}
 {
-  "name": "Portfolio grid",
+  "name": "Collection grid",
   "settings": [
-    {
-      "type": "header",
-      "content": "Current residences"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_current",
-      "label": "Include residences from Products",
-      "default": true,
-      "info": "Pulled straight from Products (their Status decides the group). Off = only the completed Residence blocks below."
-    },
-    {
-      "type": "select",
-      "id": "current_scope",
-      "label": "Which ones",
-      "options": [
-        { "value": "sold", "label": "Sold only (past projects)" },
-        { "value": "all", "label": "For Sale and Sold" }
-      ],
-      "default": "all"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_filter",
-      "label": "Show the filter bar (All / For Sale / Sold / Completed)",
-      "default": true
-    },
-    {
-      "type": "header",
-      "content": "Wording"
-    },
-    { "type": "text", "id": "filter_label", "label": "Filter label", "default": "Filter:" },
-    { "type": "text", "id": "filter_all", "label": "Filter - all", "default": "All" },
-    { "type": "text", "id": "filter_live", "label": "Filter - for sale", "default": "For Sale" },
-    { "type": "text", "id": "filter_sold", "label": "Filter - sold", "default": "Sold" },
-    { "type": "text", "id": "filter_done", "label": "Filter - completed", "default": "Completed" },
-    {
-      "type": "text",
-      "id": "film_tag",
-      "label": "Film tag",
-      "default": "Film"
-    }
+    { "type": "paragraph", "content": "Completed residences only. Homes for sale live on their own page (For Sale); nothing from Products appears here. Add one Residence block per completed home and pick its page - the card fills itself from that page's metafields (Content › Pages › the residence › Metafields: Style, Completed year, Hero image, Film)." },
+    { "type": "header", "content": "Filter bar" },
+    { "type": "checkbox", "id": "show_filter", "label": "Show the filter bar", "default": true, "info": "Style chips come from each residence page's Style field; the suburb list from its Location line. Appears once there are four or more residences." },
+    { "type": "checkbox", "id": "style_on_card", "label": "Show the style on the photo on hover", "default": true },
+    { "type": "text", "id": "filter_label", "label": "Filter label", "default": "Style" },
+    { "type": "text", "id": "filter_all", "label": "All chip", "default": "All" },
+    { "type": "text", "id": "all_suburbs", "label": "All-suburbs option", "default": "All Suburbs" },
+    { "type": "text", "id": "empty_text", "label": "No-matches text", "default": "Nothing matches those filters. Try widening them." },
+    { "type": "text", "id": "film_tag", "label": "Film tag", "default": "Film" },
+    { "type": "checkbox", "id": "show_current", "label": "(Retired) Include residences from Products", "default": false, "info": "No longer used - For Sale has its own page." }
   ],
   "blocks": [
     {
       "type": "residence",
       "name": "Residence",
       "settings": [
-        {
-          "type": "page",
-          "id": "page",
-          "label": "Residence page",
-          "info": "Pick the completed residence's page (Content › Pages, theme template \"collection-item\"). Its name, location line, photo, film and link then fill in by themselves - the fields below only override."
-        },
-        {
-          "type": "text",
-          "id": "name",
-          "label": "Name",
-          "info": "Leave empty to use the page title."
-        },
-        {
-          "type": "text",
-          "id": "loc",
-          "label": "Location line"
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Image"
-        },
-        {
-          "type": "text",
-          "id": "image_ext",
-          "label": "Current photo (URL)",
-          "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field."
-        },
-        {
-          "type": "video",
-          "id": "video_file",
-          "label": "Hover film (upload, optional)"
-        },
-        {
-          "type": "text",
-          "id": "video",
-          "label": "Current hover film (URL)",
-          "info": "Upload a film above and it takes over."
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "Link (optional)"
-        }
+        { "type": "page", "id": "page", "label": "Residence page", "info": "Pick the completed residence's page (Content › Pages, theme template \"collection-item\"). Its name, location line, style, year, photo, film and link then fill in by themselves - the fields below only override." },
+        { "type": "text", "id": "name", "label": "Name", "info": "Leave empty to use the page title." },
+        { "type": "text", "id": "loc", "label": "Location line" },
+        { "type": "text", "id": "style", "label": "Style (override)", "info": "Normally set on the page itself (Metafields › Style) so the residence page shows it too." },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_ext", "label": "Current photo (URL)", "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field." },
+        { "type": "video", "id": "video_file", "label": "Hover film (upload, optional)" },
+        { "type": "text", "id": "video", "label": "Current hover film (URL)", "info": "Upload a film above and it takes over." },
+        { "type": "url", "id": "link", "label": "Link (optional)" }
       ]
     }
   ],
   "presets": [
-    {
-      "name": "Portfolio grid"
-    }
+    { "name": "Collection grid" }
   ]
 }
 {% endschema %}

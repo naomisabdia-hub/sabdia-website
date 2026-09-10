@@ -5,7 +5,7 @@
       "settings": {
         "label": "For Real Estate Professionals",
         "title_html": "Exclusive<br><em style=\"color:var(--gold2)\">Agent</em><br>Access.",
-        "text": "Join the Sabdia agent list and hear about the next release before it goes to market.",
+        "text": "Available to select agents only. Join the Sabdia register and hear about the next release before it goes to market - we also keep agents on file for the areas we build in next.",
         "image_ext": "/images/agent-portrait.jpg",
         "image_alt": "Agent Access"
       }
@@ -14,7 +14,7 @@
       "type": "agent-benefits",
       "settings": {
         "label": "Why Join",
-        "heading_html": "The Sabdia agent program gives you <em style=\"color:var(--gold2)\">a genuine edge</em>."
+        "heading_html": "Pre-release access, for <em>select agents</em>."
       },
       "blocks": {
         "benefit-1": {
@@ -22,57 +22,30 @@
           "settings": {
             "icon": "layers",
             "title": "Pre-Release Access",
-            "desc": "Be first to know about upcoming developments before they reach the public market. Give your clients a genuine first-mover advantage."
+            "desc": "Hear about unreleased projects and developments before they reach the market."
           }
         },
         "benefit-2": {
           "type": "benefit",
           "settings": {
             "icon": "plan",
-            "title": "Floor Plans & Pricing",
-            "desc": "Floor plans and indicative pricing before launch, so you can brief your clients early."
-          }
-        },
-        "benefit-3": {
-          "type": "benefit",
-          "settings": {
-            "icon": "phone",
-            "title": "Priority Communication",
-            "desc": "One person at Sabdia to call, from first enquiry to settlement."
-          }
-        },
-        "benefit-4": {
-          "type": "benefit",
-          "settings": {
-            "icon": "dollar",
-            "title": "Exclusive Commissions",
-            "desc": "Commission structures for agents on the list."
+            "title": "Floor Plans & Brochures",
+            "desc": "Plans and brochures for upcoming residences, on request, before launch."
           }
         },
         "benefit-5": {
           "type": "benefit",
           "settings": {
             "icon": "users",
-            "title": "Private Previews",
+            "title": "Private Walkthroughs",
             "desc": "Walk through homes before they launch, at agent-only previews."
-          }
-        },
-        "benefit-6": {
-          "type": "benefit",
-          "settings": {
-            "icon": "star",
-            "title": "Award-Winning Product",
-            "desc": "Award-winning homes your clients will already know by name."
           }
         }
       },
       "block_order": [
         "benefit-1",
         "benefit-2",
-        "benefit-3",
-        "benefit-4",
-        "benefit-5",
-        "benefit-6"
+        "benefit-5"
       ]
     },
     "listings": {
@@ -91,7 +64,7 @@
         "heading_html": "Join the <em>network</em>.",
         "text": "Fill in the form and we will be in touch within a business day.",
         "note_label": "Please note",
-        "note_text": "Licensed agents only. We may ask to see your licence.",
+        "note_text": "Licensed agents only. We may ask to see your licence. Your details are handled in line with our <a href=\"/pages/privacy\">Privacy Policy</a>.",
         "submit_label": "Submit Application"
       }
     }

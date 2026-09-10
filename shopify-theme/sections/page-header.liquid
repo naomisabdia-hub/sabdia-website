@@ -1,12 +1,68 @@
 {%- comment -%}
-  Text-only page header band, in the three treatments the site uses:
+  Page header band. Text-only in the three treatments the site uses:
   · collection - warm cream, biggest display title (The Sabdia Collection)
   · contact - warm stone (bg3), invitation-sized title
   · guided - centred, serif sub-line (Find Your Home)
+  Pick a banner photo or film (Banner, below) and the same header becomes
+  a full-bleed photographic hero - the same height as the inner-page
+  heroes on About and Services, so every page opens the same way.
 {%- endcomment -%}
 {%- liquid
   assign style = section.settings.style | default: 'collection'
+  assign focus = section.settings.focus | default: 'center'
+  assign bg_video = section.settings.bg_video_url
+  if section.settings.bg_video
+    assign vmp4 = section.settings.bg_video.sources | where: 'format', 'mp4' | first
+    if vmp4
+      assign bg_video = vmp4.url
+    endif
+  endif
+  assign has_banner = false
+  if section.settings.bg_image or section.settings.bg_image_ext != blank or bg_video != blank
+    assign has_banner = true
+  endif
+  case section.settings.height
+    when 'short'
+      assign ph_h = '44vh'
+      assign ph_hm = '40vh'
+    when 'tall'
+      assign ph_h = '78vh'
+      assign ph_hm = '60vh'
+    when 'full'
+      assign ph_h = '100vh'
+      assign ph_hm = '100svh'
+    else
+      assign ph_h = '60vh'
+      assign ph_hm = '50vh'
+  endcase
 -%}
+{%- if has_banner -%}
+<section class="page-hero ph-sized pgh-hero" style="--ph-h:{{ ph_h }};--ph-hm:{{ ph_hm }}">
+  {%- if bg_video != blank -%}
+    <video class="pgh-video" src="{{ bg_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"
+      {%- if section.settings.bg_image %} poster="{{ section.settings.bg_image | image_url: width: 1920, height: 1080, crop: focus }}"{% elsif section.settings.bg_image_ext != blank %} poster="{% render 'ext-variant', src: section.settings.bg_image_ext, w: 1920, h: 1080 %}"{% endif %}></video>
+  {%- elsif section.settings.bg_image -%}
+    <img src="{{ section.settings.bg_image | image_url: width: 1920, height: 1080, crop: focus }}" alt="{{ section.settings.bg_alt | default: page.title | escape }}" loading="eager" fetchpriority="high" width="1920" height="1080" style="object-position:{{ focus }}">
+  {%- else -%}
+    <img src="{% render 'ext-variant', src: section.settings.bg_image_ext, w: 1920, h: 1080 %}" alt="{{ section.settings.bg_alt | default: page.title | escape }}" loading="eager" fetchpriority="high" width="1920" height="1080" style="object-position:{{ focus }}">
+  {%- endif -%}
+  <div class="page-hero-ov"></div>
+  <div class="page-hero-content inner"{% if style == 'guided' %} style="text-align:center"{% endif %}>
+    <div class="slabel slabel-dark"{% if style == 'guided' %} style="justify-content:center"{% endif %}>{{ section.settings.label }}</div>
+    <h1 class="page-h">{{ section.settings.title_html }}</h1>
+    {%- if section.settings.text != blank -%}
+      <p class="page-hero-sub"{% if style == 'guided' %} style="margin-left:auto;margin-right:auto"{% endif %}>{{ section.settings.text }}</p>
+    {%- endif -%}
+  </div>
+</section>
+<style>
+  .page-hero.ph-sized{min-height:max(380px,var(--ph-h,60vh))}
+  .pgh-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.74) saturate(.95)}
+  .pgh-hero .page-hero-sub a{color:var(--white);border-bottom:1px solid rgba(253,251,246,.5)}
+  @media(max-width:900px){.page-hero.ph-sized{height:auto;min-height:max(320px,var(--ph-hm,50vh))}}
+  @media(prefers-reduced-motion:reduce){.pgh-video{display:none}}
+</style>
+{%- else -%}
 <section class="pgh pgh-{{ style }}">
   <div class="{% if style == 'guided' %}inner-md{% else %}inner{% endif %}"{% if style == 'guided' %} style="text-align:center"{% endif %}>
     <div class="slabel reveal"{% if style == 'guided' %} style="justify-content:center"{% endif %}>{{ section.settings.label }}</div>
@@ -30,10 +86,11 @@
   .pgh .pgh-h em{font-style:italic}
   .pgh .pgh-p a{color:var(--ink);border-bottom:1px solid rgba(41,35,25,.45)}
 </style>
+{%- endif -%}
 
 {% schema %}
 {
-  "name": "Page header (text)",
+  "name": "Page header",
   "settings": [
     {
       "type": "select", "id": "style", "label": "Treatment",
@@ -46,8 +103,35 @@
     },
     { "type": "text", "id": "label", "label": "Small label" },
     { "type": "html", "id": "title_html", "label": "Title (HTML - <em> and <br> allowed)" },
-    { "type": "html", "id": "text", "label": "Sub-line (HTML links allowed)" }
+    { "type": "html", "id": "text", "label": "Sub-line (HTML links allowed)" },
+    { "type": "header", "content": "Banner (optional)", "info": "Pick a photo or a film and the header becomes a full-bleed hero, the same height as About and Services. Leave both empty for the plain text header." },
+    { "type": "image_picker", "id": "bg_image", "label": "Banner photo" },
+    { "type": "text", "id": "bg_image_ext", "label": "Current banner photo (URL)", "info": "The photo showing now is loaded from this address. Choose a photo above and it takes over - you never need to edit this field." },
+    { "type": "text", "id": "bg_alt", "label": "Banner photo alt text" },
+    { "type": "video", "id": "bg_video", "label": "Banner film (upload)", "info": "Plays silently on a loop behind the title. Landscape works best; the banner photo becomes its poster." },
+    { "type": "text", "id": "bg_video_url", "label": "Current banner film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above." },
+    {
+      "type": "select", "id": "height", "label": "Banner height",
+      "options": [
+        { "value": "short", "label": "Short" },
+        { "value": "standard", "label": "Standard (same as About and Services)" },
+        { "value": "tall", "label": "Tall" },
+        { "value": "full", "label": "Full screen" }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "select", "id": "focus", "label": "Crop focus",
+      "options": [
+        { "value": "center", "label": "Centre" },
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    }
   ],
-  "presets": [{ "name": "Page header (text)" }]
+  "presets": [{ "name": "Page header" }]
 }
 {% endschema %}

@@ -72,7 +72,7 @@
               assign kind = 'CAROUSEL'
             endif
           endif
-          assign alt = item.caption | default: series_name | escape
+          assign alt = item.caption | replace: 'Sabdia', 'SABDIA' | default: series_name | escape
         -%}
         {%- capture card_meta -%}
           <div class="series-card-ov"></div>
@@ -91,7 +91,7 @@
           {%- endif -%}
           <div class="series-card-meta">
             <div class="series-card-date">{{ item.date | date: "%b %Y" }}</div>
-            {%- if item.caption != blank -%}<div class="series-card-cap">{{ item.caption }}</div>{%- endif -%}
+            {%- if item.caption != blank -%}<div class="series-card-cap">{{ item.caption | replace: 'Sabdia', 'SABDIA' }}</div>{%- endif -%}
           </div>
         {%- endcapture -%}
         {%- if on_site -%}
@@ -101,7 +101,7 @@
             {% if item.video != blank %}data-video="{{ item.video }}"{% endif %}
             {% if item.slides.size > 0 %}data-slides="{{ item.slides | join: '|' | escape }}"{% endif %}
             {% if item.url != blank %}data-url="{{ item.url }}"{% endif %}
-            data-caption="{{ item.caption | escape }}"
+            data-caption="{{ item.caption | replace: 'Sabdia', 'SABDIA' | escape }}"
             role="button" tabindex="0"
             aria-label="{% if item.video != blank %}Play reel{% else %}View carousel{% endif %}: {{ alt }}"
           >

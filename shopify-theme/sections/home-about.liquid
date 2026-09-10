@@ -24,6 +24,10 @@
             assign strip_cols = '1fr'
             assign w1 = 1400
             assign w2 = 1400
+          when 'carousel'
+            assign strip_cols = 'carousel'
+            assign w1 = 700
+            assign w2 = 700
           else
             assign strip_cols = '2fr 1fr'
             assign w1 = 900
@@ -32,6 +36,26 @@
         # Request the crop at twice the display height for retina screens.
         assign ih = strip_h | times: 2.5 | round
       -%}
+      {%- if strip_cols == 'carousel' -%}
+      {%- comment -%} Every Strip image, gliding sideways on a slow loop (the set
+          is drawn twice so the loop is seamless). Pauses on hover. {%- endcomment -%}
+      {%- assign strip_imgs = section.blocks | where: 'type', 'image' -%}
+      {%- assign glide = strip_imgs.size | times: 9 | at_least: 24 -%}
+      <div class="about-img-strip about-strip-carousel reveal-wipe d2" style="--strip-h:{{ strip_h }}px;--strip-h-m:{{ strip_hm }}px;--strip-gap:{{ strip_gap }}px;--strip-glide:{{ glide }}s" aria-label="Sabdia homes">
+        <div class="about-strip-track">
+          {%- for pass in (1..2) -%}
+            {%- for block in strip_imgs -%}
+              {%- assign focus = block.settings.focus | default: 'center' -%}
+              {%- if block.settings.image -%}
+                <img src="{{ block.settings.image | image_url: width: 700, height: ih, crop: focus }}" alt="{% if pass == 1 %}{{ block.settings.alt | escape }}{% endif %}" loading="lazy" decoding="async" width="700" height="{{ ih }}" style="object-position:{{ focus }}"{% if pass == 2 %} aria-hidden="true"{% endif %} {% if pass == 1 %}{{ block.shopify_attributes }}{% endif %}>
+              {%- elsif block.settings.ext != blank -%}
+                <img src="{% render 'ext-variant', src: block.settings.ext, w: 700, h: ih %}" alt="{% if pass == 1 %}{{ block.settings.alt | escape }}{% endif %}" loading="lazy" decoding="async" width="700" height="{{ ih }}" style="object-position:{{ focus }}"{% if pass == 2 %} aria-hidden="true"{% endif %} {% if pass == 1 %}{{ block.shopify_attributes }}{% endif %}>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endfor -%}
+        </div>
+      </div>
+      {%- else -%}
       <div class="about-img-strip reveal-wipe d2" style="--strip-h:{{ strip_h }}px;--strip-h-m:{{ strip_hm }}px;--strip-gap:{{ strip_gap }}px;--strip-cols:{{ strip_cols }}">
         {%- assign img_i = 0 -%}
         {%- for block in section.blocks -%}
@@ -53,6 +77,7 @@
           {%- endif -%}
         {%- endfor -%}
       </div>
+      {%- endif -%}
     </div>
     <div>
       {%- for block in section.blocks -%}
@@ -110,10 +135,11 @@
         { "value": "large-small", "label": "Large + small (2:1)" },
         { "value": "equal", "label": "Two equal" },
         { "value": "small-large", "label": "Small + large (1:2)" },
-        { "value": "single", "label": "One image, full width" }
+        { "value": "single", "label": "One image, full width" },
+        { "value": "carousel", "label": "Carousel - every image glides past on a loop" }
       ],
-      "default": "large-small",
-      "info": "With one image selected, only the first Strip image block shows."
+      "default": "carousel",
+      "info": "Carousel shows every Strip image block, gliding sideways as the visitor scrolls the section (Tamsin, 10 Sep 2026: more images, carousel feel). The other layouts show the first one or two."
     },
     {
       "type": "range",

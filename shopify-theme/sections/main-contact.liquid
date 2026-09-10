@@ -136,6 +136,25 @@
   @media(max-width:1000px){.contact-page-grid{grid-template-columns:1fr;gap:52px}}
 </style>
 
+<script>
+  /* Links such as /pages/contact?interest=Request%20a%20Viewing (the For Sale
+     page's "Request a Viewing" button) arrive with that enquiry type chosen. */
+  (function () {
+    var sel = document.getElementById('cf-interest');
+    if (!sel || sel.dataset.prefill) return;
+    sel.dataset.prefill = '1';
+    var want = new URLSearchParams(location.search).get('interest');
+    if (!want) return;
+    var found = null;
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value && sel.options[i].value.toLowerCase() === want.toLowerCase()) { found = sel.options[i]; break; }
+    }
+    if (!found) { found = new Option(want, want); sel.add(found, 1); }
+    sel.value = found.value;
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+  })();
+</script>
+
 {% schema %}
 {
   "name": "Contact body",

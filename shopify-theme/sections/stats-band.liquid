@@ -1,6 +1,6 @@
 {%- comment -%} Port of the homepage stats band - counters count up on reveal. {%- endcomment -%}
 {%- assign delays = ',d1,d2,d3,d4,d5' | split: ',' -%}
-<div class="stats-band sp-sm">
+<div class="stats-band sp-sm{% if section.settings.size == 'compact' %} stats-compact{% endif %}">
   <div class="stats-grid inner">
     {%- for block in section.blocks -%}
       <div class="stat reveal {{ delays[forloop.index0] }}" {{ block.shopify_attributes }}>
@@ -20,7 +20,9 @@
 {% schema %}
 {
   "name": "Stats band",
-  "settings": [],
+  "settings": [
+    { "type": "select", "id": "size", "label": "Size", "options": [ { "value": "standard", "label": "Standard" }, { "value": "compact", "label": "Compact (Tamsin: a touch smaller)" } ], "default": "compact" }
+  ],
   "blocks": [
     {
       "type": "stat",

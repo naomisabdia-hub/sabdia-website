@@ -103,11 +103,15 @@
       assign loop_words = true
     endif
   -%}
-  <div class="h-mid{% if wpos == 'low' %} h-mid-low{% elsif wpos == 'high' %} h-mid-high{% endif %}{% if loop_words %} h-js-words{% endif %}" style="{% if hold > 0 %}--h-hold:{{ hold }}s;{% endif %}{% if show_mark %}--h-mark-hold:{{ mark_hold }}s;--h-mark-h:{{ section.settings.wordmark_size | default: 44 }}px;{% endif %}"{% if loop_words %} data-loop-words data-hold="{{ hold }}" data-mark-hold="{{ mark_hold }}" data-lead="{{ section.settings.words_fade_lead | default: 1 }}"{% endif %}>
+  <div class="h-mid{% if wpos == 'low' %} h-mid-low{% elsif wpos == 'high' %} h-mid-high{% endif %}{% if loop_words %} h-js-words{% endif %}{% if show_mark %} has-mark{% endif %}" style="{% if hold > 0 %}--h-hold:{{ hold }}s;{% endif %}{% if show_mark %}--h-mark-hold:{{ mark_hold }}s;--h-mark-h:{{ section.settings.wordmark_size | default: 44 }}px;{% endif %}--h-eyebrow:{{ section.settings.eyebrow_size | default: 11 }}px;"{% if loop_words %} data-loop-words data-hold="{{ hold }}" data-mark-hold="{{ mark_hold }}" data-lead="{{ section.settings.words_fade_lead | default: 1 }}"{% endif %}>
     <div class="h-mid-content">
       {%- if show_mark -%}
         <img class="h-mark" src="{{ mark_src }}" alt="{{ settings.site_name | default: 'Sabdia' }}" width="800" height="160" loading="eager">
       {%- endif -%}
+      {%- assign words_txt = section.settings.words | strip -%}
+      {%- if words_txt == blank -%}
+        <h1 class="sr-only">{{ settings.site_name | default: 'Sabdia' }} - {{ section.settings.eyebrow }}</h1>
+      {%- else -%}
       <h1 class="h-title">
         {%- assign words = section.settings.words | split: ',' -%}
         {%- for word in words -%}
@@ -119,6 +123,7 @@
           <span class="h-w"><span class="h-w-in" style="--wi:{{ wi }}">{{ word | strip }}</span></span>
         {%- endfor -%}
       </h1>
+      {%- endif -%}
       <p class="h-eyebrow-txt">{{ section.settings.eyebrow }}</p>
     </div>
   </div>
@@ -304,7 +309,19 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "Eyebrow line"
+      "label": "Eyebrow line",
+      "info": "With the wordmark on, this line fades in after the wordmark rather than with it."
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size",
+      "label": "Eyebrow size",
+      "min": 9,
+      "max": 18,
+      "step": 0.5,
+      "unit": "px",
+      "default": 11,
+      "info": "Tamsin, 10 Sep 2026: a smidge bigger than the 10.5px labels."
     },
     {
       "type": "textarea",

@@ -4,14 +4,25 @@
       "type": "page-header",
       "settings": {
         "style": "collection",
-        "label": "Our Work",
+        "label": "The Collection",
         "title_html": "The Sabdia<br><em>Collection</em>.",
-        "text": "A portfolio of completed luxury residences across inner Brisbane \u2014 each one designed, developed, and constructed entirely in-house by Sabdia."
+        "text": "Completed residences across inner Brisbane - every one designed, developed and built in-house by Sabdia.",
+        "bg_image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/collection/hermosa/hermosa-20.jpg",
+        "bg_alt": "HERMOSA, Camp Hill - a completed Sabdia residence",
+        "height": "standard",
+        "focus": "center"
       }
     },
     "grid": {
       "type": "portfolio-grid",
-      "settings": {},
+      "settings": {
+        "show_filter": true,
+        "style_on_card": true,
+        "filter_label": "Style",
+        "filter_all": "All",
+        "all_suburbs": "All Suburbs",
+        "film_tag": "Film"
+      },
       "blocks": {
         "residence-1": {
           "type": "residence",
@@ -20,7 +31,8 @@
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos-poster.jpg",
             "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos.mp4",
-            "link": "/pages/collection-milos"
+            "link": "/pages/collection-milos",
+            "page": "collection-milos"
           }
         },
         "residence-2": {
@@ -30,7 +42,8 @@
             "loc": "Taringa QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos-poster.jpg",
             "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos.mp4",
-            "link": "/pages/collection-ammos"
+            "link": "/pages/collection-ammos",
+            "page": "collection-ammos"
           }
         },
         "residence-3": {
@@ -40,7 +53,8 @@
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "/images/collection-calle.jpg",
             "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/calle.mp4",
-            "link": "/pages/collection-calle"
+            "link": "/pages/collection-calle",
+            "page": "collection-calle"
           }
         },
         "residence-4": {
@@ -50,7 +64,8 @@
             "loc": "Holland Park QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium-poster.jpg",
             "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium.mp4",
-            "link": "/pages/collection-elysium"
+            "link": "/pages/collection-elysium",
+            "page": "collection-elysium"
           }
         },
         "residence-5": {
@@ -60,7 +75,8 @@
             "loc": "Brisbane QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra-poster.jpg",
             "video": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra.mp4",
-            "link": "/pages/collection-alhambra"
+            "link": "/pages/collection-alhambra",
+            "page": "collection-alhambra"
           }
         },
         "residence-6": {
@@ -70,7 +86,8 @@
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "/images/collection-encanto.jpg",
             "video": "",
-            "link": "/pages/collection-encanto"
+            "link": "/pages/collection-encanto",
+            "page": "collection-encanto"
           }
         },
         "residence-7": {
@@ -80,7 +97,8 @@
             "loc": "Rochedale QLD, Australia",
             "image_ext": "/images/collection-nero.jpg",
             "video": "",
-            "link": "/pages/collection-nero"
+            "link": "/pages/collection-nero",
+            "page": "collection-nero"
           }
         },
         "residence-8": {
@@ -90,7 +108,8 @@
             "loc": "Camp Hill QLD, Australia",
             "image_ext": "/images/collection-hermosa.jpg",
             "video": "",
-            "link": "/pages/collection-hermosa"
+            "link": "/pages/collection-hermosa",
+            "page": "collection-hermosa"
           }
         },
         "residence-9": {
@@ -100,7 +119,8 @@
             "loc": "Graceville QLD, Australia",
             "image_ext": "/images/collection-fraser.jpg",
             "video": "",
-            "link": "/pages/collection-fraser"
+            "link": "/pages/collection-fraser",
+            "page": "collection-fraser"
           }
         },
         "residence-10": {
@@ -110,7 +130,8 @@
             "loc": "Taringa QLD, Australia",
             "image_ext": "/images/collection-petra.jpg",
             "video": "",
-            "link": "/pages/collection-petra"
+            "link": "/pages/collection-petra",
+            "page": "collection-petra"
           }
         },
         "residence-11": {
@@ -120,7 +141,8 @@
             "loc": "Brisbane QLD, Australia",
             "image_ext": "/images/caspian-hero.jpg",
             "video": "",
-            "link": "/pages/collection-kirra"
+            "link": "/pages/collection-kirra",
+            "page": "collection-kirra"
           }
         }
       },
