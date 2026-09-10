@@ -878,10 +878,11 @@ function initPage() {
       loader.classList.add('out');
       setTimeout(() => loader.remove(), 520);
     };
-    const hold = reduceMotion ? 120 : 420;
-    const cap = reduceMotion ? 200 : 900;
-    setTimeout(dismiss, cap);
-    window.addEventListener('load', () => setTimeout(dismiss, hold), { once: true });
+    // The hold is set in Customize (Header › Homepage loader stays for):
+    // the screen stays for that long, then goes - whether or not every
+    // image has finished loading. Reduced-motion visitors see it briefly.
+    const hold = reduceMotion ? 200 : (Number(loader.dataset.hold) || 3000);
+    setTimeout(dismiss, hold);
   }
 
   // ── NAV SCROLL STATE ──────────────────────────────────────

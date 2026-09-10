@@ -41,7 +41,7 @@
 </div>
 
 {%- if template.name == 'index' -%}
-  <div id="loader" aria-hidden="true">
+  <div id="loader" aria-hidden="true" data-hold="{{ section.settings.loader_hold | default: 3 | times: 1000 | round }}">
     <div class="ld-logo">
       <img src="{{ logo_src }}" alt="" loading="eager">
     </div>
@@ -127,6 +127,7 @@
     { "type": "text", "id": "cta_link", "label": "Button link", "default": "/pages/contact" },
     { "type": "text", "id": "mobile_contact_label", "label": "Mobile menu - final link label", "default": "Contact" },
     { "type": "text", "id": "loader_meta", "label": "Homepage loader caption", "default": "Sabdia · Est. 2013" },
+    { "type": "range", "id": "loader_hold", "label": "Homepage loader stays for", "min": 0.5, "max": 5, "step": 0.5, "unit": "s", "default": 3, "info": "How long the SABDIA opening screen holds on the first visit of a session (Naomi, 11 Sep 2026: 2.5 to 3 seconds). It shows once per visit, on the home page only." },
     { "type": "text", "id": "light_templates", "label": "Light-top templates", "default": "blog, article, page.contact, page.find-your-home, page.collection", "info": "Comma-separated template names whose first section is a light surface - the nav renders dark-on-light there from the top." }
   ]
 }
