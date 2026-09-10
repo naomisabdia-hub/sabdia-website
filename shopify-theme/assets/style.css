@@ -1241,6 +1241,8 @@ h1 em, h2 em, h3 em,
 .psb-loc{font-family:var(--font-u);font-size:var(--t-micro);font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:rgba(253,251,246,.5)}
 .psb-btn{flex-shrink:0;padding:12px 24px;background:var(--dark);color:var(--white);font-size:var(--t-label);font-weight:400;letter-spacing:.22em;text-transform:uppercase}
 @media(max-width:768px){.prop-sticky-bar{display:flex}}
+/* Shopify Inbox's chat bubble sits over the sticky bar's Enquire button on phones: lift the bubble above the bar while the bar is showing (the bubble is the embed's exported `activator` part). */
+@media(max-width:768px){body:has(.prop-sticky-bar:not(.psb-hidden)) shopify-chat::part(activator){transform:translateY(calc(-70px - env(safe-area-inset-bottom)));transition:transform .4s var(--ease)}}
 
 /* ── CUSTOM PAGE SECTIONS (admin-authored) ── */
 .cs-section{border-top:1px solid var(--border)}
