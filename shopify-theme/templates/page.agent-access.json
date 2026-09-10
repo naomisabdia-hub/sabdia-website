@@ -40,12 +40,42 @@
             "title": "Private Walkthroughs",
             "desc": "Walk through homes before they launch, at agent-only previews."
           }
+        },
+        "benefit-3": {
+          "type": "benefit",
+          "settings": {
+            "icon": "phone",
+            "title": "Priority Communication",
+            "desc": "One person at Sabdia to call, from first enquiry to settlement."
+          },
+          "disabled": true
+        },
+        "benefit-4": {
+          "type": "benefit",
+          "settings": {
+            "icon": "dollar",
+            "title": "Exclusive Commissions",
+            "desc": "Commission structures for agents on the list."
+          },
+          "disabled": true
+        },
+        "benefit-6": {
+          "type": "benefit",
+          "settings": {
+            "icon": "star",
+            "title": "Award-Winning Product",
+            "desc": "Award-winning homes your clients will already know by name."
+          },
+          "disabled": true
         }
       },
       "block_order": [
         "benefit-1",
         "benefit-2",
-        "benefit-5"
+        "benefit-3",
+        "benefit-4",
+        "benefit-5",
+        "benefit-6"
       ]
     },
     "listings": {

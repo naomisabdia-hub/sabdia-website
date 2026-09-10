@@ -2,7 +2,7 @@
   Port of the homepage About section - sticky heading + image strip on
   the left, paragraphs, signature, numbered values and CTA on the right.
 {%- endcomment -%}
-<section class="sp" id="about">
+<section class="sp{% if section.settings.vals_caps == false %} about-vals-serif{% endif %}" id="about">
   <div class="inner about-grid">
     <div class="about-sticky">
       <div class="slabel reveal">{{ section.settings.label }}</div>
@@ -122,6 +122,13 @@
       "type": "html",
       "id": "heading_html",
       "label": "Heading"
+    },
+    {
+      "type": "checkbox",
+      "id": "vals_caps",
+      "label": "Value titles as small capitals under the heading",
+      "default": true,
+      "info": "On since 10 Sep 2026 (Tamsin): the heading leads, the three titles read as sub-headings. Off restores the serif titles."
     },
     {
       "type": "header",

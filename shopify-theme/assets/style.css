@@ -466,6 +466,7 @@ html.js .slabel.reveal.vis::before{width:24px}
 .about-val-n{font-family:var(--font-u);font-size:var(--t-label);font-weight:400;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe-d);width:24px;flex-shrink:0;padding-top:7px}
 .about-val-t{font-family:var(--font-u);font-size:var(--t-label);font-weight:500;letter-spacing:.28em;text-transform:uppercase;line-height:1.4;color:var(--ink);margin-bottom:6px}
 .about-val{gap:24px;padding:24px 0}
+.about-vals-serif .about-val-t{font-family:var(--font-d);font-size:clamp(19px,1.6vw,23px);font-weight:400;letter-spacing:0;text-transform:none;line-height:1.25;margin-bottom:4px}
 .about-val-d{font-size:var(--t-body);font-weight:300;line-height:var(--lh-body);color:var(--ink3);letter-spacing:.018em}
 
 /* ── PROPERTIES ── */

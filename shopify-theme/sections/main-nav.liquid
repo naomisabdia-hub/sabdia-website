@@ -69,6 +69,7 @@
       <a href="/pages/collection">Collection</a>
       <a href="/pages/services">Services</a>
       <a href="/pages/about">About</a>
+      {%- if section.settings.show_agent_link -%}<a href="/pages/agent-access">Agent Access</a>{%- endif -%}
     {%- endif -%}
     <a href="{{ section.settings.cta_link }}">{{ section.settings.mobile_contact_label }}</a>
   </nav>
@@ -106,6 +107,7 @@
       <li><a href="/pages/collection">Collection</a></li>
       <li><a href="/pages/services">Services</a></li>
       <li><a href="/pages/about">About</a></li>
+      {%- if section.settings.show_agent_link -%}<li><a href="/pages/agent-access">Agent Access</a></li>{%- endif -%}
     {%- endif -%}
   </ul>
   <div class="nav-right">
@@ -119,6 +121,7 @@
 {
   "name": "Navigation",
   "settings": [
+    { "type": "checkbox", "id": "show_agent_link", "label": "Show Agent Access in the built-in menu", "default": false, "info": "Parked for launch (10 Sep 2026). Only applies when no menu is chosen in Content › Menus; with a menu, add or remove the link there." },
     { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
     { "type": "text", "id": "cta_label", "label": "Button label", "default": "Enquire" },
     { "type": "text", "id": "cta_link", "label": "Button link", "default": "/pages/contact" },

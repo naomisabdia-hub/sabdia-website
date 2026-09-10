@@ -43,6 +43,26 @@
     endfor
   endcapture
   assign suburbs = suburbs_raw | strip | split: '¦' | uniq | sort
+  # Switched off for launch (10 Sep 2026): For Sale has its own page. Turn
+  # "Include residences from Products" on and the current homes lead the
+  # grid again, tagged For Sale / Sold, with matching filter chips.
+  assign show_current = section.settings.show_current
+  assign scope = section.settings.current_scope | default: 'all'
+  assign current_handles = '' | split: ','
+  if show_current
+    if scope == 'all'
+      capture live_csv
+        render 'residence-handles', col: collections['for-sale'], group: 'live'
+      endcapture
+      assign live_handles = live_csv | split: ','
+      assign current_handles = current_handles | concat: live_handles
+    endif
+    capture sold_csv
+      render 'residence-handles', col: collections['sold'], group: 'sold'
+    endcapture
+    assign sold_handles = sold_csv | split: ','
+    assign current_handles = current_handles | concat: sold_handles
+  endif
 -%}
 
 {%- if section.settings.show_filter and section.blocks.size > 3 -%}
@@ -51,6 +71,10 @@
     <div class="pf-chips" role="group" aria-label="Filter by style">
       <span class="pf-bar-l">{{ section.settings.filter_label }}</span>
       <button type="button" class="pfilter on" data-style="">{{ section.settings.filter_all }}</button>
+      {%- if show_current -%}
+        {%- if scope == 'all' -%}<button type="button" class="pfilter" data-style="{{ section.settings.filter_live | default: 'For Sale' | escape }}">{{ section.settings.filter_live | default: "For Sale" }}</button>{%- endif -%}
+        <button type="button" class="pfilter" data-style="{{ section.settings.filter_sold | default: 'Sold' | escape }}">{{ section.settings.filter_sold | default: "Sold" }}</button>
+      {%- endif -%}
       {%- for s in styles -%}
         <button type="button" class="pfilter" data-style="{{ s | escape }}">{{ s }}</button>
       {%- endfor -%}
@@ -69,6 +93,29 @@
 <section class="pf-wrap" id="port-{{ sid }}">
   <div class="inner">
     <div class="pf-grid" id="pfGrid-{{ sid }}">
+      {%- if show_current -%}
+        {%- for h in current_handles -%}
+          {%- for product in collections.all.products -%}
+            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+            {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
+            {%- assign grp = section.settings.filter_live | default: 'For Sale' -%}
+            {%- if pstatus contains 'Sold' -%}{%- assign grp = section.settings.filter_sold | default: 'Sold' -%}{%- endif -%}
+            <a href="{{ product.url }}" class="pf-card reveal" data-port-card data-style="{{ grp | escape }}" data-suburb="{{ product.metafields.custom.suburb.value | escape }}">
+              <div class="pf-media">
+                {%- if product.featured_image -%}
+                  <img src="{{ product.featured_image | image_url: width: 1200, height: 900, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="900" loading="lazy" decoding="async">
+                {%- endif -%}
+                <span class="port-film-tag">{{ pstatus }}</span>
+              </div>
+              <div class="pf-info">
+                <div class="pf-name">{{ product.title }} <span aria-hidden="true">&rarr;</span></div>
+                <div class="pf-meta">{{ product.metafields.custom.suburb.value }}{% if product.metafields.custom.year.value != blank %} <i>&middot;</i> {{ product.metafields.custom.year.value }}{% endif %}</div>
+              </div>
+            </a>
+            {%- break -%}
+          {%- endfor -%}
+        {%- endfor -%}
+      {%- endif -%}
       {%- for block in section.blocks -%}
         {%- liquid
           assign rp = block.settings.page
@@ -201,7 +248,11 @@
     { "type": "text", "id": "all_suburbs", "label": "All-suburbs option", "default": "All Suburbs" },
     { "type": "text", "id": "empty_text", "label": "No-matches text", "default": "Nothing matches those filters. Try widening them." },
     { "type": "text", "id": "film_tag", "label": "Film tag", "default": "Film" },
-    { "type": "checkbox", "id": "show_current", "label": "(Retired) Include residences from Products", "default": false, "info": "No longer used - For Sale has its own page." }
+    { "type": "header", "content": "Residences from Products (For Sale / Sold)" },
+    { "type": "checkbox", "id": "show_current", "label": "Include residences from Products", "default": false, "info": "Off since 10 Sep 2026 (Tamsin): For Sale has its own page. On = the current homes lead the grid, tagged by their Status, with For Sale / Sold filter chips." },
+    { "type": "select", "id": "current_scope", "label": "Which ones", "options": [ { "value": "sold", "label": "Sold only (past projects)" }, { "value": "all", "label": "For Sale and Sold" } ], "default": "all" },
+    { "type": "text", "id": "filter_live", "label": "For Sale chip", "default": "For Sale" },
+    { "type": "text", "id": "filter_sold", "label": "Sold chip", "default": "Sold" }
   ],
   "blocks": [
     {

@@ -108,6 +108,7 @@
           <li><a href="/pages/about">About Sabdia</a></li>
           <li><a href="/pages/services">Services</a></li>
           <li><a href="/pages/collection">Collection</a></li>
+          {%- if section.settings.show_agent_link -%}<li><a href="/pages/agent-access">Agent Access</a></li>{%- endif -%}
           <li><a href="/blogs/journal">The Journal</a></li>
         {%- endif -%}
       </ul>
@@ -173,6 +174,13 @@
       "label": "Show the website address in the Connect column",
       "default": false,
       "info": "Off since 10 Sep 2026 (Tamsin): the site does not need to link to itself."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_agent_link",
+      "label": "Show the Agent Access link in the Company column",
+      "default": false,
+      "info": "Agent Access is parked for launch (10 Sep 2026). Only applies when no Company menu is chosen below."
     },
     {
       "type": "html",

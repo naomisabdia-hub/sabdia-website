@@ -87,7 +87,14 @@
     endif
   endif
   assign hero_auto = false
-  if section.settings.image == blank and section.settings.image_ext == blank and featured
+  assign use_chosen = true
+  if section.settings.hero_source == 'auto'
+    assign use_chosen = false
+  endif
+  if section.settings.image == blank and section.settings.image_ext == blank
+    assign use_chosen = false
+  endif
+  if use_chosen == false and featured
     assign second_handle = handles[1]
     for p in collections.all.products
       if p.handle == second_handle and p.featured_image
@@ -108,9 +115,9 @@
 <section class="page-hero">
   {%- if hero_video != blank -%}
     <video class="page-hero-video" src="{{ hero_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if section.settings.image %} poster="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}"{% endif %}></video>
-  {%- elsif section.settings.image -%}
+  {%- elsif use_chosen and section.settings.image -%}
     <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
-  {%- elsif section.settings.image_ext != blank -%}
+  {%- elsif use_chosen and section.settings.image_ext != blank -%}
     <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}" alt="" loading="eager" width="1920" height="1080">
   {%- elsif hero_auto -%}
     <img src="{{ hero_auto | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
@@ -377,6 +384,17 @@
       "label": "Intro line",
       "info": "{count} becomes the number of residences",
       "default": "{count} homes in inner Brisbane, each designed and built by Sabdia."
+    },
+    {
+      "type": "select",
+      "id": "hero_source",
+      "label": "Hero photo",
+      "options": [
+        { "value": "auto", "label": "A different residence from the featured banner (automatic)" },
+        { "value": "chosen", "label": "The photo chosen below" }
+      ],
+      "default": "chosen",
+      "info": "Automatic since 10 Sep 2026 (Tamsin): the page opened on the same house twice. Switch back to use your own photo."
     },
     {
       "type": "image_picker",

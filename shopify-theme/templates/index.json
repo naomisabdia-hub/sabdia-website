@@ -46,14 +46,16 @@
         "words_fade_lead": 9.5,
         "wordmark_size": 40,
         "words_position": "centre",
-        "words": "",
+        "words": "Design, Develop, Construct",
         "eyebrow": "Boutique Luxury Home Builder & Developer — Brisbane",
-        "description": "",
+        "description": "Sabdia has designed and built award-winning homes in inner Brisbane since 2013.",
         "award": "Award-Winning Luxury Residences.",
         "cta1_label": "View Properties",
         "cta1_link": "/collections/for-sale",
         "cta2_label": "Begin a Conversation",
-        "cta2_link": "/pages/contact"
+        "cta2_link": "/pages/contact",
+        "show_words": false,
+        "show_description": false
       }
     },
     "stats": {
@@ -115,6 +117,13 @@
             "text": "Multi-Award Winning"
           }
         },
+        "item-2": {
+          "type": "item",
+          "settings": {
+            "text": "Design · Develop · Construct"
+          },
+          "disabled": true
+        },
         "item-3": {
           "type": "item",
           "settings": {
@@ -136,6 +145,7 @@
       },
       "block_order": [
         "item-1",
+        "item-2",
         "item-3",
         "item-4",
         "item-5"

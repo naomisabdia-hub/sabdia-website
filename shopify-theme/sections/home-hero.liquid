@@ -109,6 +109,7 @@
         <img class="h-mark" src="{{ mark_src }}" alt="{{ settings.site_name | default: 'Sabdia' }}" width="800" height="160" loading="eager">
       {%- endif -%}
       {%- assign words_txt = section.settings.words | strip -%}
+      {%- if section.settings.show_words == false -%}{%- assign words_txt = '' -%}{%- endif -%}
       {%- if words_txt == blank -%}
         <h1 class="sr-only">{{ settings.site_name | default: 'Sabdia' }} - {{ section.settings.eyebrow }}</h1>
       {%- else -%}
@@ -130,7 +131,7 @@
 
   <div class="h-bottom">
     <div class="h-desc-bar inner">
-      <p class="h-desc">{{ section.settings.description }}</p>
+      {%- if section.settings.show_description -%}<p class="h-desc">{{ section.settings.description }}</p>{%- endif -%}
     </div>
     <div class="h-bottom-rule"></div>
     <div class="h-bottom-inner inner">
@@ -300,6 +301,13 @@
       "default": "centre"
     },
     {
+      "type": "checkbox",
+      "id": "show_words",
+      "label": "Show the title words",
+      "default": true,
+      "info": "Off since 10 Sep 2026 (Tamsin): the wordmark stands alone. The words below are kept so this can come back."
+    },
+    {
       "type": "text",
       "id": "words",
       "label": "Title words",
@@ -322,6 +330,13 @@
       "unit": "px",
       "default": 11,
       "info": "Tamsin, 10 Sep 2026: a smidge bigger than the 10.5px labels."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show the description line",
+      "default": true,
+      "info": "Off since 10 Sep 2026 (Tamsin): the \"since 2013\" line felt unanchored here and now opens the About paragraph. Kept below so it can come back."
     },
     {
       "type": "textarea",
