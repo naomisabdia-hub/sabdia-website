@@ -72,9 +72,18 @@
           # A picked Residence page supplies name, location, photo, film and
           # link from its own metafields; the block's fields only override.
           assign rp = block.settings.page
+          if rp == blank and block.settings.link contains '/pages/'
+            assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
+            assign rp = pages[rp_handle]
+          endif
           assign r_name = block.settings.name | default: rp.title
           assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
-          assign r_image_ext = block.settings.image_ext | default: rp.metafields.custom.image.value
+          # The residence page's own photo wins over the address typed into the
+          # block (the block's picked Image still beats both).
+          assign r_image_ext = rp.metafields.custom.image.value | default: block.settings.image_ext
+          if r_image_ext == blank and rp.metafields.custom.gallery.value.size > 0
+            assign r_image_ext = rp.metafields.custom.gallery.value | first
+          endif
           assign r_video = block.settings.video | default: rp.metafields.custom.video.value
           assign r_link = block.settings.link | default: rp.url
         -%}

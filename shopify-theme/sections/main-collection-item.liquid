@@ -6,6 +6,9 @@
     image          single line   - hero/poster URL or /images/… path
     video          single line   - film URL (optional)
     series_posts   json          - the residence's real Instagram posts
+    gallery        list of URLs  - the residence's photos, in order (Gallery
+                                   photos in the page's metafields). Shown as a
+                                   stage + filmstrip with the full-screen viewer.
   The editorial story is stitched from the strongest Series captions,
   exactly like the live site. "More from the Collection" renders from
   this section's blocks (the full portfolio list; the residence being
@@ -14,11 +17,17 @@
 {%- liquid
   assign mf = page.metafields.custom
   assign posts = mf.series_posts.value
+  assign gallery = mf.gallery.value
+  assign hero = mf.image.value
+  if hero == blank and gallery.size > 0
+    assign hero = gallery[0]
+  endif
+  assign name_token = '{' | append: 'name' | append: '}'
 -%}
 
 <section class="cd-hero">
-  {%- if mf.image.value != blank -%}
-    <img src="{% render 'ext-variant', src: mf.image.value, w: 1920, h: 1080 %}" alt="{{ page.title | escape }}" loading="eager" fetchpriority="high" width="1920" height="1080">
+  {%- if hero != blank -%}
+    <img src="{% render 'ext-variant', src: hero, w: 1920, h: 1080 %}" alt="{{ page.title | escape }}" loading="eager" fetchpriority="high" width="1920" height="1080">
   {%- endif -%}
   <div class="cd-hero-ov"></div>
   <div class="cd-hero-content">
@@ -47,6 +56,136 @@
       <p class="reveal">{{ p }}{% unless last == '.' or last == '!' or last == '?' %}.{% endunless %}</p>
     {%- endfor -%}
   </div>
+{%- endif -%}
+
+{%- if gallery.size > 0 -%}
+  {%- comment -%} Photo gallery - the same stage + filmstrip as the residences for sale,
+      fed by the page's Gallery photos. Thumbnails live beside the photos
+      (…/media/collection-thumbs/…); a photo without one just uses itself. {%- endcomment -%}
+  <section class="cd-gallery">
+    <div class="prop-gallery inner">
+      <div class="slabel reveal">{{ section.settings.gallery_label }}</div>
+      <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, page.title }}</h2>
+      <div hidden id="pgData">
+        {%- for u in gallery -%}
+          {%- assign t = u | replace: '/media/collection/', '/media/collection-thumbs/' -%}
+          <span data-lb-item data-src="{{ u }}" data-stage="{{ u }}" data-thumb="{{ t }}" data-alt="{{ page.title | escape }} &middot; {{ forloop.index }}"></span>
+        {%- endfor -%}
+      </div>
+      <div class="pg reveal d1" id="pg" data-house="{{ page.title | escape }}">
+        <div class="pg-stage" id="pgStage" tabindex="0" aria-roledescription="carousel" aria-label="{{ page.title | escape }} photos">
+          <img class="pg-img" id="pgImgA" alt="" decoding="async" width="1800" height="1013">
+          <img class="pg-img" id="pgImgB" alt="" decoding="async" width="1800" height="1013">
+          <div class="pg-veil" aria-hidden="true"></div>
+          <div class="pg-top"><span class="pg-house">{{ page.title }}{% if mf.loc.value != blank %} &middot; {{ mf.loc.value | split: ',' | first }}{% endif %}</span><span class="pg-count" id="pgCount"></span></div>
+          <button type="button" class="pg-arrow pg-prev" id="pgPrev" aria-label="Previous photo">&larr;</button>
+          <button type="button" class="pg-arrow pg-next" id="pgNext" aria-label="Next photo">&rarr;</button>
+          <button type="button" class="pg-expand" id="pgExpand"><span aria-hidden="true">&#x2922;</span> {{ section.settings.gallery_all_label | default: "View all photos" }} ({{ gallery.size }})</button>
+        </div>
+        <div class="pg-strip" id="pgStrip" role="tablist" aria-label="Photo thumbnails"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+    <img id="lbImg" src="" alt="" width="2000" height="1400">
+    <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&larr;</button>
+    <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&rarr;</button>
+    <button class="lb-close" id="lbClose" aria-label="Close">&#10005;</button>
+    <div class="lb-meta"><span class="lb-cap" id="lbCap"></span><span id="lbCount"></span></div>
+  </div>
+  <style>
+    .cd-gallery{padding-top:clamp(8px,2vw,24px)}
+    .cd-gallery .pg{margin-top:32px}
+  </style>
+  <script>
+    (function () {
+      var pg = document.getElementById('pg'), lb = document.getElementById('lb');
+      if (!pg || !lb || pg.dataset.init) return;
+      pg.dataset.init = '1';
+      var data = Array.prototype.slice.call(document.querySelectorAll('#pgData [data-lb-item]'));
+      if (!data.length) { pg.hidden = true; return; }
+      var house = pg.getAttribute('data-house') || '';
+      var imgs = [document.getElementById('pgImgA'), document.getElementById('pgImgB')];
+      var count = document.getElementById('pgCount'), strip = document.getElementById('pgStrip'), stage = document.getElementById('pgStage');
+      var lbImg = document.getElementById('lbImg'), lbCap = document.getElementById('lbCap'), lbCount = document.getElementById('lbCount');
+      var i = 0, on = 0, li = 0, lastFocus = null;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function srcOf(n) { return data[n].getAttribute('data-src'); }
+      function preload(n) { [n + 1, n - 1].forEach(function (k) { var p = new Image(); p.src = srcOf((k + data.length) % data.length); }); }
+      /* Filmstrip */
+      data.forEach(function (el, n) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'pg-thumb'; b.setAttribute('role', 'tab'); b.setAttribute('aria-label', house + ' photo ' + (n + 1));
+        var im = document.createElement('img'); im.loading = 'lazy'; im.decoding = 'async'; im.alt = '';
+        im.src = el.getAttribute('data-thumb') || el.getAttribute('data-src');
+        im.addEventListener('error', function () { if (im.src !== el.getAttribute('data-src')) im.src = el.getAttribute('data-src'); }, { once: true });
+        b.appendChild(im); b.addEventListener('click', function () { show(n); });
+        strip.appendChild(b);
+      });
+      function show(n, instant) {
+        i = (n + data.length) % data.length;
+        var nxt = imgs[1 - on], src = srcOf(i);
+        var swap = function () { imgs[on].classList.remove('is-on'); nxt.classList.add('is-on'); on = 1 - on; nxt.onload = null; };
+        nxt.alt = house + ' photo ' + (i + 1);
+        if (nxt.getAttribute('src') === src && nxt.complete) swap(); else { nxt.onload = swap; nxt.src = src; }
+        count.textContent = (i + 1) + ' / ' + data.length;
+        var th = strip.children;
+        for (var k = 0; k < th.length; k++) { th[k].classList.toggle('is-on', k === i); th[k].setAttribute('aria-selected', k === i ? 'true' : 'false'); }
+        if (th[i]) strip.scrollTo({ left: th[i].offsetLeft - strip.clientWidth / 2 + th[i].offsetWidth / 2, behavior: (instant || reduce) ? 'auto' : 'smooth' });
+        preload(i);
+      }
+      /* Full-screen viewer */
+      function lbShow(n) {
+        li = (n + data.length) % data.length;
+        lbImg.src = srcOf(li); lbImg.alt = house + ' photo ' + (li + 1);
+        lbCap.textContent = house; lbCount.textContent = (li + 1) + ' / ' + data.length;
+        preload(li);
+      }
+      function openFull(e) {
+        if (e) e.stopPropagation();
+        lastFocus = document.activeElement;
+        lb.hidden = false; requestAnimationFrame(function () { lb.classList.add('open'); });
+        document.documentElement.style.overflow = 'hidden';
+        lbShow(i); document.getElementById('lbClose').focus();
+      }
+      function close() {
+        lb.classList.remove('open'); document.documentElement.style.overflow = '';
+        setTimeout(function () { lb.hidden = true; }, 350);
+        show(li, true);
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }
+      document.getElementById('pgPrev').addEventListener('click', function (e) { e.stopPropagation(); show(i - 1); });
+      document.getElementById('pgNext').addEventListener('click', function (e) { e.stopPropagation(); show(i + 1); });
+      document.getElementById('pgExpand').addEventListener('click', openFull);
+      stage.addEventListener('click', function (e) { if (e.target.closest('button')) return; openFull(); });
+      stage.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { e.preventDefault(); show(i + 1); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); show(i - 1); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFull(); }
+      });
+      document.getElementById('lbPrev').addEventListener('click', function () { lbShow(li - 1); });
+      document.getElementById('lbNext').addEventListener('click', function () { lbShow(li + 1); });
+      document.getElementById('lbClose').addEventListener('click', close);
+      lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+      document.addEventListener('keydown', function (e) {
+        if (lb.hidden) return;
+        if (e.key === 'Escape') close();
+        else if (e.key === 'ArrowRight') lbShow(li + 1);
+        else if (e.key === 'ArrowLeft') lbShow(li - 1);
+      });
+      /* Swipe on touch screens - stage and viewer */
+      [stage, lb].forEach(function (el, which) {
+        var tx = null;
+        el.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].clientX; }, { passive: true });
+        el.addEventListener('touchend', function (e) {
+          if (tx === null) return; var dx = e.changedTouches[0].clientX - tx; tx = null;
+          if (Math.abs(dx) > 40) { if (which) lbShow(dx < 0 ? li + 1 : li - 1); else show(dx < 0 ? i + 1 : i - 1); }
+        }, { passive: true });
+      });
+      show(0, true);
+    })();
+  </script>
 {%- endif -%}
 
 {%- if mf.video.value != blank -%}
@@ -80,12 +219,27 @@
   {%- for block in section.blocks -%}
     {%- if block.settings.name == page.title or shown >= 3 -%}{%- continue -%}{%- endif -%}
     {%- assign shown = shown | plus: 1 -%}
+    {%- liquid
+      # The linked residence page's own photo (its Hero image metafield) wins
+      # over the address typed into the block, so a page updated in Pages
+      # shows the same photo everywhere.
+      assign more_img = block.settings.image_ext
+      if block.settings.link contains '/pages/'
+        assign more_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
+        assign more_page = pages[more_handle]
+        if more_page.metafields.custom.image.value != blank
+          assign more_img = more_page.metafields.custom.image.value
+        elsif more_page.metafields.custom.gallery.value.size > 0
+          assign more_img = more_page.metafields.custom.gallery.value | first
+        endif
+      endif
+    -%}
     <a href="{{ block.settings.link }}" class="port-card reveal" {{ block.shopify_attributes }}>
       <div class="port-img-wrap">
         {%- if block.settings.image -%}
           <img src="{{ block.settings.image | image_url: width: 800, height: 600, crop: 'center' }}" alt="{{ block.settings.name | escape }}" loading="lazy" width="800" height="600">
-        {%- elsif block.settings.image_ext != blank -%}
-          <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 800, h: 600 %}" alt="{{ block.settings.name | escape }}" loading="lazy" width="800" height="600">
+        {%- elsif more_img != blank -%}
+          <img src="{% render 'ext-variant', src: more_img, w: 800, h: 600 %}" alt="{{ block.settings.name | escape }}" loading="lazy" width="800" height="600">
         {%- endif -%}
       </div>
       <div class="port-name">{{ block.settings.name }}</div>
@@ -143,6 +297,29 @@
       "id": "film_text",
       "label": "Film text ({name})",
       "default": "{name}, on film."
+    },
+    {
+      "type": "header",
+      "content": "Gallery",
+      "info": "Shows when the page has Gallery photos (Pages > the residence > Metafields)."
+    },
+    {
+      "type": "text",
+      "id": "gallery_label",
+      "label": "Gallery label",
+      "default": "The Residence"
+    },
+    {
+      "type": "html",
+      "id": "gallery_heading_html",
+      "label": "Gallery heading (HTML - {name})",
+      "default": "Inside <em>{name}</em>."
+    },
+    {
+      "type": "text",
+      "id": "gallery_all_label",
+      "label": "View all button",
+      "default": "View all photos"
     },
     {
       "type": "text",
