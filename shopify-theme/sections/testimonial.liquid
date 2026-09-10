@@ -1,30 +1,167 @@
-{%- comment -%} Port of the dark testimonial band. {%- endcomment -%}
-{%- if section.settings.quote != blank -%}
-<section class="testi-dark sp">
+{%- comment -%}
+  Testimonials - the clients' own words, one at a time, turning on their
+  own. Each Review block is a quote (verbatim from Google), the reviewer's
+  first name, where it was said and the stars. With no blocks the single
+  Quote / Attribution fields below still work as before.
+{%- endcomment -%}
+{%- liquid
+  assign reviews = section.blocks | where: 'type', 'review'
+  assign single = false
+  if reviews.size == 0 and section.settings.quote != blank
+    assign single = true
+  endif
+  assign sid = section.id
+  assign every = section.settings.every | default: 7
+-%}
+{%- if reviews.size > 0 or single -%}
+<section class="testi-dark sp" id="testi-{{ sid }}" data-testi data-every="{{ every | times: 1000 }}">
   <div class="inner">
+    {%- if section.settings.label != blank or section.settings.heading_html != blank -%}
+    <div class="testi-hdr">
+      {%- if section.settings.label != blank -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+      {%- if section.settings.heading_html != blank -%}<h2 class="testi-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
+    </div>
+    {%- endif -%}
     <div class="testi-wrap">
       <div>
         <span class="testi-q-mark reveal">&ldquo;</span>
       </div>
-      <div>
-        <blockquote class="testi-text reveal d1">{{ section.settings.quote }}</blockquote>
-        <div class="testi-auth reveal d2">
-          <div class="testi-line"></div>
-          <div class="testi-name">{{ section.settings.attribution }}</div>
-        </div>
+      <div class="testi-stage reveal d1" aria-roledescription="carousel" aria-label="{{ section.settings.label | default: 'What clients say' | escape }}">
+        {%- if single -%}
+          <figure class="testi-slide is-on">
+            <blockquote class="testi-text">{{ section.settings.quote }}</blockquote>
+            <figcaption class="testi-auth">
+              <div class="testi-line"></div>
+              <div class="testi-name">{{ section.settings.attribution }}</div>
+            </figcaption>
+          </figure>
+        {%- else -%}
+          {%- for block in reviews -%}
+            {%- assign stars = block.settings.stars | default: 5 -%}
+            <figure class="testi-slide{% if forloop.first %} is-on{% endif %}" data-testi-slide {{ block.shopify_attributes }} aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}">
+              <blockquote class="testi-text">{{ block.settings.quote }}</blockquote>
+              <figcaption class="testi-auth">
+                <div class="testi-line"></div>
+                <div class="testi-name">{{ block.settings.name }}</div>
+                {%- if section.settings.show_stars -%}
+                  <div class="testi-stars" aria-label="{{ stars }} out of 5 stars">
+                    {%- for i in (1..5) -%}<span{% if i > stars %} class="off"{% endif %}>&#9733;</span>{%- endfor -%}
+                  </div>
+                {%- endif -%}
+                {%- if block.settings.source != blank -%}<div class="testi-src">{{ block.settings.source }}</div>{%- endif -%}
+              </figcaption>
+            </figure>
+          {%- endfor -%}
+          {%- if reviews.size > 1 -%}
+          <div class="testi-nav">
+            <button type="button" class="testi-arrow" data-testi-prev aria-label="Previous review">&larr;</button>
+            <div class="testi-dots" role="tablist">
+              {%- for block in reviews -%}
+                <button type="button" class="testi-dot{% if forloop.first %} is-on{% endif %}" role="tab" data-testi-dot="{{ forloop.index0 }}" aria-label="Review {{ forloop.index }} of {{ reviews.size }}"></button>
+              {%- endfor -%}
+            </div>
+            <button type="button" class="testi-arrow" data-testi-next aria-label="Next review">&rarr;</button>
+            {%- if section.settings.google_url != blank -%}
+              <a class="testi-all" href="{{ section.settings.google_url }}" target="_blank" rel="noopener">{{ section.settings.google_label | default: "Read all reviews on Google" }} &rarr;</a>
+            {%- endif -%}
+          </div>
+          {%- endif -%}
+        {%- endif -%}
       </div>
     </div>
   </div>
 </section>
 {%- endif -%}
 
+<style>
+  .testi-hdr{margin-bottom:clamp(36px,5vw,64px)}
+  .testi-h{font-family:var(--font-d);font-size:var(--t-h2);font-weight:300;color:var(--ink);letter-spacing:-.02em}
+  .testi-h em{font-style:italic;color:var(--ink)}
+  .testi-stage{position:relative;display:grid}
+  .testi-slide{grid-area:1/1;margin:0;opacity:0;transform:translateY(10px);transition:opacity .9s var(--ease),transform .9s var(--ease);pointer-events:none}
+  .testi-slide.is-on{opacity:1;transform:none;pointer-events:auto;position:relative;z-index:1}
+  .testi-slide .testi-text{margin-bottom:32px}
+  .testi-auth{flex-wrap:wrap;row-gap:8px}
+  .testi-stars{display:inline-flex;gap:2px;color:var(--gold);font-size:13px;letter-spacing:.1em;line-height:1}
+  .testi-stars .off{color:rgba(168,135,74,.3)}
+  .testi-src{font-size:var(--t-micro);font-weight:300;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe-d)}
+  .testi-nav{display:flex;align-items:center;gap:18px;margin-top:40px;flex-wrap:wrap}
+  .testi-arrow{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:none;color:var(--ink);cursor:pointer;font-size:15px;transition:border-color .3s,background .3s}
+  .testi-arrow:hover{border-color:var(--gold);background:rgba(168,135,74,.08)}
+  .testi-dots{display:flex;gap:8px}
+  .testi-dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--gold);background:none;padding:0;cursor:pointer;transition:background .3s,transform .3s}
+  .testi-dot.is-on{background:var(--gold);transform:scale(1.2)}
+  .testi-all{margin-left:auto;font-family:var(--font-u);font-size:var(--t-label);font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(168,135,74,.35);padding-bottom:3px;transition:color .25s,border-color .25s}
+  .testi-all:hover{color:var(--ink);border-color:var(--gold)}
+  @media(max-width:900px){.testi-wrap{grid-template-columns:1fr;gap:24px}.testi-q-mark{font-size:96px}.testi-all{margin-left:0;width:100%}}
+  @media(prefers-reduced-motion:reduce){.testi-slide{transition:none}}
+</style>
+
+<script>
+  (function () {
+    var root = document.getElementById('testi-{{ sid }}');
+    if (!root || root.dataset.init) return;
+    root.dataset.init = '1';
+    var slides = Array.prototype.slice.call(root.querySelectorAll('[data-testi-slide]'));
+    if (slides.length < 2) return;
+    var dots = Array.prototype.slice.call(root.querySelectorAll('[data-testi-dot]'));
+    var every = Number(root.dataset.every) || 7000, i = 0, timer = null;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function show(n) {
+      i = (n + slides.length) % slides.length;
+      slides.forEach(function (s, k) { s.classList.toggle('is-on', k === i); s.setAttribute('aria-hidden', k === i ? 'false' : 'true'); });
+      dots.forEach(function (d, k) { d.classList.toggle('is-on', k === i); d.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
+    }
+    function start() { if (reduce || timer) return; timer = setInterval(function () { show(i + 1); }, every); }
+    function stop() { clearInterval(timer); timer = null; }
+    function restart() { stop(); start(); }
+    root.querySelector('[data-testi-prev]').addEventListener('click', function () { show(i - 1); restart(); });
+    root.querySelector('[data-testi-next]').addEventListener('click', function () { show(i + 1); restart(); });
+    dots.forEach(function (d, k) { d.addEventListener('click', function () { show(k); restart(); }); });
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', start);
+    root.addEventListener('focusin', stop);
+    root.addEventListener('focusout', start);
+    document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+    /* Swipe on touch screens */
+    var tx = null;
+    root.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].clientX; }, { passive: true });
+    root.addEventListener('touchend', function (e) {
+      if (tx === null) return; var dx = e.changedTouches[0].clientX - tx; tx = null;
+      if (Math.abs(dx) > 40) { show(dx < 0 ? i + 1 : i - 1); restart(); }
+    }, { passive: true });
+    start();
+  })();
+</script>
+
 {% schema %}
 {
-  "name": "Testimonial",
+  "name": "Testimonials",
+  "max_blocks": 20,
   "settings": [
+    { "type": "paragraph", "content": "Add one Review block per client quote (⊕ Add block). They turn on their own, pause while the mouse is over them, and can be swiped on a phone. Quotes are the clients' own words from Google, so they keep their own punctuation." },
+    { "type": "text", "id": "label", "label": "Small label", "default": "In Their Words" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)", "default": "What our clients <em>say</em>." },
+    { "type": "range", "id": "every", "label": "Change every", "min": 3, "max": 15, "step": 1, "unit": "s", "default": 7 },
+    { "type": "checkbox", "id": "show_stars", "label": "Show the stars", "default": true },
+    { "type": "url", "id": "google_url", "label": "Link to all reviews on Google" },
+    { "type": "text", "id": "google_label", "label": "Link label", "default": "Read all reviews on Google" },
+    { "type": "header", "content": "Single quote (when there are no Review blocks)" },
     { "type": "textarea", "id": "quote", "label": "Quote" },
     { "type": "text", "id": "attribution", "label": "Attribution" }
   ],
-  "presets": [{ "name": "Testimonial" }]
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        { "type": "textarea", "id": "quote", "label": "Quote", "info": "Verbatim from the review - one or two sentences read best." },
+        { "type": "text", "id": "name", "label": "Name", "info": "First name, or first name and initial, as it appears on Google." },
+        { "type": "text", "id": "source", "label": "Where it was said", "default": "Google review" },
+        { "type": "range", "id": "stars", "label": "Stars", "min": 1, "max": 5, "step": 1, "default": 5 }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Testimonials" }]
 }
 {% endschema %}

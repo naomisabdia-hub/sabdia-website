@@ -388,9 +388,109 @@
     "testimonial": {
       "type": "testimonial",
       "settings": {
+        "label": "In Their Words",
+        "heading_html": "What our clients <em>say</em>.",
+        "every": 7,
+        "show_stars": true,
+        "google_url": "https://share.google/NWRoUuHtM8r61wzSS",
+        "google_label": "Read all reviews on Google",
         "quote": "One team did the design and the build, so nothing was lost in between. The house is exactly what we asked for, and better made.",
         "attribution": "A Sabdia client, inner Brisbane"
-      }
+      },
+      "blocks": {
+        "review-1": {
+          "type": "review",
+          "settings": {
+            "quote": "From start to finish they were amazing. We had such an incredible experience that we have engaged them again to build our dream Home. I would definitely recommend Sabdia Constructions to all my friends.",
+            "name": "Nuno",
+            "source": "Google review",
+            "stars": 5
+          }
+        },
+        "review-2": {
+          "type": "review",
+          "settings": {
+            "quote": "In addition to constructing a beautiful house, the quality of the build was impressive. Everyone in the Sabdia team is a pleasure to deal with - they are responsive, professional, helpful and truly take pride in their work.",
+            "name": "Melinda R",
+            "source": "Google review",
+            "stars": 5
+          }
+        },
+        "review-3": {
+          "type": "review",
+          "settings": {
+            "quote": "No stone is left unturned and each aspect of a Sabdia home is thought out and well executed. After recommending many others to select Sabdia as their forever home builders, we’re thrilled to be taking the same advice.",
+            "name": "Savva K",
+            "source": "Google review",
+            "stars": 5
+          }
+        },
+        "review-4": {
+          "type": "review",
+          "settings": {
+            "quote": "The final product was delivered on time and with great attention to detail. In the last couple of months I had two independent assessors checking the quality of my home, both recognising my home as one of the better builds they have seen this year.",
+            "name": "Mattia P",
+            "source": "Google review",
+            "stars": 5
+          }
+        },
+        "review-5": {
+          "type": "review",
+          "settings": {
+            "quote": "I’ve never met a more honest builder, who is so timely, and whose staff is a pleasure to deal with. Even now if I have a small question, my call is always answered.",
+            "name": "Amanda N",
+            "source": "Google review",
+            "stars": 5
+          }
+        },
+        "review-6": {
+          "type": "review",
+          "settings": {
+            "quote": "I bought a brand new house from Sabdia 1 year ago - would absolutely buy / build with them if an opportunity arises. I have found the communication and post handover to be great, all emails always responded.",
+            "name": "Craig",
+            "source": "Google review",
+            "stars": 5
+          }
+        },
+        "review-7": {
+          "type": "review",
+          "settings": {
+            "quote": "My family couldn't be happier with our high quality built home. It ticks every box that we could imagine and sometimes it is like residing in our own resort!",
+            "name": "Jarrod F",
+            "source": "Google review",
+            "stars": 5
+          }
+        },
+        "review-8": {
+          "type": "review",
+          "settings": {
+            "quote": "The team did a great handover with us and showed us everything we need to know about the house. Muhammad and his team are exceptional builders and people.",
+            "name": "Kimberley T",
+            "source": "Google review",
+            "stars": 5
+          }
+        },
+        "review-9": {
+          "type": "review",
+          "settings": {
+            "quote": "Sabdia Constructions was a pleasure to deal with. Quick delivery timeline and quality craftsmanship.",
+            "name": "Afraan N",
+            "source": "Google review",
+            "stars": 5
+          }
+        }
+      },
+      "block_order": [
+        "review-1",
+        "review-2",
+        "review-3",
+        "review-4",
+        "review-5",
+        "review-6",
+        "review-7",
+        "review-8",
+        "review-9"
+      ]
     },
     "agent": {
       "type": "agent-access",
