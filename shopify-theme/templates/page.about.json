@@ -5,7 +5,7 @@
       "settings": {
         "label": "Our Story",
         "title_html": "About<br><em>Sabdia</em>",
-        "sub": "Designed and built in-house, in inner Brisbane, since 2013.",
+        "sub": "Designed, developed and built in-house, in inner Brisbane, since 2013.",
         "image_ext": "/images/home-hero-1.jpg",
         "image_alt": "Sabdia living room with city view",
         "image": "shopify://shop_images/sierra-living-view-01.jpg"
@@ -14,7 +14,7 @@
     "mission": {
       "type": "about-mission",
       "settings": {
-        "label": "Mission",
+        "label": "The Studio",
         "heading_html": "Designed with <em>care</em>, built with precision.",
         "sig_name": "Sabdia",
         "sig_title": "Founder & Principal"
@@ -23,19 +23,19 @@
         "paragraph-1": {
           "type": "paragraph",
           "settings": {
-            "text": "Sabdia Constructions started in 2013 because Brisbane needed a boutique developer that would not cut corners, one that would do the design and the development itself and then build the house with its own team."
+            "text": "Sabdia Constructions was founded in Brisbane in 2013 on a single conviction: that a residence is at its best when the people who design it are the people who build it. Architecture, interiors, development and construction have sat under the one roof ever since."
           }
         },
         "paragraph-2": {
           "type": "paragraph",
           "settings": {
-            "text": "More than 100 homes later, that is still how we work."
+            "text": "More than 100 residences later, the approach has not changed. Each home is drawn for its site and its owners, developed without hand-offs, and built by a team that has held the same standard for more than a decade."
           }
         },
         "paragraph-3": {
           "type": "paragraph",
           "settings": {
-            "text": "We stay small on purpose. We take on a few projects a year so each one gets our full attention. We do not build in volume. We build in detail."
+            "text": "The studio stays small by design. A few residences a year, each given the time that restraint, proportion and natural materials ask for."
           }
         }
       },
@@ -56,15 +56,15 @@
           "settings": {
             "numeral": "i.",
             "title": "Integrity",
-            "desc": "We say what we do, and we do what we say. Clients hear the truth about cost and timing at every stage."
+            "desc": "What is drawn is what is built. Owners hear the truth about cost and program at every stage."
           }
         },
         "value-2": {
           "type": "value",
           "settings": {
             "numeral": "ii.",
-            "title": "Innovation",
-            "desc": "We keep looking for better ways to design and build, so the homes last."
+            "title": "Refinement",
+            "desc": "Every residence refines the last: in its detailing, its materials, and the way its rooms are lived in."
           }
         },
         "value-3": {
@@ -72,7 +72,7 @@
           "settings": {
             "numeral": "iii.",
             "title": "Excellence",
-            "desc": "We do not accept 'good enough'. Every detail, the roofline down to the door handles, has to be right."
+            "desc": "Nothing is added for effect and nothing is left unresolved, from the roofline to the door hardware."
           }
         }
       },
@@ -87,7 +87,7 @@
       "settings": {
         "label": "Our Journey",
         "heading_html": "A decade of<br><em>milestones</em>.",
-        "text": "The company started with one project. It has now completed more than 100 homes, and each year the standard has gone up."
+        "text": "The studio began with a single residence. More than 100 homes on, each one has raised the standard for the next."
       },
       "blocks": {
         "milestone-1": {
@@ -95,7 +95,7 @@
           "settings": {
             "year": "2013",
             "title": "Founded",
-            "desc": "Sabdia Constructions opens in Brisbane, designing and building its own homes."
+            "desc": "Sabdia Constructions opens in Brisbane, designing and building its own residences."
           }
         },
         "milestone-2": {
@@ -111,7 +111,7 @@
           "settings": {
             "year": "2017",
             "title": "50 Residences Delivered",
-            "desc": "50 homes delivered across inner Brisbane."
+            "desc": "Fifty residences delivered across inner Brisbane."
           }
         },
         "milestone-4": {
@@ -134,8 +134,8 @@
           "type": "milestone",
           "settings": {
             "year": "2025",
-            "title": "QASR — Flagship Release",
-            "desc": "QASR launches in Coorparoo, the largest home Sabdia has built."
+            "title": "QASR - Flagship Release",
+            "desc": "QASR launches in Coorparoo, the largest residence Sabdia has built."
           }
         }
       },
@@ -152,7 +152,7 @@
       "type": "about-awards",
       "settings": {
         "label": "Recognition",
-        "heading_html": "Award-winning<br><em>excellence</em>."
+        "heading_html": "Award-winning<br><em>work</em>."
       },
       "blocks": {
         "award-1": {
@@ -183,7 +183,7 @@
           "type": "award",
           "settings": {
             "year": "2021",
-            "title": "Residential Interior Design — Luxury",
+            "title": "Residential Interior Design - Luxury",
             "org": "IDEA Awards"
           }
         },
@@ -191,7 +191,7 @@
           "type": "award",
           "settings": {
             "year": "2020",
-            "title": "Custom Home of the Year — QLD",
+            "title": "Custom Home of the Year - QLD",
             "org": "Master Builders Queensland"
           }
         },
@@ -199,7 +199,7 @@
           "type": "award",
           "settings": {
             "year": "2019",
-            "title": "Best Luxury Home Builder — Brisbane",
+            "title": "Best Luxury Home Builder - Brisbane",
             "org": "REIQ Awards for Excellence"
           }
         }
@@ -218,10 +218,10 @@
       "settings": {
         "label": "Now Selling",
         "heading_html": "See what is <em>for sale</em> now.",
-        "text": "Every Sabdia residence is designed and built by the one team, from the first sketch to handover.",
-        "cta1_label": "View Current Properties",
+        "text": "Every Sabdia residence is designed and built by the one team, from the first line on a page to the final detail.",
+        "cta1_label": "View Residences",
         "cta1_link": "/collections/for-sale",
-        "cta2_label": "Get in Touch",
+        "cta2_label": "Begin a Conversation",
         "cta2_link": "/pages/contact"
       }
     }

@@ -28,7 +28,7 @@ Legend: ✅ done on staging · 🟡 built, needs Naomi's content or a tick in Cu
 | 1.9 | Drop "Design · Develop · Construct" from the marquee. | ✅ |
 | 1.10 | About hierarchy: heading clearly bigger; "Integrated delivery" etc. as uppercase tracked sub-headings. | ✅ |
 | 1.11 | More images in the About strip, carousel feel. | 🟡 Layout = Carousel is on; it glides every Strip image block. Naomi adds more Strip image blocks (2 today) |
-| 1.12 | Copy refined via the corpus. | ☐ Naomi, then Tamsin |
+| 1.12 | Copy refined via the corpus. | ✅ 11 Sep: every page, residence and completed-residence rewritten in the evidenced Sabdia voice (docs/BRAND-VOICE.md). ☐ Tamsin reads it; the testimonial is still a placeholder |
 | 1.14 | Film band: second video / three images / carousel beside the skinny reel. | 🟡 Built: ⊕ Add block › "Photo beside the reel" or "Second film" (up to 3). Naomi picks the photos |
 | 1.15 | Film band margins match the band above. | ✅ |
 | 1.18–1.19 | Grid order fine; SIERRA/SOLACE real photos when edits arrive. | ☐ content |
@@ -123,7 +123,7 @@ Legend: ✅ done on staging · 🟡 built, needs Naomi's content or a tick in Cu
 | 10.3 | Password page film + wordmark, no default text. | 🟡 built: Customize › Password page › pick the film/photo; wordmark on by default |
 | 10.4 | Domain move from Wix. | ☐ start now (LAUNCH-CHECKLIST.md §16–18) |
 | 10.5 | AETHER → realestate.com.au link. | ☐ Monday, Products › AETHER › Brochure/links |
-| 10.7 | Copy rewrite. | ☐ Naomi, then Tamsin |
+| 10.7 | Copy rewrite. | ✅ done in the Sabdia voice, on staging (docs/BRAND-VOICE.md) |
 
 ---
 

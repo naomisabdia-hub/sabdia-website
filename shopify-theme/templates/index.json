@@ -48,9 +48,9 @@
         "words_position": "centre",
         "words": "Design, Develop, Construct",
         "eyebrow": "Boutique Luxury Home Builder & Developer — Brisbane",
-        "description": "Sabdia has designed and built award-winning homes in inner Brisbane since 2013.",
-        "award": "Award-Winning Luxury Residences.",
-        "cta1_label": "View Properties",
+        "description": "Sabdia has designed and built award-winning residences in inner Brisbane since 2013.",
+        "award": "Award-Winning Residences.",
+        "cta1_label": "View Residences",
         "cta1_link": "/collections/for-sale",
         "cta2_label": "Begin a Conversation",
         "cta2_link": "/pages/contact",
@@ -176,19 +176,19 @@
         "paragraph-3": {
           "type": "paragraph",
           "settings": {
-            "text": "Sabdia has designed and built award-winning homes in inner Brisbane since 2013. Every Sabdia home is designed in-house and built by our own team. One team answers for the whole job, so the quality holds and so does the program."
+            "text": "Sabdia has designed and built award-winning residences across inner Brisbane since 2013. Every home is drawn, developed and constructed by the one team, so the decisions made on paper are the decisions that get built."
           }
         },
         "paragraph-4": {
           "type": "paragraph",
           "settings": {
-            "text": "Every project starts with the site and the people who will live there. We take time to understand both before a line is drawn."
+            "text": "Each residence begins with its site and the way a family will actually live in it. From there the work is patient: proportion, light, and a palette of natural materials chosen for that house alone."
           }
         },
         "paragraph-5": {
           "type": "paragraph",
           "settings": {
-            "text": "We build homes people keep. Each one is designed for its street and its owners, and finished to a standard that does not date."
+            "text": "What reads as simplicity is the result of repetition, refinement, and time spent getting every detail right."
           }
         },
         "value-6": {
@@ -196,23 +196,23 @@
           "settings": {
             "n": "i.",
             "title": "Integrated Delivery",
-            "desc": "We design the home and build it ourselves, under one roof."
+            "desc": "Design, development and construction under one roof, from the first sketch to handover."
           }
         },
         "value-7": {
           "type": "value",
           "settings": {
             "n": "ii.",
-            "title": "Quality without shortcuts",
-            "desc": "The best materials, the best trades, and attention to every detail."
+            "title": "Material Honesty",
+            "desc": "Natural stone, warm timber and light, chosen for the house and left to speak for themselves."
           }
         },
         "value-8": {
           "type": "value",
           "settings": {
             "n": "iii.",
-            "title": "Boutique & Personal",
-            "desc": "A few projects a year, so each one gets our full attention."
+            "title": "Boutique by Design",
+            "desc": "A few residences a year, each given the full attention of the studio."
           }
         },
         "image-9": {
@@ -248,7 +248,7 @@
       ],
       "settings": {
         "label": "About Sabdia",
-        "heading_html": "Beautiful homes, <em>built properly</em>.",
+        "heading_html": "One team, from the first line<br><em>to the final detail</em>.",
         "strip_split": "large-small",
         "strip_height": 240,
         "strip_height_mobile": 160,
@@ -267,10 +267,10 @@
         "anchor": "story",
         "label": "The Sabdia Story",
         "heading_html": "Our homes, <em>on film</em>.",
-        "text": "The residences, the people who build them, and the work that goes into every Sabdia home.",
+        "text": "The residences, the craft behind them, and the team that carries each one from drawing to handover.",
         "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand.mp4",
         "poster_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand-poster.jpg",
-        "caption_left": "Sabdia — On Film",
+        "caption_left": "Sabdia - On Film",
         "caption_right": "Brisbane, QLD",
         "cta_label": "Explore the Collection",
         "cta_link": "/pages/collection",
@@ -281,7 +281,7 @@
       "type": "properties-grid",
       "settings": {
         "label": "For Sale",
-        "heading_html": "<em>Current</em> Properties",
+        "heading_html": "<em>Current</em> Residences",
         "cta_label": "View All",
         "cta_link": "/collections/for-sale",
         "max_cards": 12,
@@ -296,8 +296,8 @@
           "type": "service",
           "settings": {
             "number": "01",
-            "title": "Luxury Residential Design",
-            "description": "Single homes and small developments, designed from the first sketch to the last finish.",
+            "title": "Architecture & Design",
+            "description": "Single residences and boutique developments, drawn in-house from the first concept to the finished detail.",
             "icon": "home"
           }
         },
@@ -306,7 +306,7 @@
           "settings": {
             "number": "02",
             "title": "Development Management",
-            "description": "We manage the whole development ourselves, from site to handover, so quality and timing stay in our hands.",
+            "description": "Site, approvals, engineering and program, managed by the same team that designs and builds.",
             "icon": "case"
           }
         },
@@ -315,7 +315,7 @@
           "settings": {
             "number": "03",
             "title": "Interior Architecture",
-            "description": "Our interior team works alongside the builders from day one, so what was drawn is what gets built.",
+            "description": "Interiors planned with the architecture, so material, light and proportion carry through every room.",
             "icon": "clock"
           }
         },
@@ -323,8 +323,8 @@
           "type": "service",
           "settings": {
             "number": "04",
-            "title": "Expert Construction",
-            "description": "Built by our own trades, with good materials and no shortcuts. You see every stage.",
+            "title": "Construction",
+            "description": "Built by Sabdia's own team and long-standing trades, checked at every stage.",
             "icon": "grid"
           }
         }
@@ -336,10 +336,10 @@
         "service-4"
       ],
       "settings": {
-        "label": "What We Do",
-        "heading_html": "Full-spectrum<br><em>development</em><br>expertise.",
-        "text": "Sabdia handles every stage of a project in-house, and one team is responsible for all of it. Nothing is lost between trades and the standard never drops.",
-        "cta_label": "Explore Services",
+        "label": "How We Work",
+        "heading_html": "Every discipline,<br><em>under one roof</em>.",
+        "text": "Sabdia designs, develops and constructs every residence in-house. One team carries the project from site to handover, so nothing is lost between disciplines and the standard holds.",
+        "cta_label": "Our Process",
         "cta_link": "/pages/services"
       }
     },
@@ -350,28 +350,28 @@
           "type": "step",
           "settings": {
             "title": "Design",
-            "description": "Design that works as well as it looks. We start with the site, the street and the people."
+            "description": "Every residence begins with its site, its street and the people who will live there."
           }
         },
         "step-2": {
           "type": "step",
           "settings": {
             "title": "Develop",
-            "description": "Approvals, planning and engineering are handled in-house, so every decision is ours."
+            "description": "Approvals, planning and engineering, resolved in-house so each decision stays with the team that made it."
           }
         },
         "step-3": {
           "type": "step",
           "settings": {
             "title": "Construct",
-            "description": "Our own team builds it, with the materials we specified and a check at every stage."
+            "description": "Built by our own team, to the drawings and the materials specified, with a check at every stage."
           }
         },
         "step-4": {
           "type": "step",
           "settings": {
             "title": "Deliver",
-            "description": "After handover we stay in touch. If something needs attention, we come back."
+            "description": "Handover is not the end of the relationship. The team stays close to the home and to its owners."
           }
         }
       },
@@ -389,7 +389,7 @@
       "type": "testimonial",
       "settings": {
         "quote": "One team did the design and the build, so nothing was lost in between. The house is exactly what we asked for, and better made.",
-        "attribution": "Satisfied Client — Inner Brisbane Residence"
+        "attribution": "A Sabdia client, inner Brisbane"
       }
     },
     "agent": {
@@ -457,11 +457,11 @@
     "contact": {
       "type": "contact-cta",
       "settings": {
-        "label": "Get In Touch",
-        "heading_html": "Let's start<br>a <em>conversation</em>.",
-        "text": "Leave your details and we will call or email within a business day.",
-        "interests": "For Sale — Current Properties\nCustom Home Design\nDevelopment Partnership\nAgent Access\nGeneral Enquiry",
-        "note": "We typically respond within one business day.",
+        "label": "Begin a Conversation",
+        "heading_html": "Let's begin<br>a <em>conversation</em>.",
+        "text": "Leave your details and one of the Sabdia team will be in touch within a business day.",
+        "interests": "For Sale - Current Residences\nRequest a Viewing\nUpcoming Releases\nAgent Access\nGeneral Enquiry",
+        "note": "We respond within one business day.",
         "f_first": "First Name*",
         "f_first_ph": "First name",
         "f_last": "Last Name*",
@@ -472,7 +472,7 @@
         "f_phone_ph": "Phone number",
         "f_interest": "Interest",
         "f_message": "Message*",
-        "f_message_ph": "Tell us about your interest...",
+        "f_message_ph": "Tell us which residence, or what you are looking for",
         "f_submit": "Submit",
         "d_location": "Location",
         "d_instagram": "Instagram",

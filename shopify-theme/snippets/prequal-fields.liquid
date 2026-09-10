@@ -74,5 +74,5 @@
       <option value="">{{ s.prequal_select | default: "Select…" }}</option>
       {%- for o in f_opts -%}{%- assign oo = o | strip -%}{%- if oo != blank -%}<option>{{ oo }}</option>{%- endif -%}{%- endfor -%}
     </select></div>
-  <span hidden data-prequal-ask>{{ s.prequal_ask | default: "Thank you for your interest! We appreciate you reaching out. To help us provide the most relevant information, could you please share your approximate budget range and your intended timeline for purchase? Once we have a better understanding, we'll be happy to provide further details on the home." }}</span>
+  <span hidden data-prequal-ask>{{ s.prequal_ask | default: "Thank you for your interest. So we can send the most relevant information, could you share your approximate budget range and your timeline for purchase? We will follow up with further details on the residence." }}</span>
 </div>

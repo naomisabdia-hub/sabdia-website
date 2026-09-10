@@ -69,3 +69,7 @@ Everything from the review is on the **staging theme** (#150783361126): the Coll
 1. ☐ Preview on staging, then run `zsh shopify-app/push-live.sh` — it now also pushes `page.collection.json`, `page.collection-item.json`, `collection.json` and `page.agent-access.json` from `~/Desktop/sabdia-store-templates`.
 2. ☐ **Content › Menus › Main menu › remove Agent Access** (the API token may not edit menus).
 3. ☐ New page fields for the Collection residences are live in the admin already: Content › Pages › the residence › Metafields (Style, Completed, Bedrooms, Bathrooms, Garages, Land size, Headline, Story, Key features). Style and year were pre-filled for Tamsin to confirm.
+
+## Added 11 Sep 2026 — copy in the Sabdia voice
+
+The voice guide is `docs/BRAND-VOICE.md` (distilled from the 154 posted captions the hub measured, the Brand Kit and the approved SOLACE HIA entry). Rewritten and on staging: home, About, Our Process, Contact, Collection header, Find Your Home, Agent Access, For Sale; every residence's description, headline and enquiry copy (Products, already live because products are store data); every completed residence's headline, teaser and story (Pages, already live). `push-live.sh` carries the page templates; nothing else is needed. Still open: a real client quote for the home testimonial, and the awards list to verify.

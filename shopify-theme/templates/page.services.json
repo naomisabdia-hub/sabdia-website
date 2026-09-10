@@ -5,7 +5,7 @@
       "settings": {
         "label": "How We Work",
         "title_html": "Our<br><em>Process</em>",
-        "sub": "Design, development and construction, one team, all in-house.",
+        "sub": "Design, development and construction, carried by one team from site to handover.",
         "image_ext": "/images/aether-hero.jpg",
         "image_alt": "SOLACE at dusk",
         "image": "shopify://shop_images/solace-exterior-front-dusk-01.jpg"
@@ -21,13 +21,13 @@
         "paragraph-1": {
           "type": "paragraph",
           "settings": {
-            "text": "Good developments happen when the people who design a home are the same people who build it. At Sabdia they are. Every discipline is in-house, one team, one standard."
+            "text": "A residence is at its best when the people who design it are the people who build it. At Sabdia they are: architecture, interiors, development and construction sit within the one studio, to one standard."
           }
         },
         "paragraph-2": {
           "type": "paragraph",
           "settings": {
-            "text": "The same people make every decision, on the first sketch and on handover day. Nothing is handed off and nothing gets lost."
+            "text": "The same team makes every decision, from the first sketch to handover day. Nothing is handed off, and nothing is lost between disciplines."
           }
         }
       },
@@ -45,12 +45,12 @@
           "settings": {
             "number": "01",
             "label": "Design",
-            "title": "Luxury Residential Design",
-            "heading_html": "Luxury Residential <em>Design</em>",
+            "title": "Architecture & Design",
+            "heading_html": "Architecture <em>& Design</em>",
             "image_ext": "/images/home-hero-1.jpg",
             "image_alt": "Luxury Residential Design",
-            "paragraphs": "Our architecture and design team is in-house. Each home starts with the site, the street and the client, before anything is drawn.\nThe result is a home that belongs to its site and its owners.",
-            "bullets": "Architectural concept and schematic design\nDesign development and documentation\nPlanning approvals and DA management\nLandscape architecture\nMaterial and finishes specification\n3D visualisation and virtual walkthroughs",
+            "paragraphs": "Every residence is drawn in-house, and every drawing begins with the site: its light, its fall, its street and the way a family will live on it.\nProportion, material and light are resolved together on paper, so the home arrives on site already decided.",
+            "bullets": "Architectural concept and schematic design\nDesign development and documentation\nPlanning approvals and DA management\nLandscape architecture\nMaterial and finishes specification\n3D visualisation and walkthroughs",
             "image": "shopify://shop_images/solace-staircase-02.jpg"
           }
         },
@@ -63,7 +63,7 @@
             "heading_html": "Development <em>Management</em>",
             "image_ext": "/images/solace-hero.jpg",
             "image_alt": "Development Management",
-            "paragraphs": "Development management is everything between the land and the keys: town planning, engineering, approvals, finance, sales and delivery.\nWe do all of it in-house. Fewer hand-offs means fewer delays and a tighter budget.",
+            "paragraphs": "Development management is everything between the land and the keys: planning, engineering, approvals, program and delivery.\nAll of it sits with the same team that designs and builds, so fewer hand-offs mean a tighter program and a cleaner result.",
             "bullets": "Site acquisition analysis and due diligence\nFeasibility modelling and investment structuring\nTown planning strategy and DA management\nEngineering and civil coordination\nSales and marketing strategy\nProject reporting and stakeholder management",
             "image": "shopify://shop_images/sierra-exterior-front-01.jpg"
           }
@@ -77,7 +77,7 @@
             "heading_html": "Interior <em>Architecture</em>",
             "image_ext": "/images/sierra-hero.jpg",
             "image_alt": "Interior Architecture",
-            "paragraphs": "Our interior architects work with the architecture team from day one, so the inside of the house is planned with the same care as the outside.\nKitchens, bathrooms, bedrooms and living rooms are designed together, so light, materials and proportion carry through the whole house.",
+            "paragraphs": "Interior architecture runs alongside the architecture from the first line, so the inside of a residence is planned with the same care as its form.\nKitchens, bathrooms, joinery and lighting are designed as one composition, and the palette carries from room to room without a change of language.",
             "bullets": "Interior concept and spatial design\nCustom joinery design and specification\nMaterial, finish, and hardware selection\nLighting design and coordination\nFF&E procurement and styling\nKitchen and bathroom design",
             "image": "shopify://shop_images/solace-kitchen-01.jpg"
           }
@@ -87,12 +87,12 @@
           "settings": {
             "number": "04",
             "label": "Construction",
-            "title": "Expert Construction",
-            "heading_html": "Expert <em>Construction</em>",
+            "title": "Construction",
+            "heading_html": "<em>Construction</em>",
             "image_ext": "/images/caspian-hero.jpg",
             "image_alt": "Expert Construction",
-            "paragraphs": "Our own team builds every home. Many of the trades have worked with Sabdia for years and hold the same standard we do.\nGood materials from suppliers we trust, and no shortcuts. The house should look right at handover and still be right in twenty years.",
-            "bullets": "Full residential construction management\nPremium material sourcing and procurement\nMaster tradesperson coordination\nQuality assurance and defect management\nClient reporting and site access\nPost-completion aftercare and warranty",
+            "paragraphs": "Sabdia's own team builds every residence, with trades who have worked alongside the studio for years and hold the same standard.\nNatural stone, warm timber and honest materials, laid and finished by hand and checked at every stage. Right at handover, and right in twenty years.",
+            "bullets": "Full residential construction management\nMaterial sourcing and procurement\nTrade coordination\nQuality assurance and defect management\nOwner reporting and site access\nPost-completion care and warranty",
             "image": "shopify://shop_images/sierra-exterior-rear-dusk-01.jpg"
           }
         }
@@ -114,28 +114,28 @@
           "type": "step",
           "settings": {
             "title": "Design",
-            "description": "Design that works as well as it looks. We start with the site, the street and the people."
+            "description": "Every residence begins with its site, its street and the people who will live there."
           }
         },
         "step-2": {
           "type": "step",
           "settings": {
             "title": "Develop",
-            "description": "Approvals, planning and engineering are handled in-house, so every decision is ours."
+            "description": "Approvals, planning and engineering, resolved in-house so each decision stays with the team that made it."
           }
         },
         "step-3": {
           "type": "step",
           "settings": {
             "title": "Construct",
-            "description": "Our own team builds it, with the materials we specified and a check at every stage."
+            "description": "Built by our own team, to the drawings and the materials specified, with a check at every stage."
           }
         },
         "step-4": {
           "type": "step",
           "settings": {
             "title": "Deliver",
-            "description": "After handover we stay in touch. If something needs attention, we come back."
+            "description": "Handover is not the end of the relationship. The team stays close to the home and to its owners."
           }
         }
       },
