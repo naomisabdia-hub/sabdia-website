@@ -30,8 +30,14 @@ We release a small number of residences each year. Leave your email and we will 
 **I am a real estate agent.**
 Thank you for reaching out. Apply on our Agent Access page (sabdia.com.au/pages/agent-access) and a member of our team will be in touch.
 
-**I want to enquire.**
-We would love to hear from you. Share your name, email, phone, the residence, your budget range, timeline to purchase and preferred locations, and a member of our team will be in touch as soon as possible.
+**I want to enquire about a residence.**
+Wonderful. Please share your name, email, phone and which residence (QASR, SOLACE, SIERRA, CASPIAN or AETHER), plus your approximate budget range, timeline to purchase and preferred locations. A member of our team will be in touch as soon as possible.
+
+**I am looking for a home, not sure which.**
+Happy to help you find the right one. Share your name, email, phone, your approximate budget range, timeline to purchase and the suburbs you would consider, and a member of our team will come back with the residences that fit.
+
+**General enquiry.**
+Of course. Share your name, email, phone and a few words about how we can help, and a member of our team will be in touch as soon as possible.
 
 **How do I buy one of your homes?**
 Tell us the residence, your budget range and timeline, with your name, email and phone. A member of our team will walk you through it, from a private inspection to settlement.

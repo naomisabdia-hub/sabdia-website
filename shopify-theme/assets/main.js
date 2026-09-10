@@ -504,6 +504,7 @@ function nativeFormInit() {
     const fail = (msg) => {
       pending = false;
       if (silent) return;
+      if (form.dataset.quiet) { form.dispatchEvent(new CustomEvent('sabdia:failed', { bubbles: true, detail: msg })); return; }
       if (btn) { btn.textContent = label; btn.style.background = ''; }
       announce(msg);
       let note = form.querySelector('.form-error');
@@ -514,6 +515,7 @@ function nativeFormInit() {
       pending = false;
       if (silent) return;
       if (!isNews) fileCustomer(form);
+      if (form.dataset.quiet) { form.dispatchEvent(new CustomEvent('sabdia:sent', { bubbles: true })); return; }
       if (isNews) {
         const doneEl = form.querySelector('[data-nl-success]');
         form.innerHTML = '<p class="nl-done">' + ((doneEl && doneEl.textContent.trim()) || 'Thank you — you\'re subscribed.') + '</p>';
@@ -531,7 +533,7 @@ function nativeFormInit() {
           credentials: 'same-origin',
           redirect: 'follow'
         });
-        if (/\/challenge/.test(res.url)) { if (!isNews && !silent) stashCustomer(form); location.assign(res.url); return; } // Shopify's visible check; it holds the enquiry and returns here
+        if (/\/challenge/.test(res.url)) { if (!isNews && !silent) stashCustomer(form); if (form.dataset.quiet) { try { sessionStorage.setItem('cc-pending', '1'); } catch (e) {} } location.assign(res.url); return; } // Shopify's visible check; it holds the enquiry and returns here
         const ok = isNews ? /customer_posted=true/.test(res.url) : /contact_posted=true/.test(res.url);
         if (ok) { done(); return; }
         const html = await res.text();
@@ -617,9 +619,163 @@ function prequalInit() {
   });
 }
 
+
+/* Sabdia Concierge (section concierge.liquid). */
+function conciergeInit() {
+  const cc = document.querySelector('[data-concierge]');
+  if (!cc || cc.dataset.init) return;
+  cc.dataset.init = '1';
+  const parseJSON = (t, d) => { try { return JSON.parse(t); } catch (e) { return d; } };
+  const residences = parseJSON(cc.getAttribute('data-residences') || '[]', []);
+  const forSale = residences.filter((r) => !/sold/i.test(r.status || ''));
+  const raw = parseJSON((cc.querySelector('[data-concierge-qa]') || {}).textContent || '[]', []);
+  const qa = [];
+  for (let i = 0; i + 3 < raw.length + 1 && i < raw.length; i += 4) qa.push({ q: raw[i] || '', k: raw[i + 1] || '', a: raw[i + 2] || '', link: raw[i + 3] || '' });
+  const locations = (cc.getAttribute('data-locations') || '').split(',').map((x) => x.trim()).filter(Boolean);
+  const budgets = (cc.getAttribute('data-budgets') || '').split('|').filter(Boolean);
+  const timelines = (cc.getAttribute('data-timelines') || '').split('|').filter(Boolean);
+  const log = cc.querySelector('#ccLog'), panel = cc.querySelector('#ccPanel'), launch = cc.querySelector('#ccLaunch');
+  const input = cc.querySelector('#ccText'), chatForm = cc.querySelector('#ccForm');
+  const contact = cc.querySelector('#ccContact');
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const linkify = (t) => esc(t).replace(/(https?:\/\/[^\s]+|\/(?:pages|products|collections)\/[a-z0-9\-\/]+)/g, (m) => '<a href="' + m + '">' + m.replace(/^https?:\/\/[^/]+/, '') + '</a>');
+  const scroll = () => { log.scrollTop = log.scrollHeight; };
+  const say = (html, who) => { const d = document.createElement('div'); d.className = 'cc-msg ' + (who || 'bot'); d.innerHTML = html; log.appendChild(d); scroll(); return d; };
+  const options = (items, onPick, ghostLast) => {
+    const wrap = document.createElement('div'); wrap.className = 'cc-opts';
+    items.forEach((label, n) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cc-opt' + (ghostLast && n === items.length - 1 ? ' ghost' : ''); b.textContent = label;
+      b.addEventListener('click', () => { wrap.remove(); onPick(label, n); });
+      wrap.appendChild(b);
+    });
+    log.appendChild(wrap); scroll(); return wrap;
+  };
+  const multi = (items, doneLabel, onDone) => {
+    const chosen = new Set();
+    const wrap = document.createElement('div'); wrap.className = 'cc-opts';
+    items.forEach((label) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'cc-opt'; b.textContent = label; b.addEventListener('click', () => { b.classList.toggle('on'); if (chosen.has(label)) chosen.delete(label); else chosen.add(label); }); wrap.appendChild(b); });
+    const d = document.createElement('button'); d.type = 'button'; d.className = 'cc-opt ghost'; d.textContent = doneLabel; d.addEventListener('click', () => { wrap.remove(); onDone(Array.from(chosen)); }); wrap.appendChild(d);
+    log.appendChild(wrap); scroll();
+  };
+  const typing = async (ms) => { const d = document.createElement('div'); d.className = 'cc-typing'; d.textContent = '…'; log.appendChild(d); scroll(); await new Promise((r) => setTimeout(r, ms || 450)); d.remove(); };
+  const norm = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9$\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  const STOP = new Set('you your can could the and for are with this that what how does have has any our its get from into will would like want need please hello hey thanks tell more about there here they them then than some just also very really when where which who why yes not but all one two new house home homes property properties sabdia'.split(' '));
+  const words = (t) => norm(t).split(' ').filter((w) => w.length > 2 && !STOP.has(w));
+  /* Residence answer, built live from the product data. */
+  const residenceText = (r) => {
+    const facts = [r.beds && r.beds + ' bedrooms', r.baths && r.baths + ' bathrooms', r.cars && r.cars + '-car garage', r.land && r.land + ' sqm'].filter(Boolean).join(', ');
+    const feats = (r.features || '').split(',').map((x) => x.trim()).filter(Boolean).slice(0, 6).join(', ');
+    const status = /sold/i.test(r.status || '') ? ' (' + r.status + ')' : '';
+    return r.title + ' in ' + r.suburb + status + '. ' + (r.headline ? r.headline.replace(/\s+/g, ' ') + ' ' : '') + (facts ? facts + '. ' : '') + (feats ? 'Highlights: ' + feats + '. ' : '') + 'See ' + r.url + ' or tell me if you would like to enquire.';
+  };
+  const findResidence = (text) => { const n = norm(text); return residences.find((r) => n.indexOf(norm(r.title)) !== -1 || n.indexOf(r.handle) !== -1) || null; };
+  const enquiryIntent = /\b(enquir|inquir|price|pricing|cost|how much|inspect|viewing|appointment|interested|register|buy|purchase|contact|call me|floor ?plan|brochure)/i;
+  const personIntent = /\b(person|human|someone|staff|talk to|speak to|call)\b/i;
+  const bestMatch = (text) => {
+    const ws = words(text); if (!ws.length) return null;
+    let best = null, bestScore = 0;
+    const hit = (bag, w) => bag.some((b) => b === w || (w.length > 4 && b.length > 4 && (b.indexOf(w.slice(0, 5)) === 0 || w.indexOf(b.slice(0, 5)) === 0)));
+    qa.forEach((item) => {
+      const kw = words(item.k), qw = words(item.q);
+      let score = 0; ws.forEach((w) => { if (hit(kw, w)) score += 2; else if (hit(qw, w)) score += 1; });
+      if (score > bestScore) { bestScore = score; best = item; }
+    });
+    return bestScore >= 2 ? best : null;
+  };
+  /* Enquiry, step by step. */
+  const state = {};
+  const setC = (n, v) => { const el = contact && contact.querySelector('[name="' + n + '"]'); if (el) el.value = v || ''; };
+  let step = null;
+  const ask = (q, key, opts) => { say(esc(q)); step = { key, opts }; if (opts) options(opts.items, (label) => answerStep(label), opts.ghostLast); input.focus(); };
+  const answerStep = async (value) => {
+    if (!step) return;
+    const { key } = step; state[key] = value; say(esc(value), 'me'); step = null;
+    await typing(350);
+    if (key === 'name') ask('And your email address?', 'email');
+    else if (key === 'email') { if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) { ask('That email does not look right - could you check it?', 'email'); return; } ask('Best phone number to reach you on?', 'phone'); }
+    else if (key === 'phone') { if (state.kind === 'general') ask('How can we help? Tell us a little about your enquiry.', 'message'); else if (state.residence) askBudget(); else ask('Which residence are you interested in?', 'residence', { items: forSale.map((r) => r.title + ' - ' + r.suburb).concat(['Not sure yet']), ghostLast: true }); }
+    else if (key === 'residence') askBudget();
+    else if (key === 'budget') ask('And your timeline to purchase?', 'timeline', { items: timelines });
+    else if (key === 'timeline') { say(esc('Which locations would you consider? Tap all that apply.')); multi(locations, 'Done', async (picked) => { state.locations = picked.join(', '); say(esc(picked.length ? picked.join(', ') : 'No preference'), 'me'); await typing(300); ask('Anything else we should know? (or type "no")', 'message'); }); }
+    else if (key === 'message') submitEnquiry();
+  };
+  const askBudget = () => ask('To help us give you the most relevant information, what is your approximate budget range?', 'budget', { items: budgets });
+  const startEnquiry = (residence) => {
+    if (residence) state.residence = residence.title + ' - ' + residence.suburb;
+    if (state.residence || state.kind) { if (state.name && state.email && state.phone) { askBudget(); return; } ask('Great - what is your name?', 'name'); return; }
+    /* First: what is it about? A residence, a home sales enquiry in general, or something else. */
+    say(esc('What is your enquiry about?'));
+    options(forSale.map((r) => r.title + ' - ' + r.suburb).concat(['A home for sale, not sure which yet', 'Something else']), (label, n) => {
+      say(esc(label), 'me');
+      if (n < forSale.length) { state.residence = label; state.kind = 'residence'; }
+      else if (n === forSale.length) { state.kind = 'sales'; state.residence = 'Not sure yet'; }
+      else { state.kind = 'general'; state.intent = 'General Enquiry'; }
+      typing(300).then(() => ask('Great - what is your name?', 'name'));
+    });
+  };
+  const submitEnquiry = async () => {
+    if (!contact) { say(esc('Please use our contact page: /pages/contact')); return; }
+    const parts = String(state.name || '').trim().split(/\s+/);
+    setC('contact[First name]', parts[0] || ''); setC('contact[Last name]', parts.slice(1).join(' '));
+    setC('contact[email]', state.email); setC('contact[Phone]', state.phone);
+    setC('contact[Property]', state.residence && state.residence !== 'Not sure yet' ? state.residence : '');
+    setC('contact[Enquiry type]', state.intent || 'Register Interest');
+    setC('contact[Budget range]', state.budget); setC('contact[Timeline]', state.timeline); setC('contact[Preferred locations]', state.locations || '');
+    setC('contact[body]', (state.message && !/^no$/i.test(state.message)) ? state.message : 'Enquiry via concierge chat');
+    say(esc('Sending…'));
+    const em = contact.querySelector('[name="contact[email]"]');
+    em.dispatchEvent(new Event('focusin', { bubbles: true })); em.dispatchEvent(new Event('change', { bubbles: true }));
+    setTimeout(() => { if (contact.requestSubmit) contact.requestSubmit(); else contact.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); }, 1200);
+  };
+  if (contact) {
+    contact.addEventListener('sabdia:sent', async () => { await typing(300); const first = (state.name || '').split(/\s+/)[0]; say(esc((first ? 'Thank you, ' + first + '. ' : '') + (cc.getAttribute('data-thanks') || 'Thank you. We will be in touch.'))); options(['Ask another question'], () => showOpening()); Object.keys(state).forEach((k) => delete state[k]); });
+    contact.addEventListener('sabdia:failed', (e) => { say(esc(e.detail || 'Something went wrong. Please try again or use /pages/contact.')); options(['Try again'], () => submitEnquiry()); });
+  }
+  const handOver = () => {
+    cc.classList.add('handoff');
+    const btn = document.querySelector('#ShopifyChat button, shopify-chat button, [id^="shopify-chat"] button, .shopify-chat-launcher, #ShopifyChat');
+    if (btn) { closePanel(); setTimeout(() => btn.click(), 150); }
+    else say('You can reach the team at <a href="/pages/contact">/pages/contact</a> or sales@sabdia.com.au.');
+  };
+  const handle = async (text) => {
+    say(esc(text), 'me');
+    if (step) { const v = text; step && await answerStep(v); return; }
+    await typing(500);
+    const r = findResidence(text);
+    if (personIntent.test(text) && !enquiryIntent.test(text)) { handOver(); return; }
+    if (r && !enquiryIntent.test(text)) { say(linkify(residenceText(r))); options(['Enquire about ' + r.title, 'Arrange an inspection', 'Ask something else'], (label, n) => { if (n === 2) { showOpening(); return; } state.intent = n === 1 ? 'Arrange Private Inspection' : 'Register Interest'; startEnquiry(r); }); return; }
+    const m = bestMatch(text);
+    if (m) { say(linkify(m.a)); afterAnswer(m, r); return; }
+    if (enquiryIntent.test(text)) { state.intent = /inspect|viewing|appointment/i.test(text) ? 'Arrange Private Inspection' : (/price|cost|how much/i.test(text) ? 'Request Price Guide' : 'Register Interest'); startEnquiry(r); return; }
+    say(esc(cc.getAttribute('data-fallback') || 'Our team can help with that.'));
+    options(['Leave an enquiry', cc.getAttribute('data-person') || 'Chat with a person', 'Back to questions'], (label, n) => { if (n === 0) startEnquiry(null); else if (n === 1) handOver(); else showOpening(); });
+  };
+  const afterAnswer = (m, r) => {
+    if (m.link === 'enquire') { options(['Leave my details', 'Back to questions'], (label, n) => { if (n === 0) { state.intent = /inspect/i.test(m.q) ? 'Arrange Private Inspection' : (/price/i.test(m.q) ? 'Request Price Guide' : 'Register Interest'); startEnquiry(r); } else showOpening(); }); }
+    else if (m.link) { say('<a href="' + esc(m.link) + '">Open ' + esc(m.link) + '</a>'); options(['Leave an enquiry', 'Back to questions'], (label, n) => { if (n === 0) startEnquiry(r); else showOpening(); }); }
+    else options(['Leave an enquiry', 'Back to questions'], (label, n) => { if (n === 0) startEnquiry(r); else showOpening(); });
+  };
+  const showOpening = () => {
+    const count = parseInt(cc.getAttribute('data-buttons') || '5', 10);
+    const items = qa.slice(0, count).map((x) => x.q).concat([cc.getAttribute('data-person') || 'Chat with a person']);
+    options(items, (label, n) => { if (n === items.length - 1) { say(esc(label), 'me'); handOver(); return; } const item = qa[n]; say(esc(label), 'me'); typing(400).then(() => { say(linkify(item.a)); afterAnswer(item, null); }); }, true);
+  };
+  let opened = false;
+  const openPanel = () => { panel.hidden = false; cc.classList.add('open'); launch.setAttribute('aria-expanded', 'true'); if (!opened) { opened = true; say(esc(cc.getAttribute('data-greeting') || 'Hello.')); showOpening(); } setTimeout(() => input.focus(), 100); };
+  const closePanel = () => { panel.hidden = true; cc.classList.remove('open'); launch.setAttribute('aria-expanded', 'false'); };
+  launch.addEventListener('click', openPanel);
+  cc.querySelector('#ccClose').addEventListener('click', closePanel);
+  chatForm.addEventListener('submit', (e) => { e.preventDefault(); const t = input.value.trim(); if (!t) return; input.value = ''; handle(t); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) closePanel(); });
+  const delay = parseInt(cc.getAttribute('data-open-delay') || '0', 10);
+  if (delay > 0) setTimeout(() => { if (panel.hidden && !sessionStorage.getItem('cc-auto')) { try { sessionStorage.setItem('cc-auto', '1'); } catch (e) {} openPanel(); } }, delay * 1000);
+  if (/[?&]contact_posted=true/.test(location.search) && contact && sessionStorage.getItem('cc-pending')) { try { sessionStorage.removeItem('cc-pending'); } catch (e) {} openPanel(); say(esc(cc.getAttribute('data-thanks') || 'Thank you. We will be in touch.')); }
+}
+
 function initPage() {
   nativeFormInit();
   prequalInit();
+  conciergeInit();
   if (window.SabdiaForms) window.SabdiaForms.preview = { thanksText, thanksHeading }; // lets staff test replies from the console
   /* After Shopify accepts an enquiry it reloads the page with
      ?contact_posted=true. Show the thank-you where the form was and bring

@@ -108,6 +108,7 @@ try {
 </main>
 
 {% sections 'footer-group' %}
+{% section 'concierge' %}
 {%- capture res_handles -%}{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{{ p.handle }},{%- endif -%}{%- endfor -%}{%- endcapture -%}
 {%- capture res_map -%}[{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{"handle":{{ p.handle | json }},"title":{{ p.title | json }},"suburb":{{ p.metafields.custom.suburb.value | default: '' | json }}},{%- endif -%}{%- endfor -%}]{%- endcapture -%}
 <script>window.SabdiaForms={residences:{{ res_handles | split: ',' | compact | json }},residenceMap:{{ res_map | replace: ',]', ']' }},mode:{{ settings.form_backend | json }},mirror:{% if settings.forms_endpoint != blank %}{{ settings.forms_endpoint | append: '/api/contact' | json }}{% else %}null{% endif %},thanks:{"heading":"Thank you","text":"Thank you for your interest - we appreciate you reaching out. A member of our team will be in touch with you as soon as possible."},replies:[

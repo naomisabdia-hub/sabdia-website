@@ -1,0 +1,118 @@
+{%- comment -%} Sabdia Concierge: the site's own chat. Opening questions, keyword
+    matching on typed text, live residence facts from Products, and a
+    step-by-step enquiry inside the chat that posts through the same
+    Shopify contact form as the site forms (email to the store + Customers
+    with tags). "Chat with a person" hands over to Shopify Inbox when its
+    embed is on. Everything is editable in Customize › Concierge chat. {%- endcomment -%}
+{%- if section.settings.enabled -%}
+{%- liquid
+  assign b_opts = "Under $4m|$4m - $5m|$5m - $6m|$6m - $8m|$8m+|Prefer not to say" | split: '|'
+  if section.settings.budget_options != blank
+    assign b_opts = section.settings.budget_options | newline_to_br | split: '<br />'
+  endif
+  assign t_opts = "Ready now|1 - 3 months|3 - 6 months|6 - 12 months|Just researching" | split: '|'
+  if section.settings.timeline_options != blank
+    assign t_opts = section.settings.timeline_options | newline_to_br | split: '<br />'
+  endif
+-%}
+{%- capture residences_json -%}[{%- for p in collections.all.products -%}{%- unless p.tags contains 'property' -%}{%- continue -%}{%- endunless -%}{%- capture pstatus -%}{% render 'residence-status', product: p %}{%- endcapture -%}{%- assign feats = p.metafields.custom.features.value -%}{"handle":{{ p.handle | json }},"title":{{ p.title | json }},"suburb":{{ p.metafields.custom.suburb.value | default: '' | json }},"status":{{ pstatus | strip | json }},"beds":{{ p.metafields.custom.beds.value | default: '' | json }},"baths":{{ p.metafields.custom.baths.value | default: '' | json }},"cars":{{ p.metafields.custom.cars.value | default: '' | json }},"land":{{ p.metafields.custom.land.value | default: '' | json }},"headline":{{ p.metafields.custom.headline.value | default: '' | strip_html | json }},"features":{{ feats | default: '' | join: ', ' | json }},"url":{{ p.url | json }}},{%- endfor -%}]{%- endcapture -%}
+{%- capture locations_csv -%}{%- assign seen = '' -%}{%- for p in collections.all.products -%}{%- if p.tags contains 'property' and p.metafields.custom.suburb.value != blank -%}{%- assign sub = p.metafields.custom.suburb.value | strip -%}{%- assign key = sub | append: ',' -%}{%- unless seen contains key -%}{%- assign seen = seen | append: key -%}{%- endunless -%}{%- endif -%}{%- endfor -%}{{ seen }}Other inner Brisbane{%- endcapture -%}
+<div class="cc" id="concierge" data-concierge
+  data-residences="{{ residences_json | replace: ',]', ']' | escape }}"
+  data-locations="{{ locations_csv | escape }}"
+  data-budgets="{{ b_opts | join: '|' | escape }}"
+  data-timelines="{{ t_opts | join: '|' | escape }}"
+  data-greeting="{{ section.settings.greeting | escape }}"
+  data-fallback="{{ section.settings.fallback | escape }}"
+  data-thanks="{{ section.settings.thanks | escape }}"
+  data-person="{{ section.settings.person_label | escape }}"
+  data-buttons="{{ section.settings.opening_count }}"
+  data-open-delay="{{ section.settings.open_delay }}">
+  <script type="application/json" data-concierge-qa>[
+    {%- for block in section.blocks -%}
+      {{ block.settings.question | json }}{{ ',' }}{{ block.settings.keywords | json }}{{ ',' }}{{ block.settings.answer | json }}{{ ',' }}{{ block.settings.link | json }}{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ]</script>
+  <button type="button" class="cc-launch" id="ccLaunch" aria-expanded="false" aria-controls="ccPanel">
+    <span class="cc-launch-dot" aria-hidden="true"></span><span>{{ section.settings.launch_label }}</span>
+  </button>
+  <div class="cc-panel" id="ccPanel" role="dialog" aria-label="{{ section.settings.title | escape }}" hidden>
+    <div class="cc-head">
+      <div><div class="cc-title">{{ section.settings.title }}</div><div class="cc-sub">{{ section.settings.subtitle }}</div></div>
+      <button type="button" class="cc-close" id="ccClose" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="cc-log" id="ccLog" aria-live="polite"></div>
+    <form class="cc-input" id="ccForm" autocomplete="off">
+      <input type="text" id="ccText" class="cc-text" placeholder="{{ section.settings.placeholder | escape }}" aria-label="{{ section.settings.placeholder | escape }}">
+      <button type="submit" class="cc-send" aria-label="Send">&rarr;</button>
+    </form>
+    <div class="cc-hidden" hidden aria-hidden="true">
+      {% form 'contact', id: 'ccContact', class: 'cform', data-quiet: 'true' %}
+        <input type="hidden" name="contact[First name]" value="">
+        <input type="hidden" name="contact[Last name]" value="">
+        <input type="email" name="contact[email]" value="" tabindex="-1">
+        <input type="hidden" name="contact[Phone]" value="">
+        <input type="hidden" name="contact[Enquiry type]" value="">
+        <input type="hidden" name="contact[Property]" value="">
+        <input type="hidden" name="contact[Budget range]" value="">
+        <input type="hidden" name="contact[Timeline]" value="">
+        <input type="hidden" name="contact[Preferred locations]" value="">
+        <input type="hidden" name="contact[Keep me updated]" value="Yes" data-optin-hidden>
+        <input type="hidden" name="contact[body]" value="">
+        <input type="hidden" name="contact[Source]" value="Concierge chat">
+        <button type="submit" class="fsub" tabindex="-1">Send</button>
+      {% endform %}
+      {%- assign cm_uid = 'cm-concierge' -%}{% render 'customer-mirror', uid: cm_uid, residence: '' %}
+    </div>
+  </div>
+</div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Concierge chat",
+  "settings": [
+    { "type": "checkbox", "id": "enabled", "label": "Show the concierge chat", "default": true },
+    { "type": "paragraph", "content": "Sabdia's own chat: opening questions, answers matched to what people type, live residence facts, and an enquiry taken step by step inside the chat (emailed to the store and filed in Customers with tags, like the forms). Add or edit questions as blocks below." },
+    { "type": "text", "id": "launch_label", "label": "Button label", "default": "Ask Sabdia" },
+    { "type": "text", "id": "title", "label": "Chat title", "default": "Sabdia" },
+    { "type": "text", "id": "subtitle", "label": "Chat subtitle", "default": "Ask us anything about our residences" },
+    { "type": "textarea", "id": "greeting", "label": "Greeting", "default": "Welcome to Sabdia. Ask me anything about our residences, or choose a question below." },
+    { "type": "range", "id": "opening_count", "label": "Opening questions shown", "min": 3, "max": 8, "step": 1, "default": 5 },
+    { "type": "text", "id": "placeholder", "label": "Typing box placeholder", "default": "Type a question…" },
+    { "type": "textarea", "id": "fallback", "label": "When nothing matches", "default": "I am not sure about that one, but our team will be. Would you like to leave an enquiry, or chat with a person?" },
+    { "type": "textarea", "id": "thanks", "label": "After an enquiry", "default": "Thank you. A member of our team will be in touch with you as soon as possible." },
+    { "type": "text", "id": "person_label", "label": "Hand-over button", "default": "Chat with a person", "info": "Opens Shopify Inbox when its chat embed is on; otherwise opens the contact page." },
+    { "type": "range", "id": "open_delay", "label": "Auto-open after (seconds, 0 = never)", "min": 0, "max": 60, "step": 5, "default": 0 },
+    { "type": "header", "content": "Enquiry steps" },
+    { "type": "textarea", "id": "budget_options", "label": "Budget options (one per line)", "default": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say" },
+    { "type": "textarea", "id": "timeline_options", "label": "Timeline options (one per line)", "default": "Ready now\n1 - 3 months\n3 - 6 months\n6 - 12 months\nJust researching" }
+  ],
+  "blocks": [
+    {
+      "type": "qa",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question (as shown on the button)" },
+        { "type": "text", "id": "keywords", "label": "Words that match it", "info": "Space-separated words people might type. The question itself always counts too." },
+        { "type": "textarea", "id": "answer", "label": "Answer" },
+        { "type": "text", "id": "link", "label": "Then…", "info": "Leave empty for nothing; a page path like /pages/agent-access to offer a link; the word enquire to start the enquiry steps." }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+{"type": "qa", "settings": {"question": "Tell me more about Sabdia", "keywords": "sabdia company history story team builder developer boutique", "answer": "Sabdia is a boutique Brisbane developer. We started in 2013 and do everything in-house: architecture, interiors, development management and construction, one team from the first sketch to handover. More than 100 homes later, we still take on only a few projects a year so each one gets our full attention.", "link": ""}},
+{"type": "qa", "settings": {"question": "Which residences are for sale?", "keywords": "for sale available residences homes houses what do you have listings current", "answer": "Right now: QASR in Coorparoo, SOLACE in Camp Hill, SIERRA in Holland Park West, CASPIAN in Ascot and AETHER in Hendra. Ask me about any of them by name, or tell me a little about what you are looking for.", "link": "/collections/for-sale"}},
+{"type": "qa", "settings": {"question": "I want to enquire", "keywords": "enquire enquiry interested register interest contact call me get in touch", "answer": "We would love to hear from you. I will take a few details here so the right person can get back to you.", "link": "enquire"}},
+{"type": "qa", "settings": {"question": "How do I inspect a residence?", "keywords": "inspect inspection viewing view open home walk through appointment visit see it", "answer": "Inspections are by private appointment. Tell me which residence and a little about your budget and timeline, and a member of our team will arrange a time.", "link": "enquire"}},
+{"type": "qa", "settings": {"question": "What is the price?", "keywords": "price pricing cost how much guide value offers range budget", "answer": "We talk through pricing directly rather than publishing a guide. So we can give you the most relevant information, share your approximate budget range and timeline to purchase and a member of our team will be in touch.", "link": "enquire"}},
+{"type": "qa", "settings": {"question": "Do you take on client builds or renovations?", "keywords": "custom build client renovation renovate renovating block land knockdown extension quote design", "answer": "Thank you so much for thinking of us. At the moment we aren't taking on client builds or renovations, our focus is solely on designing and building our own development projects. We would be happy to keep you posted on our releases.", "link": "enquire"}},
+{"type": "qa", "settings": {"question": "When is your next release?", "keywords": "next release upcoming coming soon new project future launch", "answer": "We release a small number of residences each year. Leave your details and we will let you know first.", "link": "enquire"}},
+{"type": "qa", "settings": {"question": "I am a real estate agent", "keywords": "agent agency real estate commission pre-launch conjunction", "answer": "Thank you for reaching out. Apply on our Agent Access page and a member of our team will be in touch.", "link": "/pages/agent-access"}},
+{"type": "qa", "settings": {"question": "Where are you based?", "keywords": "where located address office brisbane suburbs area", "answer": "Brisbane. Our residences are in the inner suburbs: Coorparoo, Camp Hill, Holland Park West, Ascot and Hendra.", "link": ""}},
+{"type": "qa", "settings": {"question": "Can I see floor plans?", "keywords": "floor plan plans layout drawings brochure pdf", "answer": "Leave your details and the residence you mean, and a member of our team will send the floor plans and details through.", "link": "enquire"}}
+    ]
+  }
+}
+{% endschema %}
