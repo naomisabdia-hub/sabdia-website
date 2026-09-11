@@ -4,8 +4,9 @@
       "type": "main-collection-item",
       "settings": {
         "hero_media": "film",
-        "show_side_photos": false,
-        "body_film": "same"
+        "show_side_photos": true,
+        "body_film": "same",
+        "show_mosaic": false
       }
     },
     "series": {

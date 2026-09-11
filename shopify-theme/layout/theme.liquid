@@ -16,6 +16,8 @@
   # neutral title instead of Shopify's "Your Shopping Cart".
   assign title_text = page_title
   case template.name
+    when 'password'
+      assign title_text = shop.name
     when 'cart'
       assign title_text = 'Not in use'
     when 'search'
@@ -105,6 +107,15 @@ try {
   assign lay_slabel = settings.slabel_size | default: 13
 -%}
 <style>:root{--page-pad:clamp({{ lay_pad_m }}px,{{ lay_pad_vw }}vw,{{ lay_pad }}px);--page-max:{{ lay_max }}px;--sp-scale:{{ lay_sp | divided_by: 100.0 }};--t-slabel:{{ lay_slabel }}px}</style>
+{%- if template.name == 'password' -%}
+{%- comment -%}
+  Shopify already keeps a locked storefront out of the index; saying it in
+  the page too means nothing of the pre-launch site is indexed even if the
+  address is crawled from a link someone shares.
+{%- endcomment -%}
+<meta name="robots" content="noindex,nofollow">
+<style>html,body{background:var(--dark)}body.pw-page{min-height:100svh;display:flex;flex-direction:column}body.pw-page main{flex:1;display:flex;flex-direction:column}body.pw-page .pw-band{flex:1}</style>
+{%- endif -%}
 {{ content_for_header }}
 </head>
 {%- comment -%}
@@ -154,17 +165,32 @@ try {
     assign dark_top = true
   endif
 -%}
-<body class="{% if dark_top %}top-dark{% else %}top-light{% endif %}">
+{%- comment -%}
+  The locked store (Online Store › Preferences › Restrict access) renders
+  templates/password.json through this layout, so the coming-soon page is
+  made by leaving the furniture out. The nav and the footer would list
+  every page and every residence before they are announced, and each of
+  those links bounces the visitor straight back to /password, which reads
+  as a broken site. One screen instead: the film, the wordmark, a line and
+  a discreet way in. Everything else in the shell is unchanged, so the
+  page keeps the site's fonts, colours and spacing.
+{%- endcomment -%}
+{%- assign locked = false -%}
+{%- if template.name == 'password' -%}{%- assign locked = true -%}{%- endif -%}
+<body class="{% if dark_top %}top-dark{% else %}top-light{% endif %}{% if locked %} pw-page{% endif %}">
+{%- unless locked %}
 
 <a href="#main" class="skip-link">Skip to content</a>
 
 {% sections 'header-group' %}
-
+{% endunless %}
 <main id="main">
 {{ page_html }}
 </main>
+{%- unless locked %}
 
 {% sections 'footer-group' %}
+{% endunless -%}
 {%- comment -%}
   Ask Sabdia (sections/concierge.liquid) is the front chat: scripted answers
   edited in Customize › Sabdia replies, live residence facts from Products
@@ -173,7 +199,7 @@ try {
   concierge is present and shows it when the visitor chooses "Chat with a
   person" (.cc.handoff). Naomi, 11 Sep 2026.
 {%- endcomment -%}
-{% section 'concierge' %}
+{%- unless locked %}{% section 'concierge' %}{% endunless -%}
 {%- capture res_handles -%}{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{{ p.handle }},{%- endif -%}{%- endfor -%}{%- endcapture -%}
 {%- capture res_map -%}[{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{"handle":{{ p.handle | json }},"title":{{ p.title | json }},"suburb":{{ p.metafields.custom.suburb.value | default: '' | json }}},{%- endif -%}{%- endfor -%}]{%- endcapture -%}
 <script>window.SabdiaForms={residences:{{ res_handles | split: ',' | compact | json }},residenceMap:{{ res_map | replace: ',]', ']' }},mode:{{ settings.form_backend | json }},mirror:{% if settings.forms_endpoint != blank %}{{ settings.forms_endpoint | append: '/api/contact' | json }}{% else %}null{% endif %},thanks:{"heading":"Thank you","text":"Thank you for your interest - we appreciate you reaching out. A member of our team will be in touch with you as soon as possible."},replies:[
@@ -184,5 +210,18 @@ try {
 {"match":"about sabdia|tell me more|who (are|is) sabdia|your company|your team|history","text":"Thank you for reaching out. Sabdia is a boutique Brisbane developer, in-house from the first sketch to handover, with more than 100 homes since 2013. A member of our team will be in touch with you as soon as possible."}
 ]};</script>
 <script src="{{ 'main.js' | asset_url }}"></script>
+{%- if locked -%}
+<script>
+/* style.css hides .reveal under html.js and main.js clears it as each
+   section scrolls into view. The coming-soon page is a single screen with
+   no nav, footer or concierge, so if anything in main.js stops short of
+   that observer the words would never appear at all. Revealing again once
+   the page has loaded is a no-op when it already happened. */
+addEventListener('load', function () {
+  var els = document.querySelectorAll('.reveal, .reveal-x, .reveal-r');
+  for (var i = 0; i < els.length; i++) els[i].classList.add('vis');
+});
+</script>
+{%- endif -%}
 </body>
 </html>

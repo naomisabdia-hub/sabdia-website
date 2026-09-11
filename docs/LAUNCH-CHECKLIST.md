@@ -39,7 +39,10 @@ Lands with the next push. Then, in the admin (5 minutes):
 
 16. ☐ **Connect the domain** — Settings › Domains › Connect existing domain › `sabdiaconstructions.com.au`. Shopify shows two DNS records: an **A record** for the root → `23.227.38.65` and a **CNAME** for `www` → `shops.myshopify.com`. Enter them at the registrar (where the Wix DNS is now). Wait for "Connected"; HTTPS issues itself within an hour.
 17. ☐ **Set the primary domain** to `www.sabdiaconstructions.com.au` (Settings › Domains › ⋯ › Change primary) — Shopify then redirects the bare domain and the .myshopify address to it.
-18. ☐ **Remove the storefront password** — Online Store › Preferences › Password protection ✗.
+
+    ✎ **11 Sep 2026: 16 and 17 now come first, on their own.** Naomi's call — move the domain off Wix while the store stays locked, so the address serves the Sabdia coming-soon page rather than the old site. The registrar is GoDaddy (not Wix), the domain carries no MX or TXT records so company email on `sabdia.com.au` is untouched, and the store is already password protected, so DNS is the only thing that changes. Step by step, with the rollback records and the GoDaddy lock: **`docs/DOMAIN-MOVE.md`**. Item 18 then happens whenever the site is ready, on its own day.
+
+18. ☐ **Remove the storefront password** — Online Store › Preferences › Password protection ✗. This is go-live: the coming-soon page becomes the site the moment it is switched off.
 19. ✎ Live check: every page 200, forms deliver, redirects from old URLs, share cards, structured data.
 20. ☐ **Submit the sitemap** in Search Console: `https://www.sabdiaconstructions.com.au/sitemap.xml`.
 

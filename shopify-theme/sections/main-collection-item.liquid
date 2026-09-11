@@ -3,7 +3,7 @@
   residences for sale but with no enquiry flow. In order: the hero (the
   residence's film playing silently behind the name when it has one,
   else the photo), the specs bar, the story at full measure, the stage +
-  filmstrip gallery, the details mosaic, then the film band with its
+  filmstrip gallery, an optional details mosaic, then the film band with its
   sound button. The Instagram strip (series-strip) and then Similar
   residences with the closing push to what is for sale
   (collection-similar) follow as their own sections, in that order, from
@@ -665,7 +665,7 @@
     {"type": "checkbox", "id": "show_features", "label": "Show the key features", "default": true},
     {"type": "checkbox", "id": "show_links", "label": "Photos and film buttons under the story", "default": true},
     {"type": "select", "id": "story_align", "label": "Story column", "options": [{"value": "left", "label": "Left (as designed)"}, {"value": "centre", "label": "Centred on the page"}], "default": "left", "info": "Applies while the side photos are off: the story runs a reading measure with no empty column beside it."},
-    {"type": "checkbox", "id": "show_side_photos", "label": "Show the two photos beside the story", "default": false, "info": "Off as designed: the photos stay in the gallery below. On, photos 2 and 3 (or the picks in the Residence photos and film block) return beside the story."},
+    {"type": "checkbox", "id": "show_side_photos", "label": "Show the two photos beside the story", "default": true, "info": "The large photo with the smaller one overlapping it, beside the story (Naomi, 11 Sep 2026). Photos 2 and 3, or the picks in the Residence photos and film block."},
     {"type": "checkbox", "id": "show_side_caption", "label": "Caption under the side photos", "default": true},
     {"type": "checkbox", "id": "sticky_story", "label": "Story holds while the photos scroll", "default": true, "info": "Only with the side photos on."},
     {"type": "select", "id": "story_split", "label": "Column split", "options": [{"value": "7-5", "label": "Story 7 : photos 5 (as designed)"}, {"value": "equal", "label": "Equal halves"}, {"value": "8-4", "label": "Story 8 : photos 4"}], "default": "7-5"},
@@ -674,7 +674,7 @@
     {"type": "checkbox", "id": "show_gallery", "label": "Show the gallery", "default": true},
     {"type": "checkbox", "id": "show_thumbs", "label": "Filmstrip of thumbnails", "default": true},
     {"type": "checkbox", "id": "show_expand", "label": "\"View all photos\" button on the stage", "default": true},
-    {"type": "checkbox", "id": "show_mosaic", "label": "Details mosaic under the gallery (ten or more photos)", "default": true},
+    {"type": "checkbox", "id": "show_mosaic", "label": "Details mosaic under the gallery (ten or more photos)", "default": false, "info": "Off since 11 Sep 2026 (Naomi): the gallery already shows every photo, so the mosaic repeated them."},
     {"type": "select", "id": "stage_shape", "label": "Stage shape", "options": [{"value": "16/9", "label": "Wide 16:9 (as designed)"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "21/9", "label": "Cinematic 21:9"}], "default": "16/9"},
     {"type": "checkbox", "id": "show_film", "label": "Show the film band", "default": true},
     {"type": "select", "id": "body_film", "label": "Film in the body", "options": [{"value": "same", "label": "The residence's film (as designed)"}, {"value": "second", "label": "A second film, picked for the residence"}, {"value": "none", "label": "No film band"}], "default": "same", "info": "The band with the sound button, after the gallery. It shows the film even when the same film already plays silently in the hero. A second film comes from the Residence photos and film block; a residence without one keeps its film."},

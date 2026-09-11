@@ -112,6 +112,40 @@
   {%- endfor -%}
 {%- endcapture -%}
 {%- assign more_stripped = more_cards | strip -%}
+{%- comment -%} The closing band is obsidian and so is the footer, so it sits
+    ABOVE More from the Collection: the light row separates the two dark
+    surfaces (Naomi, 11 Sep 2026). Turn the order back with "Closing band
+    last" in the section's settings. {%- endcomment -%}
+{%- unless section.settings.close_last -%}
+{%- if section.settings.show_close -%}
+<section class="cd-close cd-close-{{ section.settings.close_style | default: 'obsidian' }}">
+  <div class="inner-sm">
+    {%- if section.settings.cta_label != blank -%}<div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">{{ section.settings.cta_label }}</div>{%- endif -%}
+    <h2 class="cd-close-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, page.title }}</h2>
+    {%- if section.settings.cta_text != blank -%}<p class="cd-close-p reveal d2">{{ section.settings.cta_text | replace: name_token, page.title }}</p>{%- endif -%}
+    <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="{{ section.settings.cta1_link | default: '/collections/for-sale' }}" class="btn-p">{{ section.settings.cta1_label }}</a>
+      {%- if section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link | default: '/pages/collection' }}" class="btn-g btn-g-light">{{ section.settings.cta2_label }}</a>{%- endif -%}
+    </div>
+    {%- assign share_url = shop.url | append: page.url -%}
+    {%- assign share_title = page.title | append: ' - ' | append: suburb | append: ' | Sabdia Constructions' -%}
+    {%- assign eu = share_url | url_encode -%}
+    {%- assign et = share_title | url_encode -%}
+    {%- if section.settings.show_share -%}
+    <div class="share-row cd-share reveal d4" aria-label="Share this page">
+      <span class="share-l">{{ section.settings.share_label | default: "Share" }}</span>
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{ eu }}" target="_blank" rel="noopener" class="share-a">Facebook</a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ eu }}" target="_blank" rel="noopener" class="share-a">LinkedIn</a>
+      <a href="mailto:?subject={{ et }}&body={{ et }}%0A{{ eu }}" class="share-a">Email</a>
+      <button type="button" class="share-a share-copy" data-share-url="{{ share_url }}">{{ section.settings.copy_link_label | default: "Copy link" }}</button>
+    </div>
+    {%- endif -%}
+  </div>
+</section>
+{%- endif -%}
+
+{%- endunless -%}
+
 {%- if more_stripped != blank and section.settings.show_similar -%}
   <section class="cd-similar" style="--pf-cols:{{ section.settings.similar_columns | default: '3' }}">
     <div class="inner">
@@ -140,6 +174,7 @@
   </script>
 {%- endif -%}
 
+{%- if section.settings.close_last -%}
 {%- if section.settings.show_close -%}
 <section class="cd-close cd-close-{{ section.settings.close_style | default: 'obsidian' }}">
   <div class="inner-sm">
@@ -165,6 +200,8 @@
     {%- endif -%}
   </div>
 </section>
+{%- endif -%}
+
 {%- endif -%}
 
 <style>
@@ -226,6 +263,7 @@
     {"type": "checkbox", "id": "show_similar", "label": "Show similar residences", "default": true},
     {"type": "range", "id": "similar_count", "label": "Residences shown", "min": 1, "max": 6, "step": 1, "default": 3},
     {"type": "select", "id": "similar_columns", "label": "Cards across", "options": [{"value": "2", "label": "Two"}, {"value": "3", "label": "Three (as designed)"}, {"value": "4", "label": "Four"}], "default": "3"},
+    {"type": "checkbox", "id": "close_last", "label": "Closing band last, under More from the Collection", "default": false, "info": "Off since 11 Sep 2026 (Naomi): the band is dark and so is the footer, so it reads better above the lighter row."},
     {"type": "checkbox", "id": "show_close", "label": "Show the closing band", "default": true},
     {"type": "select", "id": "close_style", "label": "Closing band", "options": [{"value": "obsidian", "label": "Obsidian (as designed)"}, {"value": "stone", "label": "Stone"}], "default": "obsidian"},
     {"type": "checkbox", "id": "show_share", "label": "Share row", "default": true},
