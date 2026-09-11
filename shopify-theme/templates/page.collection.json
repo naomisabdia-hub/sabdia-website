@@ -21,7 +21,10 @@
         "filter_label": "Style",
         "filter_all": "All",
         "all_suburbs": "All Suburbs",
-        "film_tag": "Film"
+        "film_tag": "Film",
+        "tile_media": "photo",
+        "show_lead": true,
+        "show_more": false
       },
       "blocks": {
         "residence-1": {

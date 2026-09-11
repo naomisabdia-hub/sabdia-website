@@ -69,7 +69,9 @@
         assign nf_fmt = 'woff'
       endif
     -%}
-    <style>@font-face{font-family:'{{ nf_family }}';src:url('{{ nf_file }}') format('{{ nf_fmt }}');font-weight:{{ nf_weight }};font-display:swap}</style>
+    <style>
+  /* [hidden] alone loses to .lb{display:flex} in style.css, so the viewer never hid. */
+  @font-face{font-family:'{{ nf_family }}';src:url('{{ nf_file }}') format('{{ nf_fmt }}');font-weight:{{ nf_weight }};font-display:swap}</style>
   {%- else -%}
     {%- assign nf_family = nf -%}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -736,6 +738,8 @@
 {%- endunless -%}
 
 <style>
+  /* [hidden] alone loses to .lb{display:flex} in style.css, so the photo viewer never hid. */
+  .lb[hidden]{display:none}
   .prop-hero-centre{align-items:center}.prop-hero-centre .prop-hero-content{text-align:center}.prop-hero-centre .prop-status{justify-content:center}
   .prop-specs-centre .prop-specs-inner{justify-content:center}
   @media(min-width:1201px){.prop-body .prop-layout{grid-template-columns:var(--prop-split,7fr 5fr)}}
@@ -756,7 +760,7 @@
 {% schema %}
 {
   "name": "Property page",
-  "max_blocks": 80,
+  "max_blocks": 50,
   "blocks": [
     {
       "type": "photo",

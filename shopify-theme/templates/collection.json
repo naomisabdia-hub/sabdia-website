@@ -17,7 +17,7 @@
         "cta1_label": "Request a Viewing",
         "cta1_link": "",
         "cta2_label": "Agent Enquiries",
-        "cta2_link": "",
+        "cta2_link": "/pages/contact?interest=Agent%20Access",
         "cta3_label": "Guided Match",
         "cta3_link": "",
         "filter_land_label": "Land Size",

@@ -4,6 +4,8 @@
   collection's order. The heading switches when this residence's Status
   is in the Sold group.
 {%- endcomment -%}
+{%- comment -%} The residences' own brochure faces, so a card name prints in its house's face. {%- endcomment -%}
+{% render 'residence-faces' %}
 {%- liquid
   assign col = section.settings.related_collection | default: collections['for-sale']
   capture pstatus

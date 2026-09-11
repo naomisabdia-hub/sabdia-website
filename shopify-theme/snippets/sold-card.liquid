@@ -45,7 +45,7 @@
   <div class="sc-ov"></div>
   <div class="sc-badge">{{ badge }}</div>
   <div class="sc-info">
-    <div class="sc-name"{% if nf_style != blank %} style="{{ nf_style }}"{% endif %}>{{ product.title }}</div>
+    <div class="sc-name"{% if nf_style != blank %} style="{{ nf_style | escape }}"{% endif %}>{{ product.title }}</div>
     {%- if show_suburb and mf.suburb.value != blank -%}
       <div class="pc-loc">{% render 'spec-icon', icon: 'pin' %}{{ mf.suburb.value }}, QLD</div>
     {%- endif -%}

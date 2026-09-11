@@ -64,7 +64,7 @@
   <div class="pc-ov"></div>
   <div class="pc-status-chip"><span class="pc-dot {{ dot_class }}"></span>{{ chip }}</div>
   <div class="pc-info">
-    <div class="pc-name"{% if nf_style != blank %} style="{{ nf_style }}"{% endif %}>{{ product.title }}</div>
+    <div class="pc-name"{% if nf_style != blank %} style="{{ nf_style | escape }}"{% endif %}>{{ product.title }}</div>
     {%- if mf.suburb.value != blank -%}
       <div class="pc-loc">{% render 'spec-icon', icon: 'pin' %}{{ mf.suburb.value }}, QLD</div>
     {%- endif -%}

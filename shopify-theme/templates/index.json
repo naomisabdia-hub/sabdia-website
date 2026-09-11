@@ -767,7 +767,7 @@
         "cta1_label": "Apply for Access",
         "cta1_link": "/pages/agent-access",
         "cta2_label": "Start a Conversation",
-        "cta2_link": "/pages/agent-access"
+        "cta2_link": "/pages/contact?interest=Agent%20Access"
       },
       "disabled": true
     },

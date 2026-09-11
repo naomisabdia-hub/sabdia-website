@@ -44,6 +44,13 @@
   {%- if section.settings.menu_case == 'as-written' -%}
   .nav-center a{text-transform:none;letter-spacing:.04em;font-size:calc(var(--nav-link) + 2px)}
   {%- endif -%}
+  /* Tablet and small laptop: the five links plus the button overran the bar. */
+  @media(min-width:769px) and (max-width:1120px){
+    .nav-center{gap:clamp(14px,2.2vw,var(--nav-gap))}
+    .nav-center a{font-size:calc(var(--nav-link) - 1px);letter-spacing:.14em}
+    .nav-cta{padding:9px 16px}
+  }
+
   /* Automatic tone (layout/theme.liquid stamps body.top-light when the page
      opens on cream or stone, body.top-dark when it opens on a photo, film
      or dark band). Until the bar scrolls solid (.sc) a light opening gets

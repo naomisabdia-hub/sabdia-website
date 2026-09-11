@@ -4,6 +4,8 @@
   a residence is in comes from its Status (see residence-status); the two
   collections chosen in the customizer set the order.
 {%- endcomment -%}
+{%- comment -%} The residences' own brochure faces, so a card name prints in its house's face. {%- endcomment -%}
+{% render 'residence-faces' %}
 {%- liquid
   assign for_sale = collections[section.settings.for_sale_collection]
   assign sold = collections[section.settings.sold_collection]

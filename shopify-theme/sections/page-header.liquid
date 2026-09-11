@@ -9,6 +9,12 @@
 {%- endcomment -%}
 {%- liquid
   assign style = section.settings.style | default: 'collection'
+  # Guided Match off (Theme settings › Features): the header must not keep
+  # promising the questions the page no longer asks.
+  assign show_sub = section.settings.show_text
+  if style == 'guided' and settings.guided_match_enabled == false
+    assign show_sub = false
+  endif
   assign focus = section.settings.focus | default: 'center'
   assign bg_video = section.settings.bg_video_url
   if section.settings.bg_video
@@ -64,7 +70,7 @@
   <div class="page-hero-content inner">
     {%- if section.settings.show_label and section.settings.label != blank -%}<div class="slabel slabel-dark">{{ section.settings.label }}</div>{%- endif -%}
     <h1 class="page-h">{{ section.settings.title_html }}</h1>
-    {%- if section.settings.text != blank and section.settings.show_text -%}
+    {%- if section.settings.text != blank and show_sub -%}
       <p class="page-hero-sub">{{ section.settings.text }}</p>
     {%- endif -%}
   </div>
@@ -91,7 +97,7 @@
   <div class="{% if style == 'guided' %}inner-md{% else %}inner{% endif %}"{% if pgh_centre %} style="text-align:center"{% endif %}>
     {%- if section.settings.show_label and section.settings.label != blank -%}<div class="slabel reveal"{% if pgh_centre %} style="justify-content:center"{% endif %}>{{ section.settings.label }}</div>{%- endif -%}
     <h1 class="reveal d1 pgh-h">{{ section.settings.title_html }}</h1>
-    {%- if section.settings.text != blank and section.settings.show_text -%}
+    {%- if section.settings.text != blank and show_sub -%}
       <p class="reveal d2 pgh-p"{% if pgh_centre %} style="margin-left:auto;margin-right:auto"{% endif %}>{{ section.settings.text }}</p>
     {%- endif -%}
   </div>

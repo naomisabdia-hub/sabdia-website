@@ -169,7 +169,7 @@
 
 <style>
   .cd-similar{padding:calc(clamp(64px,9vw,120px) * var(--sp-scale) * var(--sp-top,1)) var(--page-pad) calc(clamp(64px,9vw,120px) * var(--sp-scale) * var(--sp-bot,1));background:var(--bg2);border-top:1px solid var(--border)}
-  .cd-similar .pf-grid-3{grid-template-columns:repeat(var(--pf-cols,3),1fr)}
+  @media(min-width:901px){.cd-similar .pf-grid-3{grid-template-columns:repeat(var(--pf-cols,3),1fr)}}
   .cd-similar-hdr{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:40px}
   .cd-similar-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:300;color:var(--ink);letter-spacing:-.02em}
   .cd-similar-h em{font-style:italic;color:var(--ink)}

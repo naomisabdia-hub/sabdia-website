@@ -61,6 +61,9 @@
   endcase
   assign count_token = '{' | append: 'count' | append: '}'
   assign intro = section.settings.intro_template | replace: count_token, count_word
+  if count == 1
+    assign intro = intro | replace: ' residences ', ' residence ' | replace: ' homes ', ' home ' | replace: ', each ', ', '
+  endif
   assign show_rich = true
   if collection.handle == 'sold'
     assign show_rich = false
@@ -241,8 +244,18 @@
   {%- endif -%}
   <div class="page-hero-ov"></div>
   <div class="page-hero-content inner">
-    {%- if section.settings.show_label -%}<div class="slabel slabel-dark">{{ section.settings.label | default: collection.title }}</div>{%- endif -%}
-    <h1 class="page-h">{{ section.settings.heading_html | default: collection.title }}</h1>
+    {%- liquid
+      # The Sold collection is served by these same settings, so its hero takes the
+      # collection's own words rather than the For Sale label and heading.
+      assign hero_label = section.settings.label | default: collection.title
+      assign hero_heading = section.settings.heading_html | default: collection.title
+      unless show_rich
+        assign hero_label = collection.title
+        assign hero_heading = collection.title
+      endunless
+    -%}
+    {%- if section.settings.show_label -%}<div class="slabel slabel-dark">{{ hero_label }}</div>{%- endif -%}
+    <h1 class="page-h">{{ hero_heading }}</h1>
     {%- if section.settings.show_intro -%}<p class="page-hero-sub">{{ intro }}</p>{%- endif -%}
   </div>
 </section>
