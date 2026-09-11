@@ -192,7 +192,7 @@ html.no-loader #loader{display:none}
 html.nav-veil #navVeil{opacity:1;pointer-events:auto}
 
 /* ── NAV ── */
-#mainNav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:1000;display:flex;align-items:center;padding:0 var(--page-pad);transition:background .45s,border-color .45s,height .35s;border-bottom:1px solid transparent}
+#mainNav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:1000;display:flex;align-items:center;padding:0 var(--nav-pad,28px);transition:background .45s,border-color .45s,height .35s;border-bottom:1px solid transparent}
 /* Scrolled nav ground = --bg exactly (247,243,235). It was 242,240,235 —
    a second, subtly greyer cream that showed as a visible seam where the
    nav met the page (Tamsin, 2026-09-01). One cream everywhere. */
@@ -412,7 +412,7 @@ html.js .slabel.reveal.vis::before{width:24px}
    empty photograph once that was shortened. Sequence now: title 0.75s →
    words 0.85s → eyebrow 1.15s → action bar 1.4s → scroll cue 1.8s. */
 .h-bottom{position:relative;z-index:4;flex-shrink:0;opacity:0;animation:fin .8s ease 1.4s forwards}
-.h-bottom-rule{height:1.5px;background:var(--gold);margin:0 var(--page-pad)}
+.h-bottom-rule{height:1.5px;background:var(--gold);margin:0}
 .h-bottom-inner{padding:clamp(12px,1.4vw,20px) var(--page-pad);display:flex;align-items:center;justify-content:space-between;gap:40px}
 .h-bottom-left{display:flex;align-items:center;gap:32px}
 
@@ -929,7 +929,7 @@ footer{background:var(--dark);padding-top:0}
   .nav-center{display:none}
   .nav-right .nav-cta{display:none}
   .mob-btn{display:flex}
-  #mainNav{height:60px;padding:0 20px}
+  #mainNav{height:60px;padding:0 var(--nav-pad-m,18px)}
   #mainNav.sc{height:56px}
   .nav-logo img{height:var(--logo-h-m,30px)}
 
@@ -1103,6 +1103,7 @@ h1 em, h2 em, h3 em,
    selectors catch sections that set a dark background inline.
    These are (0,1,1) and so outrank the (0,0,2) rule above. */
 .film-band em, footer em, .prop-hero em, .page-hero em, .cd-hero em,
+.pw-has-media em,
 [style*="var(--dark)"] em,
 [style*="var(--dark2)"] em,
 [style*="var(--dark3)"] em{--gold:#C3A45E;--gold2:#C3A45E}
