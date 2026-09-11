@@ -118,16 +118,18 @@
 {%- if section.settings.show_filter and section.blocks.size > 3 -%}
 <div class="pf-bar s-surface{% if section.settings.filter_sticky == false %} pf-static{% endif %}" data-pf-bar="{{ sid }}">
   <div class="inner pf-bar-inner">
-    <div class="pf-chips" role="group" aria-label="Filter by style">
+    {%- comment -%} A dropdown, like the suburb one beside it and the For Sale
+        toolbar, rather than a row of chips (Naomi, 11 Sep 2026). {%- endcomment -%}
+    <div class="pf-chips">
       <span class="pf-bar-l">{{ section.settings.filter_label }}</span>
-      <button type="button" class="pfilter on" data-style="">{{ section.settings.filter_all }}</button>
-      {%- if show_current -%}
-        {%- if scope == 'all' -%}<button type="button" class="pfilter" data-style="{{ section.settings.filter_live | default: 'For Sale' | escape }}">{{ section.settings.filter_live | default: "For Sale" }}</button>{%- endif -%}
-        <button type="button" class="pfilter" data-style="{{ section.settings.filter_sold | default: 'Sold' | escape }}">{{ section.settings.filter_sold | default: "Sold" }}</button>
-      {%- endif -%}
-      {%- for s in styles -%}
-        <button type="button" class="pfilter" data-style="{{ s | escape }}">{{ s }}</button>
-      {%- endfor -%}
+      <select class="pf-sel" id="pfStyle-{{ sid }}" aria-label="Filter by style">
+        <option value="">{{ section.settings.filter_all }}</option>
+        {%- if show_current -%}
+          {%- if scope == 'all' -%}<option value="{{ section.settings.filter_live | default: 'For Sale' | escape }}">{{ section.settings.filter_live | default: "For Sale" }}</option>{%- endif -%}
+          <option value="{{ section.settings.filter_sold | default: 'Sold' | escape }}">{{ section.settings.filter_sold | default: "Sold" }}</option>
+        {%- endif -%}
+        {%- for s in styles -%}<option value="{{ s | escape }}">{{ s }}</option>{%- endfor -%}
+      </select>
     </div>
     {%- if suburbs.size > 1 -%}
     <select class="pf-sel" id="pfSuburb-{{ sid }}" aria-label="Filter by suburb">
@@ -295,7 +297,7 @@
   #shopify-section-{{ sid }} .pf-bar{position:sticky;top:var(--pf-top,var(--nav-h));z-index:20;padding:16px var(--page-pad);background:rgba(var(--bg-rgb),.96)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
   #shopify-section-{{ sid }} .pf-bar.pf-static{position:static}
   .pf-bar-inner{gap:20px 28px}
-  .pf-chips{gap:6px 22px}
+  .pf-chips{display:flex;align-items:center;gap:14px}
   .pf-count{white-space:nowrap}
 
   /* No stray space between the bar and the first row: the grid carries no
@@ -323,9 +325,8 @@
        stack of five; the bar itself stays in flow on phones (as designed). */
     #shopify-section-{{ sid }} .pf-bar{position:static}
     .pf-bar-inner{gap:12px 16px}
-    .pf-chips{flex-wrap:nowrap;overflow-x:auto;width:100%;gap:18px;padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 28px),transparent)}
-    .pf-chips::-webkit-scrollbar{display:none}
-    .pfilter{white-space:nowrap;flex-shrink:0}
+    .pf-chips{width:100%}
+    .pf-chips .pf-sel{flex:1}
     .pf-sel{width:100%;margin-left:0}
     .pf-count{min-width:0;text-align:left}
     #port-{{ sid }}.pf-wrap{padding-top:clamp(24px,5vw,32px)}
@@ -340,7 +341,7 @@
     grid.dataset.init = '1';
     var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-port-card]'));
     var bar = document.querySelector('[data-pf-bar="' + sid + '"]');
-    var chips = bar ? Array.prototype.slice.call(bar.querySelectorAll('.pfilter')) : [];
+    var styleSel = document.getElementById('pfStyle-' + sid);
     var suburb = document.getElementById('pfSuburb-' + sid);
     var count = document.getElementById('pfCount-' + sid);
     var empty = document.getElementById('pfEmpty-' + sid);
@@ -384,14 +385,7 @@
         else count.textContent = '';
       }
     }
-    chips.forEach(function (b) {
-      b.addEventListener('click', function () {
-        chips.forEach(function (x) { x.classList.remove('on'); });
-        b.classList.add('on');
-        style = b.dataset.style || '';
-        apply();
-      });
-    });
+    if (styleSel) styleSel.addEventListener('change', function () { style = styleSel.value || ''; apply(); });
     if (suburb) suburb.addEventListener('change', function () { apply(); });
     if (more) more.addEventListener('click', function () { expanded = true; apply(); });
     apply(true);

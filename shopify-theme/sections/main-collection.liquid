@@ -95,6 +95,13 @@
   assign live_suburbs = ''
   assign max_beds = 0
   assign max_baths = 0
+  # Every distinct count in use, so a step is only offered when a residence
+  # has it (Naomi, 11 Sep 2026: every home has five bedrooms, so "4+" was
+  # offering a choice nothing could answer).
+  assign bed_vals = ''
+  assign bath_vals = ''
+  assign car_vals = ''
+  assign land_vals = ''
   assign statuses = ''
   assign feats_all = ''
   assign has_year = false
@@ -113,9 +120,23 @@
       if pb > max_beds
         assign max_beds = pb
       endif
+      if pb > 0
+        assign bed_vals = bed_vals | append: pb | append: '¦'
+      endif
       assign pba = pm.baths.value | plus: 0
       if pba > max_baths
         assign max_baths = pba
+      endif
+      if pba > 0
+        assign bath_vals = bath_vals | append: pba | append: '¦'
+      endif
+      assign pc = pm.cars.value | plus: 0
+      if pc > 0
+        assign car_vals = car_vals | append: pc | append: '¦'
+      endif
+      assign pl = pm.land.value | plus: 0
+      if pl > 0
+        assign land_vals = land_vals | append: pl | append: '¦'
       endif
       capture pst
         render 'residence-status', product: p
@@ -145,6 +166,23 @@
   endfor
   assign suburb_list = live_suburbs | split: '¦' | uniq | sort
   assign status_list = statuses | split: '¦' | uniq
+  assign bed_list = bed_vals | split: '¦' | uniq | sort_natural
+  assign bath_list = bath_vals | split: '¦' | uniq | sort_natural
+  assign car_list = car_vals | split: '¦' | uniq | sort_natural
+  assign land_nums = land_vals | split: '¦'
+  assign land_small = false
+  assign land_mid = false
+  assign land_big = false
+  for lv in land_nums
+    assign lvn = lv | plus: 0
+    if lvn < 600
+      assign land_small = true
+    elsif lvn < 800
+      assign land_mid = true
+    else
+      assign land_big = true
+    endif
+  endfor
   assign gfont_list = gfonts | split: '||' | uniq
   assign ffile_list = ffiles | split: '||' | uniq
 
@@ -273,37 +311,30 @@
       {%- endfor -%}
     </select>
     {%- endif -%}
-    {%- if section.settings.show_filter_beds != false and max_beds >= 4 -%}
+    {%- if section.settings.show_filter_beds != false and bed_list.size > 0 -%}
     <select class="ptool-sel" id="fBeds" aria-label="Minimum bedrooms">
       <option value="">{{ section.settings.filter_any_beds | default: "Any Bedrooms" }}</option>
-      {%- if max_beds >= 4 -%}<option value="4">4+ Bed</option>{%- endif -%}
-      {%- if max_beds >= 5 -%}<option value="5">5+ Bed</option>{%- endif -%}
-      {%- if max_beds >= 6 -%}<option value="6">6+ Bed</option>{%- endif -%}
+      {%- for v in bed_list -%}<option value="{{ v }}">{{ v }}+ Bed</option>{%- endfor -%}
     </select>
     {%- endif -%}
-    {%- if section.settings.show_filter_baths != false and max_baths >= 3 -%}
+    {%- if section.settings.show_filter_baths != false and bath_list.size > 0 -%}
     <select class="ptool-sel" id="fBaths" aria-label="Minimum bathrooms">
       <option value="">{{ section.settings.filter_any_baths | default: "Any Bathrooms" }}</option>
-      {%- if max_baths >= 3 -%}<option value="3">3+ Bath</option>{%- endif -%}
-      {%- if max_baths >= 4 -%}<option value="4">4+ Bath</option>{%- endif -%}
-      {%- if max_baths >= 5 -%}<option value="5">5+ Bath</option>{%- endif -%}
+      {%- for v in bath_list -%}<option value="{{ v }}">{{ v }}+ Bath</option>{%- endfor -%}
     </select>
     {%- endif -%}
-    {%- if section.settings.show_filter_garage != false -%}
+    {%- if section.settings.show_filter_garage != false and car_list.size > 0 -%}
     <select class="ptool-sel" id="fCars" aria-label="Minimum garage spaces">
       <option value="">{{ section.settings.filter_any_garage | default: "Any Garage" }}</option>
-      <option value="2">2+ Cars</option>
-      <option value="3">3+ Cars</option>
-      <option value="4">4+ Cars</option>
-      <option value="6">6+ Cars</option>
+      {%- for v in car_list -%}<option value="{{ v }}">{{ v }}+ Cars</option>{%- endfor -%}
     </select>
     {%- endif -%}
     {%- if section.settings.show_filter_land != false -%}
     <select class="ptool-sel" id="fLand" aria-label="Land size">
       <option value="">{{ section.settings.filter_any_land | default: "Any Land Size" }}</option>
-      <option value="0-600">Up to 600m&sup2;</option>
-      <option value="600-800">600&ndash;800m&sup2;</option>
-      <option value="800-">800m&sup2;+</option>
+      {%- if land_small -%}<option value="0-600">Up to 600m&sup2;</option>{%- endif -%}
+      {%- if land_mid -%}<option value="600-800">600&ndash;800m&sup2;</option>{%- endif -%}
+      {%- if land_big -%}<option value="800-">800m&sup2;+</option>{%- endif -%}
     </select>
     {%- endif -%}
     {%- if section.settings.show_filter_build != false and has_build -%}
@@ -338,19 +369,25 @@
       <button type="button" class="ptool-clear" id="fClear" hidden>{{ section.settings.clear_label | default: "Clear filters" }}</button>
       <span class="ptool-count" id="fCount"></span>
     </div>
+    {%- comment -%} Features read as a dropdown like the rest of the toolbar, with a
+        box beside each one so several can be chosen (Naomi, 11 Sep 2026). {%- endcomment -%}
     {%- if section.settings.show_filter_features != false and feats_all != blank -%}
-    <div class="ptool-chips" role="group" aria-label="{{ section.settings.features_label | default: 'Features' | escape }}">
-      <span class="ptool-l ptool-chips-l">{{ section.settings.features_label | default: "Features" }}</span>
-      {%- if feats_all contains 'pool' -%}<button type="button" class="ptool-chip" data-feat="pool" aria-pressed="false">{{ section.settings.chip_pool | default: "Pool" }}</button>{%- endif -%}
-      {%- if feats_all contains 'views' -%}<button type="button" class="ptool-chip" data-feat="views" aria-pressed="false">{{ section.settings.chip_views | default: "City Views" }}</button>{%- endif -%}
-      {%- if feats_all contains 'lift' -%}<button type="button" class="ptool-chip" data-feat="lift" aria-pressed="false">{{ section.settings.chip_lift | default: "Lift" }}</button>{%- endif -%}
-      {%- if feats_all contains 'cinema' -%}<button type="button" class="ptool-chip" data-feat="cinema" aria-pressed="false">{{ section.settings.chip_cinema | default: "Cinema" }}</button>{%- endif -%}
-      {%- if feats_all contains 'gym' -%}<button type="button" class="ptool-chip" data-feat="gym" aria-pressed="false">{{ section.settings.chip_gym | default: "Gym" }}</button>{%- endif -%}
-      {%- if feats_all contains 'cellar' -%}<button type="button" class="ptool-chip" data-feat="cellar" aria-pressed="false">{{ section.settings.chip_cellar | default: "Cellar" }}</button>{%- endif -%}
-      {%- if feats_all contains 'study' -%}<button type="button" class="ptool-chip" data-feat="study" aria-pressed="false">{{ section.settings.chip_study | default: "Study" }}</button>{%- endif -%}
-      {%- if feats_all contains 'solar' -%}<button type="button" class="ptool-chip" data-feat="solar" aria-pressed="false">{{ section.settings.chip_solar | default: "Solar and Battery" }}</button>{%- endif -%}
-      {%- if feats_all contains 'butler' -%}<button type="button" class="ptool-chip" data-feat="butler" aria-pressed="false">{{ section.settings.chip_butler | default: "Butler's Pantry" }}</button>{%- endif -%}
-    </div>
+    <details class="ptool-drop" data-feat-drop>
+      <summary class="ptool-sel ptool-sel-drop" aria-label="{{ section.settings.features_label | default: 'Features' | escape }}">
+        <span data-feat-summary>{{ section.settings.filter_any_features | default: "Any Features" }}</span>
+      </summary>
+      <div class="ptool-menu" role="group" aria-label="{{ section.settings.features_label | default: 'Features' | escape }}">
+        {%- if feats_all contains 'pool' -%}<label class="ptool-opt"><input type="checkbox" data-feat="pool"><span>{{ section.settings.chip_pool | default: "Pool" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'views' -%}<label class="ptool-opt"><input type="checkbox" data-feat="views"><span>{{ section.settings.chip_views | default: "City Views" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'lift' -%}<label class="ptool-opt"><input type="checkbox" data-feat="lift"><span>{{ section.settings.chip_lift | default: "Lift" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'cinema' -%}<label class="ptool-opt"><input type="checkbox" data-feat="cinema"><span>{{ section.settings.chip_cinema | default: "Cinema" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'gym' -%}<label class="ptool-opt"><input type="checkbox" data-feat="gym"><span>{{ section.settings.chip_gym | default: "Gym" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'cellar' -%}<label class="ptool-opt"><input type="checkbox" data-feat="cellar"><span>{{ section.settings.chip_cellar | default: "Cellar" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'study' -%}<label class="ptool-opt"><input type="checkbox" data-feat="study"><span>{{ section.settings.chip_study | default: "Study" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'solar' -%}<label class="ptool-opt"><input type="checkbox" data-feat="solar"><span>{{ section.settings.chip_solar | default: "Solar and Battery" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'butler' -%}<label class="ptool-opt"><input type="checkbox" data-feat="butler"><span>{{ section.settings.chip_butler | default: "Butler's Pantry" }}</span></label>{%- endif -%}
+      </div>
+    </details>
     {%- endif -%}
   </div>
 </div>
@@ -556,18 +593,21 @@
   .ptool-clear{font-family:var(--font-u);font-size:10px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:none;border:0;border-bottom:1px solid var(--gold);padding:0 0 2px;cursor:pointer;transition:color .3s,border-color .3s}
   .ptool-clear:hover{color:var(--ink);border-bottom-color:var(--ink)}
   .ptool-clear[hidden]{display:none}
-  .ptool-chips{display:flex;align-items:center;gap:8px;flex:1 0 100%;flex-wrap:wrap;padding-top:2px}
-  .ptool-chips-l{margin-right:8px}
-  .ptool-chip{font-family:var(--font-u);font-size:10px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;border:1px solid var(--border);border-radius:999px;padding:7px 14px;cursor:pointer;white-space:nowrap;transition:border-color .3s,color .3s,background .3s}
-  .ptool-chip:hover{border-color:var(--ink);color:var(--ink)}
-  .ptool-chip[aria-pressed="true"]{background:var(--dark);color:var(--white);border-color:var(--dark)}
-  .ptool-chip:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+  .ptool-drop{position:relative}
+  .ptool-drop summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .ptool-drop summary::-webkit-details-marker{display:none}
+  .ptool-drop summary::after{content:'';width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--gold);flex-shrink:0}
+  .ptool-drop[open] summary::after{transform:rotate(180deg)}
+  .ptool-drop summary:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
+  .ptool-menu{position:absolute;top:calc(100% + 10px);left:0;z-index:30;min-width:232px;max-height:62vh;overflow-y:auto;background:var(--bg);border:1px solid var(--border);box-shadow:0 20px 44px -20px rgba(var(--dark-rgb),.35);padding:6px 0}
+  .ptool-opt{display:flex;align-items:center;gap:11px;padding:9px 16px;cursor:pointer;font-family:var(--font-u);font-size:11px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+  .ptool-opt:hover{background:var(--bg2);color:var(--ink)}
+  .ptool-opt input{width:13px;height:13px;accent-color:var(--gold);flex-shrink:0;margin:0}
   @media(max-width:900px){
     .prop-toolbar{padding:16px var(--page-pad)}
     .prop-toolbar-inner{gap:14px 20px}
     .ptool-end{margin-left:auto}
-    .ptool-chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 calc(-1 * var(--page-pad));padding:2px var(--page-pad) 4px}
-    .ptool-chips::-webkit-scrollbar{display:none}
+    .ptool-menu{left:auto;right:0}
   }
   .mc-intro{padding:clamp(56px,7vw,88px) var(--page-pad) clamp(8px,1vw,12px);background:var(--bg)}
   .mc-intro-grid{display:grid;grid-template-columns:7fr 5fr;gap:32px clamp(32px,6vw,96px);align-items:end}
@@ -605,7 +645,10 @@
     var empty = byId('fEmpty');
     var clear = byId('fClear');
     var featuredWrap = byId('featuredWrap');
-    var chips = Array.prototype.slice.call(document.querySelectorAll('.ptool-chip'));
+    var drop = document.querySelector('[data-feat-drop]');
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.ptool-opt input[data-feat]'));
+    var featSummary = document.querySelector('[data-feat-summary]');
+    var featAnyLabel = featSummary ? featSummary.textContent : '';
     var selects = [suburb, beds, baths, cars, land, build, status].filter(Boolean);
     var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-prop-card]'));
     if (!selects.length && !chips.length && !sort) return;
@@ -620,7 +663,7 @@
       return n >= lo && n < hi;
     }
     function activeFeats() {
-      return chips.filter(function (c) { return c.getAttribute('aria-pressed') === 'true'; })
+      return chips.filter(function (c) { return c.checked; })
         .map(function (c) { return c.dataset.feat; });
     }
 
@@ -673,17 +716,25 @@
     selects.concat(sort ? [sort] : []).forEach(function (el) {
       el.addEventListener('change', apply);
     });
+    function featLabel() {
+      if (!featSummary) return;
+      var on = chips.filter(function (c) { return c.checked; });
+      featSummary.textContent = on.length === 0 ? featAnyLabel
+        : (on.length === 1 ? on[0].parentNode.textContent.trim() : on.length + ' Features');
+    }
     chips.forEach(function (chip) {
-      chip.addEventListener('click', function () {
-        var on = chip.getAttribute('aria-pressed') === 'true';
-        chip.setAttribute('aria-pressed', on ? 'false' : 'true');
-        apply();
-      });
+      chip.addEventListener('change', function () { featLabel(); apply(); });
     });
+    /* A dropdown left open over the grid gets in the way. */
+    if (drop) {
+      document.addEventListener('click', function (e) { if (drop.open && !drop.contains(e.target)) drop.open = false; });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && drop.open) { drop.open = false; drop.querySelector('summary').focus(); } });
+    }
     if (clear) clear.addEventListener('click', function () {
       selects.forEach(function (el) { el.value = ''; });
       if (sort) sort.value = 'featured';
-      chips.forEach(function (chip) { chip.setAttribute('aria-pressed', 'false'); });
+      chips.forEach(function (chip) { chip.checked = false; });
+      featLabel();
       apply();
     });
   })();
@@ -934,7 +985,8 @@
     {"type": "checkbox", "id": "show_filter_land", "label": "Show the Land size filter", "default": true},
     {"type": "checkbox", "id": "show_filter_build", "label": "Show the Build size filter", "default": true},
     {"type": "checkbox", "id": "show_filter_status", "label": "Show the Status filter", "default": true},
-    {"type": "checkbox", "id": "show_filter_features", "label": "Show the Feature chips", "default": true, "info": "Choose more than one and a residence must have them all."},
+    {"type": "checkbox", "id": "show_filter_features", "label": "Show the Features filter", "default": true, "info": "A dropdown with a box beside each feature. Tick more than one and a residence must have them all. Only features a residence actually has are listed."},
+    {"type": "text", "id": "filter_any_features", "label": "Features filter: nothing chosen", "default": "Any Features"},
     {"type": "checkbox", "id": "show_sort", "label": "Show the Sort menu", "default": true},
     {"type": "text", "id": "features_label", "label": "Chips label", "default": "Features"},
     {"type": "text", "id": "chip_pool", "label": "Chip: pool", "default": "Pool"},

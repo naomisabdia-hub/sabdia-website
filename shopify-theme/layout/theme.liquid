@@ -200,6 +200,28 @@ try {
   person" (.cc.handoff). Naomi, 11 Sep 2026.
 {%- endcomment -%}
 {%- unless locked %}{% section 'concierge' %}{% endunless -%}
+{%- if locked -%}
+{%- comment -%}
+  Nothing about the site itself goes onto the closed page. SabdiaForms
+  lists every residence by handle, title and suburb, which view-source
+  hands to anyone who looks, and the concierge replies describe the
+  company; main.js is 1300 lines of behaviour for furniture this page does
+  not have, and it guards every window.SabdiaForms read, so leaving both
+  out breaks nothing. What remains is the one thing the page still needs:
+  style.css hides .reveal under html.js, so something has to clear it.
+  Twice, because a film in the page can make load late.
+{%- endcomment -%}
+<script>
+(function () {
+  function show() {
+    var els = document.querySelectorAll('.reveal, .reveal-x, .reveal-r');
+    for (var i = 0; i < els.length; i++) els[i].classList.add('vis');
+  }
+  requestAnimationFrame(function () { requestAnimationFrame(show); });
+  addEventListener('load', show);
+})();
+</script>
+{%- else -%}
 {%- capture res_handles -%}{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{{ p.handle }},{%- endif -%}{%- endfor -%}{%- endcapture -%}
 {%- capture res_map -%}[{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{"handle":{{ p.handle | json }},"title":{{ p.title | json }},"suburb":{{ p.metafields.custom.suburb.value | default: '' | json }}},{%- endif -%}{%- endfor -%}]{%- endcapture -%}
 <script>window.SabdiaForms={residences:{{ res_handles | split: ',' | compact | json }},residenceMap:{{ res_map | replace: ',]', ']' }},mode:{{ settings.form_backend | json }},mirror:{% if settings.forms_endpoint != blank %}{{ settings.forms_endpoint | append: '/api/contact' | json }}{% else %}null{% endif %},thanks:{"heading":"Thank you","text":"Thank you for your interest - we appreciate you reaching out. A member of our team will be in touch with you as soon as possible."},replies:[
@@ -210,18 +232,6 @@ try {
 {"match":"about sabdia|tell me more|who (are|is) sabdia|your company|your team|history","text":"Thank you for reaching out. Sabdia is a boutique Brisbane developer, in-house from the first sketch to handover, with more than 100 homes since 2013. A member of our team will be in touch with you as soon as possible."}
 ]};</script>
 <script src="{{ 'main.js' | asset_url }}"></script>
-{%- if locked -%}
-<script>
-/* style.css hides .reveal under html.js and main.js clears it as each
-   section scrolls into view. The coming-soon page is a single screen with
-   no nav, footer or concierge, so if anything in main.js stops short of
-   that observer the words would never appear at all. Revealing again once
-   the page has loaded is a no-op when it already happened. */
-addEventListener('load', function () {
-  var els = document.querySelectorAll('.reveal, .reveal-x, .reveal-r');
-  for (var i = 0; i < els.length; i++) els[i].classList.add('vis');
-});
-</script>
 {%- endif -%}
 </body>
 </html>
