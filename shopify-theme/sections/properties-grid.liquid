@@ -18,44 +18,60 @@
   # Everything after the first three live residences flows into rows of
   # three (live first, then sold), capped by "Most residences to show".
   assign max_cards = section.settings.max_cards | default: 12
-  assign rest_limit = max_cards | minus: 3
-  assign rest_handles = sold_handles
-  if live_handles.size > 3
-    assign live_rest = live_handles | slice: 3, 60
-    assign rest_handles = live_rest | concat: sold_handles
+  assign pg_layout = section.settings.layout | default: 'editorial'
+  unless section.settings.include_sold
+    assign sold_handles = '' | split: ','
+  endunless
+  if pg_layout == 'editorial'
+    assign rest_limit = max_cards | minus: 3
+    assign rest_handles = sold_handles
+    if live_handles.size > 3
+      assign live_rest = live_handles | slice: 3, 60
+      assign rest_handles = live_rest | concat: sold_handles
+    endif
+  else
+    assign rest_limit = max_cards
+    assign rest_handles = live_handles | concat: sold_handles
   endif
 -%}
-<section id="properties" style="padding:0 0 clamp(80px,12vw,160px)">
-  <div class="inner" style="padding:clamp(80px,12vw,160px) var(--page-pad) clamp(44px,5vw,60px)">
+{% render 'section-look', section: section %}
+<section id="properties" class="pgrid pgrid-{{ pg_layout }}" style="padding:0 0 calc(clamp(80px,12vw,160px) * var(--sp-scale) * var(--sp-bot,1));--proj-gap:{{ section.settings.gap | default: 10 }}px;--pg-hero-min:{{ section.settings.hero_height | default: 560 }}px;--pg-row-ar:{{ section.settings.row_shape | default: '16/10' }}">
+  {%- if section.settings.show_label or section.settings.show_heading or section.settings.show_button -%}
+  <div class="inner" style="padding:calc(clamp(80px,12vw,160px) * var(--sp-scale) * var(--sp-top,1)) var(--page-pad) clamp(44px,5vw,60px)">
     <div class="proj-hdr">
       <div>
-        <div class="slabel reveal">{{ section.settings.label }}</div>
-        <h2 class="proj-h reveal d1">{{ section.settings.heading_html }}</h2>
+        {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+        {%- if section.settings.show_heading -%}<h2 class="proj-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
       </div>
-      <a href="{{ section.settings.cta_link }}" class="btn-g reveal d2">{{ section.settings.cta_label }} &rarr;</a>
+      {%- if section.settings.show_button and section.settings.cta_label != blank -%}<a href="{{ section.settings.cta_link }}" class="btn-g reveal d2">{{ section.settings.cta_label }} &rarr;</a>{%- endif -%}
     </div>
   </div>
+  {%- else -%}
+  <div style="padding-top:calc(clamp(80px,12vw,160px) * var(--sp-scale) * var(--sp-top,1))"></div>
+  {%- endif -%}
 
   <div class="inner" style="padding:0 var(--page-pad)">
+    {%- if pg_layout == 'editorial' -%}
     <div class="proj-grid proj-grid-main">
       {%- for h in live_handles limit: 3 -%}
         {%- assign i = forloop.index -%}
         {%- for product in collections.all.products -%}
           {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
           {%- if i == 1 -%}
-            {% render 'property-card', product: product, class: 'pc-hero reveal-wipe', img_w: 1400, img_h: 900, show_cars: true %}
+            {% render 'property-card', product: product, class: 'pc-hero reveal-wipe', img_w: 1400, img_h: 900, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}
           {%- elsif i == 2 -%}
-            {% render 'property-card', product: product, class: 'pc-sm-a reveal-wipe d1', img_w: 900, img_h: 680 %}
+            {% render 'property-card', product: product, class: 'pc-sm-a reveal-wipe d1', img_w: 900, img_h: 680, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land %}
           {%- else -%}
-            {% render 'property-card', product: product, class: 'pc-sm-b reveal-wipe d2', img_w: 900, img_h: 680 %}
+            {% render 'property-card', product: product, class: 'pc-sm-b reveal-wipe d2', img_w: 900, img_h: 680, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land %}
           {%- endif -%}
           {%- break -%}
         {%- endfor -%}
       {%- endfor -%}
     </div>
+    {%- endif -%}
 
     {%- if rest_handles.size > 0 and rest_limit > 0 -%}
-      <div class="proj-grid-3 proj-grid-flow" style="margin-top:10px">
+      <div class="{% if pg_layout == 'two' %}proj-grid-2{% else %}proj-grid-3 proj-grid-flow{% endif %}" style="{% if pg_layout == 'editorial' %}margin-top:var(--proj-gap,10px){% endif %}">
         {%- assign delays = ',d1,d2' | split: ',' -%}
         {%- for h in rest_handles limit: rest_limit -%}
           {%- assign di = forloop.index0 | modulo: 3 -%}
@@ -64,9 +80,9 @@
             {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
             {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
             {%- if pstatus contains 'Sold' -%}
-              {% render 'sold-card', product: product, class: card_class, img_w: 900, img_h: 560, show_suburb: false %}
+              {% render 'sold-card', product: product, class: card_class, img_w: 900, img_h: 560, show_suburb: section.settings.sold_suburb %}
             {%- else -%}
-              {% render 'property-card', product: product, class: card_class, img_w: 900, img_h: 560 %}
+              {% render 'property-card', product: product, class: card_class, img_w: 900, img_h: 560, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land %}
             {%- endif -%}
             {%- break -%}
           {%- endfor -%}
@@ -90,7 +106,48 @@
     { "type": "header", "content": "Order" },
     { "type": "paragraph", "content": "These two pickers only set the drag order (Products › Collections › the collection › sort Manually). They never move a house between For Sale and Sold." },
     { "type": "collection", "id": "for_sale_collection", "label": "Order of For Sale cards" },
-    { "type": "collection", "id": "sold_collection", "label": "Order of Sold cards" }
+    { "type": "collection", "id": "sold_collection", "label": "Order of Sold cards" },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
+    {"type": "checkbox", "id": "show_button", "label": "Show the button", "default": true},
+    {"type": "checkbox", "id": "show_cars", "label": "Garage count on the large card", "default": true},
+    {"type": "checkbox", "id": "show_cars_small", "label": "Garage count on the smaller cards", "default": false},
+    {"type": "checkbox", "id": "show_land", "label": "Land size on the cards", "default": true},
+    {"type": "checkbox", "id": "include_sold", "label": "Sold residences after the live ones", "default": true, "info": "Off = live residences only."},
+    {"type": "checkbox", "id": "sold_suburb", "label": "Suburb on sold cards", "default": false},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "layout", "label": "Layout", "options": [{"value": "editorial", "label": "One large, two small, then rows (as designed)"}, {"value": "rows", "label": "Rows of three"}, {"value": "two", "label": "Two across"}], "default": "editorial"},
+    {"type": "range", "id": "hero_height", "label": "Large card height", "min": 360, "max": 800, "step": 20, "default": 560, "unit": "px", "info": "Editorial layout. The two small cards share it."},
+    {"type": "select", "id": "row_shape", "label": "Shape of the row cards", "options": [{"value": "16/10", "label": "Landscape 16:10"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "1/1", "label": "Square"}, {"value": "4/5", "label": "Portrait 4:5"}], "default": "16/10"},
+    {"type": "range", "id": "gap", "label": "Gap between cards", "min": 0, "max": 40, "step": 2, "default": 10, "unit": "px"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "presets": [{ "name": "Properties grid" }]
 }

@@ -1,21 +1,27 @@
 {%- comment -%}
   About - journey: heading/text beside the gold-threaded year timeline.
 {%- endcomment -%}
-<section class="sp">
+{% render 'section-look', section: section %}
+{%- liquid
+  assign tl_layout = section.settings.layout | default: 'beside'
+  assign tl_line = section.settings.line_style | default: 'fade'
+  assign tl_dot = section.settings.dot_style | default: 'dot'
+-%}
+<section class="sp tl tl-{{ tl_layout }} tl-line-{{ tl_line }} tl-dot-{{ tl_dot }}{% if section.settings.sticky == false %} tl-nosticky{% endif %}{% if section.settings.two_cols %} tl-cols{% endif %}" style="--tl-gap:{{ section.settings.gap | default: 44 }}px;--tl-year:{{ section.settings.year_size | default: 10 }}px">
   <div class="inner">
     <div class="journey-grid">
       <div>
-        <div class="slabel reveal">{{ section.settings.label }}</div>
-        <h2 class="about-h reveal d1">{{ section.settings.heading_html }}</h2>
-        <p class="about-p reveal d2" style="margin-top:0">{{ section.settings.text }}</p>
+        {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+        {%- if section.settings.show_heading -%}<h2 class="about-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
+        {%- if section.settings.show_text and section.settings.text != blank -%}<p class="about-p reveal d2" style="margin-top:0">{{ section.settings.text }}</p>{%- endif -%}
       </div>
       <div class="timeline reveal d2">
         {%- for block in section.blocks -%}
           <div class="tl-item" {{ block.shopify_attributes }}>
             <div class="tl-dot"></div>
-            <div class="tl-year">{{ block.settings.year }}</div>
+            {%- if section.settings.show_years -%}<div class="tl-year">{{ block.settings.year }}</div>{%- endif -%}
             <div class="tl-title">{{ block.settings.title }}</div>
-            <div class="tl-desc">{{ block.settings.desc }}</div>
+            {%- if section.settings.show_desc -%}<div class="tl-desc">{{ block.settings.desc }}</div>{%- endif -%}
           </div>
         {%- endfor -%}
       </div>
@@ -26,15 +32,24 @@
 <style>
   .timeline{position:relative;padding-left:40px;margin-top:0}
   .timeline::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:1px;background:linear-gradient(to bottom,var(--gold),transparent)}
-  .tl-item{position:relative;margin-bottom:44px}
+  .tl-item{position:relative;margin-bottom:var(--tl-gap,44px)}
   .tl-item:last-child{margin-bottom:0}
   .tl-dot{position:absolute;left:-44px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px var(--bg)}
-  .tl-year{font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--ink);margin-bottom:8px}
-  .tl-title{font-family:var(--font-d);font-size:var(--t-h3);font-weight:300;color:var(--ink);margin-bottom:6px}
-  .tl-desc{font-size:var(--t-body);font-weight:300;line-height:var(--lh-body);color:var(--ink3)}
+  .tl-year{font-size:var(--tl-year,10px);font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--ink);margin-bottom:8px}
+  .tl-title{font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:300;color:var(--ink);margin-bottom:6px}
+  .tl-desc{font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:var(--ink3)}
   .journey-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start}
   /* The heading column holds while the milestones move past it (Tamsin, 10 Sep 2026). */
   .journey-grid>div:first-child{position:sticky;top:calc(var(--nav-h) + 40px)}
+  .tl-line-solid .timeline::before{background:var(--gold)}
+  .tl-line-none .timeline::before{display:none}
+  .tl-dot-ring .tl-dot{background:var(--bg);border:1px solid var(--gold)}
+  .tl-dot-none .tl-dot{display:none}
+  .tl-above .journey-grid{grid-template-columns:1fr;gap:40px}
+  .tl-above .journey-grid>div:first-child,.tl-nosticky .journey-grid>div:first-child{position:static}
+  .tl-cols .timeline{display:grid;grid-template-columns:1fr 1fr;gap:0 40px}
+  .tl-cols .tl-item:last-child{margin-bottom:var(--tl-gap,44px)}
+  @media(max-width:700px){.tl-cols .timeline{grid-template-columns:1fr}}
   @media(max-width:900px){.journey-grid>div:first-child{position:static}}
   @media(max-width:900px){.journey-grid{grid-template-columns:1fr;gap:48px}}
 </style>
@@ -45,7 +60,48 @@
   "settings": [
     { "type": "text", "id": "label", "label": "Small label", "default": "Our Journey" },
     { "type": "html", "id": "heading_html", "label": "Heading (HTML)" },
-    { "type": "textarea", "id": "text", "label": "Intro text" }
+    { "type": "textarea", "id": "text", "label": "Intro text" },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
+    {"type": "checkbox", "id": "show_text", "label": "Show the intro text", "default": true},
+    {"type": "checkbox", "id": "show_years", "label": "Show the year on each milestone", "default": true},
+    {"type": "checkbox", "id": "show_desc", "label": "Show each milestone's description", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "layout", "label": "Heading", "options": [{"value": "beside", "label": "Beside the milestones"}, {"value": "above", "label": "Above the milestones"}], "default": "beside"},
+    {"type": "checkbox", "id": "sticky", "label": "Heading holds while the milestones scroll", "default": true, "info": "Beside layout only."},
+    {"type": "checkbox", "id": "two_cols", "label": "Milestones in two columns", "default": false},
+    {"type": "select", "id": "line_style", "label": "The thread", "options": [{"value": "fade", "label": "Gold, fading out (as designed)"}, {"value": "solid", "label": "Solid gold"}, {"value": "none", "label": "No line"}], "default": "fade"},
+    {"type": "select", "id": "dot_style", "label": "The dots", "options": [{"value": "dot", "label": "Gold dots"}, {"value": "ring", "label": "Gold rings"}, {"value": "none", "label": "No dots"}], "default": "dot"},
+    {"type": "range", "id": "gap", "label": "Space between milestones", "min": 16, "max": 80, "step": 4, "default": 44, "unit": "px"},
+    {"type": "range", "id": "year_size", "label": "Year size", "min": 8, "max": 14, "step": 0.5, "default": 10, "unit": "px"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "blocks": [
     {

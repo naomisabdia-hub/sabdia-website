@@ -2,8 +2,20 @@
   Services - the alternating image/copy service spreads. One block per
   service; paragraphs and bullet lists are written one per line.
 {%- endcomment -%}
-<section class="sp">
+{% render 'section-look', section: section %}
+{%- liquid
+  assign sdt_side = section.settings.image_side | default: 'alternate'
+  assign sdt_b = section.settings.bullet_style | default: 'dots'
+  assign sdt_pad = section.settings.spread_space | default: 100 | divided_by: 100.0
+-%}
+<section class="sp sdt sdt-{{ sdt_side }} sdt-b-{{ sdt_b }}{% if section.settings.dividers %} sdt-div{% endif %}{% if section.settings.hover_zoom == false %} sdt-nozoom{% endif %}" style="--sdt-ar:{{ section.settings.image_shape | default: '4/3' }};--sdt-gap:{{ section.settings.gap | default: 96 }}px;--sdt-pad:{{ sdt_pad }}">
   <div class="inner">
+    {%- if section.settings.label != blank or section.settings.heading_html != blank -%}
+      <div class="sdt-hdr">
+        {%- if section.settings.label != blank -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+        {%- if section.settings.heading_html != blank -%}<h2 class="about-h reveal d1" style="margin-bottom:0">{{ section.settings.heading_html }}</h2>{%- endif -%}
+      </div>
+    {%- endif -%}
     {%- for block in section.blocks -%}
       <div class="svc-detail-grid" {{ block.shopify_attributes }}>
         <div class="svc-detail-img {% cycle 'reveal-x', 'reveal-r' %}">
@@ -14,8 +26,8 @@
           {%- endif -%}
         </div>
         <div class="reveal">
-          <span class="svc-num">{{ block.settings.number }}</span>
-          <div class="slabel">{{ block.settings.label }}</div>
+          {%- if section.settings.show_numbers and block.settings.number != blank -%}<span class="svc-num">{{ block.settings.number }}</span>{%- endif -%}
+          {%- if section.settings.show_labels and block.settings.label != blank -%}<div class="slabel">{{ block.settings.label }}</div>{%- endif -%}
           <h2 class="svc-detail-h">{{ block.settings.heading_html }}</h2>
           {%- assign paras = block.settings.paragraphs | newline_to_br | split: '<br />' -%}
           {%- for p in paras -%}
@@ -23,12 +35,14 @@
             {%- if pt != blank -%}<p class="svc-detail-p">{{ pt }}</p>{%- endif -%}
           {%- endfor -%}
           {%- assign bullets = block.settings.bullets | newline_to_br | split: '<br />' -%}
+          {%- if section.settings.show_bullets and block.settings.bullets != blank -%}
           <ul class="svc-detail-list">
             {%- for b in bullets -%}
               {%- assign bt = b | strip -%}
               {%- if bt != blank -%}<li>{{ bt }}</li>{%- endif -%}
             {%- endfor -%}
           </ul>
+          {%- endif -%}
         </div>
       </div>
     {%- endfor -%}
@@ -36,27 +50,74 @@
 </section>
 
 <style>
-  .svc-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:center;padding:clamp(72px,10vw,140px) 0}
-  .svc-detail-grid:nth-child(even){direction:rtl}
-  .svc-detail-grid:nth-child(even)>*{direction:ltr}
-  .svc-detail-grid+.svc-detail-grid{border-top:1px solid var(--border)}
-  .svc-detail-img{overflow:hidden;aspect-ratio:4/3}
+  .svc-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sdt-gap,96px);align-items:center;padding:calc(clamp(72px,10vw,140px) * var(--sdt-pad,1)) 0}
+  .sdt-hdr{margin-bottom:8px}
+  .sdt-alternate .svc-detail-grid:nth-child(even),.sdt-right .svc-detail-grid{direction:rtl}
+  .svc-detail-grid>*{direction:ltr}
+  .sdt-div .svc-detail-grid+.svc-detail-grid{border-top:1px solid var(--border)}
+  .sdt-b-lines .svc-detail-list li::before{display:none}
+  .sdt-b-plain .svc-detail-list li::before{display:none}.sdt-b-plain .svc-detail-list li{border-bottom:0;padding:4px 0}.sdt-b-plain .svc-detail-list{border-top:0;padding-top:0}
+  .sdt-nozoom .svc-detail-grid:hover .svc-detail-img img{transform:none}
+  .svc-detail-img{overflow:hidden;aspect-ratio:var(--sdt-ar,4/3)}
   .svc-detail-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.85);transition:transform .8s var(--ease)}
   .svc-detail-grid:hover .svc-detail-img img{transform:scale(1.04)}
-  .svc-num{font-family:var(--font-d);font-size:var(--t-display);font-weight:300;font-style:italic;color:rgba(168,135,74,.1);line-height:1;margin-bottom:-20px;display:block}
-  .svc-detail-h{font-family:var(--font-d);font-size:var(--t-h2);font-weight:300;color:var(--ink);margin-bottom:20px;letter-spacing:-.02em}
+  .svc-num{font-family:var(--font-d);font-size:calc(var(--t-display)*var(--s-h,1));font-weight:300;font-style:italic;color:rgba(var(--gold-rgb),.1);line-height:1;margin-bottom:-20px;display:block}
+  .svc-detail-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:300;color:var(--ink);margin-bottom:20px;letter-spacing:-.02em}
   .svc-detail-h em{font-style:italic;color:var(--ink)}
-  .svc-detail-p{font-size:var(--t-body);font-weight:300;line-height:var(--lh-body);color:var(--ink3);margin-bottom:16px}
+  .svc-detail-p{font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:var(--ink3);margin-bottom:16px}
   .svc-detail-list{list-style:none;margin-top:24px;border-top:1px solid var(--border);padding-top:24px}
   .svc-detail-list li{font-size:13px;font-weight:300;color:var(--ink3);padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
   .svc-detail-list li::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
-  @media(max-width:900px){.svc-detail-grid{grid-template-columns:1fr;gap:36px}.svc-detail-grid:nth-child(even){direction:ltr}}
+  @media(max-width:900px){.svc-detail-grid{grid-template-columns:1fr;gap:36px}.sdt-alternate .svc-detail-grid:nth-child(even),.sdt-right .svc-detail-grid{direction:ltr}}
 </style>
 
 {% schema %}
 {
-  "name": "Services - details",
-  "settings": [],
+  "name": "Process - stages",
+  "settings": [
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_numbers", "label": "Show the large numbers", "default": true},
+    {"type": "checkbox", "id": "show_labels", "label": "Show the small labels", "default": true},
+    {"type": "checkbox", "id": "show_bullets", "label": "Show the bullet lists", "default": true},
+    {"type": "checkbox", "id": "dividers", "label": "Hairlines between the stages", "default": true},
+    {"type": "checkbox", "id": "hover_zoom", "label": "Photos zoom gently on hover", "default": true},
+    {"type": "header", "content": "Words (optional)"},
+    {"type": "text", "id": "label", "label": "Small label above the stages"},
+    {"type": "html", "id": "heading_html", "label": "Heading above the stages", "info": "Wrap a word in <em> for the italic accent."},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "image_side", "label": "Photos sit", "options": [{"value": "alternate", "label": "Alternating sides (as designed)"}, {"value": "left", "label": "Always left"}, {"value": "right", "label": "Always right"}], "default": "alternate"},
+    {"type": "select", "id": "image_shape", "label": "Photo shape", "options": [{"value": "16/10", "label": "Landscape 16:10"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "1/1", "label": "Square"}, {"value": "4/5", "label": "Portrait 4:5"}], "default": "4/3"},
+    {"type": "select", "id": "bullet_style", "label": "Bullet style", "options": [{"value": "dots", "label": "Gold dots with hairlines (as designed)"}, {"value": "lines", "label": "Hairlines only"}, {"value": "plain", "label": "Plain list"}], "default": "dots"},
+    {"type": "range", "id": "gap", "label": "Gap between photo and words", "min": 32, "max": 140, "step": 4, "default": 96, "unit": "px"},
+    {"type": "range", "id": "spread_space", "label": "Space around each stage", "min": 40, "max": 160, "step": 10, "default": 100, "unit": "%"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ],
   "blocks": [
     {
       "type": "service",
@@ -114,7 +175,7 @@
   ],
   "presets": [
     {
-      "name": "Services - details"
+      "name": "Process - stages"
     }
   ]
 }

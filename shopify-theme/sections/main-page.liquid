@@ -3,21 +3,91 @@
   Projects, …) is ported to its own dedicated template. Renders the
   page's own content styled inside the site's design system.
 {%- endcomment -%}
-<section class="sp" style="padding-top:clamp(140px,18vw,220px)">
-  <div class="inner" style="max-width:840px">
-    <div class="slabel reveal">{{ section.settings.label }}</div>
-    <h1 class="about-h reveal d1">{{ page.title }}</h1>
-    <div class="reveal d2" style="margin-top:32px">
+{% render 'section-look', section: section %}
+{%- liquid
+  assign mp_w = section.settings.width | default: '840'
+  if mp_w == 'theme'
+    assign mp_max = 'var(--page-max)'
+  else
+    assign mp_max = mp_w | append: 'px'
+  endif
+  assign mp_shape = section.settings.banner_shape | default: 'auto'
+-%}
+<section class="sp mp{% if section.settings.align == 'centre' %} mp-centre{% endif %}{% if section.settings.serif_body %} mp-serif{% endif %}{% if section.settings.drop_cap %} mp-dropcap{% endif %}{% if section.settings.first_lead == false %} mp-nolead{% endif %}" style="padding-top:calc(var(--nav-h) + (clamp(140px,18vw,220px) - var(--nav-h)) * var(--sp-top,1))">
+  <div class="inner" style="max-width:{{ mp_max }}">
+    {%- if section.settings.banner_image and section.settings.banner_position != 'below' -%}
+      <img class="mp-banner reveal" src="{{ section.settings.banner_image | image_url: width: 1800 }}" srcset="{{ section.settings.banner_image | image_url: width: 900 }} 900w, {{ section.settings.banner_image | image_url: width: 1800 }} 1800w" sizes="(max-width: 900px) 100vw, 900px" alt="{{ section.settings.banner_image.alt | escape }}" width="{{ section.settings.banner_image.width }}" height="{{ section.settings.banner_image.height }}" loading="eager"{% if mp_shape != 'auto' %} style="aspect-ratio:{{ mp_shape }};object-fit:cover"{% endif %}>
+    {%- endif -%}
+    {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+    {%- if section.settings.show_title -%}<h1 class="about-h reveal d1">{{ page.title }}</h1>{%- endif -%}
+    {%- if section.settings.banner_image and section.settings.banner_position == 'below' -%}
+      <img class="mp-banner reveal d1" src="{{ section.settings.banner_image | image_url: width: 1800 }}" srcset="{{ section.settings.banner_image | image_url: width: 900 }} 900w, {{ section.settings.banner_image | image_url: width: 1800 }} 1800w" sizes="(max-width: 900px) 100vw, 900px" alt="{{ section.settings.banner_image.alt | escape }}" width="{{ section.settings.banner_image.width }}" height="{{ section.settings.banner_image.height }}" loading="eager" style="margin-top:32px;{% if mp_shape != 'auto' %}aspect-ratio:{{ mp_shape }};object-fit:cover{% endif %}">
+    {%- endif -%}
+    <div class="reveal d2 mp-body" style="margin-top:32px">
       {{ page.content | replace: '<p>', '<p class="about-p">' }}
     </div>
   </div>
 </section>
 
+<style>
+  .mp-banner{width:100%;height:auto;margin-bottom:36px;display:block}
+  .mp-centre{text-align:center}.mp-centre .slabel{justify-content:center}.mp-centre .about-p{margin-left:auto;margin-right:auto}
+  .mp-serif .about-p{font-family:var(--font-d);font-size:calc(var(--t-lead)*var(--s-t,1));line-height:1.65;color:var(--ink2);letter-spacing:0}
+  .mp-dropcap .mp-body .about-p:first-of-type::first-letter{font-size:3.2em;float:left;line-height:.82;padding-right:12px;color:var(--ink);font-style:italic}
+  .mp-nolead .about-p:first-of-type{font-size:calc(var(--t-body)*var(--s-t,1));line-height:var(--lh-body);letter-spacing:.018em;color:var(--ink3);max-width:560px}
+  .mp-nolead .about-p:first-of-type + .about-p{margin-top:20px}
+  .mp-body h2,.mp-body h3{font-family:var(--font-d);font-weight:400;color:var(--ink);line-height:1.2;margin:1.6em 0 .6em}
+  .mp-body h2{font-size:calc(var(--t-h2)*var(--s-h,1))}.mp-body h3{font-size:calc(var(--t-h3)*var(--s-h,1))}
+  .mp-body ul,.mp-body ol{margin:0 0 1.5em 1.2em;font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:var(--ink3)}
+  .mp-body a{color:var(--ink);border-bottom:1px solid rgba(var(--gold-rgb),.45)}
+  .mp-body img{margin:1.5em 0}
+</style>
+
 {% schema %}
 {
   "name": "Page",
   "settings": [
-    { "type": "text", "id": "label", "label": "Small label", "default": "Sabdia" }
+    { "type": "text", "id": "label", "label": "Small label", "default": "Sabdia" },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_title", "label": "Show the page title", "default": true},
+    {"type": "checkbox", "id": "first_lead", "label": "First paragraph larger, as a lead line", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "width", "label": "Text column", "options": [{"value": "680", "label": "Narrow (680px)"}, {"value": "840", "label": "Reading (840px, as designed)"}, {"value": "980", "label": "Wide (980px)"}, {"value": "theme", "label": "The theme's content width"}], "default": "840"},
+    {"type": "select", "id": "align", "label": "Words sit", "options": [{"value": "left", "label": "Left"}, {"value": "centre", "label": "Centre"}], "default": "left"},
+    {"type": "checkbox", "id": "serif_body", "label": "Paragraphs in the serif (editorial)", "default": false},
+    {"type": "checkbox", "id": "drop_cap", "label": "Drop capital on the first paragraph", "default": false},
+    {"type": "header", "content": "Banner photo (optional)"},
+    {"type": "image_picker", "id": "banner_image", "label": "Photo", "info": "A real photograph. Shown above the title unless set below."},
+    {"type": "select", "id": "banner_position", "label": "Photo sits", "options": [{"value": "above", "label": "Above the title"}, {"value": "below", "label": "Under the title"}], "default": "above"},
+    {"type": "select", "id": "banner_shape", "label": "Photo shape", "options": [{"value": "auto", "label": "As uploaded"}, {"value": "21/9", "label": "Cinematic 21:9"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "4/3", "label": "Landscape 4:3"}], "default": "auto"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ]
 }
 {% endschema %}

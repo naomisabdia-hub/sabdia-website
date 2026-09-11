@@ -44,6 +44,23 @@ newsletter) between:
 The nav logo size is Theme settings → **Brand → Logo size** (reviewed
 default 38px; mobile scales in step).
 
+## Per-section dials (11 Sep 2026)
+
+Every section renders `snippets/section-look.liquid` before its root
+element and carries the shared **Look** settings (ids `look_*`) at the end
+of its schema: surface (cream / stone / obsidian / custom colour / photo or
+film behind with a darken dial), space above / below, content width, side
+margins, heading / text / label size, fade-in, hairlines, anchor. The
+snippet writes one style block scoped to `#shopify-section-<id>`; a surface
+of the other tone flips the palette by redefining the colour tokens, which
+works because every colour in `style.css` is a token (the `rgba()` colours
+read `--white-rgb`, `--dark-rgb`, … triplets). Spacing reads `--sp-top` /
+`--sp-bot`, type reads `--s-h` / `--s-t` multipliers. Hero-type sections
+render the snippet with `mode: 'hero'` and keep their own media dials.
+On top of that each section has its own Show / Layout settings for the
+parts it contains. Nothing changes until a dial is moved: an untouched
+section renders exactly as before.
+
 ## Product metafields (namespace `custom`)
 
 | Key | Type |

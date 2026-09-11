@@ -2,6 +2,13 @@
   Port of FilmBand.astro - a vertical reel in a framed player beside
   editorial copy. Autoplays muted in view; tap for sound. The film clips
   live on the Sabdia media library (Supabase films/…).
+
+  Layouts (11 Sep 2026): the reel can sit in the centre with a vertical
+  photo carousel (two narrow columns gliding up and down, continuous) on
+  one side and the words on the other. "Words · Reel" is the original
+  two-column band and still renders the optional photo/film panels.
+  The carousel needs at least four photo blocks; with fewer, the band
+  falls back to the original layout.
 {%- endcomment -%}
 {%- liquid
   # An uploaded film (Shopify-hosted) wins over the URL fallback.
@@ -12,18 +19,110 @@
       assign film_src = mp4.url
     endif
   endif
+
+  assign layout = section.settings.layout | default: 'carousel-reel-words'
+  assign photo_count = 0
+  for block in section.blocks
+    if block.type == 'photo'
+      if block.settings.image or block.settings.ext != blank
+        assign photo_count = photo_count | plus: 1
+      endif
+    endif
+  endfor
+  assign use_carousel = false
+  if layout != 'words-reel' and photo_count >= 4
+    assign use_carousel = true
+  endif
+  assign fc_cols = section.settings.carousel_columns | default: '2' | plus: 0
+  if fc_cols < 1
+    assign fc_cols = 1
+  endif
+  assign fc_cols_last = fc_cols | minus: 1
+  assign fc_h = section.settings.carousel_height | default: 560
+  assign fc_speed = section.settings.carousel_speed | default: 45
+  assign fc_gap = section.settings.carousel_gap | default: 10
 -%}
 {%- assign panels = section.blocks -%}
 {%- if film_src != blank -%}
-<section class="film-band" id="{{ section.settings.anchor | default: 'film' }}">
-  <div class="film-grid{% if panels.size > 0 %} has-panels{% endif %}">
-    <div class="film-copy">
-      <div class="slabel slabel-dark reveal">{{ section.settings.label }}</div>
-      <h2 class="film-h reveal d1">{{ section.settings.heading_html }}</h2>
-      {%- if section.settings.text != blank -%}<p class="film-p reveal d2">{{ section.settings.text }}</p>{%- endif -%}
-      {%- if section.settings.cta_label != blank -%}
+{%- capture film_copy_html -%}
+      {%- if section.settings.show_label -%}<div class="slabel slabel-dark reveal">{{ section.settings.label }}</div>{%- endif -%}
+      {%- if section.settings.show_heading -%}<h2 class="film-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
+      {%- if section.settings.text != blank and section.settings.show_text -%}<p class="film-p reveal d2">{{ section.settings.text }}</p>{%- endif -%}
+      {%- if section.settings.cta_label != blank and section.settings.show_button -%}
         <a href="{{ section.settings.cta_link }}" class="btn-g btn-g-light reveal d3">{{ section.settings.cta_label }} &rarr;</a>
       {%- endif -%}
+{%- endcapture -%}
+{%- capture film_reel_html -%}
+      <div class="film-frame" data-film{% unless section.settings.autoplay %} data-noauto{% endunless %}>
+        <video
+          src="{{ film_src }}"
+          {% if section.settings.poster %}poster="{{ section.settings.poster | image_url: width: 900 }}"{% elsif section.settings.poster_ext != blank %}poster="{{ section.settings.poster_ext }}"{% endif %}
+          muted
+          loop
+          playsinline
+          preload="none"
+        ></video>
+        {%- if section.settings.show_sound -%}
+        <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+          <span data-sound-label>{{ section.settings.sound_label | default: "Sound On" }}</span>
+        </button>
+        {%- endif -%}
+      </div>
+      {%- if section.settings.show_captions and section.settings.caption_left != blank or section.settings.show_captions and section.settings.caption_right != blank -%}
+        <div class="film-caption">
+          <span><b>{{ section.settings.caption_left }}</b></span>
+          <span>{{ section.settings.caption_right }}</span>
+        </div>
+      {%- endif -%}
+{%- endcapture -%}
+{% render 'section-look', section: section, designed: 'dark' %}
+<section class="film-band fb-{{ section.settings.frame_style | default: 'framed' }}{% if section.settings.copy_align == 'centre' %} fb-centre{% endif %}{% if section.settings.carousel_pause == false %} fb-nopause{% endif %}{% if section.settings.carousel_fade == false %} fb-nofade{% endif %} fb-dir-{{ section.settings.carousel_direction | default: 'mixed' }}" id="{{ section.settings.anchor | default: 'film' }}" style="--film-ar:{{ section.settings.reel_shape | default: '9/16' }};--film-maxh:{{ section.settings.reel_height | default: 680 }}px">
+{%- if use_carousel -%}
+  {%- comment -%} Three columns: the carousel, the reel and the words, in the order
+      the Layout setting names. DOM order stays words, reel, carousel (heading
+      first for screen readers, and the mobile order) - CSS `order` places them. {%- endcomment -%}
+  <div class="film-grid film-grid-3 film-layout-{{ layout }}">
+    <div class="film-copy">
+      {{ film_copy_html }}
+    </div>
+    <div class="film-reel reveal d2">
+      {{ film_reel_html }}
+    </div>
+    <div class="film-carousel reveal d1" data-film-carousel style="--fc-h:{{ fc_h }}px;--fc-speed:{{ fc_speed }}s;--fc-gap:{{ fc_gap }}px">
+      {%- for c in (0..fc_cols_last) -%}
+      <div class="film-col {% if c == 0 %}film-col-up{% else %}film-col-down{% endif %}">
+        <ul class="film-track">
+          {%- comment -%} Pass 1 is the list, pass 2 its duplicate (hidden from
+              assistive tech) so the -50% loop lands exactly on the start. {%- endcomment -%}
+          {%- for pass in (1..2) -%}
+            {%- assign pi = 0 -%}
+            {%- for block in section.blocks -%}
+              {%- if block.type != 'photo' -%}{%- continue -%}{%- endif -%}
+              {%- if block.settings.image == blank and block.settings.ext == blank -%}{%- continue -%}{%- endif -%}
+              {%- assign slot = pi | modulo: fc_cols -%}
+              {%- assign pi = pi | plus: 1 -%}
+              {%- if slot != c -%}{%- continue -%}{%- endif -%}
+              <li class="film-tile"{% if pass == 2 %} aria-hidden="true"{% else %} {{ block.shopify_attributes }}{% endif %}>
+                {%- if block.settings.image -%}
+                  {%- assign fc_ratio = block.settings.image.aspect_ratio | default: 1.5 -%}
+                  {%- assign fc_img_h = 640 | divided_by: fc_ratio | round -%}
+                  <img src="{{ block.settings.image | image_url: width: 640 }}" alt="{{ block.settings.alt | escape }}" width="640" height="{{ fc_img_h }}" loading="lazy" decoding="async">
+                {%- else -%}
+                  <img src="{{ block.settings.ext | escape }}" alt="{{ block.settings.alt | escape }}" width="640" height="800" loading="lazy" decoding="async">
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- else -%}
+  <div class="film-grid{% if panels.size > 0 %} has-panels{% endif %}">
+    <div class="film-copy">
+      {{ film_copy_html }}
     </div>
     {%- if panels.size > 0 -%}
     {%- comment -%} Between the copy and the reel: up to three photos or a second film,
@@ -66,33 +165,24 @@
     </div>
     {%- endif -%}
     <div class="reveal d2">
-      <div class="film-frame" data-film>
-        <video
-          src="{{ film_src }}"
-          {% if section.settings.poster %}poster="{{ section.settings.poster | image_url: width: 900 }}"{% elsif section.settings.poster_ext != blank %}poster="{{ section.settings.poster_ext }}"{% endif %}
-          muted
-          loop
-          playsinline
-          preload="none"
-        ></video>
-        <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-          <span data-sound-label>{{ section.settings.sound_label | default: "Sound On" }}</span>
-        </button>
-      </div>
-      {%- if section.settings.caption_left != blank or section.settings.caption_right != blank -%}
-        <div class="film-caption">
-          <span><b>{{ section.settings.caption_left }}</b></span>
-          <span>{{ section.settings.caption_right }}</span>
-        </div>
-      {%- endif -%}
+      {{ film_reel_html }}
     </div>
   </div>
+{%- endif -%}
 </section>
 <style>
+  .film-band .film-frame{aspect-ratio:var(--film-ar,9/16);max-height:min(76vh,var(--film-maxh,680px))}
+  .fb-plain .film-frame{border:0;box-shadow:none;background:transparent}
+  .fb-plain .film-frame::after{display:none}
+  .fb-centre .film-copy{text-align:center}.fb-centre .film-copy .slabel{justify-content:center}.fb-centre .film-p{margin-left:auto;margin-right:auto}
+  .fb-nopause .film-carousel:hover .film-track{animation-play-state:running}
+  .fb-nofade .film-col{-webkit-mask-image:none;mask-image:none}
+  .fb-dir-up .film-col-down .film-track{animation-name:film-fc-up}
+  .fb-dir-down .film-col-up .film-track{animation-name:film-fc-down}
+  /* Original two-column band with the optional panels between words and reel. */
   .film-grid.has-panels{grid-template-columns:5fr 3fr 4fr;gap:clamp(28px,4vw,64px)}
   .film-panels{display:flex;gap:12px;align-items:center;justify-content:center}
-  .film-panel{margin:0;overflow:hidden;background:var(--dark3);border:1px solid rgba(195,164,94,.18);flex:1 1 0;max-height:min(62vh,560px);aspect-ratio:9/16}
+  .film-panel{margin:0;overflow:hidden;background:var(--dark3);border:1px solid rgba(var(--gold2-rgb),.18);flex:1 1 0;max-height:min(62vh,560px);aspect-ratio:9/16}
   .film-panel:nth-child(2){flex:.8 1 0;max-height:min(50vh,450px)}
   .film-panel:nth-child(3){flex:.66 1 0;max-height:min(42vh,380px)}
   .film-panel img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.92)}
@@ -100,10 +190,50 @@
   .film-panel-film{background:none;border:0;aspect-ratio:auto;max-height:none;display:flex;flex-direction:column;justify-content:center}
   .film-panel-film .film-caption{display:none}
   .film-frame-sm{max-height:min(50vh,450px);width:100%}
+
+  /* Three columns: carousel, reel, words (in the order the Layout setting names). */
+  .film-grid.film-grid-3{gap:clamp(28px,4vw,64px)}
+  .film-grid.film-grid-3>*{min-width:0}
+  .film-grid.film-layout-carousel-reel-words{grid-template-columns:3fr 4fr 5fr}
+  .film-grid.film-layout-words-carousel-reel{grid-template-columns:5fr 3fr 4fr}
+  .film-grid.film-layout-words-reel-carousel{grid-template-columns:5fr 4fr 3fr}
+  .film-layout-carousel-reel-words .film-carousel{order:1}
+  .film-layout-carousel-reel-words .film-reel{order:2}
+  .film-layout-carousel-reel-words .film-copy{order:3;text-align:left}
+  .film-layout-carousel-reel-words .film-copy .slabel{justify-content:flex-start}
+  .film-layout-carousel-reel-words .film-p{margin-left:0;margin-right:0}
+  .film-layout-words-carousel-reel .film-copy{order:1}
+  .film-layout-words-carousel-reel .film-carousel{order:2}
+  .film-layout-words-carousel-reel .film-reel{order:3}
+  .film-layout-words-reel-carousel .film-copy{order:1}
+  .film-layout-words-reel-carousel .film-reel{order:2}
+  .film-layout-words-reel-carousel .film-carousel{order:3}
+  .film-grid-3 .film-reel{width:100%}
+
+  /* The carousel: narrow columns of photos gliding up and down, continuous. */
+  .film-carousel{--fc-h:560px;--fc-speed:45s;--fc-gap:10px;display:flex;gap:var(--fc-gap);height:var(--fc-h);max-height:min(76vh,680px);width:100%;min-width:0;overflow:hidden}
+  .film-col{flex:1 1 0;min-width:0;height:100%;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 9%,#000 91%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 9%,#000 91%,transparent 100%)}
+  .film-track{list-style:none;margin:0;padding:0;display:block;will-change:transform;animation:film-fc-up var(--fc-speed) linear infinite}
+  .film-col-down .film-track{animation-name:film-fc-down}
+  .film-tile{margin:0 0 var(--fc-gap);padding:0;overflow:hidden;background:var(--dark3);border:1px solid rgba(var(--gold2-rgb),.22);box-shadow:0 24px 48px -32px rgba(0,0,0,.7)}
+  .film-tile img{display:block;width:100%;height:auto;filter:saturate(.92)}
+  .film-carousel:hover .film-track,.film-carousel.fc-paused .film-track{animation-play-state:paused}
+  @keyframes film-fc-up{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+  @keyframes film-fc-down{from{transform:translateY(-50%)}to{transform:translateY(0)}}
+  @media(prefers-reduced-motion:reduce){
+    .film-track{animation:none}
+    .film-col-down .film-track{transform:none}
+  }
   @media(max-width:900px){
     .film-grid.has-panels{grid-template-columns:1fr}
     .film-panels{order:3}
     .film-panel,.film-panel:nth-child(2),.film-panel:nth-child(3){max-height:44vh}
+    .film-grid.film-grid-3{grid-template-columns:1fr;gap:44px}
+    .film-grid-3 .film-copy,.film-layout-carousel-reel-words .film-copy{order:1;text-align:center}
+    .film-layout-carousel-reel-words .film-copy .slabel{justify-content:center}
+    .film-layout-carousel-reel-words .film-p{margin-left:auto;margin-right:auto}
+    .film-grid-3 .film-reel{order:2}
+    .film-grid-3 .film-carousel{order:3;--fc-h:44vh;height:44vh;max-height:none;max-width:100%}
   }
 </style>
 
@@ -118,7 +248,7 @@ function sabdiaFilmInit() {
     var label = frame.querySelector('[data-sound-label]');
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if ('IntersectionObserver' in window && !reduced) {
+    if ('IntersectionObserver' in window && !reduced && !frame.dataset.noauto) {
       var wantPlay = false;
       var retries = 0;
       var attempt = function () {
@@ -147,12 +277,34 @@ function sabdiaFilmInit() {
       io.observe(frame);
     }
 
-    btn.addEventListener('click', function () {
+    if (btn) btn.addEventListener('click', function () {
       video.muted = !video.muted;
       if (!video.muted && video.paused) video.play().catch(function () {});
       label.textContent = video.muted ? 'Sound On' : 'Mute';
     });
+    if (frame.dataset.noauto) {
+      /* Autoplay off: the frame itself is the play button. */
+      frame.style.cursor = 'pointer';
+      frame.addEventListener('click', function (e) {
+        if (btn && btn.contains(e.target)) return;
+        if (video.paused) video.play().catch(function () {}); else video.pause();
+      });
+    }
   });
+
+  /* The photo carousel is pure CSS; this only rests it while off screen. */
+  if ('IntersectionObserver' in window) {
+    document.querySelectorAll('[data-film-carousel]').forEach(function (car) {
+      if (car.dataset.fcInit) return;
+      car.dataset.fcInit = '1';
+      var cio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          car.classList.toggle('fc-paused', !en.isIntersecting);
+        });
+      }, { threshold: 0 });
+      cio.observe(car);
+    });
+  }
 }
 sabdiaFilmInit();
 </script>
@@ -161,23 +313,25 @@ sabdiaFilmInit();
 {% schema %}
 {
   "name": "Film band",
-  "max_blocks": 3,
+  "max_blocks": 16,
   "blocks": [
     {
       "type": "photo",
-      "name": "Photo beside the reel",
+      "name": "Photo",
       "settings": [
+        { "type": "paragraph", "content": "In the carousel layouts every photo block joins the gliding columns (add at least four). In the original Words · Reel layout up to three sit beside the reel." },
         { "type": "image_picker", "id": "image", "label": "Photo" },
         { "type": "text", "id": "ext", "label": "Current photo (URL)", "info": "Choose a photo above and it takes over." },
         { "type": "text", "id": "alt", "label": "Alt text" },
-        { "type": "text", "id": "caption", "label": "Caption (optional)" },
-        { "type": "select", "id": "focus", "label": "Crop focus", "options": [ { "value": "center", "label": "Centre" }, { "value": "top", "label": "Top" }, { "value": "bottom", "label": "Bottom" } ], "default": "center" }
+        { "type": "text", "id": "caption", "label": "Caption (optional)", "info": "Not shown in the carousel." },
+        { "type": "select", "id": "focus", "label": "Crop focus", "info": "Applies beside the reel only; the carousel shows each photo whole.", "options": [ { "value": "center", "label": "Centre" }, { "value": "top", "label": "Top" }, { "value": "bottom", "label": "Bottom" } ], "default": "center" }
       ]
     },
     {
       "type": "film",
       "name": "Second film",
       "settings": [
+        { "type": "paragraph", "content": "Shows beside the reel in the original Words · Reel layout only." },
         { "type": "video", "id": "film", "label": "Film (upload)" },
         { "type": "text", "id": "video_url", "label": "Current film (URL)" },
         { "type": "image_picker", "id": "poster", "label": "Poster" },
@@ -187,7 +341,69 @@ sabdiaFilmInit();
     }
   ],
   "settings": [
-    { "type": "paragraph", "content": "The reel alone reads narrow. Add up to three blocks (⊕ Add block) - photos or a second film - and they sit between the words and the reel, each a little smaller than the last." },
+    { "type": "paragraph", "content": "The reel can sit in the centre with a vertical photo carousel on one side and the words on the other. Add photo blocks (⊕ Add block) - four or more - and they glide in two narrow columns, one up, one down. With fewer than four, or in the Words · Reel layout, up to three blocks sit beside the reel as before." },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "carousel-reel-words", "label": "Carousel · Reel · Words" },
+        { "value": "words-carousel-reel", "label": "Words · Carousel · Reel" },
+        { "value": "words-reel-carousel", "label": "Words · Reel · Carousel" },
+        { "value": "words-reel", "label": "Words · Reel (original)" }
+      ],
+      "default": "carousel-reel-words"
+    },
+    {
+      "type": "select",
+      "id": "carousel_columns",
+      "label": "Carousel columns",
+      "options": [
+        { "value": "1", "label": "One" },
+        { "value": "2", "label": "Two" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "range",
+      "id": "carousel_speed",
+      "label": "Carousel speed",
+      "info": "Seconds for one full loop. Higher is slower.",
+      "min": 20,
+      "max": 90,
+      "step": 5,
+      "unit": "s",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "carousel_gap",
+      "label": "Carousel gap",
+      "min": 6,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "carousel_height",
+      "label": "Carousel height",
+      "info": "The visible height of the columns. Keep it near the reel.",
+      "min": 320,
+      "max": 680,
+      "step": 20,
+      "unit": "px",
+      "default": 560
+    },
+    {
+      "type": "header",
+      "content": "Words"
+    },
     {
       "type": "text",
       "id": "anchor",
@@ -208,6 +424,10 @@ sabdiaFilmInit();
       "type": "textarea",
       "id": "text",
       "label": "Paragraph"
+    },
+    {
+      "type": "header",
+      "content": "Reel"
     },
     {
       "type": "video",
@@ -261,7 +481,51 @@ sabdiaFilmInit();
       "id": "sound_label",
       "label": "Sound button",
       "default": "Sound On"
-    }
+    },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
+    {"type": "checkbox", "id": "show_text", "label": "Show the paragraph", "default": true},
+    {"type": "checkbox", "id": "show_button", "label": "Show the button", "default": true},
+    {"type": "checkbox", "id": "show_captions", "label": "Show the captions under the reel", "default": true},
+    {"type": "checkbox", "id": "show_sound", "label": "Show the sound button", "default": true},
+    {"type": "checkbox", "id": "autoplay", "label": "Reel plays by itself when in view", "default": true, "info": "Off = the reel waits for a click."},
+    {"type": "header", "content": "Reel"},
+    {"type": "select", "id": "reel_shape", "label": "Reel shape", "options": [{"value": "9/16", "label": "Portrait 9:16 (as designed)"}, {"value": "4/5", "label": "Portrait 4:5"}, {"value": "1/1", "label": "Square"}, {"value": "16/9", "label": "Landscape 16:9"}], "default": "9/16"},
+    {"type": "range", "id": "reel_height", "label": "Reel height, at most", "min": 360, "max": 900, "step": 20, "default": 680, "unit": "px"},
+    {"type": "select", "id": "frame_style", "label": "Frame", "options": [{"value": "framed", "label": "Framed with a shadow (as designed)"}, {"value": "plain", "label": "Plain"}], "default": "framed"},
+    {"type": "select", "id": "copy_align", "label": "Words align", "options": [{"value": "left", "label": "Left"}, {"value": "centre", "label": "Centre"}], "default": "left"},
+    {"type": "header", "content": "Carousel motion"},
+    {"type": "select", "id": "carousel_direction", "label": "Columns glide", "options": [{"value": "mixed", "label": "One up, one down (as designed)"}, {"value": "up", "label": "All up"}, {"value": "down", "label": "All down"}], "default": "mixed"},
+    {"type": "checkbox", "id": "carousel_pause", "label": "Pause while the pointer is over it", "default": true},
+    {"type": "checkbox", "id": "carousel_fade", "label": "Soft fade at the top and bottom", "default": true},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "presets": [
     {

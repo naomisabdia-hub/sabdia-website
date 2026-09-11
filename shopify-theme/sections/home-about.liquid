@@ -1,16 +1,33 @@
 {%- comment -%}
   Port of the homepage About section - sticky heading + image strip on
   the left, paragraphs, signature, numbered values and CTA on the right.
+
+  Image strip (11 Sep 2026): two slots that carousel through every Strip
+  image block. Slot k shows image (offset + k) mod n, so on each tick the
+  right-hand photo moves into the left-hand slot (a conveyor) while a new
+  one arrives on the right. Each incoming photo fades in with a short drift
+  from the right; reduced motion gets a plain swap.
 {%- endcomment -%}
-<section class="sp{% if section.settings.vals_caps == false %} about-vals-serif{% endif %}" id="about">
+{% render 'section-look', section: section %}
+{%- liquid
+  assign ha_layout = section.settings.layout | default: 'beside'
+  assign ha_split = section.settings.split | default: '5-7'
+  assign ha_strip = section.settings.strip_position | default: 'heading'
+  if section.settings.show_strip == false
+    assign ha_strip = 'none'
+  endif
+-%}
+<section class="sp ha ha-{{ ha_layout }} ha-split-{{ ha_split }}{% if section.settings.vals_caps == false %} about-vals-serif{% endif %}{% if section.settings.values_layout == 'columns' %} ha-vals-cols{% endif %}{% if section.settings.show_numbers == false %} ha-nonum{% endif %}{% if section.settings.serif_text %} ha-serif{% endif %}{% if section.settings.drop_cap %} ha-dropcap{% endif %}{% if section.settings.first_lead == false %} ha-nolead{% endif %}" id="about">
   <div class="inner about-grid">
-    <div class="about-sticky">
-      <div class="slabel reveal">{{ section.settings.label }}</div>
-      <h2 class="about-h reveal d1">{{ section.settings.heading_html }}</h2>
+    <div class="{% if section.settings.sticky and ha_layout == 'beside' %}about-sticky{% endif %}">
+      {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+      {%- if section.settings.show_heading -%}<h2 class="about-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
+      {%- capture about_strip -%}
       {%- liquid
-        assign strip_h = section.settings.strip_height | default: 240
-        assign strip_hm = section.settings.strip_height_mobile | default: 160
+        assign strip_h = section.settings.strip_height | default: 300
+        assign strip_hm = section.settings.strip_height_mobile | default: 200
         assign strip_gap = section.settings.strip_gap | default: 8
+        assign strip_every = section.settings.strip_every | default: 2.5
         case section.settings.strip_split
           when 'equal'
             assign strip_cols = '1fr 1fr'
@@ -24,33 +41,49 @@
             assign strip_cols = '1fr'
             assign w1 = 1400
             assign w2 = 1400
-          else
+          when 'large-small'
             assign strip_cols = '2fr 1fr'
+            assign w1 = 900
+            assign w2 = 500
+          else
+            # landscape-portrait (default): a wide slot on the left, an upright one on the right.
+            assign strip_cols = '1.7fr 1fr'
             assign w1 = 900
             assign w2 = 500
         endcase
         # Request the crop at twice the display height for retina screens.
         assign ih = strip_h | times: 2.5 | round
       -%}
-      {%- comment -%} Two photo slots, as before. With "Rotate" on and more than two
-          Strip images, each slot crossfades through the set - always two
-          photos showing, always changing. {%- endcomment -%}
+      {%- comment -%} Two photo slots. With "Rotate" on and more than two Strip
+          images, each slot carousels through the whole set - always two photos
+          showing, always changing. {%- endcomment -%}
       {%- assign strip_imgs = section.blocks | where: 'type', 'image' -%}
       {%- assign rotate = false -%}
       {%- if section.settings.strip_rotate and strip_imgs.size > 2 and strip_cols != '1fr' -%}{%- assign rotate = true -%}{%- endif -%}
-      <div class="about-img-strip reveal-wipe d2{% if rotate %} about-strip-rotate{% endif %}" style="--strip-h:{{ strip_h }}px;--strip-h-m:{{ strip_hm }}px;--strip-gap:{{ strip_gap }}px;--strip-cols:{{ strip_cols }}"{% if rotate %} data-about-rotate data-every="{{ section.settings.strip_every | default: 5 }}"{% endif %}>
+      <div class="about-img-strip reveal-wipe d2{% if rotate %} about-strip-rotate{% endif %}{% if strip_cols == '1fr' %} about-strip-single{% endif %}" style="--strip-h:{{ strip_h }}px;--strip-h-m:{{ strip_hm }}px;--strip-gap:{{ strip_gap }}px;--strip-cols:{{ strip_cols }}"{% if rotate %} data-about-rotate data-every="{{ strip_every }}"{% endif %}>
         {%- if rotate -%}
           {%- for slot in (0..1) -%}
             {%- if slot == 0 -%}{%- assign iw = w1 -%}{%- else -%}{%- assign iw = w2 -%}{%- endif -%}
             <div class="about-slot" data-slot="{{ slot }}">
               {%- for block in strip_imgs -%}
-                {%- assign focus = block.settings.focus | default: 'center' -%}
-                {%- assign on = false -%}
-                {%- if forloop.index0 == slot -%}{%- assign on = true -%}{%- endif -%}
+                {%- liquid
+                  assign focus = block.settings.focus | default: 'center'
+                  assign on = false
+                  if forloop.index0 == slot
+                    assign on = true
+                  endif
+                  # The photo each slot opens with is fetched straight away; the
+                  # rest are lazy, and the script wakes the next one a tick ahead.
+                  if on
+                    assign load = 'loading="eager"'
+                  else
+                    assign load = 'loading="lazy" fetchpriority="low"'
+                  endif
+                -%}
                 {%- if block.settings.image -%}
-                  <img class="about-slide{% if on %} is-on{% endif %}" src="{{ block.settings.image | image_url: width: iw, height: ih, crop: focus }}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {% if slot == 0 %}{{ block.shopify_attributes }}{% endif %}>
+                  <img class="about-slide{% if on %} is-on{% endif %}" src="{{ block.settings.image | image_url: width: iw, height: ih, crop: focus }}" alt="{{ block.settings.alt | escape }}" {{ load }} decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {% if slot == 0 %}{{ block.shopify_attributes }}{% endif %}>
                 {%- elsif block.settings.ext != blank -%}
-                  <img class="about-slide{% if on %} is-on{% endif %}" src="{% render 'ext-variant', src: block.settings.ext, w: iw, h: ih %}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {% if slot == 0 %}{{ block.shopify_attributes }}{% endif %}>
+                  <img class="about-slide{% if on %} is-on{% endif %}" src="{% render 'ext-variant', src: block.settings.ext, w: iw, h: ih %}" alt="{{ block.settings.alt | escape }}" {{ load }} decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {% if slot == 0 %}{{ block.shopify_attributes }}{% endif %}>
                 {%- endif -%}
               {%- endfor -%}
             </div>
@@ -77,59 +110,132 @@
         {%- endfor -%}
         {%- endif -%}
       </div>
+      {%- endcapture -%}
+      {%- if ha_strip == 'heading' -%}{{ about_strip }}{%- endif -%}
     </div>
     <div>
+      {%- if ha_strip == 'top' -%}<div class="ha-strip-top">{{ about_strip }}</div>{%- endif -%}
+      {%- if section.settings.show_paragraphs -%}
       {%- for block in section.blocks -%}
         {%- if block.type == 'paragraph' -%}
           <p class="about-p reveal d2" {{ block.shopify_attributes }}>{{ block.settings.text }}</p>
         {%- endif -%}
       {%- endfor -%}
-      {%- if section.settings.sig_name != blank -%}
+      {%- endif -%}
+      {%- if section.settings.sig_name != blank and section.settings.show_sig -%}
       <div class="sig reveal d3" style="--sig-size:{{ section.settings.sig_size | default: 14 }}px">
         <div class="sig-name">{{ section.settings.sig_name }}</div>
         <div class="sig-title">{{ section.settings.sig_title }}</div>
       </div>
       {%- endif -%}
+      {%- if section.settings.show_values -%}
       <div class="about-vals reveal d4">
         {%- for block in section.blocks -%}
           {%- if block.type == 'value' -%}
             <div class="about-val" {{ block.shopify_attributes }}>
-              <span class="about-val-n">{{ block.settings.n }}</span>
+              {%- if section.settings.show_numbers -%}<span class="about-val-n">{{ block.settings.n }}</span>{%- endif -%}
               <div><div class="about-val-t">{{ block.settings.title }}</div><div class="about-val-d">{{ block.settings.desc }}</div></div>
             </div>
           {%- endif -%}
         {%- endfor -%}
       </div>
+      {%- endif -%}
+      {%- if ha_strip == 'bottom' -%}<div class="ha-strip-bottom">{{ about_strip }}</div>{%- endif -%}
+      {%- if section.settings.show_button and section.settings.cta_label != blank -%}
       <div class="reveal d5" style="margin-top:40px">
-        <a href="{{ section.settings.cta_link }}" class="btn-g">{{ section.settings.cta_label }} &rarr;</a>
+        <a href="{{ section.settings.cta_link }}" class="{% if section.settings.button_style == 'solid' %}btn-p{% else %}btn-g{% endif %}">{{ section.settings.cta_label }} &rarr;</a>
       </div>
+      {%- endif -%}
     </div>
   </div>
 </section>
 
+<style>
+  /* style.css hides every image after the first whenever the inline style
+     merely contains "--strip-cols:1fr", which also catches "1fr 1fr" and
+     "1fr 2fr". Only the single layout (marked .about-strip-single) should
+     hide them; the other layouts get their images back here. */
+  .about-grid .about-img-strip:not(.about-strip-single) img:not(:first-child){display:block}
+  @media(min-width:1201px){
+    .ha-above .about-grid{grid-template-columns:1fr;gap:40px}
+    .ha-split-equal .about-grid{grid-template-columns:1fr 1fr}
+    .ha-split-4-8 .about-grid{grid-template-columns:4fr 8fr}
+    .ha-split-7-5 .about-grid{grid-template-columns:7fr 5fr}
+  }
+  .ha-above .about-sticky{position:static}
+  .ha-strip-top .about-img-strip{margin-top:0;margin-bottom:40px}
+  .ha-strip-bottom .about-img-strip{margin-top:44px}
+  .ha-vals-cols .about-vals{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .ha-vals-cols .about-val{flex-direction:column;gap:10px;border:0!important;padding:0}
+  @media(max-width:768px){.ha-vals-cols .about-vals{grid-template-columns:1fr;gap:20px}}
+  .ha-serif .about-p{font-family:var(--font-d);font-size:calc(var(--t-lead)*var(--s-t,1));line-height:1.6;color:var(--ink2);letter-spacing:0}
+  .ha-dropcap .about-p:first-of-type::first-letter{font-size:3.2em;float:left;line-height:.82;padding-right:12px;color:var(--ink);font-style:italic}
+  .ha-nolead .about-p:first-of-type{font-size:calc(var(--t-body)*var(--s-t,1));line-height:var(--lh-body);letter-spacing:.018em;color:var(--ink3);max-width:560px}
+  .ha-nolead .about-p:first-of-type + .about-p{margin-top:20px}
+  /* Carousel motion for the rotating strip (style.css keeps the base 1.4 s
+     crossfade for anything else). Resting slides sit 8px to the right at
+     opacity 0; the one switched on drifts to 0 as it fades in, on top; the
+     one switched off holds still while it fades so nothing moves against
+     the conveyor. */
+  .about-strip-rotate .about-slide{opacity:0;transform:translateX(8px);transition:opacity .7s var(--ease2),transform .7s var(--ease2)}
+  .about-strip-rotate .about-slide.is-on{opacity:1;transform:none;z-index:1}
+  .about-strip-rotate .about-slide.is-out{transform:none}
+  @media (prefers-reduced-motion: reduce){
+    .about-strip-rotate .about-slide,
+    .about-strip-rotate .about-slide.is-out{transition:none;transform:none}
+  }
+</style>
+
 <script>
   (function () {
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     document.querySelectorAll('[data-about-rotate]').forEach(function (strip) {
       if (strip.dataset.init) return;
       strip.dataset.init = '1';
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      var slots = strip.querySelectorAll('.about-slot');
+      var slots = Array.prototype.slice.call(strip.querySelectorAll('.about-slot'));
       var n = slots[0] ? slots[0].querySelectorAll('.about-slide').length : 0;
       if (n < 3) return;
-      var every = (Number(strip.dataset.every) || 5) * 1000, offset = 0, timer = null;
-      function show() {
+      // data-every is seconds, possibly fractional ("2.5"); never faster than 1 s.
+      var every = Math.max(1, parseFloat(strip.dataset.every) || 2.5) * 1000;
+      var offset = 0, timer = null, hover = false, seen = true, hidden = !!document.hidden;
+
+      function slides(slot) { return slot.querySelectorAll('.about-slide'); }
+      // One tick ahead: make sure the photo about to enter each slot is fetching.
+      function warm() {
         slots.forEach(function (slot, k) {
-          var imgs = slot.querySelectorAll('.about-slide');
-          for (var i = 0; i < imgs.length; i++) imgs[i].classList.toggle('is-on', i === (offset + k) % n);
+          var img = slides(slot)[(offset + 1 + k) % n];
+          if (img && !img.complete && img.getAttribute('loading') === 'lazy') img.setAttribute('loading', 'eager');
         });
       }
-      function tick() { offset = (offset + 1) % n; show(); }
-      function start() { if (!timer) timer = setInterval(tick, every); }
+      // Slot k shows image (offset + k) mod n, so the right-hand photo moves
+      // into the left-hand slot on the next tick.
+      function show() {
+        slots.forEach(function (slot, k) {
+          var imgs = slides(slot), want = (offset + k) % n;
+          for (var i = 0; i < imgs.length; i++) {
+            var was = imgs[i].classList.contains('is-on'), on = i === want;
+            imgs[i].classList.toggle('is-out', was && !on && !reduce);
+            imgs[i].classList.toggle('is-on', on);
+          }
+        });
+      }
+      function tick() { offset = (offset + 1) % n; show(); warm(); }
+      function start() { if (!timer) { warm(); timer = setInterval(tick, every); } }
       function stop() { clearInterval(timer); timer = null; }
-      strip.addEventListener('mouseenter', stop);
-      strip.addEventListener('mouseleave', start);
-      document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
-      start();
+      // Runs only while pointed away from, on screen, and in a visible tab.
+      function sync() { (hover || hidden || !seen) ? stop() : start(); }
+
+      strip.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'touch') { hover = true; sync(); } });
+      strip.addEventListener('pointerleave', function (e) { if (e.pointerType !== 'touch') { hover = false; sync(); } });
+      document.addEventListener('visibilitychange', function () { hidden = !!document.hidden; sync(); });
+      document.addEventListener('shopify:section:unload', function (e) { if (e.target && e.target.contains(strip)) stop(); });
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          seen = entries[entries.length - 1].isIntersecting;
+          sync();
+        }, { rootMargin: '80px 0px' }).observe(strip);
+      }
+      sync();
     });
   })();
 </script>
@@ -165,30 +271,32 @@
       "id": "strip_split",
       "label": "Layout",
       "options": [
+        { "value": "landscape-portrait", "label": "Landscape + portrait" },
         { "value": "large-small", "label": "Large + small (2:1)" },
         { "value": "equal", "label": "Two equal" },
         { "value": "small-large", "label": "Small + large (1:2)" },
         { "value": "single", "label": "One image, full width" }
       ],
-      "default": "large-small",
-      "info": "With one image selected, only the first Strip image block shows."
+      "default": "landscape-portrait",
+      "info": "Landscape + portrait (11 Sep 2026) pairs a wide slot with an upright one at the 300px height. With one image selected, only the first Strip image block shows."
     },
     {
       "type": "checkbox",
       "id": "strip_rotate",
       "label": "Rotate through every Strip image",
       "default": true,
-      "info": "Two photos always show; with three or more Strip image blocks they crossfade through the set (Tamsin, 10 Sep 2026: more images, carousel feel). Off = the first two stay put."
+      "info": "Two photos always show; with three or more Strip image blocks they carousel through the set, the right-hand photo moving to the left slot on each change (Tamsin, 10 Sep 2026: more images, carousel feel). Off = the first two stay put."
     },
     {
       "type": "range",
       "id": "strip_every",
       "label": "Change every",
-      "min": 3,
+      "min": 2,
       "max": 12,
-      "step": 1,
+      "step": 0.5,
       "unit": "s",
-      "default": 5
+      "default": 2.5,
+      "info": "Pauses while the pointer is over the strip and while the strip is off screen."
     },
     {
       "type": "range",
@@ -198,7 +306,7 @@
       "max": 520,
       "step": 10,
       "unit": "px",
-      "default": 240
+      "default": 300
     },
     {
       "type": "range",
@@ -208,7 +316,7 @@
       "max": 400,
       "step": 10,
       "unit": "px",
-      "default": 160
+      "default": 200
     },
     {
       "type": "range",
@@ -257,7 +365,53 @@
       "id": "cta_link",
       "label": "Button link",
       "default": "/pages/about"
-    }
+    },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
+    {"type": "checkbox", "id": "show_strip", "label": "Show the image strip", "default": true},
+    {"type": "checkbox", "id": "show_paragraphs", "label": "Show the paragraphs", "default": true},
+    {"type": "checkbox", "id": "show_sig", "label": "Show the signature", "default": true},
+    {"type": "checkbox", "id": "show_values", "label": "Show the values", "default": true},
+    {"type": "checkbox", "id": "show_numbers", "label": "Numerals beside the values", "default": true},
+    {"type": "checkbox", "id": "show_button", "label": "Show the button", "default": true},
+    {"type": "checkbox", "id": "first_lead", "label": "First paragraph larger, as a lead line", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "layout", "label": "Heading", "options": [{"value": "beside", "label": "Beside the paragraphs (as designed)"}, {"value": "above", "label": "Above the paragraphs"}], "default": "beside"},
+    {"type": "checkbox", "id": "sticky", "label": "Heading holds while the paragraphs scroll", "default": true},
+    {"type": "select", "id": "split", "label": "Column split", "options": [{"value": "5-7", "label": "Heading 5 : words 7 (as designed)"}, {"value": "equal", "label": "Equal halves"}, {"value": "4-8", "label": "Heading 4 : words 8"}, {"value": "7-5", "label": "Heading 7 : words 5"}], "default": "5-7"},
+    {"type": "select", "id": "strip_position", "label": "Image strip sits", "options": [{"value": "heading", "label": "Under the heading (as designed)"}, {"value": "top", "label": "Above the paragraphs"}, {"value": "bottom", "label": "Under the values"}], "default": "heading"},
+    {"type": "select", "id": "values_layout", "label": "Values", "options": [{"value": "list", "label": "A list with hairlines (as designed)"}, {"value": "columns", "label": "Three columns"}], "default": "list"},
+    {"type": "checkbox", "id": "serif_text", "label": "Paragraphs in the serif (editorial)", "default": false},
+    {"type": "checkbox", "id": "drop_cap", "label": "Drop capital on the first paragraph", "default": false},
+    {"type": "select", "id": "button_style", "label": "Button style", "options": [{"value": "ghost", "label": "Outlined (as designed)"}, {"value": "solid", "label": "Solid"}], "default": "ghost"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "blocks": [
     {

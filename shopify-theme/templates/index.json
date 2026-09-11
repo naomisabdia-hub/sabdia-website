@@ -155,24 +155,6 @@
     "about": {
       "type": "home-about",
       "blocks": {
-        "image-1": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/sierra-living-kitchen-01.jpg",
-            "ext": "/images/home-hero-1.jpg",
-            "alt": "Detail of a Sabdia home",
-            "focus": "center"
-          }
-        },
-        "image-2": {
-          "type": "image",
-          "settings": {
-            "ext": "/images/home-hero-2.jpg",
-            "alt": "Sabdia detail",
-            "focus": "center",
-            "image": "shopify://shop_images/solace-kitchen-01.jpg"
-          }
-        },
         "paragraph-3": {
           "type": "paragraph",
           "settings": {
@@ -215,12 +197,75 @@
             "desc": "A few residences a year, each given the full attention of the studio."
           }
         },
+        "image-1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/sierra-living-kitchen-01.jpg",
+            "ext": "/images/home-hero-1.jpg",
+            "alt": "SIERRA, living room and kitchen",
+            "focus": "center"
+          }
+        },
+        "image-2": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/solace-kitchen-01.jpg",
+            "ext": "/images/home-hero-2.jpg",
+            "alt": "SOLACE, kitchen island",
+            "focus": "center"
+          }
+        },
+        "image-11": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/caspian-render-living-fireplace-01.jpg",
+            "ext": "",
+            "alt": "CASPIAN, living room, render",
+            "focus": "center"
+          }
+        },
+        "image-12": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-formal-living-02.jpg",
+            "ext": "",
+            "alt": "QASR, formal living room, render",
+            "focus": "center"
+          }
+        },
         "image-9": {
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/sierra-living-view-01.jpg",
             "ext": "",
-            "alt": "Sabdia living room with a city view",
+            "alt": "SIERRA, living room with a city view",
+            "focus": "center"
+          }
+        },
+        "image-13": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/solace-staircase-02.jpg",
+            "ext": "",
+            "alt": "SOLACE, curved staircase",
+            "focus": "center"
+          }
+        },
+        "image-14": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-pool-night-01.jpg",
+            "ext": "",
+            "alt": "QASR, pool at night, render",
+            "focus": "center"
+          }
+        },
+        "image-15": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/caspian-render-facade-detail-01.jpg",
+            "ext": "",
+            "alt": "CASPIAN, facade detail, render",
             "focus": "center"
           }
         },
@@ -229,7 +274,52 @@
           "settings": {
             "image": "shopify://shop_images/sierra-aerial-dusk-01.jpg",
             "ext": "",
-            "alt": "A Sabdia residence at dusk, from above",
+            "alt": "SIERRA at dusk, from above",
+            "focus": "center"
+          }
+        },
+        "image-16": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/solace-living-fireplace-01.jpg",
+            "ext": "",
+            "alt": "SOLACE, living room fireplace",
+            "focus": "center"
+          }
+        },
+        "image-17": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/caspian-render-exterior-front-dusk-01.jpg",
+            "ext": "",
+            "alt": "CASPIAN, front elevation at dusk, render",
+            "focus": "center"
+          }
+        },
+        "image-18": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/sierra-master-bedroom-sunset-01.jpg",
+            "ext": "",
+            "alt": "SIERRA, main bedroom at sunset",
+            "focus": "center"
+          }
+        },
+        "image-19": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/solace-kitchen-detail-01.jpg",
+            "ext": "",
+            "alt": "SOLACE, kitchen detail",
+            "focus": "center"
+          }
+        },
+        "image-20": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-kitchen-01.jpg",
+            "ext": "",
+            "alt": "QASR, kitchen, render",
             "focus": "center"
           }
         }
@@ -237,8 +327,18 @@
       "block_order": [
         "image-1",
         "image-2",
+        "image-11",
+        "image-12",
         "image-9",
+        "image-13",
+        "image-14",
+        "image-15",
         "image-10",
+        "image-16",
+        "image-17",
+        "image-18",
+        "image-19",
+        "image-20",
         "paragraph-3",
         "paragraph-4",
         "paragraph-5",
@@ -249,16 +349,16 @@
       "settings": {
         "label": "About Sabdia",
         "heading_html": "Beautiful homes,<br>drawn and built<br><em>by one team</em>.",
-        "strip_split": "large-small",
-        "strip_height": 240,
-        "strip_height_mobile": 160,
+        "strip_split": "landscape-portrait",
+        "strip_height": 300,
+        "strip_height_mobile": 200,
         "strip_gap": 8,
         "sig_name": "Sabdia",
         "sig_title": "Founder & Principal",
         "cta_label": "Our Full Story",
         "cta_link": "/pages/about",
         "strip_rotate": true,
-        "strip_every": 5
+        "strip_every": 2.5
       }
     },
     "film": {
@@ -274,8 +374,117 @@
         "caption_right": "Brisbane, QLD",
         "cta_label": "Explore the Collection",
         "cta_link": "/pages/collection",
-        "sound_label": "Sound On"
-      }
+        "sound_label": "Sound On",
+        "layout": "carousel-reel-words",
+        "carousel_speed": 45,
+        "carousel_gap": 10,
+        "carousel_height": 560,
+        "carousel_columns": "2"
+      },
+      "blocks": {
+        "fc-1": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-exterior-front-dusk-01.jpg",
+            "ext": "",
+            "alt": "SOLACE, Camp Hill, the street elevation at dusk",
+            "focus": "center"
+          }
+        },
+        "fc-2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-staircase-01.jpg",
+            "ext": "",
+            "alt": "The staircase at SOLACE",
+            "focus": "center"
+          }
+        },
+        "fc-3": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-exterior-front-evening-01.jpg",
+            "ext": "",
+            "alt": "QASR, Coorparoo, the front elevation at evening",
+            "focus": "center"
+          }
+        },
+        "fc-4": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/sierra-kitchen-01.jpg",
+            "ext": "",
+            "alt": "Walnut joinery and stone in the SIERRA kitchen",
+            "focus": "center"
+          }
+        },
+        "fc-5": {
+          "type": "photo",
+          "settings": {
+            "image": "",
+            "ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/caspian-2-thumb.webp",
+            "alt": "CASPIAN taking shape in Ascot",
+            "focus": "center"
+          }
+        },
+        "fc-6": {
+          "type": "photo",
+          "settings": {
+            "image": "",
+            "ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/brand-poster.jpg",
+            "alt": "Inside a Sabdia residence, from the studio reel",
+            "focus": "center"
+          }
+        },
+        "fc-7": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/sierra-living-view-01.jpg",
+            "ext": "",
+            "alt": "The living room at SIERRA, Holland Park West",
+            "focus": "center"
+          }
+        },
+        "fc-8": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-kitchen-detail-01.jpg",
+            "ext": "",
+            "alt": "Kitchen detail at SOLACE",
+            "focus": "center"
+          }
+        },
+        "fc-9": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/caspian-render-exterior-rear-01.jpg",
+            "ext": "",
+            "alt": "CASPIAN, Ascot, the rear elevation",
+            "focus": "center"
+          }
+        },
+        "fc-10": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-facade-detail-01.jpg",
+            "ext": "",
+            "alt": "Facade detail at QASR",
+            "focus": "center"
+          }
+        }
+      },
+      "block_order": [
+        "fc-1",
+        "fc-2",
+        "fc-3",
+        "fc-4",
+        "fc-5",
+        "fc-6",
+        "fc-7",
+        "fc-8",
+        "fc-9",
+        "fc-10"
+      ]
     },
     "properties": {
       "type": "properties-grid",
@@ -395,7 +604,15 @@
         "google_url": "https://share.google/NWRoUuHtM8r61wzSS",
         "google_label": "Read all reviews on Google",
         "quote": "One team did the design and the build, so nothing was lost in between. The house is exactly what we asked for, and better made.",
-        "attribution": "A Sabdia client, inner Brisbane"
+        "attribution": "A Sabdia client, inner Brisbane",
+        "show_rating": true,
+        "rating": "4.4",
+        "review_count": "28",
+        "rating_label": "on Google",
+        "photo_1": "shopify://shop_images/sierra-living-kitchen-01.jpg",
+        "photo_2": "shopify://shop_images/solace-alfresco-pool-01.jpg",
+        "photo_3": "shopify://shop_images/sierra-master-bedroom-sunset-01.jpg",
+        "photo_focus": "center"
       },
       "blocks": {
         "review-1": {

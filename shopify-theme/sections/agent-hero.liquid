@@ -2,21 +2,43 @@
   Agent Access - the full-height dark hero with the portrait image and
   bottom-anchored copy.
 {%- endcomment -%}
-<section style="position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;background:var(--dark)">
+{%- liquid
+  assign ah_dim = section.settings.dim | default: 56 | divided_by: 100.0
+  assign ah_focus = section.settings.focus | default: 'center'
+  case section.settings.height
+    when 'standard'
+      assign ah_h = '60vh'
+    when 'tall'
+      assign ah_h = '80vh'
+    else
+      assign ah_h = '100svh'
+  endcase
+  case section.settings.words_position
+    when 'centre'
+      assign ah_just = 'center'
+    when 'top'
+      assign ah_just = 'flex-start'
+    else
+      assign ah_just = 'flex-end'
+  endcase
+-%}
+{% render 'section-look', section: section, mode: 'hero' %}
+<section class="ah{% if section.settings.words_align == 'centre' %} ah-centre{% endif %}" style="position:relative;min-height:{{ ah_h }};display:flex;flex-direction:column;justify-content:{{ ah_just }};overflow:hidden;background:var(--dark);--ah-dim:{{ ah_dim }}">
   {%- if section.settings.image -%}
-    <img src="{{ section.settings.image | image_url: width: 1400, height: 1800, crop: 'center' }}" alt="{{ section.settings.image_alt | default: 'Agent Access' | escape }}" loading="eager" width="1400" height="1800"
-         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.92)">
+    <img src="{{ section.settings.image | image_url: width: 1400, height: 1800, crop: ah_focus }}" alt="{{ section.settings.image_alt | default: 'Agent Access' | escape }}" loading="eager" width="1400" height="1800"
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ ah_focus }};filter:brightness(calc(1 - var(--ah-dim,.56) * .5)) saturate(.92)">
   {%- elsif section.settings.image_ext != blank -%}
     <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1400, h: 1800 %}" alt="{{ section.settings.image_alt | default: 'Agent Access' | escape }}" loading="eager" width="1400" height="1800"
-         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.72) saturate(.92)">
+         style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ ah_focus }};filter:brightness(calc(1 - var(--ah-dim,.56) * .5)) saturate(.92)">
   {%- endif -%}
-  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(31,27,20,.95) 0%,rgba(31,27,20,.3) 60%,transparent 100%)"></div>
-  <div class="inner" style="position:relative;z-index:2;padding:var(--page-pad);padding-bottom:clamp(72px,12vw,140px)">
-    <div class="slabel slabel-dark reveal" style="margin-bottom:20px">{{ section.settings.label }}</div>
-    <h1 class="reveal d1" style="font-family:var(--font-d);font-size:var(--t-display);font-weight:300;line-height:.88;letter-spacing:-.035em;color:var(--white)">{{ section.settings.title_html }}</h1>
-    <p class="reveal d2" style="font-size:15px;font-weight:400;color:rgba(253,251,246,.8);max-width:440px;margin-top:28px;line-height:1.85">{{ section.settings.text }}</p>
+  <div style="position:absolute;inset:0;{% if section.settings.scrim == 'even' %}background:rgba(var(--dark-rgb),.5){% else %}background:linear-gradient(to top,rgba(var(--dark-rgb),.95) 0%,rgba(var(--dark-rgb),.3) 60%,transparent 100%){% endif %};opacity:calc(var(--ah-dim,.56) / .56)"></div>
+  <div class="inner" style="position:relative;z-index:2;padding:var(--page-pad);padding-top:calc(var(--nav-h) + 24px);padding-bottom:clamp(72px,12vw,140px)">
+    {%- if section.settings.show_label -%}<div class="slabel slabel-dark reveal" style="margin-bottom:20px{% if section.settings.words_align == 'centre' %};justify-content:center{% endif %}">{{ section.settings.label }}</div>{%- endif -%}
+    <h1 class="reveal d1" style="font-family:var(--font-d);font-size:calc(var(--t-display)*var(--s-h,1));font-weight:300;line-height:.88;letter-spacing:-.035em;color:var(--white)">{{ section.settings.title_html }}</h1>
+    {%- if section.settings.show_text and section.settings.text != blank -%}<p class="reveal d2" style="font-size:calc(15px*var(--s-t,1));font-weight:400;color:rgba(var(--white-rgb),.8);max-width:440px;margin-top:28px;line-height:1.85{% if section.settings.words_align == 'centre' %};margin-left:auto;margin-right:auto{% endif %}">{{ section.settings.text }}</p>{%- endif -%}
   </div>
 </section>
+<style>.ah-centre .inner{text-align:center}</style>
 
 {% schema %}
 {
@@ -53,7 +75,31 @@
       "type": "text",
       "id": "image_alt",
       "label": "Image alt text"
-    }
+    },
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."},
+    {"type": "header", "content": "Photo"},
+    {"type": "range", "id": "dim", "label": "Darken the photo", "min": 0, "max": 100, "step": 4, "default": 56, "unit": "%", "info": "Lower = brighter."},
+    {"type": "select", "id": "focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "scrim", "label": "Veil", "options": [{"value": "base", "label": "Fades up from the base (as designed)"}, {"value": "even", "label": "Even veil"}], "default": "base"},
+    {"type": "header", "content": "Words"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_text", "label": "Show the paragraph", "default": true},
+    {"type": "select", "id": "height", "label": "Height", "options": [{"value": "full", "label": "Full screen (as designed)"}, {"value": "tall", "label": "Tall"}, {"value": "standard", "label": "Standard"}], "default": "full"},
+    {"type": "select", "id": "words_position", "label": "Where the words sit", "options": [{"value": "bottom", "label": "Base"}, {"value": "centre", "label": "Centre"}, {"value": "top", "label": "Top"}], "default": "bottom"},
+    {"type": "select", "id": "words_align", "label": "Words align", "options": [{"value": "left", "label": "Left"}, {"value": "centre", "label": "Centre"}], "default": "left"}
   ],
   "presets": [
     {

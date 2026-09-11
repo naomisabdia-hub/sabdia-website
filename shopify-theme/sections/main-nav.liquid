@@ -25,6 +25,36 @@
 
   assign menu = linklists[section.settings.menu]
 -%}
+{%- liquid
+  assign nav_h = section.settings.bar_height | default: 80
+  assign nav_link = section.settings.link_size | default: 12.5
+  assign nav_gap = section.settings.link_gap | default: 40
+  assign nav_track = section.settings.link_tracking | default: 22
+  assign mob_link = section.settings.mobile_link_size | default: 44
+-%}
+<style>
+  :root{--nav-h:{{ nav_h }}px;--nav-link:{{ nav_link }}px;--nav-gap:{{ nav_gap }}px;--nav-track:{{ nav_track }};--mob-link:{{ mob_link }}px}
+  #mainNav.sc{height:{{ nav_h | times: 0.85 | round }}px}
+  {%- if section.settings.menu_case == 'as-written' -%}
+  .nav-center a{text-transform:none;letter-spacing:.04em;font-size:calc(var(--nav-link) + 2px)}
+  {%- endif -%}
+  {%- if section.settings.cta_style == 'solid' -%}
+  .nav-cta,#mainNav.sc .nav-cta,nav.on-light .nav-cta{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+  .nav-cta:hover,#mainNav.sc .nav-cta:hover,nav.on-light .nav-cta:hover{background:var(--gold2);border-color:var(--gold2);color:var(--ink)}
+  {%- elsif section.settings.cta_style == 'text' -%}
+  .nav-cta,#mainNav.sc .nav-cta,nav.on-light .nav-cta{border-color:transparent;padding-left:0;padding-right:0;background:none}
+  {%- endif -%}
+  {%- if section.settings.scrolled_bar == 'obsidian' -%}
+  #mainNav.sc{background:rgba(var(--dark-rgb),.94);border-color:rgba(var(--gold3-rgb),.16)}
+  #mainNav.sc .logo-light{display:block}#mainNav.sc .logo-dark{display:none}
+  #mainNav.sc .nav-center a{color:rgba(var(--white-rgb),.75)}#mainNav.sc .nav-center a:hover{color:var(--white)}
+  #mainNav.sc .nav-cta{border-color:rgba(var(--white-rgb),.45);color:rgba(var(--white-rgb),.85)}
+  #mainNav.sc .mob-btn span{background:var(--white)}
+  {%- endif -%}
+  {%- if section.settings.show_progress == false -%}
+  .nav-progress{display:none}
+  {%- endif -%}
+</style>
 <div id="cur" aria-hidden="true"></div>
 <div id="cur-r" aria-hidden="true"></div>
 
@@ -67,7 +97,7 @@
     {%- else -%}
       <a href="/collections/for-sale">For Sale</a>
       <a href="/pages/collection">Collection</a>
-      <a href="/pages/services">Services</a>
+      <a href="/pages/services">Process</a>
       <a href="/pages/about">About</a>
       {%- if section.settings.show_agent_link -%}<a href="/pages/agent-access">Agent Access</a>{%- endif -%}
     {%- endif -%}
@@ -105,13 +135,13 @@
     {%- else -%}
       <li><a href="/collections/for-sale">For Sale</a></li>
       <li><a href="/pages/collection">Collection</a></li>
-      <li><a href="/pages/services">Services</a></li>
+      <li><a href="/pages/services">Process</a></li>
       <li><a href="/pages/about">About</a></li>
       {%- if section.settings.show_agent_link -%}<li><a href="/pages/agent-access">Agent Access</a></li>{%- endif -%}
     {%- endif -%}
   </ul>
   <div class="nav-right">
-    <a href="{{ section.settings.cta_link }}" class="nav-cta">{{ section.settings.cta_label }}</a>
+    {%- if section.settings.show_cta -%}<a href="{{ section.settings.cta_link }}" class="nav-cta">{{ section.settings.cta_label }}</a>{%- endif -%}
     <button class="mob-btn" id="mobBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobNav"><span></span><span></span></button>
   </div>
   <div class="nav-progress" id="navProgress" aria-hidden="true"></div>
@@ -128,7 +158,20 @@
     { "type": "text", "id": "mobile_contact_label", "label": "Mobile menu - final link label", "default": "Contact" },
     { "type": "text", "id": "loader_meta", "label": "Homepage loader caption", "default": "Sabdia · Est. 2013" },
     { "type": "range", "id": "loader_hold", "label": "Homepage loader stays for", "min": 0.5, "max": 5, "step": 0.5, "unit": "s", "default": 3, "info": "How long the SABDIA opening screen holds on the first visit of a session (Naomi, 11 Sep 2026: 2.5 to 3 seconds). It shows once per visit, on the home page only." },
-    { "type": "text", "id": "light_templates", "label": "Light-top templates", "default": "blog, article, page.contact, page.find-your-home, page.collection", "info": "Comma-separated template names whose first section is a light surface - the nav renders dark-on-light there from the top." }
+    { "type": "text", "id": "light_templates", "label": "Light-top templates", "default": "blog, article, page.contact, page.find-your-home, page.collection", "info": "Comma-separated template names whose first section is a light surface - the nav renders dark-on-light there from the top." },
+    {"type": "header", "content": "Bar"},
+    {"type": "range", "id": "bar_height", "label": "Bar height", "min": 60, "max": 110, "step": 2, "default": 80, "unit": "px", "info": "The scrolled bar is 15% shorter. Every page hero clears this height by itself."},
+    {"type": "select", "id": "scrolled_bar", "label": "Bar once scrolled", "options": [{"value": "cream", "label": "Cream (as designed)"}, {"value": "obsidian", "label": "Obsidian"}], "default": "cream"},
+    {"type": "checkbox", "id": "show_progress", "label": "Thin gold reading-progress line under the bar", "default": true},
+    {"type": "header", "content": "Links"},
+    {"type": "range", "id": "link_size", "label": "Link size", "min": 9, "max": 16, "step": 0.5, "default": 12.5, "unit": "px"},
+    {"type": "range", "id": "link_gap", "label": "Gap between links", "min": 20, "max": 64, "step": 2, "default": 40, "unit": "px"},
+    {"type": "range", "id": "link_tracking", "label": "Letter spacing", "min": 0, "max": 40, "step": 2, "default": 22, "info": "Hundredths of an em."},
+    {"type": "select", "id": "menu_case", "label": "Links set in", "options": [{"value": "caps", "label": "Tracked capitals (as designed)"}, {"value": "as-written", "label": "As written in the menu"}], "default": "caps"},
+    {"type": "range", "id": "mobile_link_size", "label": "Mobile menu link size", "min": 24, "max": 60, "step": 2, "default": 44, "unit": "px"},
+    {"type": "header", "content": "Button"},
+    {"type": "checkbox", "id": "show_cta", "label": "Show the Enquire button", "default": true},
+    {"type": "select", "id": "cta_style", "label": "Button style", "options": [{"value": "outlined", "label": "Outlined (as designed)"}, {"value": "solid", "label": "Solid gold"}, {"value": "text", "label": "Plain text"}], "default": "outlined"}
   ]
 }
 {% endschema %}

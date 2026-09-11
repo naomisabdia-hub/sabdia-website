@@ -38,24 +38,43 @@
   endfor
 -%}
 {%- if visible > 0 -%}
-<section class="series-band{% if section.settings.dark %} on-dark{% endif %}" data-series>
+{%- liquid
+  assign look_designed = 'light'
+  if section.settings.dark
+    assign look_designed = 'dark'
+  endif
+-%}
+{% render 'section-look', section: section, designed: look_designed %}
+{%- liquid
+  assign ss_limit = section.settings.limit | default: 0
+  assign ss_posts = posts
+  if section.settings.order == 'reverse'
+    assign ss_posts = posts | reverse
+  endif
+  assign ss_shown = 0
+-%}
+<section class="series-band{% if section.settings.dark %} on-dark{% endif %}{% if section.settings.show_arrows == false %} series-noarrows{% endif %}{% if section.settings.show_kind == false %} series-nokind{% endif %}" data-series style="--series-w:{{ section.settings.card_width | default: 250 }}px;--series-ar:{{ section.settings.card_shape | default: '9/14' }};--series-gap:{{ section.settings.gap | default: 14 }}px;--series-lines:{{ section.settings.caption_lines | default: 3 }}">
   <div class="series-hdr">
     <div>
-      <div class="slabel {% if section.settings.dark %}slabel-dark {% endif %}reveal">{{ section.settings.label }}</div>
-      <h2 class="series-h reveal d1">{{ section.settings.heading_prefix }} <em>{{ series_name }}</em>.</h2>
+      {%- if section.settings.show_label -%}<div class="slabel {% if section.settings.dark %}slabel-dark {% endif %}reveal">{{ section.settings.label }}</div>{%- endif -%}
+      {%- if section.settings.show_heading -%}<h2 class="series-h reveal d1">{{ section.settings.heading_prefix }} <em>{{ series_name }}</em>.</h2>{%- endif -%}
+      {%- if section.settings.show_handle -%}
       <a href="{{ section.settings.instagram_url | default: settings.instagram_url }}" target="_blank" rel="noopener" class="series-handle reveal d2">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
         {{ section.settings.handle_line }} {{ section.settings.handle | default: settings.instagram_label }}
       </a>
+      {%- endif -%}
     </div>
-    <p class="series-sub reveal d2">{{ section.settings.sub }}</p>
+    {%- if section.settings.show_sub and section.settings.sub != blank -%}<p class="series-sub reveal d2">{{ section.settings.sub }}</p>{%- endif -%}
   </div>
   <div class="series-track-wrap">
     <button class="series-nav series-prev" type="button" aria-label="Scroll back" data-series-prev>&larr;</button>
     <button class="series-nav series-next" type="button" aria-label="Scroll forward" data-series-next>&rarr;</button>
     <div class="series-track" data-series-track>
-      {%- for item in posts -%}
+      {%- for item in ss_posts -%}
         {%- if item.hidden == true -%}{%- continue -%}{%- endif -%}
+        {%- if ss_limit > 0 and ss_shown >= ss_limit -%}{%- break -%}{%- endif -%}
+        {%- assign ss_shown = ss_shown | plus: 1 -%}
         {%- liquid
           # Where does a click go? On-site player when the setting says so
           # and we hold the media; otherwise the Instagram post itself - or
@@ -98,8 +117,8 @@
             </div>
           {%- endif -%}
           <div class="series-card-meta">
-            <div class="series-card-date">{{ item.date | date: "%b %Y" }}</div>
-            {%- if item.caption != blank -%}<div class="series-card-cap">{{ item.caption | replace: brand_from, brand_to }}</div>{%- endif -%}
+            {%- if section.settings.show_dates -%}<div class="series-card-date">{{ item.date | date: "%b %Y" }}</div>{%- endif -%}
+            {%- if item.caption != blank and section.settings.show_captions -%}<div class="series-card-cap">{{ item.caption | replace: brand_from, brand_to }}</div>{%- endif -%}
           </div>
         {%- endcapture -%}
         {%- if on_site -%}
@@ -148,15 +167,15 @@
 <style>
   .lbv [hidden]{display:none!important}
   .lbv-slides{position:relative;display:flex;align-items:center;justify-content:center;max-width:calc(100vw - 100px);max-height:calc(100vh - 120px)}
-  .lbv-slides img{display:block;width:auto;height:auto;max-width:calc(100vw - 100px);max-height:calc(100vh - 190px);object-fit:contain;background:#000;box-shadow:0 30px 90px rgba(0,0,0,.7);border:1px solid rgba(195,164,94,.25)}
+  .lbv-slides img{display:block;width:auto;height:auto;max-width:calc(100vw - 100px);max-height:calc(100vh - 190px);object-fit:contain;background:#000;box-shadow:0 30px 90px rgba(0,0,0,.7);border:1px solid rgba(var(--gold2-rgb),.25)}
   .lbv video{max-height:calc(100vh - 190px)}
   #lbvCapText{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .lbv-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(10,9,8,.55);color:rgba(253,251,246,.75);font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--font-u);transition:border-color .3s,color .3s}
+  .lbv-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:1px solid rgba(var(--white-rgb),.25);background:rgba(10,9,8,.55);color:rgba(var(--white-rgb),.75);font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--font-u);transition:border-color .3s,color .3s}
   .lbv-arrow:hover{border-color:var(--gold2);color:var(--gold2)}
   .lbv-arrow-prev{left:-22px}.lbv-arrow-next{right:-22px}
   .lbv-arrow[disabled]{opacity:.25;cursor:default}
   .lbv-dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:6px}
-  .lbv-dots i{width:5px;height:5px;border-radius:50%;background:rgba(253,251,246,.35)}
+  .lbv-dots i{width:5px;height:5px;border-radius:50%;background:rgba(var(--white-rgb),.35)}
   .lbv-dots i.on{background:var(--gold2)}
   .lbv-ig{display:inline-block;margin-top:10px;color:var(--gold2);text-decoration:none;font-size:9px;letter-spacing:.22em;text-transform:uppercase;white-space:nowrap}
   .lbv-ig:hover{text-decoration:underline}
@@ -298,7 +317,50 @@
     },
     { "type": "text", "id": "view_on_instagram", "label": "Player link text", "default": "View on Instagram" },
     { "type": "checkbox", "id": "brand_caps", "label": "Write SABDIA in capitals inside captions", "default": true },
-    { "type": "checkbox", "id": "dark", "label": "Dark band", "default": false }
+    { "type": "checkbox", "id": "dark", "label": "Dark band", "default": false },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
+    {"type": "checkbox", "id": "show_handle", "label": "Show the Instagram handle line", "default": true},
+    {"type": "checkbox", "id": "show_sub", "label": "Show the sub-line", "default": true},
+    {"type": "checkbox", "id": "show_dates", "label": "Date on each post", "default": true},
+    {"type": "checkbox", "id": "show_captions", "label": "Caption on each post", "default": true},
+    {"type": "checkbox", "id": "show_kind", "label": "Reel / carousel / post icon on each tile", "default": true},
+    {"type": "checkbox", "id": "show_arrows", "label": "Scroll arrows", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "range", "id": "card_width", "label": "Tile width", "min": 160, "max": 360, "step": 10, "default": 250, "unit": "px"},
+    {"type": "select", "id": "card_shape", "label": "Tile shape", "options": [{"value": "9/14", "label": "Tall 9:14 (as designed)"}, {"value": "4/5", "label": "Portrait 4:5"}, {"value": "1/1", "label": "Square"}, {"value": "3/4", "label": "Portrait 3:4"}], "default": "9/14"},
+    {"type": "range", "id": "gap", "label": "Gap between tiles", "min": 4, "max": 40, "step": 2, "default": 14, "unit": "px"},
+    {"type": "range", "id": "caption_lines", "label": "Caption lines shown", "min": 1, "max": 5, "step": 1, "default": 3},
+    {"type": "range", "id": "limit", "label": "Most posts shown", "min": 0, "max": 40, "step": 1, "default": 0, "info": "0 = every post."},
+    {"type": "select", "id": "order", "label": "Order", "options": [{"value": "posted", "label": "As posted"}, {"value": "reverse", "label": "Reversed"}], "default": "posted"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "presets": [{ "name": "The Series" }]
 }

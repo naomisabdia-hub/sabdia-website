@@ -19,8 +19,15 @@
   endif
 -%}
 
-<section class="pg pg-{{ layout }}{% if section.settings.dark %} pg-dark{% endif %}" id="pg-{{ sid }}" data-gallery
-         style="--pg-ar:{{ section.settings.shape | default: '4/3' }};--pg-gap:{{ section.settings.gap | default: 10 }}px;--pg-slide:{{ section.settings.slide_width | default: 72 }}%">
+{%- liquid
+  assign look_designed = 'light'
+  if section.settings.dark
+    assign look_designed = 'dark'
+  endif
+-%}
+{% render 'section-look', section: section, designed: look_designed %}
+<section class="pg pg-{{ layout }}{% if section.settings.dark %} pg-dark{% endif %}{% if section.settings.hover_zoom == false %} pg-nozoom{% endif %}{% if section.settings.frame %} pg-frame{% endif %}{% if section.settings.align == 'centre' %} pg-centre{% endif %}{% if section.settings.caption_style == 'below' %} pg-cap-below{% endif %}{% if section.settings.lightbox == false %} pg-nolb{% endif %} pg-m{{ section.settings.columns_mobile | default: 'auto' }}" id="pg-{{ sid }}" data-gallery
+         style="--pg-ar:{{ section.settings.shape | default: '4/3' }};--pg-gap:{{ section.settings.gap | default: 10 }}px;--pg-slide:{{ section.settings.slide_width | default: 72 }}%;--pg-radius:{{ section.settings.corner | default: 0 }}px">
   <div class="inner">
     {%- if section.settings.label != blank or section.settings.heading_html != blank or section.settings.text != blank -%}
       <div class="pg-hdr">
@@ -59,8 +66,8 @@
         -%}
         {%- if thumb != blank -%}
           <figure class="pg-item{% if block.settings.wide %} pg-wide{% endif %}{% if block.settings.tall %} pg-tall{% endif %} reveal-wipe {{ delays[di] }}"
-                  data-lb-item data-src="{{ full }}" data-alt="{{ alt | escape }}" data-cap="{{ block.settings.caption | escape }}"
-                  role="button" tabindex="0" aria-label="View photo: {{ alt | escape }}" {{ block.shopify_attributes }}>
+                  {% if section.settings.lightbox %}data-lb-item data-src="{{ full }}" data-alt="{{ alt | escape }}" data-cap="{{ block.settings.caption | escape }}"
+                  role="button" tabindex="0" aria-label="View photo: {{ alt | escape }}"{% endif %} {{ block.shopify_attributes }}>
             <img src="{{ thumb }}" alt="{{ alt | escape }}" loading="lazy" decoding="async" width="1200" height="900" style="object-position:{{ block.settings.focus | default: 'center' }}">
             {%- if block.settings.caption != blank and section.settings.show_captions -%}
               <figcaption class="pg-cap">{{ block.settings.caption }}</figcaption>
@@ -90,18 +97,26 @@
   .pg{padding:clamp(56px,7vw,104px) var(--page-pad);background:var(--bg)}
   .pg-dark{background:var(--dark)}
   .pg-hdr{max-width:720px;margin-bottom:clamp(28px,4vw,48px)}
-  .pg-h{font-family:var(--font-d);font-size:var(--t-h2);font-weight:300;line-height:1.05;letter-spacing:-.02em;color:var(--ink);margin-top:14px}
+  .pg-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:300;line-height:1.05;letter-spacing:-.02em;color:var(--ink);margin-top:14px}
   .pg-h em{font-style:italic}
   .pg-dark .pg-h{color:var(--white)}
   .pg-dark .pg-h em{color:var(--gold2)}
-  .pg-p{font-size:var(--t-body);font-weight:300;line-height:var(--lh-body);color:var(--ink3);margin-top:16px;max-width:520px}
-  .pg-dark .pg-p{color:rgba(253,251,246,.6)}
+  .pg-p{font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:var(--ink3);margin-top:16px;max-width:520px}
+  .pg-dark .pg-p{color:rgba(var(--white-rgb),.6)}
   .pg-grid{display:grid;gap:var(--pg-gap,10px);grid-auto-flow:dense}
   .pg-two .pg-grid{grid-template-columns:repeat(2,1fr)}
   .pg-three .pg-grid{grid-template-columns:repeat(3,1fr)}
   .pg-four .pg-grid{grid-template-columns:repeat(4,1fr)}
   .pg-editorial .pg-grid{grid-template-columns:repeat(6,1fr)}
-  .pg-item{margin:0;position:relative;overflow:hidden;aspect-ratio:var(--pg-ar,4/3);cursor:zoom-in;background:var(--bg3)}
+  .pg-item{margin:0;position:relative;overflow:hidden;aspect-ratio:var(--pg-ar,4/3);cursor:zoom-in;background:var(--bg3);border-radius:var(--pg-radius,0)}
+  .pg-nolb .pg-item{cursor:default}
+  .pg-nozoom .pg-item:hover img,.pg-nozoom .pg-item:focus-visible img{transform:none}
+  .pg-frame .pg-item{border:1px solid var(--border)}
+  .pg-centre .pg-hdr{text-align:center;margin-left:auto;margin-right:auto}.pg-centre .pg-hdr .slabel{justify-content:center}.pg-centre .pg-p{margin-left:auto;margin-right:auto}
+  .pg-cap-below .pg-item{overflow:visible}
+  .pg-cap-below .pg-cap{position:static;background:none;padding:10px 0 0;color:var(--taupe-d);text-transform:none;letter-spacing:.04em;font-size:12px;pointer-events:auto}
+  .pg-dark.pg-cap-below .pg-cap{color:rgba(var(--white-rgb),.6)}
+  @media(max-width:560px){.pg-m1 .pg-grid{grid-template-columns:1fr!important}.pg-m2 .pg-grid{grid-template-columns:repeat(2,1fr)!important}}
   .pg-dark .pg-item{background:var(--dark2)}
   .pg-editorial .pg-item{grid-column:span 2}
   .pg-editorial .pg-item:nth-child(6n+1){grid-column:span 4;aspect-ratio:16/10}
@@ -113,7 +128,7 @@
   .pg-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.94);transition:transform 1s var(--ease),filter .5s}
   .pg-item:hover img,.pg-item:focus-visible img{transform:scale(1.035);filter:saturate(1)}
   .pg-item:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
-  .pg-cap{position:absolute;left:0;right:0;bottom:0;padding:28px 14px 12px;background:linear-gradient(to top,rgba(31,27,20,.7),transparent);font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:rgba(253,251,246,.85);pointer-events:none}
+  .pg-cap{position:absolute;left:0;right:0;bottom:0;padding:28px 14px 12px;background:linear-gradient(to top,rgba(var(--dark-rgb),.7),transparent);font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--white-rgb),.85);pointer-events:none}
   .pg-empty{font-size:12px;color:var(--ink3);padding:36px;border:1px dashed var(--border);text-align:center}
   /* Carousel structure - a sideways strip that snaps photo by photo. */
   .pg-strip{position:relative}
@@ -122,8 +137,8 @@
   .pg-carousel .pg-grid:focus-visible{outline:2px solid var(--gold2);outline-offset:4px}
   .pg-carousel .pg-item{flex:0 0 var(--pg-slide,72%);max-width:100%;scroll-snap-align:start}
   .pg-carousel .pg-item.pg-wide,.pg-carousel .pg-item.pg-tall{grid-column:auto;grid-row:auto}
-  .pg-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:44px;height:44px;border-radius:50%;border:1px solid rgba(195,164,94,.5);background:rgba(31,27,20,.55);color:var(--gold2);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;font-family:var(--font-u);transition:background .3s,opacity .3s}
-  .pg-arrow:hover{background:rgba(31,27,20,.82)}
+  .pg-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:44px;height:44px;border-radius:50%;border:1px solid rgba(var(--gold2-rgb),.5);background:rgba(var(--dark-rgb),.55);color:var(--gold2);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;font-family:var(--font-u);transition:background .3s,opacity .3s}
+  .pg-arrow:hover{background:rgba(var(--dark-rgb),.82)}
   .pg-arrow:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
   .pg-arrow[disabled]{opacity:.3;cursor:default}
   .pg-arrow-prev{left:14px}
@@ -291,7 +306,42 @@
     },
     { "type": "range", "id": "gap", "label": "Gap between photos", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 10 },
     { "type": "checkbox", "id": "show_captions", "label": "Show captions on the photos", "default": false },
-    { "type": "checkbox", "id": "dark", "label": "Dark background", "default": false }
+    { "type": "checkbox", "id": "dark", "label": "Dark background", "default": false },
+    {"type": "header", "content": "Photos"},
+    {"type": "checkbox", "id": "lightbox", "label": "Open full screen on click", "default": true},
+    {"type": "checkbox", "id": "hover_zoom", "label": "Photos zoom gently on hover", "default": true},
+    {"type": "select", "id": "caption_style", "label": "Captions", "options": [{"value": "over", "label": "Over the photo (as designed)"}, {"value": "below", "label": "Under the photo"}], "default": "over"},
+    {"type": "range", "id": "corner", "label": "Rounded corners", "min": 0, "max": 24, "step": 2, "default": 0, "unit": "px"},
+    {"type": "checkbox", "id": "frame", "label": "Hairline frame around each photo", "default": false},
+    {"type": "select", "id": "columns_mobile", "label": "Across on phones", "options": [{"value": "auto", "label": "As designed"}, {"value": "1", "label": "One"}, {"value": "2", "label": "Two"}], "default": "auto"},
+    {"type": "select", "id": "align", "label": "Words sit", "options": [{"value": "left", "label": "Left"}, {"value": "centre", "label": "Centre"}], "default": "left"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "blocks": [
     {

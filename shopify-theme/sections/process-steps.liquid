@@ -1,12 +1,26 @@
 {%- comment -%} Port of the Process track - numbered steps in a horizontal band. {%- endcomment -%}
 {%- assign delays = ',d1,d2,d3,d4,d5' | split: ',' -%}
-<section class="sp">
+{% render 'section-look', section: section %}
+{%- liquid
+  assign ps_cols = section.settings.columns | default: 'auto'
+  if ps_cols == 'auto'
+    assign ps_cols = section.blocks.size | at_least: 1 | at_most: 6
+  endif
+  assign ps_num = section.settings.number_style | default: 'ring'
+  assign ps_has_words = false
+  if section.settings.heading_html != blank or section.settings.text != blank
+    assign ps_has_words = true
+  endif
+-%}
+<section class="sp ps ps-num-{{ ps_num }}{% if section.settings.show_line == false %} ps-noline{% endif %}{% if section.settings.align == 'left' %} ps-left{% endif %}{% if section.settings.show_numbers == false %} ps-nonum{% endif %}" style="--proc-cols:{{ ps_cols }};--proc-n:{{ section.settings.number_size | default: 48 }}px">
   <div class="inner">
-    <div class="slabel reveal" style="margin-bottom:56px">{{ section.settings.label }}</div>
+    {%- if section.settings.show_label -%}<div class="slabel reveal" style="margin-bottom:{% if ps_has_words %}20px{% else %}56px{% endif %}">{{ section.settings.label }}</div>{%- endif -%}
+    {%- if section.settings.heading_html != blank -%}<h2 class="about-h reveal d1" style="margin-bottom:{% if section.settings.text != blank %}20px{% else %}56px{% endif %}">{{ section.settings.heading_html }}</h2>{%- endif -%}
+    {%- if section.settings.text != blank -%}<p class="about-p reveal d2" style="margin-bottom:56px;max-width:620px">{{ section.settings.text }}</p>{%- endif -%}
     <div class="proc-track">
       {%- for block in section.blocks -%}
         <div class="proc-step reveal {{ delays[forloop.index0] }}" {{ block.shopify_attributes }}>
-          <div class="proc-n">{{ forloop.index }}</div>
+          {%- if section.settings.show_numbers -%}<div class="proc-n">{% if section.settings.number_format == 'padded' %}{{ forloop.index | prepend: '0' | slice: -2, 2 }}{% else %}{{ forloop.index }}{% endif %}</div>{%- endif -%}
           <div class="proc-t">{{ block.settings.title }}</div>
           <div class="proc-d">{{ block.settings.description }}</div>
         </div>
@@ -19,7 +33,47 @@
 {
   "name": "Process steps",
   "settings": [
-    { "type": "text", "id": "label", "label": "Small label", "default": "The Process" }
+    { "type": "text", "id": "label", "label": "Small label", "default": "The Process" },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_numbers", "label": "Show the numbers", "default": true},
+    {"type": "checkbox", "id": "show_line", "label": "Show the gold line joining the steps", "default": true},
+    {"type": "header", "content": "Words"},
+    {"type": "html", "id": "heading_html", "label": "Heading (optional)", "info": "Wrap a word in <em> for the italic accent."},
+    {"type": "textarea", "id": "text", "label": "Intro line (optional)"},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "columns", "label": "Steps across", "options": [{"value": "auto", "label": "One per step (as designed)"}, {"value": "2", "label": "Two"}, {"value": "3", "label": "Three"}, {"value": "4", "label": "Four"}, {"value": "5", "label": "Five"}, {"value": "6", "label": "Six"}], "default": "auto"},
+    {"type": "select", "id": "align", "label": "Words sit", "options": [{"value": "centre", "label": "Centre"}, {"value": "left", "label": "Left"}], "default": "centre"},
+    {"type": "select", "id": "number_style", "label": "Number style", "options": [{"value": "ring", "label": "Gold ring (as designed)"}, {"value": "fill", "label": "Filled gold"}, {"value": "plain", "label": "Plain, no ring"}], "default": "ring"},
+    {"type": "select", "id": "number_format", "label": "Numbering", "options": [{"value": "plain", "label": "1, 2, 3"}, {"value": "padded", "label": "01, 02, 03"}], "default": "plain"},
+    {"type": "range", "id": "number_size", "label": "Number size", "min": 32, "max": 72, "step": 4, "default": 48, "unit": "px"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "blocks": [
     {

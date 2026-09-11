@@ -3,11 +3,14 @@
   (cart, search, account) - keeps them rendering inside the design
   system instead of erroring.
 {%- endcomment -%}
-<section class="sp" style="padding-top:clamp(160px,20vw,240px);text-align:center;min-height:50vh">
+{% render 'section-look', section: section %}
+{%- assign al = section.settings.align | default: 'centre' -%}
+<section class="sp" style="padding-top:calc(var(--nav-h) + (clamp(160px,20vw,240px) - var(--nav-h)) * var(--sp-top,1));text-align:{% if al == 'centre' %}center{% else %}left{% endif %};min-height:{{ section.settings.min_height | default: 50 }}vh">
   <div class="inner">
-    <h1 class="about-h reveal">{{ page_title }}</h1>
-    <p class="about-p reveal d1" style="margin:20px auto 32px;max-width:460px">{{ section.settings.text | default: "This part of the store isn't in use - explore the residences instead." }}</p>
-    <a href="/" class="btn-p reveal d2">{{ section.settings.button_label | default: "Return Home" }} &rarr;</a>
+    {%- if section.settings.label != blank -%}<div class="slabel reveal"{% if al == 'centre' %} style="justify-content:center"{% endif %}>{{ section.settings.label }}</div>{%- endif -%}
+    {%- if section.settings.show_title -%}<h1 class="about-h reveal">{{ page_title }}</h1>{%- endif -%}
+    <p class="about-p reveal d1" style="margin:20px {% if al == 'centre' %}auto{% else %}0{% endif %} 32px;max-width:460px">{{ section.settings.text | default: "This part of the store isn't in use - explore the residences instead." }}</p>
+    {%- if section.settings.show_button -%}<a href="{{ section.settings.button_link | default: '/' }}" class="{% if section.settings.button_style == 'ghost' %}btn-g{% else %}btn-p{% endif %} reveal d2">{{ section.settings.button_label | default: "Return Home" }} &rarr;</a>{%- endif -%}
   </div>
 </section>
 
@@ -30,7 +33,43 @@
       "id": "button_label",
       "label": "Button",
       "default": "Return Home"
-    }
+    },
+    {"type": "header", "content": "Show"},
+    {"type": "text", "id": "label", "label": "Small label (optional)"},
+    {"type": "checkbox", "id": "show_title", "label": "Show the page title", "default": true},
+    {"type": "checkbox", "id": "show_button", "label": "Show the button", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "align", "label": "Words sit", "options": [{"value": "centre", "label": "Centre"}, {"value": "left", "label": "Left"}], "default": "centre"},
+    {"type": "range", "id": "min_height", "label": "Least height", "min": 30, "max": 90, "step": 5, "default": 50, "unit": "vh", "info": "A share of the window height."},
+    {"type": "select", "id": "button_style", "label": "Button style", "options": [{"value": "primary", "label": "Solid"}, {"value": "ghost", "label": "Outlined"}], "default": "primary"},
+    {"type": "url", "id": "button_link", "label": "Button goes to", "info": "Defaults to the home page."},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ]
 }
 {% endschema %}

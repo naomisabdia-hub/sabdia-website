@@ -1,7 +1,12 @@
 {%- comment -%}
   Testimonials - the clients' own words, one at a time, turning on their
-  own. Each Review block is a quote (verbatim from Google), the reviewer's
-  first name, where it was said and the stars. With no blocks the single
+  own, beside a photograph of a finished Sabdia home. Each Review block is
+  a quote (verbatim from Google), the reviewer's first name, where it was
+  said and the stars. A block may carry its own photo; otherwise the
+  section's fallback photos turn with the words, in order. A small Google
+  chip sits on the photo with the real overall rating, exactly as Google
+  shows it (never rounded up). With no photos at all the panel is left out
+  and the words span the band as before. With no blocks the single
   Quote / Attribution fields below still work as before.
 {%- endcomment -%}
 {%- liquid
@@ -12,9 +17,86 @@
   endif
   assign sid = section.id
   assign every = section.settings.every | default: 7
+  assign focus = section.settings.photo_focus | default: 'center'
+
+  # Fallback photos, section level, deduped by src. In single-quote mode
+  # only Photo 1 is used.
+  assign fb_max = 3
+  if single
+    assign fb_max = 1
+  endif
+  assign fb_list = ''
+  assign fb_seen = ''
+  for n in (1..fb_max)
+    assign key = 'photo_' | append: n
+    assign img = section.settings[key]
+    if img != blank
+      assign k = img.src
+      assign needle = '|' | append: k | append: '|'
+      unless fb_seen contains needle
+        assign fb_seen = fb_seen | append: needle
+        if fb_list == ''
+          assign fb_list = k
+        else
+          assign fb_list = fb_list | append: '|' | append: k
+        endif
+      endunless
+    endif
+  endfor
+  assign fb_keys = fb_list | split: '|'
+
+  # Does anything carry a photo at all?
+  assign has_photo = false
+  if fb_keys.size > 0
+    assign has_photo = true
+  endif
+  unless single
+    for block in reviews
+      if block.settings.photo != blank
+        assign has_photo = true
+      endif
+    endfor
+  endunless
+
+  # Which photo shows first: the first review's own, else the first fallback.
+  assign first_key = fb_keys | first
+  unless single
+    assign first_review = reviews | first
+    if first_review.settings.photo != blank
+      assign first_key = first_review.settings.photo.src
+    endif
+  endunless
+
+  # Google chip: five stars, filled to the real rating (4.4 fills four
+  # stars and two fifths of the fifth). Star cells are 20 wide on a 22 pitch.
+  assign rating = section.settings.rating | default: '4.4'
+  assign r = rating | times: 1.0
+  assign r_full = r | floor
+  assign r_frac = r | minus: r_full
+  assign fill_w = r_frac | times: 20
+  assign fill_w = r_full | times: 22 | plus: fill_w
+  if r <= 0 or r > 5
+    assign fill_w = 108
+  endif
+  assign review_count = section.settings.review_count
+  assign rating_label = section.settings.rating_label | default: 'on Google'
+  assign rating_sr = 'Rated ' | append: rating | append: ' out of 5'
+  if review_count != blank
+    assign rating_sr = rating_sr | append: ' from ' | append: review_count | append: ' reviews'
+  endif
+  assign rating_sr = rating_sr | append: ' ' | append: rating_label
 -%}
 {%- if reviews.size > 0 or single -%}
-<section class="testi-dark sp" id="testi-{{ sid }}" data-testi data-every="{{ every | times: 1000 }}">
+{% render 'section-look', section: section %}
+{%- liquid
+  assign ts_split = '5fr 7fr'
+  if section.settings.split == 'equal'
+    assign ts_split = '1fr 1fr'
+  elsif section.settings.split == '4-8'
+    assign ts_split = '4fr 8fr'
+  endif
+-%}
+<section class="testi-dark sp testi-q-{{ section.settings.quote_style | default: 'italic' }} testi-t-{{ section.settings.transition | default: 'rise' }}{% if section.settings.photo_side == 'right' %} testi-flip{% endif %}{% if section.settings.show_quote_mark == false %} testi-noqm{% endif %}{% if section.settings.show_arrows == false %} testi-noarrows{% endif %}{% if section.settings.show_dots == false %} testi-nodots{% endif %}{% if section.settings.show_source == false %} testi-nosrc{% endif %}" id="testi-{{ sid }}" data-testi data-every="{{ every | times: 1000 }}" data-auto="{% if section.settings.auto %}1{% else %}0{% endif %}" style="--testi-split:{{ ts_split }};--testi-ar:{{ section.settings.photo_shape | default: '4/5' }}">
   <div class="inner">
     {%- if section.settings.label != blank or section.settings.heading_html != blank -%}
     <div class="testi-hdr">
@@ -22,10 +104,72 @@
       {%- if section.settings.heading_html != blank -%}<h2 class="testi-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
     </div>
     {%- endif -%}
-    <div class="testi-wrap">
+    <div class="testi-wrap{% if has_photo %} has-photo{% endif %}">
+      {%- if has_photo -%}
+      <div class="testi-photo-panel reveal" data-testi-panel data-fallbacks="{{ fb_list | escape }}">
+        <div class="testi-photo-frame">
+          {%- assign seen = '' -%}
+          {%- for n in (1..fb_max) -%}
+            {%- assign key = 'photo_' | append: n -%}
+            {%- assign img = section.settings[key] -%}
+            {%- if img != blank -%}
+              {%- assign k = img.src -%}
+              {%- assign needle = '|' | append: k | append: '|' -%}
+              {%- unless seen contains needle -%}
+                {%- assign seen = seen | append: needle -%}
+                <picture class="testi-pic">
+                  <source media="(max-width:900px)" srcset="{{ img | image_url: width: 1200, height: 900, crop: focus }}">
+                  <img class="testi-photo{% if k == first_key %} is-on{% endif %}" data-key="{{ k | escape }}" src="{{ img | image_url: width: 1000, height: 1250, crop: focus }}" alt="A Sabdia residence" width="1000" height="1250"{% unless k == first_key %} loading="lazy"{% endunless %} decoding="async" style="object-position:{{ focus }}">
+                </picture>
+              {%- endunless -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- unless single -%}
+            {%- for block in reviews -%}
+              {%- if block.settings.photo != blank -%}
+                {%- assign k = block.settings.photo.src -%}
+                {%- assign needle = '|' | append: k | append: '|' -%}
+                {%- unless seen contains needle -%}
+                  {%- assign seen = seen | append: needle -%}
+                  <picture class="testi-pic">
+                    <source media="(max-width:900px)" srcset="{{ block.settings.photo | image_url: width: 1200, height: 900, crop: focus }}">
+                    <img class="testi-photo{% if k == first_key %} is-on{% endif %}" data-key="{{ k | escape }}" src="{{ block.settings.photo | image_url: width: 1000, height: 1250, crop: focus }}" alt="{{ block.settings.photo_alt | default: 'A Sabdia residence' | escape }}" width="1000" height="1250"{% unless k == first_key %} loading="lazy"{% endunless %} decoding="async" style="object-position:{{ focus }}">
+                  </picture>
+                {%- endunless -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endunless -%}
+        </div>
+        <span class="testi-q-mark" aria-hidden="true">&ldquo;</span>
+        {%- if section.settings.show_rating -%}
+          {%- if section.settings.google_url != blank -%}
+          <a class="testi-chip" href="{{ section.settings.google_url }}" target="_blank" rel="noopener" aria-label="{{ rating_sr | escape }}. Opens Google in a new tab.">
+          {%- else -%}
+          <div class="testi-chip">
+          {%- endif -%}
+            <svg class="testi-g" viewBox="0 0 48 48" width="18" height="18" aria-hidden="true" focusable="false">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            <svg class="testi-chip-stars" viewBox="0 0 108 20" width="76" height="14" aria-hidden="true" focusable="false">
+              <defs>
+                <path id="testi-star-{{ sid }}" d="M10 1.5l2.63 5.33 5.87.85-4.25 4.14 1 5.85L10 14.9l-5.25 2.77 1-5.85L1.5 7.68l5.87-.85z"/>
+                <clipPath id="testi-clip-{{ sid }}"><rect x="0" y="0" width="{{ fill_w }}" height="20"/></clipPath>
+              </defs>
+              <g class="testi-star-base">{% for x in (0..4) %}<use href="#testi-star-{{ sid }}" x="{{ x | times: 22 }}"/>{% endfor %}</g>
+              <g class="testi-star-fill" clip-path="url(#testi-clip-{{ sid }})">{% for x in (0..4) %}<use href="#testi-star-{{ sid }}" x="{{ x | times: 22 }}"/>{% endfor %}</g>
+            </svg>
+            <span class="testi-chip-text"><strong>{{ rating }}</strong><span class="sr-only"> out of 5</span>{% if review_count != blank %} <span class="testi-chip-sep">&middot;</span> {{ review_count }} reviews{% endif %} {{ rating_label }}</span>
+          {%- if section.settings.google_url != blank -%}</a>{%- else -%}</div>{%- endif -%}
+        {%- endif -%}
+      </div>
+      {%- else -%}
       <div>
         <span class="testi-q-mark reveal">&ldquo;</span>
       </div>
+      {%- endif -%}
       <div class="testi-stage reveal d1" aria-roledescription="carousel" aria-label="{{ section.settings.label | default: 'What clients say' | escape }}">
         {%- if single -%}
           <figure class="testi-slide is-on">
@@ -38,7 +182,7 @@
         {%- else -%}
           {%- for block in reviews -%}
             {%- assign stars = block.settings.stars | default: 5 -%}
-            <figure class="testi-slide{% if forloop.first %} is-on{% endif %}" data-testi-slide {{ block.shopify_attributes }} aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}">
+            <figure class="testi-slide{% if forloop.first %} is-on{% endif %}" data-testi-slide{% if block.settings.photo != blank %} data-photo="{{ block.settings.photo.src | escape }}"{% endif %} {{ block.shopify_attributes }} aria-hidden="{% if forloop.first %}false{% else %}true{% endif %}">
               <blockquote class="testi-text">{{ block.settings.quote }}</blockquote>
               <figcaption class="testi-auth">
                 <div class="testi-line"></div>
@@ -61,7 +205,7 @@
               {%- endfor -%}
             </div>
             <button type="button" class="testi-arrow" data-testi-next aria-label="Next review">&rarr;</button>
-            {%- if section.settings.google_url != blank -%}
+            {%- if section.settings.google_url != blank and section.settings.show_google_link -%}
               <a class="testi-all" href="{{ section.settings.google_url }}" target="_blank" rel="noopener">{{ section.settings.google_label | default: "Read all reviews on Google" }} &rarr;</a>
             {%- endif -%}
           </div>
@@ -75,7 +219,7 @@
 
 <style>
   .testi-hdr{margin-bottom:clamp(36px,5vw,64px)}
-  .testi-h{font-family:var(--font-d);font-size:var(--t-h2);font-weight:300;color:var(--ink);letter-spacing:-.02em}
+  .testi-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:300;color:var(--ink);letter-spacing:-.02em}
   .testi-h em{font-style:italic;color:var(--ink)}
   .testi-stage{position:relative;display:grid}
   .testi-slide{grid-area:1/1;margin:0;opacity:0;transform:translateY(10px);transition:opacity .9s var(--ease),transform .9s var(--ease);pointer-events:none}
@@ -83,18 +227,55 @@
   .testi-slide .testi-text{margin-bottom:32px}
   .testi-auth{flex-wrap:wrap;row-gap:8px}
   .testi-stars{display:inline-flex;gap:2px;color:var(--gold);font-size:13px;letter-spacing:.1em;line-height:1}
-  .testi-stars .off{color:rgba(168,135,74,.3)}
+  .testi-stars .off{color:rgba(var(--gold-rgb),.3)}
   .testi-src{font-size:var(--t-micro);font-weight:300;letter-spacing:.24em;text-transform:uppercase;color:var(--taupe-d)}
   .testi-nav{display:flex;align-items:center;gap:18px;margin-top:40px;flex-wrap:wrap}
   .testi-arrow{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:none;color:var(--ink);cursor:pointer;font-size:15px;transition:border-color .3s,background .3s}
-  .testi-arrow:hover{border-color:var(--gold);background:rgba(168,135,74,.08)}
+  .testi-arrow:hover{border-color:var(--gold);background:rgba(var(--gold-rgb),.08)}
   .testi-dots{display:flex;gap:8px}
   .testi-dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--gold);background:none;padding:0;cursor:pointer;transition:background .3s,transform .3s}
   .testi-dot.is-on{background:var(--gold);transform:scale(1.2)}
-  .testi-all{margin-left:auto;font-family:var(--font-u);font-size:var(--t-label);font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(168,135,74,.35);padding-bottom:3px;transition:color .25s,border-color .25s}
+  .testi-all{margin-left:auto;font-family:var(--font-u);font-size:var(--t-label);font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(var(--gold-rgb),.35);padding-bottom:3px;transition:color .25s,border-color .25s}
   .testi-all:hover{color:var(--ink);border-color:var(--gold)}
-  @media(max-width:900px){.testi-wrap{grid-template-columns:1fr;gap:24px}.testi-q-mark{font-size:96px}.testi-all{margin-left:0;width:100%}}
-  @media(prefers-reduced-motion:reduce){.testi-slide{transition:none}}
+
+  /* Photograph beside the words. The panel stretches to the row; the frame
+     is a 4:5 portrait at least, taller only when the words need it. */
+  .testi-dark .testi-wrap.has-photo{grid-template-columns:var(--testi-split,5fr 7fr);gap:clamp(40px,6vw,88px);align-items:stretch}
+  @media(min-width:901px){.testi-flip .testi-photo-panel{order:2}}
+  .testi-q-upright .testi-text{font-style:normal}
+  .testi-q-sans .testi-text{font-family:var(--font-u);font-size:calc(var(--t-lead)*var(--s-t,1));font-style:normal;line-height:1.6;letter-spacing:0;font-weight:300}
+  .testi-t-fade .testi-slide{transform:none}
+  .testi-t-cut .testi-slide{transition:none;transform:none}
+  .testi-noqm .testi-q-mark{display:none}
+  .testi-noarrows .testi-arrow{display:none}
+  .testi-nodots .testi-dots{display:none}
+  .testi-nosrc .testi-src{display:none}
+  .testi-wrap.has-photo .testi-stage{align-self:center}
+  .testi-photo-panel{position:relative;align-self:stretch;min-height:0}
+  .testi-photo-frame{position:relative;height:100%;aspect-ratio:var(--testi-ar,4/5);overflow:hidden;background:var(--dark2)}
+  .testi-photo-frame::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(var(--dark-rgb),0) 58%,rgba(var(--dark-rgb),.44) 100%);pointer-events:none;z-index:2}
+  .testi-pic{display:contents}
+  .testi-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.1s var(--ease);z-index:1}
+  .testi-photo.is-on{opacity:1;z-index:1}
+  .testi-photo-panel .testi-q-mark{position:absolute;top:-.08em;left:-.12em;margin:0;font-size:clamp(120px,13vw,200px);line-height:.7;color:var(--gold);opacity:.94;z-index:3;pointer-events:none;display:block;text-shadow:0 2px 28px rgba(var(--dark-rgb),.35)}
+  .testi-chip{position:absolute;left:16px;bottom:16px;z-index:3;display:inline-flex;align-items:center;gap:10px;padding:9px 14px 9px 11px;max-width:calc(100% - 32px);background:rgba(var(--dark-rgb),.78);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(var(--gold3-rgb),.28);border-radius:var(--r-sm);color:var(--white);text-decoration:none;transition:border-color .3s,background .3s}
+  a.testi-chip:hover,a.testi-chip:focus-visible{border-color:var(--gold2);background:rgba(var(--dark-rgb),.9)}
+  .testi-g,.testi-chip-stars{flex:none;display:block}
+  .testi-star-base{fill:rgba(var(--gold3-rgb),.26)}
+  .testi-star-fill{fill:var(--gold2)}
+  .testi-chip-text{font-family:var(--font-u);font-size:11px;font-weight:300;letter-spacing:.06em;line-height:1;color:rgba(var(--white-rgb),.8);white-space:nowrap}
+  .testi-chip-text strong{font-weight:500;font-size:12px;letter-spacing:.02em;color:var(--white)}
+  .testi-chip-sep{color:rgba(var(--gold3-rgb),.6)}
+
+  @media(max-width:900px){
+    .testi-wrap{grid-template-columns:1fr;gap:24px}.testi-q-mark{font-size:96px}.testi-all{margin-left:0;width:100%}
+    .testi-dark .testi-wrap.has-photo{grid-template-columns:1fr;gap:32px}
+    .testi-photo-panel{align-self:auto}
+    .testi-photo-frame{height:auto;aspect-ratio:4/3;max-height:46vh}
+    .testi-photo-panel .testi-q-mark{font-size:72px;top:-.1em;left:-.1em}
+    .testi-chip{left:12px;bottom:12px;padding:8px 12px 8px 10px;gap:8px}
+  }
+  @media(prefers-reduced-motion:reduce){.testi-slide{transition:none}.testi-photo{transition:none}}
 </style>
 
 <script>
@@ -107,10 +288,23 @@
     var dots = Array.prototype.slice.call(root.querySelectorAll('[data-testi-dot]'));
     var every = Number(root.dataset.every) || 7000, i = 0, timer = null;
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (root.dataset.auto === '0') reduce = true; /* "turn by themselves" switched off */
+    /* Photo panel: a review's own photo, else the fallbacks in turn. */
+    var panel = root.querySelector('[data-testi-panel]');
+    var photos = panel ? Array.prototype.slice.call(panel.querySelectorAll('.testi-photo')) : [];
+    var fallbacks = panel && panel.getAttribute('data-fallbacks') ? panel.getAttribute('data-fallbacks').split('|').filter(Boolean) : [];
+    function syncPhoto(n) {
+      if (!photos.length) return;
+      var key = slides[n].getAttribute('data-photo');
+      if (!key && fallbacks.length) key = fallbacks[n % fallbacks.length];
+      if (!key) return;
+      photos.forEach(function (p) { p.classList.toggle('is-on', p.getAttribute('data-key') === key); });
+    }
     function show(n) {
       i = (n + slides.length) % slides.length;
       slides.forEach(function (s, k) { s.classList.toggle('is-on', k === i); s.setAttribute('aria-hidden', k === i ? 'false' : 'true'); });
       dots.forEach(function (d, k) { d.classList.toggle('is-on', k === i); d.setAttribute('aria-selected', k === i ? 'true' : 'false'); });
+      syncPhoto(i);
     }
     function start() { if (reduce || timer) return; timer = setInterval(function () { show(i + 1); }, every); }
     function stop() { clearInterval(timer); timer = null; }
@@ -146,9 +340,71 @@
     { "type": "checkbox", "id": "show_stars", "label": "Show the stars", "default": true },
     { "type": "url", "id": "google_url", "label": "Link to all reviews on Google" },
     { "type": "text", "id": "google_label", "label": "Link label", "default": "Read all reviews on Google" },
+    { "type": "header", "content": "Photograph beside the words" },
+    { "type": "paragraph", "content": "Real photographs of finished Sabdia homes. A Review block can carry its own photo; otherwise these turn with the words, in order. With no photos at all the words span the band on their own." },
+    { "type": "image_picker", "id": "photo_1", "label": "Photo 1" },
+    { "type": "image_picker", "id": "photo_2", "label": "Photo 2" },
+    { "type": "image_picker", "id": "photo_3", "label": "Photo 3" },
+    {
+      "type": "select", "id": "photo_focus", "label": "Photo focus", "default": "center",
+      "info": "Which part of the photo to keep when it is cropped to the panel.",
+      "options": [
+        { "value": "center", "label": "Centre" },
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    { "type": "header", "content": "Google rating" },
+    { "type": "paragraph", "content": "A small chip on the photo. Copy the rating and count exactly as Google shows them; never round up." },
+    { "type": "checkbox", "id": "show_rating", "label": "Show the rating", "default": true },
+    { "type": "text", "id": "rating", "label": "Rating", "default": "4.4" },
+    { "type": "text", "id": "review_count", "label": "Number of reviews", "default": "28" },
+    { "type": "text", "id": "rating_label", "label": "Rating label", "default": "on Google" },
     { "type": "header", "content": "Single quote (when there are no Review blocks)" },
     { "type": "textarea", "id": "quote", "label": "Quote" },
-    { "type": "text", "id": "attribution", "label": "Attribution" }
+    { "type": "text", "id": "attribution", "label": "Attribution" },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "auto", "label": "Reviews turn by themselves", "default": true},
+    {"type": "checkbox", "id": "show_arrows", "label": "Show the arrows", "default": true},
+    {"type": "checkbox", "id": "show_dots", "label": "Show the dots", "default": true},
+    {"type": "checkbox", "id": "show_google_link", "label": "Show the link to Google", "default": true},
+    {"type": "checkbox", "id": "show_source", "label": "Show where each review was said", "default": true},
+    {"type": "checkbox", "id": "show_quote_mark", "label": "Show the large quotation mark", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "photo_side", "label": "Photo sits", "options": [{"value": "left", "label": "Left (as designed)"}, {"value": "right", "label": "Right"}], "default": "left"},
+    {"type": "select", "id": "photo_shape", "label": "Photo shape", "options": [{"value": "4/5", "label": "Portrait 4:5 (as designed)"}, {"value": "3/4", "label": "Portrait 3:4"}, {"value": "1/1", "label": "Square"}, {"value": "4/3", "label": "Landscape 4:3"}], "default": "4/5"},
+    {"type": "select", "id": "split", "label": "Column split", "options": [{"value": "5-7", "label": "Photo 5 : words 7 (as designed)"}, {"value": "equal", "label": "Equal halves"}, {"value": "4-8", "label": "Photo 4 : words 8"}], "default": "5-7"},
+    {"type": "select", "id": "quote_style", "label": "Quote style", "options": [{"value": "italic", "label": "Italic serif (as designed)"}, {"value": "upright", "label": "Upright serif"}, {"value": "sans", "label": "Body font"}], "default": "italic"},
+    {"type": "select", "id": "transition", "label": "Between reviews", "options": [{"value": "rise", "label": "Fade and rise (as designed)"}, {"value": "fade", "label": "Crossfade"}, {"value": "cut", "label": "Instant"}], "default": "rise"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "blocks": [
     {
@@ -158,7 +414,9 @@
         { "type": "textarea", "id": "quote", "label": "Quote", "info": "Verbatim from the review - one or two sentences read best." },
         { "type": "text", "id": "name", "label": "Name", "info": "First name, or first name and initial, as it appears on Google." },
         { "type": "text", "id": "source", "label": "Where it was said", "default": "Google review" },
-        { "type": "range", "id": "stars", "label": "Stars", "min": 1, "max": 5, "step": 1, "default": 5 }
+        { "type": "range", "id": "stars", "label": "Stars", "min": 1, "max": 5, "step": 1, "default": 5 },
+        { "type": "image_picker", "id": "photo", "label": "Photo", "info": "Photo shown with this review (optional). A real photograph of the home, never a render of somewhere else." },
+        { "type": "text", "id": "photo_alt", "label": "Photo description", "info": "For screen readers. Blank reads as \"A Sabdia residence\"." }
       ]
     }
   ],

@@ -40,7 +40,18 @@
   endif
 -%}
 {%- assign dim = section.settings.overlay | default: 55 | divided_by: 100.0 -%}
-<section class="hero{% if use_video %} hero-video{% endif %}" id="hero" style="--h-dim:{{ dim }}">
+{% render 'section-look', section: section, mode: 'hero' %}
+{%- liquid
+  case section.settings.height
+    when 'tall'
+      assign hero_h = '85svh'
+    when 'standard'
+      assign hero_h = '72svh'
+    else
+      assign hero_h = '100svh'
+  endcase
+-%}
+<section class="hero{% if use_video %} hero-video{% endif %}{% if section.settings.ken_burns == false %} hero-still{% endif %}{% if section.settings.title_font == 'serif' %} h-title-serif{% endif %}{% if section.settings.show_bottom_rule == false %} h-norule{% endif %}" id="hero" style="--h-dim:{{ dim }};--hero-h:{{ hero_h }};--h-title:{{ section.settings.words_size | default: 30 }}px;--h-title-track:{{ section.settings.words_tracking | default: 28 }}">
   {%- if use_video -%}
   <div class="h-video" id="hVideo">
     <video
@@ -56,7 +67,7 @@
     ></video>
   </div>
   {%- else -%}
-  <div class="h-slides" id="hSlides">
+  <div class="h-slides" id="hSlides" data-every="{{ section.settings.slide_every | default: 6.2 | times: 1000 | round }}">
     {%- for block in section.blocks -%}
       <div class="h-slide{% if forloop.first %} active{% endif %}" {{ block.shopify_attributes }}>
         {%- if block.settings.image -%}
@@ -136,25 +147,29 @@
     <div class="h-bottom-rule"></div>
     <div class="h-bottom-inner inner">
       <div class="h-bottom-left">
-        {%- unless use_video -%}
+        {%- unless use_video or section.settings.show_dots == false -%}
         <div class="h-dots" id="hDots">
           {%- for block in section.blocks -%}
             <button type="button" class="h-dot{% if forloop.first %} active{% endif %}" aria-label="Show slide {{ forloop.index }} of {{ section.blocks.size }}"></button>
           {%- endfor -%}
         </div>
         {%- endunless -%}
-        <p class="h-award"><em>{{ section.settings.award }}</em></p>
+        {%- if section.settings.show_award and section.settings.award != blank -%}<p class="h-award"><em>{{ section.settings.award }}</em></p>{%- endif -%}
       </div>
+      {%- if section.settings.show_buttons -%}
       <div class="h-actions">
-        <a href="{{ section.settings.cta1_link }}" class="btn-p">{{ section.settings.cta1_label }} &rarr;</a>
-        <a href="{{ section.settings.cta2_link }}" class="btn-g btn-g-light">{{ section.settings.cta2_label }}</a>
+        {%- if section.settings.cta1_label != blank -%}<a href="{{ section.settings.cta1_link }}" class="btn-p">{{ section.settings.cta1_label }} &rarr;</a>{%- endif -%}
+        {%- if section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link }}" class="btn-g btn-g-light">{{ section.settings.cta2_label }}</a>{%- endif -%}
       </div>
+      {%- endif -%}
     </div>
   </div>
+  {%- if section.settings.show_scroll_cue -%}
   <div class="h-scroll-wrap">
     {%- unless use_video -%}<span class="h-scroll-num">01 / {{ section.blocks.size | prepend: '00' | slice: -2, 2 }}</span>{%- endunless -%}
     <div class="h-scroll-line"></div>
   </div>
+  {%- endif -%}
 </section>
 {%- if use_video -%}
 <script>
@@ -371,7 +386,35 @@
       "id": "cta2_link",
       "label": "Secondary button link",
       "default": "/pages/contact"
-    }
+    },
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."},
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_dots", "label": "Slide dots (slideshow)", "default": true},
+    {"type": "checkbox", "id": "show_scroll_cue", "label": "Scroll cue on the right", "default": true},
+    {"type": "checkbox", "id": "show_award", "label": "Award line", "default": true},
+    {"type": "checkbox", "id": "show_buttons", "label": "The two buttons", "default": true},
+    {"type": "checkbox", "id": "show_bottom_rule", "label": "Gold rule above the buttons", "default": true},
+    {"type": "header", "content": "Slideshow"},
+    {"type": "range", "id": "slide_every", "label": "Change slides every", "min": 3, "max": 15, "step": 0.2, "default": 6.2, "unit": "s"},
+    {"type": "checkbox", "id": "ken_burns", "label": "Slow drift on each slide (Ken Burns)", "default": true},
+    {"type": "header", "content": "Size"},
+    {"type": "select", "id": "height", "label": "Height", "options": [{"value": "full", "label": "Full screen (as designed)"}, {"value": "tall", "label": "Tall"}, {"value": "standard", "label": "Standard"}], "default": "full"},
+    {"type": "select", "id": "title_font", "label": "Title words set in", "options": [{"value": "caps", "label": "Tracked capitals (as designed)"}, {"value": "serif", "label": "The display serif"}], "default": "caps"},
+    {"type": "range", "id": "words_size", "label": "Title words size", "min": 14, "max": 56, "step": 1, "default": 30, "unit": "px"},
+    {"type": "range", "id": "words_tracking", "label": "Title words letter spacing", "min": 0, "max": 40, "step": 2, "default": 28, "info": "Hundredths of an em."}
   ],
   "blocks": [
     {

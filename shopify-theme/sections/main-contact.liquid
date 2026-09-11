@@ -6,42 +6,49 @@
   lists each for-sale residence, then the editable interest options.
 {%- endcomment -%}
 {%- assign fs = section.settings.listings_collection | default: collections['for-sale'] -%}
-<section class="sp">
+{% render 'section-look', section: section %}
+<section class="sp cp cp-{{ section.settings.layout | default: 'beside' }} cp-agent-{{ section.settings.agent_style | default: 'obsidian' }}{% if section.settings.form_style == 'card' %} cp-card{% endif %}" style="--cm-map-ar:{{ section.settings.map_shape | default: '16/9' }}">
   <div class="inner contact-page-grid">
     <div>
-      <div class="slabel reveal">{{ section.settings.direct_label }}</div>
+      {%- if section.settings.show_direct -%}
+      {%- if section.settings.direct_label != blank -%}<div class="slabel reveal">{{ section.settings.direct_label }}</div>{%- endif -%}
       <ul class="cdet reveal d1" style="margin-top:12px">
-        <li class="cd"><span class="cd-l">{{ section.settings.d_location | default: "Location" }}</span><span class="cd-v">{{ settings.location }}</span></li>
-        {%- if settings.contact_phone != blank -%}
+        {%- if section.settings.d_show_location -%}<li class="cd"><span class="cd-l">{{ section.settings.d_location | default: "Location" }}</span><span class="cd-v">{{ settings.location }}</span></li>{%- endif -%}
+        {%- if settings.contact_phone != blank and section.settings.d_show_phone -%}
           <li class="cd"><span class="cd-l">{{ section.settings.d_phone | default: "Phone" }}</span><a href="tel:{{ settings.contact_phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}" class="cd-v">{{ settings.contact_phone }}</a></li>
         {%- endif -%}
-        {%- if settings.contact_email != blank -%}
+        {%- if settings.contact_email != blank and section.settings.d_show_email -%}
           <li class="cd"><span class="cd-l">{{ section.settings.d_email | default: "Email" }}</span><a href="mailto:{{ settings.contact_email }}" class="cd-v">{{ settings.contact_email }}</a></li>
         {%- endif -%}
-        <li class="cd"><span class="cd-l">{{ section.settings.d_instagram | default: "Instagram" }}</span><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.instagram_label }}</a></li>
-        <li class="cd"><span class="cd-l">{{ section.settings.d_facebook | default: "Facebook" }}</span><a href="{{ settings.facebook_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.facebook_label | default: settings.site_name }}</a></li>
-        <li class="cd"><span class="cd-l">{{ section.settings.d_linkedin | default: "LinkedIn" }}</span><a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.linkedin_label | default: settings.site_name }}</a></li>
-        <li class="cd"><span class="cd-l">{{ section.settings.d_website | default: "Website" }}</span><a href="{{ settings.domain_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.domain_display }}</a></li>
+        {%- if section.settings.d_show_instagram -%}<li class="cd"><span class="cd-l">{{ section.settings.d_instagram | default: "Instagram" }}</span><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.instagram_label }}</a></li>{%- endif -%}
+        {%- if section.settings.d_show_facebook -%}<li class="cd"><span class="cd-l">{{ section.settings.d_facebook | default: "Facebook" }}</span><a href="{{ settings.facebook_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.facebook_label | default: settings.site_name }}</a></li>{%- endif -%}
+        {%- if section.settings.d_show_linkedin -%}<li class="cd"><span class="cd-l">{{ section.settings.d_linkedin | default: "LinkedIn" }}</span><a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.linkedin_label | default: settings.site_name }}</a></li>{%- endif -%}
+        {%- if section.settings.d_show_website -%}<li class="cd"><span class="cd-l">{{ section.settings.d_website | default: "Website" }}</span><a href="{{ settings.domain_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.domain_display }}</a></li>{%- endif -%}
       </ul>
+      {%- endif -%}
 
+      {%- if section.settings.show_agent and section.settings.agent_body_html != blank -%}
       <div class="contact-info-block reveal d2">
         <div class="contact-info-h">{{ section.settings.agent_heading }}</div>
-        <p style="font-size:14px;font-weight:400;color:rgba(253,251,246,.78);line-height:1.8">{{ section.settings.agent_body_html }}</p>
+        <p class="contact-info-p">{{ section.settings.agent_body_html }}</p>
       </div>
+      {%- endif -%}
 
+      {%- if section.settings.show_map -%}
       <div class="contact-map-placeholder reveal d3" style="margin-top:32px">
         {%- if section.settings.map_image -%}
           <img src="{{ section.settings.map_image | image_url: width: 900, height: 500, crop: 'center' }}" alt="{{ section.settings.map_label | escape }}" loading="lazy" width="900" height="500">
         {%- elsif section.settings.map_image_ext != blank -%}
           <img src="{% render 'ext-variant', src: section.settings.map_image_ext, w: 900, h: 500 %}" alt="{{ section.settings.map_label | escape }}" loading="lazy" width="900" height="500">
         {%- endif -%}
-        <div class="contact-map-placeholder-label">{{ section.settings.map_label }}</div>
+        {%- if section.settings.map_label != blank -%}<div class="contact-map-placeholder-label">{{ section.settings.map_label }}</div>{%- endif -%}
       </div>
+      {%- endif -%}
     </div>
 
     <div>
-      <div class="slabel reveal">{{ section.settings.form_label }}</div>
-      {%- if section.settings.guided_line_html != blank -%}
+      {%- if section.settings.show_form_label and section.settings.form_label != blank -%}<div class="slabel reveal">{{ section.settings.form_label }}</div>{%- endif -%}
+      {%- if section.settings.guided_line_html != blank and section.settings.show_guided -%}
         <p class="reveal d1" style="font-family:'EB Garamond',Georgia,serif;font-size:14px;font-style:italic;color:var(--ink3);margin:10px 0 6px">{{ section.settings.guided_line_html }}</p>
       {%- endif -%}
       {%- if settings.form_backend == 'vercel' -%}
@@ -128,11 +135,19 @@
 
 <style>
   .contact-page-grid{display:grid;grid-template-columns:5fr 7fr;gap:96px;align-items:start}
+  .cp-flip .contact-page-grid>div:first-child{order:2}
+  .cp-formonly .contact-page-grid{grid-template-columns:1fr;max-width:760px}
+  .cp-formonly .contact-page-grid>div:first-child{display:none}
+  .cp-above .contact-page-grid{grid-template-columns:1fr;gap:48px}
+  .cp-card .cform{padding:clamp(22px,3vw,36px);background:var(--white);border:1px solid var(--border);border-top:2px solid var(--gold)}
   .contact-info-block{padding:44px;background:var(--dark);color:var(--white);margin-top:44px}
-  .contact-info-h{font-family:var(--font-d);font-size:18px;font-weight:300;color:var(--white);margin-bottom:20px}
-  .contact-map-placeholder{width:100%;aspect-ratio:16/9;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-top:44px;position:relative;overflow:hidden}
+  .contact-info-h{font-family:var(--font-d);font-size:calc(18px*var(--s-h,1));font-weight:300;color:var(--white);margin-bottom:20px}
+  .contact-info-p{font-size:calc(14px*var(--s-t,1));font-weight:400;color:rgba(var(--white-rgb),.78);line-height:1.8}
+  .cp-agent-stone .contact-info-block{background:var(--bg3);color:var(--ink)}.cp-agent-stone .contact-info-h{color:var(--ink)}.cp-agent-stone .contact-info-p{color:var(--ink3)}
+  .cp-agent-plain .contact-info-block{background:transparent;padding:28px 0 0;border-top:1px solid var(--border);color:var(--ink)}.cp-agent-plain .contact-info-h{color:var(--ink)}.cp-agent-plain .contact-info-p{color:var(--ink3)}
+  .contact-map-placeholder{width:100%;aspect-ratio:var(--cm-map-ar,16/9);background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-top:44px;position:relative;overflow:hidden}
   .contact-map-placeholder img{width:100%;height:100%;object-fit:cover;filter:saturate(.75) brightness(.98)}
-  .contact-map-placeholder-label{position:absolute;bottom:20px;left:20px;padding:8px 16px;background:rgba(31,27,20,.8);backdrop-filter:blur(8px);font-size:10px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:rgba(253,251,246,.7)}
+  .contact-map-placeholder-label{position:absolute;bottom:20px;left:20px;padding:8px 16px;background:rgba(var(--dark-rgb),.8);backdrop-filter:blur(8px);font-size:10px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:rgba(var(--white-rgb),.7)}
   @media(max-width:1000px){.contact-page-grid{grid-template-columns:1fr;gap:52px}}
 </style>
 
@@ -394,7 +409,52 @@
       "id": "d_website",
       "label": "Website row label",
       "default": "Website"
-    }
+    },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_direct", "label": "Show the direct-contact list", "default": true},
+    {"type": "checkbox", "id": "d_show_location", "label": "Location row", "default": true},
+    {"type": "checkbox", "id": "d_show_phone", "label": "Phone row", "default": true},
+    {"type": "checkbox", "id": "d_show_email", "label": "Email row", "default": true},
+    {"type": "checkbox", "id": "d_show_instagram", "label": "Instagram row", "default": true},
+    {"type": "checkbox", "id": "d_show_facebook", "label": "Facebook row", "default": true},
+    {"type": "checkbox", "id": "d_show_linkedin", "label": "LinkedIn row", "default": true},
+    {"type": "checkbox", "id": "d_show_website", "label": "Website row", "default": true},
+    {"type": "checkbox", "id": "show_agent", "label": "Show the agent block", "default": true},
+    {"type": "checkbox", "id": "show_map", "label": "Show the map card", "default": true},
+    {"type": "checkbox", "id": "show_form_label", "label": "Show the form label", "default": true},
+    {"type": "checkbox", "id": "show_guided", "label": "Show the guided-match line", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "layout", "label": "Details and form", "options": [{"value": "beside", "label": "Details beside the form (as designed)"}, {"value": "flip", "label": "Form first, details after"}, {"value": "above", "label": "Details above the form"}, {"value": "formonly", "label": "Form only"}], "default": "beside"},
+    {"type": "select", "id": "agent_style", "label": "Agent block style", "options": [{"value": "obsidian", "label": "Obsidian card (as designed)"}, {"value": "stone", "label": "Stone card"}, {"value": "plain", "label": "Plain, under a hairline"}], "default": "obsidian"},
+    {"type": "select", "id": "map_shape", "label": "Map card shape", "options": [{"value": "16/9", "label": "Wide 16:9 (as designed)"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "1/1", "label": "Square"}], "default": "16/9"},
+    {"type": "select", "id": "form_style", "label": "Form style", "options": [{"value": "plain", "label": "Fields on the page (as designed)"}, {"value": "card", "label": "In a white card"}], "default": "plain"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "blocks": [
     {

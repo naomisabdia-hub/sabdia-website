@@ -9,7 +9,9 @@
   residence-status snippet - the old "sold" tag still works), and metafields
   custom.suburb / state / beds / baths / cars / land / land_over /
   headline / features / enquiry_heading / enquiry_text / enquiry_button /
-  brochure_url / film_video / film_poster / scrollwalk_folder.
+  brochure_url / film_video / film_poster / scrollwalk_folder. The film and
+  its poster can also be picked in the customizer (section settings film /
+  film_poster); a pick wins over the metafields.
 {%- endcomment -%}
 {%- liquid
   assign mf = product.metafields.custom
@@ -63,25 +65,52 @@
   </style>
 {%- endif -%}
 
-<section class="prop-hero">
+{% render 'section-look', section: section, mode: 'hero' %}
+{%- liquid
+  assign pr_dim = section.settings.hero_dim | default: 44 | divided_by: 100.0
+  if sold
+    assign pr_dim = pr_dim | plus: 0.12
+  endif
+  case section.settings.hero_height
+    when 'full'
+      assign pr_h = '100svh'
+    when 'tall'
+      assign pr_h = '92vh'
+    when 'standard'
+      assign pr_h = '72vh'
+    when 'short'
+      assign pr_h = '56vh'
+    else
+      assign pr_h = '92vh'
+  endcase
+  assign pr_split = '7fr 5fr'
+  if section.settings.body_layout == 'equal'
+    assign pr_split = '1fr 1fr'
+  elsif section.settings.body_layout == 'stack' or section.settings.body_layout == 'form-first-stack'
+    assign pr_split = '1fr'
+  endif
+-%}
+<section class="prop-hero{% if section.settings.hero_words == 'centre' %} prop-hero-centre{% endif %}" style="--prop-h:{{ pr_h }};--prop-dim:{{ pr_dim }}">
   {%- if product.featured_image -%}
-    <img src="{{ product.featured_image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="{{ product.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:{% if sold %}brightness(.72) saturate(.9){% else %}brightness(.78) saturate(.96){% endif %}">
+    <img src="{{ product.featured_image | image_url: width: 1920, height: 1080, crop: section.settings.hero_focus | default: 'center' }}" alt="{{ product.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ section.settings.hero_focus | default: 'center' }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)">
   {%- endif -%}
-  <div class="prop-hero-ov"></div>
+  <div class="prop-hero-ov" style="opacity:calc(var(--prop-dim,.44) / .44)"></div>
   <div class="prop-hero-content inner">
+    {%- if section.settings.show_status -%}
     <div class="prop-status" {% if sold %}style="margin-bottom:14px"{% endif %}>
       <div class="prop-status-dot {% if sold %}sold{% elsif pstatus == 'For Sale' %}active{% endif %}"></div>
-      <span style="color:rgba(253,251,246,.88)">{{ pstatus }}</span>
+      <span style="color:rgba(var(--white-rgb),.88)">{{ pstatus }}</span>
     </div>
+    {%- endif -%}
     <div class="prop-name">{{ product.title }}</div>
-    <div class="prop-loc">{{ mf.suburb.value }}, {{ state }}</div>
+    {%- if section.settings.show_location -%}<div class="prop-loc">{{ mf.suburb.value }}, {{ state }}</div>{%- endif -%}
   </div>
 </section>
 
-{%- if sold -%}
+{%- if sold and section.settings.show_sold_banner -%}
   <div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:22px var(--page-pad)">
     <div class="inner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-      <div style="padding:7px 16px;background:rgba(168,135,74,.14);border:1px solid rgba(168,135,74,.4);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--ink)">{{ pstatus }}</div>
+      <div style="padding:7px 16px;background:rgba(var(--gold-rgb),.14);border:1px solid rgba(var(--gold-rgb),.4);font-size:10px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--ink)">{{ pstatus }}</div>
       <span style="font-size:13.5px;font-weight:400;color:var(--ink3)">{{ section.settings.sold_notice }}</span>
       <a href="{{ section.settings.sold_banner_link | default: '/collections/for-sale' }}" class="btn-g btn-g-gold" style="margin-left:auto;padding:9px 20px;font-size:10px">{{ section.settings.sold_banner_label }} &rarr;</a>
     </div>
@@ -89,45 +118,63 @@
 {%- endif -%}
 
 {%- unless section.settings.hide_specs -%}
-<div class="prop-specs-bar">
+<div class="prop-specs-bar{% if section.settings.specs_align == 'centre' %} prop-specs-centre{% endif %}">
   <div class="prop-specs-inner">
+    {%- if section.settings.spec_show_location -%}
     <div class="prop-spec-item">
       <div class="prop-spec-l">{{ section.settings.spec_location | default: "Location" }}</div>
       <div class="prop-spec-v" style="font-size:16px">{{ mf.suburb.value }}</div>
     </div>
+    {%- endif -%}
+    {%- if section.settings.spec_show_beds -%}
     <div class="prop-spec-item">
       <div class="prop-spec-l">{{ section.settings.spec_beds | default: "Bedrooms" }}</div>
       <div class="prop-spec-v">{{ mf.beds.value }}</div>
     </div>
+    {%- endif -%}
+    {%- if section.settings.spec_show_baths -%}
     <div class="prop-spec-item">
       <div class="prop-spec-l">{{ section.settings.spec_baths | default: "Bathrooms" }}</div>
       <div class="prop-spec-v">{{ mf.baths.value }}</div>
     </div>
+    {%- endif -%}
+    {%- if section.settings.spec_show_cars -%}
     <div class="prop-spec-item">
       <div class="prop-spec-l">{{ section.settings.spec_cars | default: "Garages" }}</div>
       <div class="prop-spec-v">{{ mf.cars.value }}</div>
     </div>
+    {%- endif -%}
+    {%- if section.settings.spec_show_land -%}
     <div class="prop-spec-item">
       <div class="prop-spec-l">{{ section.settings.spec_land | default: "Land Size" }}</div>
       <div class="prop-spec-v">{{ mf.land.value }}<em>m&sup2;{% if mf.land_over.value %}+{% endif %}</em></div>
     </div>
+    {%- endif -%}
+    {%- if section.settings.spec_show_build and mf.build_size.value != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ section.settings.spec_build | default: "Build Size" }}</div>
+      <div class="prop-spec-v">{{ mf.build_size.value }}<em>m&sup2;</em></div>
+    </div>
+    {%- endif -%}
+    {%- if section.settings.spec_show_status -%}
     <div class="prop-spec-item">
       <div class="prop-spec-l">{{ section.settings.spec_status | default: "Status" }}</div>
       <div class="prop-spec-v" style="font-size:16px;color:{% if sold %}var(--taupe-d){% else %}var(--ink){% endif %}">{{ pstatus }}</div>
     </div>
+    {%- endif -%}
   </div>
 </div>
 
 {%- endunless -%}
 
-<div class="prop-body">
+<div class="prop-body pb-{{ section.settings.body_layout | default: 'beside' }}" style="--prop-split:{{ pr_split }}">
   <div class="prop-layout inner">
-    <div class="prop-desc">
-      <div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, product.title }}</div>
-      <h1 class="prop-body-h reveal d1">{{ mf.headline.value }}</h1>
-      {{ product.description | replace: '<p>', '<p class="prop-body-p reveal d2">' }}
+    <div class="{% if section.settings.sticky_desc %}prop-desc{% endif %}">
+      {%- if section.settings.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, product.title }}</div>{%- endif -%}
+      {%- if section.settings.show_headline and mf.headline.value != blank -%}<h1 class="prop-body-h reveal d1">{{ mf.headline.value }}</h1>{%- endif -%}
+      {%- if section.settings.show_description -%}{{ product.description | replace: '<p>', '<p class="prop-body-p reveal d2">' }}{%- endif -%}
 
-      {%- if mf.features.value.size > 0 -%}
+      {%- if mf.features.value.size > 0 and section.settings.show_features -%}
         <div class="prop-features reveal d3">
           <div class="prop-features-h">{{ section.settings.features_heading }}</div>
           <div class="prop-feat-grid">
@@ -139,7 +186,8 @@
       {%- endif -%}
     </div>
 
-    <div class="reveal d2">
+    {%- if section.settings.show_enquiry -%}
+    <div class="reveal d2 prop-side">
       <div class="prop-enquire">
         <div class="prop-enquire-h">{{ mf.enquiry_heading.value | default: 'Enquire Now' }}</div>
         <p style="font-size:13px;font-weight:300;color:var(--ink3);line-height:1.75;margin-bottom:24px">{{ mf.enquiry_text.value }}</p>
@@ -221,15 +269,16 @@
         {%- endif -%}
       </div>
       <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
-        {%- if mf.brochure_url.value != blank -%}
+        {%- if mf.brochure_url.value != blank and section.settings.show_brochure -%}
           <a href="{{ mf.brochure_url.value }}" target="_blank" rel="noopener" class="btn-g btn-g-gold" style="justify-content:center" download>{{ section.settings.brochure_label }} &darr;</a>
         {%- endif -%}
         {%- if sold -%}
           <a href="{{ section.settings.sold_banner_link | default: '/collections/for-sale' }}" class="btn-p" style="justify-content:center">{{ section.settings.sold_cta_label }}</a>
         {%- endif -%}
-        <a href="{{ section.settings.general_link | default: '/pages/contact' }}" class="btn-g {% unless sold %}btn-g-gold{% endunless %}" style="justify-content:center">{{ section.settings.general_label }}</a>
+        {%- if section.settings.show_general -%}<a href="{{ section.settings.general_link | default: '/pages/contact' }}" class="btn-g {% unless sold %}btn-g-gold{% endunless %}" style="justify-content:center">{{ section.settings.general_label }}</a>{%- endif -%}
       </div>
     </div>
+    {%- endif -%}
   </div>
 </div>
 
@@ -251,9 +300,9 @@
   endif
   assign glayout = section.settings.gallery_layout | default: 'stage'
 -%}
-{%- if gallery_count > 0 -%}
-  <div class="prop-gallery inner">
-    <div class="slabel reveal">{{ section.settings.gallery_label }}</div>
+{%- if gallery_count > 0 and section.settings.show_gallery -%}
+  <div class="prop-gallery inner{% if section.settings.show_thumbs == false %} pg-nothumbs{% endif %}{% if section.settings.show_rooms == false %} pg-norooms{% endif %}{% if section.settings.show_expand == false %} pg-noexpand{% endif %}" style="--pgs-ar:{{ section.settings.stage_shape | default: '16/9' }}">
+    {%- if section.settings.gallery_label != blank -%}<div class="slabel reveal">{{ section.settings.gallery_label }}</div>{%- endif -%}
     <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, product.title }}</h2>
     {%- if glayout == 'grid' -%}
     <div class="prop-gallery-grid gn-{{ gallery_count }}" id="galleryGrid">
@@ -564,12 +613,34 @@
   })();
 </script>
 
-{%- if mf.film_video.value != blank -%}
-  <section class="film-band" id="film">
+{%- liquid
+  # The residence film. A film or poster picked in the customizer (this
+  # residence's own template) wins; otherwise the product's Film video /
+  # Film poster metafields, as before.
+  assign film_src = mf.film_video.value
+  if section.settings.film
+    assign fmp4 = section.settings.film.sources | where: 'format', 'mp4' | first
+    if fmp4
+      assign film_src = fmp4.url
+    endif
+  endif
+  assign film_poster = mf.film_poster.value
+  if section.settings.film_poster
+    assign film_poster = section.settings.film_poster | image_url: width: 1600
+  endif
+-%}
+{%- if film_src != blank and section.settings.show_film -%}
+  <section class="film-band{% if section.settings.film_side == 'left' %} film-flip{% endif %}" id="film" style="--film-ar:{{ section.settings.film_shape | default: '9/16' }}">
     <div class="film-grid">
       <div class="film-copy">
-        <div class="slabel slabel-dark reveal">{{ section.settings.film_label }}</div>
-        <h2 class="film-h reveal d1">Experience <em>{{ product.title }}</em>.</h2>
+        {%- if section.settings.film_label != blank -%}<div class="slabel slabel-dark reveal">{{ section.settings.film_label }}</div>{%- endif -%}
+        {%- liquid
+          assign film_h = section.settings.film_heading_html
+          if film_h == blank
+            assign film_h = 'Experience <em>' | append: name_token | append: '</em>.'
+          endif
+        -%}
+        <h2 class="film-h reveal d1">{{ film_h | replace: name_token, product.title }}</h2>
         {%- liquid
           assign film_text = section.settings.film_text
           if film_text == blank
@@ -580,22 +651,24 @@
       </div>
       <div class="reveal d2">
         <div class="film-frame" data-film>
-          <video src="{{ mf.film_video.value }}" {% if mf.film_poster.value != blank %}poster="{{ mf.film_poster.value }}"{% endif %} muted loop playsinline preload="none"></video>
+          <video src="{{ film_src }}" {% if film_poster != blank %}poster="{{ film_poster }}"{% endif %} muted loop playsinline preload="none"></video>
           <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
             <span data-sound-label>{{ section.settings.sound_label | default: "Sound On" }}</span>
           </button>
         </div>
+        {%- if section.settings.show_film_caption -%}
         <div class="film-caption">
           <span><b>{{ product.title }} - On Film</b></span>
           <span>{{ mf.suburb.value }}, {{ state }}</span>
         </div>
+        {%- endif -%}
       </div>
     </div>
   </section>
 {%- endif -%}
 
-{%- unless sold -%}
+{%- unless sold or section.settings.show_cta == false -%}
   <section class="prop-cta">
     <div class="inner prop-cta-inner">
       <div class="slabel reveal" style="justify-content:center">{{ section.settings.cta_label }}</div>
@@ -606,6 +679,7 @@
   </section>
 {%- endunless -%}
 
+{%- if section.settings.show_share -%}
 <section style="padding:0 var(--page-pad) clamp(48px,6vw,72px)">
   <div class="inner" style="display:flex;justify-content:center">
     {%- assign share_url = shop.url | append: product.url -%}
@@ -622,8 +696,9 @@
     </div>
   </div>
 </section>
+{%- endif -%}
 
-{%- unless sold -%}
+{%- unless sold or section.settings.show_sticky == false -%}
   <div class="prop-sticky-bar" id="stickyEnquire">
     <div class="psb-name">{{ product.title }} <span class="psb-loc">- {{ mf.suburb.value }}</span></div>
     <a href="#cform" class="psb-btn">{{ section.settings.sticky_label }} &rarr;</a>
@@ -645,9 +720,20 @@
 {%- endunless -%}
 
 <style>
+  .prop-hero-centre{align-items:center}.prop-hero-centre .prop-hero-content{text-align:center}.prop-hero-centre .prop-status{justify-content:center}
+  .prop-specs-centre .prop-specs-inner{justify-content:center}
+  .prop-body .prop-layout{grid-template-columns:var(--prop-split,7fr 5fr)}
+  .pb-form-first .prop-layout>div:first-child,.pb-form-first-stack .prop-layout>div:first-child{order:2}
+  .pb-stack .prop-side,.pb-form-first-stack .prop-side{max-width:640px}
+  .pg-nothumbs .pg-strip{display:none}
+  .pg-norooms .pg-rooms{display:none}
+  .pg-noexpand .pg-expand{display:none}
+  .prop-gallery .pg-stage{aspect-ratio:var(--pgs-ar,16/9)}
+  .film-band .film-frame{aspect-ratio:var(--film-ar,9/16)}
+  @media(min-width:901px){.film-flip .film-grid>.film-copy{order:2}}
   .share-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:36px}
   .share-l{font-size:10px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}
-  .share-a{background:none;border:none;cursor:pointer;padding:4px 0;font-family:var(--font-u);font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(168,135,74,.35);transition:color .25s,border-color .25s;text-decoration:none}
+  .share-a{background:none;border:none;cursor:pointer;padding:4px 0;font-family:var(--font-u);font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(var(--gold-rgb),.35);transition:color .25s,border-color .25s;text-decoration:none}
   .share-a:hover{color:var(--ink);border-color:var(--gold)}
 </style>
 
@@ -823,6 +909,26 @@
       "default": "Inside <em>{name}</em>."
     },
     {
+      "type": "header",
+      "content": "The film"
+    },
+    {
+      "type": "paragraph",
+      "content": "The film playing now comes from Products › the residence › Metafields › Film video and Film poster. Each residence has its own template, so a film or poster picked here belongs to this residence only."
+    },
+    {
+      "type": "video",
+      "id": "film",
+      "label": "Film (upload)",
+      "info": "Upload the residence film (mp4) and it takes over from the Film video metafield. Leave empty to keep the metafield."
+    },
+    {
+      "type": "image_picker",
+      "id": "film_poster",
+      "label": "Film poster",
+      "info": "The still shown before the film plays. Choose one and it takes over from the Film poster metafield."
+    },
+    {
       "type": "text",
       "id": "film_label",
       "label": "Film label",
@@ -970,7 +1076,65 @@
       "id": "sound_label",
       "label": "Film sound button",
       "default": "Sound On"
-    }
+    },
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."},
+    {"type": "header", "content": "Hero photo"},
+    {"type": "range", "id": "hero_dim", "label": "Darken the hero photo", "min": 0, "max": 100, "step": 4, "default": 44, "unit": "%", "info": "Lower = brighter. A sold residence sits a touch darker."},
+    {"type": "select", "id": "hero_height", "label": "Hero height", "options": [{"value": "tall", "label": "Tall (as designed)"}, {"value": "full", "label": "Full screen"}, {"value": "standard", "label": "Standard"}, {"value": "short", "label": "Short"}], "default": "tall"},
+    {"type": "select", "id": "hero_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "hero_words", "label": "Where the words sit", "options": [{"value": "base-left", "label": "Base, left (as designed)"}, {"value": "centre", "label": "Centre"}], "default": "base-left"},
+    {"type": "checkbox", "id": "show_status", "label": "Status line above the name", "default": true},
+    {"type": "checkbox", "id": "show_location", "label": "Suburb under the name", "default": true},
+    {"type": "checkbox", "id": "show_sold_banner", "label": "Sold banner under the hero (sold residences)", "default": true},
+    {"type": "header", "content": "Specs bar - which numbers"},
+    {"type": "checkbox", "id": "spec_show_location", "label": "Location", "default": true},
+    {"type": "checkbox", "id": "spec_show_beds", "label": "Bedrooms", "default": true},
+    {"type": "checkbox", "id": "spec_show_baths", "label": "Bathrooms", "default": true},
+    {"type": "checkbox", "id": "spec_show_cars", "label": "Garages", "default": true},
+    {"type": "checkbox", "id": "spec_show_land", "label": "Land size", "default": true},
+    {"type": "checkbox", "id": "spec_show_build", "label": "Build size (when the residence has one)", "default": false},
+    {"type": "checkbox", "id": "spec_show_status", "label": "Status", "default": true},
+    {"type": "text", "id": "spec_build", "label": "Build size label", "default": "Build Size"},
+    {"type": "select", "id": "specs_align", "label": "Numbers sit", "options": [{"value": "left", "label": "Left (as designed)"}, {"value": "centre", "label": "Centre"}], "default": "left"},
+    {"type": "header", "content": "Description and enquiry"},
+    {"type": "checkbox", "id": "show_about_label", "label": "Show the description label", "default": true},
+    {"type": "checkbox", "id": "show_headline", "label": "Show the headline", "default": true},
+    {"type": "checkbox", "id": "show_description", "label": "Show the description", "default": true},
+    {"type": "checkbox", "id": "show_features", "label": "Show the key features", "default": true},
+    {"type": "checkbox", "id": "show_enquiry", "label": "Show the enquiry panel", "default": true},
+    {"type": "checkbox", "id": "show_brochure", "label": "Brochure button (when the residence has one)", "default": true},
+    {"type": "checkbox", "id": "show_general", "label": "General enquiry button", "default": true},
+    {"type": "checkbox", "id": "sticky_desc", "label": "Description holds while the form scrolls", "default": true},
+    {"type": "select", "id": "body_layout", "label": "Description and form", "options": [{"value": "beside", "label": "Description 7 : form 5 (as designed)"}, {"value": "equal", "label": "Equal halves"}, {"value": "form-first", "label": "Form first"}, {"value": "stack", "label": "Form under the description"}, {"value": "form-first-stack", "label": "Form above the description"}], "default": "beside"},
+    {"type": "header", "content": "Gallery"},
+    {"type": "checkbox", "id": "show_gallery", "label": "Show the gallery", "default": true},
+    {"type": "checkbox", "id": "show_thumbs", "label": "Filmstrip of thumbnails (Stage layout)", "default": true},
+    {"type": "checkbox", "id": "show_rooms", "label": "Room names under the strip (Stage layout)", "default": true},
+    {"type": "checkbox", "id": "show_expand", "label": "\"View all photos\" button on the stage", "default": true},
+    {"type": "select", "id": "stage_shape", "label": "Stage shape", "options": [{"value": "16/9", "label": "Wide 16:9 (as designed)"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "21/9", "label": "Cinematic 21:9"}], "default": "16/9"},
+    {"type": "header", "content": "Film"},
+    {"type": "checkbox", "id": "show_film", "label": "Show the film", "default": true},
+    {"type": "checkbox", "id": "show_film_caption", "label": "Caption under the film", "default": true},
+    {"type": "html", "id": "film_heading_html", "label": "Film heading", "default": "Experience <em>{name}</em>.", "info": "{name} becomes the residence's name."},
+    {"type": "select", "id": "film_side", "label": "Film sits", "options": [{"value": "right", "label": "Right (as designed)"}, {"value": "left", "label": "Left"}], "default": "right"},
+    {"type": "select", "id": "film_shape", "label": "Film shape", "options": [{"value": "9/16", "label": "Portrait 9:16 (as designed)"}, {"value": "4/5", "label": "Portrait 4:5"}, {"value": "1/1", "label": "Square"}, {"value": "16/9", "label": "Landscape 16:9"}], "default": "9/16"},
+    {"type": "header", "content": "Closing"},
+    {"type": "checkbox", "id": "show_cta", "label": "Closing \"Experience in person\" band", "default": true},
+    {"type": "checkbox", "id": "show_share", "label": "Share row", "default": true},
+    {"type": "checkbox", "id": "show_sticky", "label": "Sticky Enquire bar on phones", "default": true}
   ]
 }
 {% endschema %}

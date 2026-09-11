@@ -634,7 +634,12 @@ function prequalInit() {
 }
 
 
-/* Sabdia Concierge (section concierge.liquid). */
+/* Sabdia Concierge (section concierge.liquid). Scripted only: every reply is
+   a Chat answer block, a fact from Products or a step of the enquiry, never
+   an AI. No price is passed in, and scrubMoney strips any currency amount
+   from a bot message regardless; the visitor's own budget chip is the only
+   money that ever appears, and only as their message. The enquiry runs step
+   by step and posts through the hidden Shopify contact form #ccContact. */
 function conciergeInit() {
   const cc = document.querySelector('[data-concierge]');
   if (!cc || cc.dataset.init) return;
@@ -653,8 +658,17 @@ function conciergeInit() {
   const contact = cc.querySelector('#ccContact');
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const linkify = (t) => esc(t).replace(/(https?:\/\/[^\s]+|\/(?:pages|products|collections)\/[a-z0-9\-\/]+)/g, (m) => '<a href="' + m + '">' + m.replace(/^https?:\/\/[^/]+/, '') + '</a>');
+  /* Hard guard: no bot message may carry a currency amount. "$0", "$0.00",
+     "AUD 0", "$4,500,000", "$5m" - anything with a currency mark and a
+     number is removed before it reaches the log. The visitor's own messages
+     (who === 'me', which is how a chosen budget chip is echoed) are left
+     as typed. */
+  const scrubMoney = (html) => String(html)
+    .replace(/\b(?:AUD?|AU\$|A\$)\s?\$?\s?\d[\d,]*(?:\.\d+)?\s?(?:k|m|million|thousand)?\b/gi, '')
+    .replace(/\$\s?\d[\d,]*(?:\.\d+)?\s?(?:k|m|million|thousand)?\b/gi, '')
+    .replace(/[ \t]{2,}/g, ' ').replace(/\s+([.,;:!?)])/g, '$1').trim();
   const scroll = () => { log.scrollTop = log.scrollHeight; };
-  const say = (html, who) => { const d = document.createElement('div'); d.className = 'cc-msg ' + (who || 'bot'); d.innerHTML = html; log.appendChild(d); scroll(); return d; };
+  const say = (html, who) => { const d = document.createElement('div'); d.className = 'cc-msg ' + (who || 'bot'); d.innerHTML = who === 'me' ? html : scrubMoney(html); log.appendChild(d); scroll(); return d; };
   const options = (items, onPick, ghostLast) => {
     const wrap = document.createElement('div'); wrap.className = 'cc-opts';
     items.forEach((label, n) => {
@@ -675,16 +689,31 @@ function conciergeInit() {
   const norm = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9$\s]/g, ' ').replace(/\s+/g, ' ').trim();
   const STOP = new Set('you your can could the and for are with this that what how does have has any our its get from into will would like want need please hello hey thanks tell more about there here they them then than some just also very really when where which who why yes not but all one two new house home homes property properties sabdia'.split(' '));
   const words = (t) => norm(t).split(' ').filter((w) => w.length > 2 && !STOP.has(w));
-  /* Residence answer, built live from the product data. */
+  /* Residence answer, built live from the product data (no price field is passed). */
   const residenceText = (r) => {
     const facts = [r.beds && r.beds + ' bedrooms', r.baths && r.baths + ' bathrooms', r.cars && r.cars + '-car garage', r.land && r.land + ' sqm'].filter(Boolean).join(', ');
     const feats = (r.features || '').split(',').map((x) => x.trim()).filter(Boolean).slice(0, 6).join(', ');
     const status = /sold/i.test(r.status || '') ? ' (' + r.status + ')' : '';
-    return r.title + ' in ' + r.suburb + status + '. ' + (r.headline ? r.headline.replace(/\s+/g, ' ') + ' ' : '') + (facts ? facts + '. ' : '') + (feats ? 'Highlights: ' + feats + '. ' : '') + 'See ' + r.url + ' or tell me if you would like to enquire.';
+    return r.title + ' in ' + r.suburb + status + '. ' + (r.headline ? r.headline.replace(/\s+/g, ' ').replace(/\s+([.,;:!?])/g, '$1').trim() + ' ' : '') + (facts ? facts + '. ' : '') + (feats ? 'Highlights: ' + feats + '. ' : '') + 'See ' + r.url + ' or tell me if you would like to enquire.';
   };
   const findResidence = (text) => { const n = norm(text); return residences.find((r) => n.indexOf(norm(r.title)) !== -1 || n.indexOf(r.handle) !== -1) || null; };
-  const enquiryIntent = /\b(enquir|inquir|price|pricing|cost|how much|inspect|viewing|appointment|interested|register|buy|purchase|contact|call me|floor ?plan|brochure)/i;
+  /* Intents, read from typed text or from a Chat answer's question and
+     keywords. The enquiry type is written to contact[Enquiry type], so a
+     viewing is "Request a Viewing" exactly as the contact form's interest
+     list has it. */
+  const viewingIntent = /\b(inspect\w*|view|viewing|book\w*|appointment|open home|visit\w*|tour|look (?:through|at|inside|around))\b/i;
+  const priceIntent = /\b(price\w*|cost\w*|how much|worth|asking|expensive|afford\w*|valuation)\b/i;
+  const enquiryIntent = /\b(enquir|inquir|price|pricing|cost|how much|inspect|view\b|viewing|book|tour|visit|appointment|interested|register|buy|purchase|contact|call me|floor ?plan|brochure)/i;
   const personIntent = /\b(person|human|someone|staff|talk to|speak to|call)\b/i;
+  const intentFor = (m) => {
+    const t = m.q + ' ' + m.k;
+    if (viewingIntent.test(t)) return 'Request a Viewing';
+    if (priceIntent.test(t)) return 'Request Price Guide';
+    if (/\b(release|upcoming)\b/i.test(t)) return 'Upcoming Releases';
+    if (m.cat === 'agents') return 'Agent Access';
+    if (m.cat === 'builds' || m.cat === 'other') return 'General Enquiry';
+    return 'Register Interest';
+  };
   const bestMatch = (text) => {
     const ws = words(text); if (!ws.length) return null;
     let best = null, bestScore = 0;
@@ -701,22 +730,31 @@ function conciergeInit() {
   const setC = (n, v) => { const el = contact && contact.querySelector('[name="' + n + '"]'); if (el) el.value = v || ''; };
   let step = null;
   const ask = (q, key, opts) => { say(esc(q)); step = { key, opts }; if (opts) options(opts.items, (label) => answerStep(label), opts.ghostLast); input.focus(); };
+  const lastQuestion = () => state.intent === 'Request a Viewing' ? 'Which days or times suit you for a viewing? (type "no" if you are not sure yet)' : 'Anything else we should know? (type "no" if not)';
+  const afterPhone = () => {
+    if (state.kind === 'general') ask('How can we help? Tell us a little about your enquiry.', 'message');
+    else if (state.residence) askBudget();
+    else ask('Which residence are you interested in?', 'residence', { items: forSale.map((r) => r.title + ' - ' + r.suburb).concat(['Not sure yet']), ghostLast: true });
+  };
   const answerStep = async (value) => {
     if (!step) return;
     const { key } = step; state[key] = value; say(esc(value), 'me'); step = null;
     await typing(350);
     if (key === 'name') ask('And your email address?', 'email');
-    else if (key === 'email') { if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) { ask('That email does not look right - could you check it?', 'email'); return; } ask('Best phone number to reach you on?', 'phone'); }
-    else if (key === 'phone') { if (state.kind === 'general') ask('How can we help? Tell us a little about your enquiry.', 'message'); else if (state.residence) askBudget(); else ask('Which residence are you interested in?', 'residence', { items: forSale.map((r) => r.title + ' - ' + r.suburb).concat(['Not sure yet']), ghostLast: true }); }
+    else if (key === 'email') { if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) { ask('That email does not look right. Could you check it?', 'email'); return; } ask('And the best phone number to reach you on?', 'phone'); }
+    else if (key === 'phone') afterPhone();
     else if (key === 'residence') askBudget();
     else if (key === 'budget') ask('And your timeline to purchase?', 'timeline', { items: timelines });
-    else if (key === 'timeline') { say(esc('Which locations would you consider? Tap all that apply.')); multi(locations, 'Done', async (picked) => { state.locations = picked.join(', '); say(esc(picked.length ? picked.join(', ') : 'No preference'), 'me'); await typing(300); ask('Anything else we should know? (or type "no")', 'message'); }); }
+    else if (key === 'timeline') { say(esc('Which locations would you consider? Tap all that apply.')); multi(locations, 'Done', async (picked) => { state.locations = picked.join(', '); say(esc(picked.length ? picked.join(', ') : 'No preference'), 'me'); await typing(300); ask(lastQuestion(), 'message'); }); }
     else if (key === 'message') submitEnquiry();
   };
   const askBudget = () => ask('To help us give you the most relevant information, what is your approximate budget range?', 'budget', { items: budgets });
   const startEnquiry = (residence) => {
     if (residence) state.residence = residence.title + ' - ' + residence.suburb;
-    if (state.residence || state.kind) { if (state.name && state.email && state.phone) { askBudget(); return; } ask('Great - what is your name?', 'name'); return; }
+    /* A general matter (a trade, a job, the press, a build request) needs no residence or budget; a release enquiry needs no residence. */
+    if (state.intent === 'General Enquiry' && !state.kind) state.kind = 'general';
+    if (state.intent === 'Upcoming Releases' && !state.kind && !state.residence) { state.kind = 'sales'; state.residence = 'Not sure yet'; }
+    if (state.residence || state.kind) { if (state.name && state.email && state.phone) { afterPhone(); return; } ask('May I take your name?', 'name'); return; }
     /* First: what is it about? A residence, a home sales enquiry in general, or something else. */
     say(esc('What is your enquiry about?'));
     options(forSale.map((r) => r.title + ' - ' + r.suburb).concat(['A home for sale, not sure which yet', 'Something else']), (label, n) => {
@@ -724,7 +762,7 @@ function conciergeInit() {
       if (n < forSale.length) { state.residence = label; state.kind = 'residence'; }
       else if (n === forSale.length) { state.kind = 'sales'; state.residence = 'Not sure yet'; }
       else { state.kind = 'general'; state.intent = 'General Enquiry'; }
-      typing(300).then(() => ask('Great - what is your name?', 'name'));
+      typing(300).then(() => ask('May I take your name?', 'name'));
     });
   };
   const submitEnquiry = async () => {
@@ -741,33 +779,61 @@ function conciergeInit() {
     em.dispatchEvent(new Event('focusin', { bubbles: true })); em.dispatchEvent(new Event('change', { bubbles: true }));
     setTimeout(() => { if (contact.requestSubmit) contact.requestSubmit(); else contact.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); }, 1200);
   };
+  const reset = () => { step = null; Object.keys(state).forEach((k) => delete state[k]); };
   if (contact) {
-    contact.addEventListener('sabdia:sent', async () => { await typing(300); const first = (state.name || '').split(/\s+/)[0]; say(esc((first ? 'Thank you, ' + first + '. ' : '') + (cc.getAttribute('data-thanks') || 'Thank you. We will be in touch.'))); options(['Ask another question'], () => showOpening()); Object.keys(state).forEach((k) => delete state[k]); });
+    contact.addEventListener('sabdia:sent', async () => { await typing(300); const first = (state.name || '').split(/\s+/)[0]; const thanks = cc.getAttribute('data-thanks') || 'Thank you. We will be in touch.'; say(esc(first ? 'Thank you, ' + first + '. ' + thanks.replace(/^\s*thank you\.\s*/i, '') : thanks)); options(['Ask another question'], () => showOpening()); reset(); });
     contact.addEventListener('sabdia:failed', (e) => { say(esc(e.detail || 'Something went wrong. Please try again or use /pages/contact.')); options(['Try again'], () => submitEnquiry()); });
   }
   const handOver = () => {
     cc.classList.add('handoff');
     const btn = document.querySelector('#ShopifyChat button, shopify-chat button, [id^="shopify-chat"] button, .shopify-chat-launcher, #ShopifyChat');
     if (btn) { closePanel(); setTimeout(() => btn.click(), 150); }
-    else say('You can reach the team at <a href="/pages/contact">/pages/contact</a> or sales@sabdia.com.au.');
+    else say('You can reach the team at <a href="/pages/contact">/pages/contact</a>.');
+  };
+  const priceQA = qa.find((x) => /\bprice/i.test(x.k)) || qa.find((x) => /\bprice/i.test(x.q)) || null;
+  const viewingQA = qa.find((x) => /\bviewing\b/i.test(x.q)) || qa.find((x) => /\b(viewing|inspect)/i.test(x.k)) || null;
+  const PRICE_TEXT = 'We talk through pricing directly rather than publishing a guide. Leave your details and a member of our team will be in touch.';
+  const VIEW_TEXT = 'Every residence is shown by private appointment. Leave your details and a member of our team will arrange a time.';
+  /* The answer first, then the offer to leave details: a typed question
+     about the price or a viewing of a named residence reads why pricing is
+     discussed directly (never a figure) before any step begins. */
+  const answerThen = (item, r, intent, fallbackText) => {
+    say(item ? linkify(item.a) : esc(fallbackText));
+    const items = ['Leave my details'].concat(r ? ['Tell me about ' + r.title] : []).concat(['Back to questions']);
+    options(items, (label, n) => { if (n === 0) { state.intent = intent; startEnquiry(r); } else if (r && n === 1) residenceCard(r); else showOpening(); });
+  };
+  const residenceCard = (r, backLabel) => {
+    say(linkify(residenceText(r)));
+    options(['Enquire about ' + r.title, 'Request a viewing', backLabel || 'Ask something else'], (label, n) => { if (n === 2) { showOpening(); return; } state.intent = n === 1 ? 'Request a Viewing' : 'Register Interest'; startEnquiry(r); });
   };
   const handle = async (text) => {
+    /* Typing instead of tapping: the button groups already offered are stale now, so clear them from the transcript. */
+    log.querySelectorAll('.cc-opts').forEach((w) => w.remove());
+    if (step && /^(cancel|stop|back|start over|never ?mind)\.?$/i.test(text.trim())) { reset(); say(esc('Of course. Choose a topic below or ask another question.')); showOpening(); return; }
     if (step) { await answerStep(text); return; }
     say(esc(text), 'me');
     await typing(500);
     const r = findResidence(text);
     if (personIntent.test(text) && !enquiryIntent.test(text)) { handOver(); return; }
-    if (r && !enquiryIntent.test(text)) { say(linkify(residenceText(r))); options(['Enquire about ' + r.title, 'Arrange an inspection', 'Ask something else'], (label, n) => { if (n === 2) { showOpening(); return; } state.intent = n === 1 ? 'Arrange Private Inspection' : 'Register Interest'; startEnquiry(r); }); return; }
-    const m = bestMatch(text);
+    if (r && priceIntent.test(text)) { answerThen(priceQA, r, 'Request Price Guide', PRICE_TEXT); return; }
+    if (r && viewingIntent.test(text)) { answerThen(viewingQA, r, 'Request a Viewing', VIEW_TEXT); return; }
+    if (r && !enquiryIntent.test(text)) { residenceCard(r); return; }
+    let m = bestMatch(text);
+    if (!m && /\bsabdia\b/i.test(text) && !enquiryIntent.test(text)) m = qa.find((x) => x.cat === 'about') || null; // "tell me about Sabdia" is all stop words
     if (m) { say(linkify(m.a)); afterAnswer(m, r); return; }
-    if (enquiryIntent.test(text)) { state.intent = /inspect|viewing|appointment/i.test(text) ? 'Arrange Private Inspection' : (/price|cost|how much/i.test(text) ? 'Request Price Guide' : 'Register Interest'); startEnquiry(r); return; }
+    if (enquiryIntent.test(text)) {
+      if (priceIntent.test(text)) { answerThen(priceQA, null, 'Request Price Guide', PRICE_TEXT); return; }
+      state.intent = viewingIntent.test(text) ? 'Request a Viewing' : 'Register Interest';
+      startEnquiry(r); return;
+    }
     say(esc(cc.getAttribute('data-fallback') || 'Our team can help with that.'));
     options(['Leave an enquiry', cc.getAttribute('data-person') || 'Chat with a person', 'Back to questions'], (label, n) => { if (n === 0) startEnquiry(null); else if (n === 1) handOver(); else showOpening(); });
   };
   const afterAnswer = (m, r) => {
-    if (m.link === 'enquire') { options(['Leave my details', 'Back to questions'], (label, n) => { if (n === 0) { state.intent = /inspect/i.test(m.q) ? 'Arrange Private Inspection' : (/price/i.test(m.q) ? 'Request Price Guide' : 'Register Interest'); startEnquiry(r); } else showOpening(); }); }
-    else if (m.link) { say('<a href="' + esc(m.link) + '">Open ' + esc(m.link) + '</a>'); options(['Leave an enquiry', 'Back to questions'], (label, n) => { if (n === 0) startEnquiry(r); else showOpening(); }); }
-    else options(['Leave an enquiry', 'Back to questions'], (label, n) => { if (n === 0) startEnquiry(r); else showOpening(); });
+    const go = () => { state.intent = intentFor(m); startEnquiry(r); };
+    if (m.link === 'enquire') options(['Leave my details', 'Back to questions'], (label, n) => { if (n === 0) go(); else showOpening(); });
+    else if (m.link) { say('<a href="' + esc(m.link) + '">Open ' + esc(m.link) + '</a>'); options(['Leave an enquiry', 'Back to questions'], (label, n) => { if (n === 0) go(); else showOpening(); }); }
+    else options(['Leave an enquiry', 'Back to questions'], (label, n) => { if (n === 0) go(); else showOpening(); });
   };
   const CATS = ['about', 'residences', 'buying', 'builds', 'agents', 'other'];
   const catNames = (cc.getAttribute('data-cats') || '').split('|');
@@ -778,6 +844,7 @@ function conciergeInit() {
     options(items, (label, n) => { if (n === items.length - 1) { if (back) { showOpening(); } else { say(esc(label), 'me'); handOver(); } return; } askItem(list[n]); }, true);
   };
   const showOpening = () => {
+    if (!step) reset(); // back at the menu: nothing from an earlier path carries into the next enquiry
     const count = parseInt(cc.getAttribute('data-buttons') || '5', 10);
     if ((cc.getAttribute('data-menu') || 'categories') !== 'categories') { showQuestions(qa.slice(0, count), false); return; }
     const present = CATS.filter((c) => qa.some((x) => x.cat === c));
@@ -791,7 +858,7 @@ function conciergeInit() {
         const homes = forSale.map((r) => r.title + ' - ' + r.suburb);
         const qs = qa.filter((x) => x.cat === c);
         const list = homes.concat(qs.map((x) => x.q)).concat(['Back']);
-        options(list, (lab, i) => { if (i === list.length - 1) { showOpening(); return; } if (i < homes.length) { const r = forSale[i]; say(esc(lab), 'me'); typing(400).then(() => { say(linkify(residenceText(r))); options(['Enquire about ' + r.title, 'Arrange an inspection', 'Back'], (l2, k) => { if (k === 2) { showOpening(); return; } state.intent = k === 1 ? 'Arrange Private Inspection' : 'Register Interest'; startEnquiry(r); }); }); return; } askItem(qs[i - homes.length]); }, true);
+        options(list, (lab, i) => { if (i === list.length - 1) { showOpening(); return; } if (i < homes.length) { const r = forSale[i]; say(esc(lab), 'me'); typing(400).then(() => residenceCard(r, 'Back')); return; } askItem(qs[i - homes.length]); }, true);
         return;
       }
       showQuestions(qa.filter((x) => x.cat === c), true);
@@ -922,6 +989,8 @@ function initPage() {
 
   // ── HERO SLIDESHOW + STRIP INDICATOR ──────────────────────
   const slides = document.querySelectorAll('.h-slide');
+  const hSlidesEl = document.getElementById('hSlides');
+  const heroEvery = (hSlidesEl && Number(hSlidesEl.dataset.every)) || 6200;
   const hDots = document.querySelectorAll('#hDots .h-dot');
   const hScrollNum = document.querySelector('.h-scroll-num');
   if (slides.length > 1) {
@@ -948,7 +1017,7 @@ function initPage() {
     update();
     let auto = null;
     if (!reduceMotion) {
-      auto = setInterval(() => goTo(si + 1), 6200);
+      auto = setInterval(() => goTo(si + 1), heroEvery);
       pageIntervals.push(auto);
     }
     hDots.forEach((d, i) => d.addEventListener('click', () => {

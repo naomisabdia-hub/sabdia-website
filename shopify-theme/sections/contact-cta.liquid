@@ -3,18 +3,23 @@
   form. The form posts into the Sabdia leads inbox via the forms
   endpoint; main.js handles submission and the status line.
 {%- endcomment -%}
-<section class="sp" id="contact" style="background:var(--bg2);border-top:1px solid var(--border)">
+{% render 'section-look', section: section %}
+<section class="sp cc-band cc-{{ section.settings.layout | default: 'beside' }}{% if section.settings.form_style == 'card' %} cc-card{% endif %}" id="contact" style="background:var(--bg2);{% if section.settings.show_rule %}border-top:1px solid var(--border){% endif %}">
   <div class="inner contact-grid">
     <div>
-      <div class="slabel reveal">{{ section.settings.label }}</div>
-      <h2 class="contact-h reveal d1">{{ section.settings.heading_html }}</h2>
-      <p class="about-p reveal d2" style="margin-bottom:36px">{{ section.settings.text }}</p>
+      {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+      {%- if section.settings.show_heading -%}<h2 class="contact-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
+      {%- if section.settings.show_text and section.settings.text != blank -%}<p class="about-p reveal d2" style="margin-bottom:36px">{{ section.settings.text }}</p>{%- endif -%}
+      {%- if section.settings.show_details -%}
       <ul class="cdet reveal d3">
-        <li class="cd"><span class="cd-l">{{ section.settings.d_location | default: "Location" }}</span><span class="cd-v">{{ settings.location }}</span></li>
-        <li class="cd"><span class="cd-l">{{ section.settings.d_instagram | default: "Instagram" }}</span><a href="{{ settings.instagram_url }}" target="_blank" class="cd-v">{{ settings.instagram_label }}</a></li>
-        <li class="cd"><span class="cd-l">{{ section.settings.d_facebook | default: "Facebook" }}</span><a href="{{ settings.facebook_url }}" target="_blank" class="cd-v">{{ section.settings.d_facebook_v | default: "Sabdia Constructions" }}</a></li>
-        <li class="cd"><span class="cd-l">{{ section.settings.d_linkedin | default: "LinkedIn" }}</span><a href="{{ settings.linkedin_url }}" target="_blank" class="cd-v">{{ section.settings.d_linkedin_v | default: "Sabdia Constructions" }}</a></li>
+        {%- if section.settings.d_show_location -%}<li class="cd"><span class="cd-l">{{ section.settings.d_location | default: "Location" }}</span><span class="cd-v">{{ settings.location }}</span></li>{%- endif -%}
+        {%- if section.settings.d_show_phone and settings.contact_phone != blank -%}<li class="cd"><span class="cd-l">{{ section.settings.d_phone | default: "Phone" }}</span><a href="tel:{{ settings.contact_phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}" class="cd-v">{{ settings.contact_phone }}</a></li>{%- endif -%}
+        {%- if section.settings.d_show_email and settings.contact_email != blank -%}<li class="cd"><span class="cd-l">{{ section.settings.d_email | default: "Email" }}</span><a href="mailto:{{ settings.contact_email }}" class="cd-v">{{ settings.contact_email }}</a></li>{%- endif -%}
+        {%- if section.settings.d_show_instagram -%}<li class="cd"><span class="cd-l">{{ section.settings.d_instagram | default: "Instagram" }}</span><a href="{{ settings.instagram_url }}" target="_blank" class="cd-v">{{ settings.instagram_label }}</a></li>{%- endif -%}
+        {%- if section.settings.d_show_facebook -%}<li class="cd"><span class="cd-l">{{ section.settings.d_facebook | default: "Facebook" }}</span><a href="{{ settings.facebook_url }}" target="_blank" class="cd-v">{{ section.settings.d_facebook_v | default: "Sabdia Constructions" }}</a></li>{%- endif -%}
+        {%- if section.settings.d_show_linkedin -%}<li class="cd"><span class="cd-l">{{ section.settings.d_linkedin | default: "LinkedIn" }}</span><a href="{{ settings.linkedin_url }}" target="_blank" class="cd-v">{{ section.settings.d_linkedin_v | default: "Sabdia Constructions" }}</a></li>{%- endif -%}
       </ul>
+      {%- endif -%}
     </div>
     <div>
       {%- if settings.form_backend == 'vercel' -%}
@@ -111,6 +116,13 @@
     </div>
   </div>
 </section>
+<style>
+  .cc-formonly .contact-grid{grid-template-columns:1fr;max-width:760px}
+  .cc-formonly .contact-grid>div:first-child{display:none}
+  .cc-above .contact-grid{grid-template-columns:1fr;gap:48px}
+  .cc-flip .contact-grid>div:first-child{order:2}
+  .cc-card .cform{padding:clamp(22px,3vw,36px);background:var(--white);border:1px solid var(--border);border-top:2px solid var(--gold)}
+</style>
 
 {% schema %}
 {
@@ -136,8 +148,7 @@
       "type": "textarea",
       "id": "interests",
       "label": "Interest options",
-      "info": "One option per line. Add a tailored thank-you after a | on the same line, e.g. Custom home design | Thank you. Everything at Sabdia is designed and built in-house, so we do not take on custom commissions - we will be in touch about our releases.",
-      "info": "One option per line."
+      "info": "One option per line. Add a tailored thank-you after a | on the same line, e.g. Custom home design | Thank you. Everything at Sabdia is designed and built in-house, so we do not take on custom commissions - we will be in touch about our releases."
     },
     {
       "type": "text",
@@ -274,7 +285,51 @@
       "id": "d_linkedin_v",
       "label": "LinkedIn display text",
       "default": "Sabdia Constructions"
-    }
+    },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
+    {"type": "checkbox", "id": "show_text", "label": "Show the paragraph", "default": true},
+    {"type": "checkbox", "id": "show_details", "label": "Show the details list", "default": true},
+    {"type": "checkbox", "id": "d_show_location", "label": "Location row", "default": true},
+    {"type": "checkbox", "id": "d_show_phone", "label": "Phone row", "default": false, "info": "Needs a phone in Theme settings › Contact."},
+    {"type": "checkbox", "id": "d_show_email", "label": "Email row", "default": false},
+    {"type": "checkbox", "id": "d_show_instagram", "label": "Instagram row", "default": true},
+    {"type": "checkbox", "id": "d_show_facebook", "label": "Facebook row", "default": true},
+    {"type": "checkbox", "id": "d_show_linkedin", "label": "LinkedIn row", "default": true},
+    {"type": "checkbox", "id": "show_rule", "label": "Hairline above the section", "default": true},
+    {"type": "text", "id": "d_phone", "label": "Phone row label", "default": "Phone"},
+    {"type": "text", "id": "d_email", "label": "Email row label", "default": "Email"},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "layout", "label": "Details and form", "options": [{"value": "beside", "label": "Details beside the form (as designed)"}, {"value": "flip", "label": "Form first, details after"}, {"value": "above", "label": "Details above the form"}, {"value": "formonly", "label": "Form only"}], "default": "beside"},
+    {"type": "select", "id": "form_style", "label": "Form style", "options": [{"value": "plain", "label": "Fields on the band (as designed)"}, {"value": "card", "label": "In a white card"}], "default": "plain"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "presets": [
     {

@@ -9,6 +9,8 @@ The full illustrated guide is *Sabdia Website Guide.pdf* on the Desktop.
 | Home banner: slideshow or a film | Customize › Home › **Hero slideshow** › Header media | Set "Show" to **Video instead**, upload the mp4. Slides are kept — set it back to Slideshow any time |
 | Size, shape or crop of a photo | Customize › click the section › **Size** | Image band, Photo gallery and Page hero: shape (4:3, square, portrait…) or fixed height, band width, gap; each image block has **Crop focus** and Image band a **Zoom**. Shopify has no drag-to-resize — these settings are the resize |
 | Size of the two About photos | Customize › Home › **About** › Image strip | Layout (2:1, equal, 1:2, single), height, phone height, gap; each Strip image block has a crop focus |
+| **The look of any section: background, photo or film behind it, space, width, type sizes** | Customize › click the section › scroll to **Look** (since 11 Sep 2026) | Every section carries the same dials the home hero has. Background: as designed, cream, stone, obsidian, a colour of your own, or a real photo / film behind it with a Darken dial and crop focus (obsidian and photos turn the words light by themselves). Space above and below (0 to 200% of the design), content width, side margins, heading / text / label sizes, the fade-in, hairlines above and below, and an anchor name so a link can jump there. Leave everything as designed and nothing changes |
+| **What each section shows, and how it is arranged** | Customize › click the section › the **Show** and **Layout** headers | Each section has its own switches for the parts it contains (label, heading, text, buttons, badges, dots, arrows, captions, numbers…) and dials for its layout: columns across, card shapes, gaps, which side a photo sits, sticky headings, card styles, quote styles, hero heights and darkening, where the words sit, slideshow timing, carousel direction and more. Nothing is deleted when switched off; it comes back with the switch |
 | "Privacy Policy" link under forms | Theme settings › Site plumbing › **Privacy link beside forms** | Appears after every enquiry note automatically; blank it to hide |
 | Password page (store locked) | Customize › pick **Password** page in the dropdown | Section "Password page": heading, text, button |
 | Form labels, button text, filter names, small labels | Customize › click the section › **Wording** | Every visible word is a setting; card chips are under Theme settings › **Labels** |
@@ -40,7 +42,7 @@ The full illustrated guide is *Sabdia Website Guide.pdf* on the Desktop.
 | Live chat with curated answers | Apps › **Inbox** › Add to theme; Chat settings › Collect customer details ON; Instant answers | The chat bubble appears on every page; chats land in Inbox and the visitor's name and email go to Customers. Instant answers are the curated replies (custom builds, inspections, price guides, agents) |
 | **Newsletter list and sending a newsletter** | Customers › Segments › **Email subscribers** is the list. Send from **Marketing › Campaigns › Create campaign › Shopify Email** (free Shopify app; add it from the same screen if asked) | Only subscribers may receive campaigns - people who merely enquired have not consented. Signups from a residence page are also tagged with that house, so a segment with `customer_tags CONTAINS 'qasr'` gives the QASR list |
 | The Journal | **Content › Blog posts** | Blog "The Journal"; featured image + excerpt matter |
-| Nav and footer links | **Content › Menus** | Main menu is For Sale, Collection, Services, About, Agent Access as plain links. Drag an item under another to make a dropdown instead |
+| Nav and footer links | **Content › Menus** | Main menu is For Sale, Collection, Process (the /pages/services page, retitled Our Process on 11 Sep 2026), About, Agent Access as plain links. Drag an item under another to make a dropdown instead |
 | How many residences the home page shows | Customize › Home › Properties grid › **Most residences to show** | First three live houses fill the large layout, the rest flow in rows of three (live first, then sold). Two left over share a row; one left over runs wide |
 | Privacy / Terms / Accessibility text | **Content › Pages** | The page body is the text. Other pages keep their words in the customizer |
 | Logo, logo size, ABN, QBCC number, phone, email, socials | Customize › **Theme settings** (bottom-left) › Brand / Contact / Social | |
@@ -51,6 +53,15 @@ The full illustrated guide is *Sabdia Website Guide.pdf* on the Desktop.
 | Where enquiries go | Theme settings › Site plumbing › **Enquiry handling** | Leave on **Sabdia API**: every enquiry lands in the Leads Inbox, monday.com, the alert email *and* Shopify › Customers (tagged `residence:QASR`, `type:…`, `form:…`, `newsletter`) once the customer scopes are on |
 | See enquiries inside Shopify | **Customers** › filter › Tagged with `website` (or `residence:QASR`, `agent`, `newsletter`) | The message and date are on the customer's note |
 | Send the Journal or a newsletter | **Marketing › Shopify Email** › create campaign › segment: tag `newsletter` (or a residence tag for one house's enquirers) | No export needed; the list keeps itself from the forms |
+
+## Every section has the same dials now (11 Sep 2026)
+
+Naomi asked for the home hero's level of control on every page, every product page and every section. Two things were built:
+
+1. **Look** - the shared panel at the bottom of every section (Customize › the section › Look). Background (as designed / cream / stone / obsidian / your colour / a photo or film behind it with Darken and crop dials), Space above and below, Content width, Side margins, Heading size, Text size, Small label size, Fade in, Hairline above / below, Anchor name. Hero-type sections (home hero, page heroes and headers, the residence and Collection heroes, the password page, the walkthrough) keep their own photo and darken dials, so their Look panel holds space, type and finishing only.
+2. **Show / Layout** - bespoke switches and dials in each section for the things it actually contains. A few examples: the marquee's speed, direction and separators; the stats band's columns, dividers and suffix size; About's heading beside or above, image strip position, values as a list or three columns; the film band's reel shape, frame, carousel direction and autoplay; testimonials' photo side, quote style and transition; the footer's columns and bands; the nav's bar height, link size and button style; the residence page's hero height and darkening, which specs show, description-and-form layout, gallery stage shape and every part of the page on a switch; the Collection residence page's story split, side photos, similar residences count and closing band style.
+
+Rules of thumb: a switch never deletes - turn it back on and the words are still there. "As designed" is always the first option and the default, so an untouched section renders exactly as before. Obsidian or a photo behind a section flips every colour in it (text, rules, buttons, cards) to the dark palette automatically; cream and stone keep the dark words. Shopify's own **Custom CSS** box (at the very bottom of every section) is still there for anything the dials do not reach.
 
 ## The three things that confuse everyone
 
@@ -77,3 +88,46 @@ The full illustrated guide is *Sabdia Website Guide.pdf* on the Desktop.
 - **Everything about a house** lives on its page: Content › Pages › e.g. CALLE › Metafields — Hero image, Film, Gallery photos, **Style** (drives the filter chips), Completed (year), Bedrooms/Bathrooms/Garages/Land size (the specs bar shows only what is filled), Headline, Story (one paragraph per line; empty = stitched from its Instagram captions), Key features.
 - **Similar residences** at the foot of each page pick themselves: same style first, then the same suburb.
 - The page header's **Banner** (photo or film) is set at Customize › Collection › Page header.
+
+## Every picture and film on the site, and where to change it
+
+Rule of thumb: a picker (Select image / Select video) always wins over the field under it (Current photo (URL), or a page or product metafield). Leave the picker empty and the site keeps showing what it shows today. A pick is live the moment you press Save; nothing needs pushing. Two places are not in the customizer on purpose: residence photos (Products › the residence › Media) and the Collection galleries (a list of photo links on the page).
+
+| Page | Section | Picture / film | Where to change it | Notes |
+|---|---|---|---|---|
+| Every page | Navigation, Footer, home hero mark, page-hero logo heading, Password page | Logo | Customize › Theme settings › Brand › Logo | One picker feeds all of them, and Google's structured data |
+| Every page | Link previews (iMessage, LinkedIn, Facebook) | Share image | Customize › Theme settings › Search & sharing › Share image | A residence for sale shares its own hero photo instead |
+| Home | Hero slideshow | Film and its poster | Customize › Home › Hero slideshow › Video, Video poster | Video (URL) is the fallback; the Media switch chooses film or slides |
+| Home | Hero slideshow | Slides | Hero slideshow › Slide 1, 2, 3 › Image | Current photo (URL) under it is the fallback |
+| Home | About | Strip photos | Customize › Home › About › Strip image blocks › Image | Current photo (URL) fallback |
+| Home | Film band (the Sabdia story) | Film, poster, side panels | Customize › Home › Film band › Film, Poster image; blocks Photo and Second film | Current film (URL) and Current poster (URL) are the Supabase brand reel |
+| Home | Properties grid | Residence cards | Products › the residence › Media, first photo | Automatic; the residence's Status decides a live or sold card |
+| Home | Agent access | Portrait | Customize › Home › Agent access › Image | Current photo (URL) fallback |
+| For Sale (/collections/…) | Collection grid | Hero photo or film | Customize › Collection (For Sale) › Collection grid › Hero image, Hero film (upload) | Both empty = the second live residence's hero photo, automatically. Current photo (URL) and Current hero film (URL) fallbacks |
+| For Sale | Collection grid | Featured residence and cards | Products › Media | Automatic |
+| Residence for sale (/products/…) | Property page | Hero | Products › the residence › Media, first photo | Automatic |
+| Residence for sale | Property page | Gallery (stage, filmstrip, viewer) | Products › Media in order, or Customize › the residence › Property page › ⊕ Add block › Photo / Video | Each residence has its own template, so blocks belong to that house. A Video block takes Video (uploaded to Shopify), or a video file URL, plus a Poster |
+| Residence for sale | Property page | The film and its poster | New: Customize › the residence › Property page › The film › Film (upload), Film poster | What shows today, and the fallback: Products › the residence › Metafields › Film video, Film poster |
+| Residence for sale | Scroll walkthrough | Frames | Automatic, from Supabase media/scrollwalk/(folder)/ | Folder: Products › Metafields › Scroll walkthrough folder (or the section's Frame folder); switch: Show the scroll walkthrough. Real visualiser footage only, never generated |
+| Residence for sale, Collection residence | The Series | Instagram tiles | Automatic, from the Instagram sync (Metafields › series_posts) | See docs/INSTAGRAM-SERIES.md |
+| Residence for sale | Related residences | Cards | Products › Media | Automatic |
+| Collection (/pages/collection) | Page header | Banner photo or film | Customize › Collection › Page header › Banner photo, Banner film (upload) | Current banner photo (URL) and Current banner film (URL) fallbacks |
+| Collection | Collection grid | Residence tiles and hover films | Customize › Collection › Collection grid › Residence block › Image, Hover film (upload, optional) | Fallback: that residence page's Hero image (or first Gallery photo) and Film metafields, then Current photo (URL) |
+| Collection residence (/pages/collection-…) | Collection residence | Hero photo | New: Customize › open that residence's page › Collection residence › ⊕ Add block › Residence photos and film › Residence page = that page › Hero photo | Fallback: Content › Pages › the residence › Metafields › Hero image (or the first Gallery photo). One block per house. All completed residences share one template, so the block's Residence page is what keeps the picks apart |
+| Collection residence | Collection residence | Story column photos (tall, wide) | The same block › Story column, tall photo / wide photo | Fallback: Gallery photos 2 and 3 |
+| Collection residence | Collection residence | Gallery stage, filmstrip, mosaic, viewer | Content › Pages › the residence › Metafields › Gallery (one photo link per line) | Link-based by design. Photos live in the Supabase media bucket at media/collection/(house)/ with thumbnails at media/collection-thumbs/(house)/; upload there, then add the public link as a new line. The order of the lines is the order on the page |
+| Collection residence | Collection residence | Film and its poster | The same block › Film (upload), Film poster | Fallback: Metafields › Film; the poster is the hero photo |
+| Collection residence | Collection residence | Similar residences cards | Collection residence › Portfolio residence blocks › Image, Hover film (upload, optional) | Fallback: that residence page's metafields, then Current photo (URL) |
+| About | Page hero (photo) | Hero photo or film | Customize › About › Page hero (photo) › Hero image, Hero film (upload) | Current photo (URL) and Current hero film (URL) fallbacks. Mission, values, journey and recognition have no pictures |
+| Services | Page hero (photo) | Hero photo or film | Customize › Services › Page hero (photo) › Hero image, Hero film (upload) | As above |
+| Services | Services - details | One photo per service | Services - details › Service block › Image | Current photo (URL) fallback |
+| Agent Access | Agent hero | Portrait | Customize › Agent access › Agent hero › Hero image | Current photo (URL) fallback |
+| Agent Access | Agent listings | Cards | Products › Media | Automatic |
+| Contact | Page header | Banner | Customize › Contact › Page header › Banner photo, Banner film (upload) | |
+| Contact | Contact body | Map card | Contact body › Map card image | Current map image (URL) fallback |
+| Find your home | Page header; Guided match | Banner; result cards | Page header pickers; Products › Media | |
+| Projects | Page hero (photo); Projects grid | Hero; cards | Page hero pickers; Products › Media | |
+| Journal | Journal listing, Journal story | Featured image | Content › Blog posts › the post › Featured image | Automatic |
+| Password page | Password page | Film or photo | Customize › Password › Password page › Film (upload), Photo (poster for the film, or on its own) | Current film (URL) and Current photo (URL) fallbacks; the logo comes from Theme settings |
+| Any page | Photo gallery; Image band | Photos | ⊕ Add section › Photo gallery › Photo blocks › Photo; Image band › Image blocks › Image | Current photo (URL) fallbacks |
+| 404, Search, Cart | 404; Simple page | None | | No pictures on these |

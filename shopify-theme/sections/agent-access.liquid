@@ -1,5 +1,6 @@
 {%- comment -%} Port of the Agent Access band - portrait visual + framed badge beside copy, features and CTAs. {%- endcomment -%}
-<div class="agent-grid" id="agents">
+{% render 'section-look', section: section %}
+<div class="agent-grid s-surface{% if section.settings.image_side == 'right' %} agent-flip{% endif %}{% if section.settings.frame == false %} agent-noframe{% endif %}" id="agents" style="--agent-min:{{ section.settings.min_height | default: 640 }}px">
   <div class="agent-vis reveal-wipe-x">
     {%- if section.settings.image -%}
       <img src="{{ section.settings.image | image_url: width: 900, height: 1100, crop: 'center' }}" alt="{{ section.settings.image_alt | default: 'Sabdia agent program' | escape }}" loading="lazy" decoding="async" width="900" height="1100">
@@ -7,21 +8,25 @@
       <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 900, h: 1100 %}" alt="{{ section.settings.image_alt | default: 'Sabdia agent program' | escape }}" loading="lazy" decoding="async" width="900" height="1100">
     {%- endif -%}
     <div class="agent-frame"></div>
-    <div class="agent-badge">{{ section.settings.badge }}</div>
+    {%- if section.settings.show_badge and section.settings.badge != blank -%}<div class="agent-badge">{{ section.settings.badge }}</div>{%- endif -%}
   </div>
   <div class="agent-content">
-    <div class="slabel reveal">{{ section.settings.label }}</div>
-    <h2 class="agent-h reveal d1">{{ section.settings.heading_html }}</h2>
-    <p class="agent-p reveal d2">{{ section.settings.text }}</p>
+    {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+    {%- if section.settings.show_heading -%}<h2 class="agent-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
+    {%- if section.settings.show_text and section.settings.text != blank -%}<p class="agent-p reveal d2">{{ section.settings.text }}</p>{%- endif -%}
+    {%- if section.settings.show_features and section.blocks.size > 0 -%}
     <ul class="agent-feats reveal d3">
       {%- for block in section.blocks -%}
         <li {{ block.shopify_attributes }}>{{ block.settings.text }}</li>
       {%- endfor -%}
     </ul>
+    {%- endif -%}
+    {%- if section.settings.show_buttons -%}
     <div class="agent-btns reveal d4">
-      <a href="{{ section.settings.cta1_link }}" class="btn-p">{{ section.settings.cta1_label }}</a>
-      <a href="{{ section.settings.cta2_link }}" class="btn-g">{{ section.settings.cta2_label }}</a>
+      {%- if section.settings.cta1_label != blank -%}<a href="{{ section.settings.cta1_link }}" class="btn-p">{{ section.settings.cta1_label }}</a>{%- endif -%}
+      {%- if section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link }}" class="btn-g">{{ section.settings.cta2_label }}</a>{%- endif -%}
     </div>
+    {%- endif -%}
   </div>
 </div>
 
@@ -89,7 +94,45 @@
       "id": "cta2_link",
       "label": "Secondary button link",
       "default": "/pages/agent-access"
-    }
+    },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_badge", "label": "Show the badge on the photo", "default": true},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
+    {"type": "checkbox", "id": "show_text", "label": "Show the paragraph", "default": true},
+    {"type": "checkbox", "id": "show_features", "label": "Show the feature list", "default": true},
+    {"type": "checkbox", "id": "show_buttons", "label": "Show the buttons", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "image_side", "label": "Photo sits", "options": [{"value": "left", "label": "Left (as designed)"}, {"value": "right", "label": "Right"}], "default": "left"},
+    {"type": "checkbox", "id": "frame", "label": "Thin gold frame offset from the photo", "default": true},
+    {"type": "range", "id": "min_height", "label": "Least height of the photo", "min": 400, "max": 900, "step": 20, "default": 640, "unit": "px"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "blocks": [
     {

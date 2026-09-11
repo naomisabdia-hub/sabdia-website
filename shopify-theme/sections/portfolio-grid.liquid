@@ -65,8 +65,9 @@
   endif
 -%}
 
+{% render 'section-look', section: section %}
 {%- if section.settings.show_filter and section.blocks.size > 3 -%}
-<div class="pf-bar" data-pf-bar="{{ sid }}">
+<div class="pf-bar s-surface{% if section.settings.filter_sticky == false %} pf-static{% endif %}" data-pf-bar="{{ sid }}">
   <div class="inner pf-bar-inner">
     <div class="pf-chips" role="group" aria-label="Filter by style">
       <span class="pf-bar-l">{{ section.settings.filter_label }}</span>
@@ -90,7 +91,7 @@
 </div>
 {%- endif -%}
 
-<section class="pf-wrap" id="port-{{ sid }}">
+<section class="pf-wrap{% if section.settings.name_style == 'caps' %} pf-caps{% endif %}{% if section.settings.hover_zoom == false %} pf-nozoom{% endif %}" id="port-{{ sid }}" style="--pf-cols:{{ section.settings.columns | default: '3' }};--pf-ar:{{ section.settings.card_shape | default: '4/3' }};--pf-gap-y:{{ section.settings.gap_y | default: 44 }}px;--pf-gap-x:{{ section.settings.gap_x | default: 24 }}px">
   <div class="inner">
     {%- if section.settings.intro != blank -%}
       {%- assign count_token = '{' | append: 'count' | append: '}' -%}
@@ -178,17 +179,17 @@
             {%- elsif r_image_ext != blank -%}
               <img src="{% render 'ext-variant', src: r_image_ext, w: 1200, h: 900 %}" alt="{{ r_name | escape }}{% if r_suburb != blank %}, {{ r_suburb | escape }}{% endif %}" width="1200" height="900" loading="lazy" decoding="async">
             {%- endif -%}
-            {%- if r_video != blank -%}
+            {%- if r_video != blank and section.settings.hover_films -%}
               <video src="{{ r_video }}" muted loop playsinline preload="none" data-port-video></video>
-              <span class="port-film-tag">{{ section.settings.film_tag | default: "Film" }}</span>
+              {%- if section.settings.show_film_tag -%}<span class="port-film-tag">{{ section.settings.film_tag | default: "Film" }}</span>{%- endif -%}
             {%- endif -%}
             {%- if r_style != blank and section.settings.style_on_card -%}
               <span class="pf-style">{{ r_style }}</span>
             {%- endif -%}
           </div>
           <div class="pf-info">
-            <div class="pf-name">{{ r_name }}{% if r_link != blank %} <span aria-hidden="true">&rarr;</span>{% endif %}</div>
-            <div class="pf-meta">{{ r_suburb }}{% if r_style != blank %} <i>&middot;</i> {{ r_style }}{% endif %}{% if r_year != blank %} <i>&middot;</i> {{ r_year }}{% endif %}</div>
+            <div class="pf-name">{{ r_name }}{% if r_link != blank and section.settings.show_arrow %} <span aria-hidden="true">&rarr;</span>{% endif %}</div>
+            {%- if section.settings.show_meta -%}<div class="pf-meta">{{ r_suburb }}{% if r_style != blank %} <i>&middot;</i> {{ r_style }}{% endif %}{% if r_year != blank %} <i>&middot;</i> {{ r_year }}{% endif %}</div>{%- endif -%}
           </div>
           {%- if section.settings.show_teaser and r_teaser != blank -%}
             <p class="pf-teaser">{{ r_teaser }}</p>
@@ -288,7 +289,47 @@
     { "type": "checkbox", "id": "show_current", "label": "Include residences from Products", "default": false, "info": "Off since 10 Sep 2026 (Tamsin): For Sale has its own page. On = the current homes lead the grid, tagged by their Status, with For Sale / Sold filter chips." },
     { "type": "select", "id": "current_scope", "label": "Which ones", "options": [ { "value": "sold", "label": "Sold only (past projects)" }, { "value": "all", "label": "For Sale and Sold" } ], "default": "all" },
     { "type": "text", "id": "filter_live", "label": "For Sale chip", "default": "For Sale" },
-    { "type": "text", "id": "filter_sold", "label": "Sold chip", "default": "Sold" }
+    { "type": "text", "id": "filter_sold", "label": "Sold chip", "default": "Sold" },
+    {"type": "header", "content": "Cards"},
+    {"type": "checkbox", "id": "hover_films", "label": "Films play on hover", "default": true},
+    {"type": "checkbox", "id": "show_film_tag", "label": "Film tag on cards that have one", "default": true},
+    {"type": "checkbox", "id": "show_arrow", "label": "Arrow after each name", "default": true},
+    {"type": "checkbox", "id": "show_meta", "label": "Suburb · style · year under each name", "default": true},
+    {"type": "checkbox", "id": "hover_zoom", "label": "Photos zoom gently on hover", "default": true},
+    {"type": "checkbox", "id": "filter_sticky", "label": "Filter bar sticks under the nav while scrolling", "default": true},
+    {"type": "select", "id": "name_style", "label": "Name style", "options": [{"value": "serif", "label": "Serif (as designed)"}, {"value": "caps", "label": "Small tracked capitals"}], "default": "serif"},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "columns", "label": "Cards across", "options": [{"value": "2", "label": "Two"}, {"value": "3", "label": "Three (as designed)"}, {"value": "4", "label": "Four"}], "default": "3"},
+    {"type": "select", "id": "card_shape", "label": "Card shape", "options": [{"value": "16/10", "label": "Landscape 16:10"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "1/1", "label": "Square"}, {"value": "4/5", "label": "Portrait 4:5"}], "default": "4/3"},
+    {"type": "range", "id": "gap_y", "label": "Gap between rows", "min": 16, "max": 80, "step": 4, "default": 44, "unit": "px"},
+    {"type": "range", "id": "gap_x", "label": "Gap between columns", "min": 8, "max": 60, "step": 4, "default": 24, "unit": "px"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "blocks": [
     {

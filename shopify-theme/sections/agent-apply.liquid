@@ -3,16 +3,19 @@
   the agent application form on the right. Posts to the existing Vercel
   API as form-name "agent-application".
 {%- endcomment -%}
-<section class="sp" style="background:var(--bg2);border-top:1px solid var(--border)" id="apply">
+{% render 'section-look', section: section %}
+<section class="sp aa aa-{{ section.settings.layout | default: 'beside' }}" style="background:var(--bg2);{% if section.settings.show_rule %}border-top:1px solid var(--border){% endif %}" id="apply">
   <div class="inner agent-apply-grid">
     <div>
-      <div class="slabel reveal">{{ section.settings.label }}</div>
-      <h2 class="about-h reveal d1" style="font-size:clamp(32px,4vw,52px)">{{ section.settings.heading_html }}</h2>
-      <p class="about-p reveal d2">{{ section.settings.text }}</p>
-      <div class="reveal d3" style="margin-top:36px;padding:28px;background:var(--dark);border-left:2px solid var(--gold)">
-        <div style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--gold3);margin-bottom:10px">{{ section.settings.note_label }}</div>
-        <div style="font-size:14px;font-weight:400;color:rgba(253,251,246,.78);line-height:1.75">{% render 'privacy-link', note: section.settings.note_text %}</div>
+      {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+      {%- if section.settings.show_heading -%}<h2 class="about-h reveal d1" style="font-size:calc(clamp(32px,4vw,52px)*var(--s-h,1))">{{ section.settings.heading_html }}</h2>{%- endif -%}
+      {%- if section.settings.show_text and section.settings.text != blank -%}<p class="about-p reveal d2">{{ section.settings.text }}</p>{%- endif -%}
+      {%- if section.settings.show_note and section.settings.note_text != blank -%}
+      <div class="reveal d3 aa-note aa-note-{{ section.settings.note_style | default: 'obsidian' }}">
+        <div class="aa-note-l">{{ section.settings.note_label }}</div>
+        <div class="aa-note-t">{% render 'privacy-link', note: section.settings.note_text %}</div>
       </div>
+      {%- endif -%}
     </div>
     <div>
       {%- if settings.form_backend == 'vercel' -%}
@@ -70,6 +73,12 @@
 
 <style>
   .agent-apply-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start}
+  .aa-above .agent-apply-grid{grid-template-columns:1fr;gap:40px;max-width:760px}
+  .aa-note{margin-top:36px;padding:28px;background:var(--dark);border-left:2px solid var(--gold)}
+  .aa-note-l{font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--gold3);margin-bottom:10px}
+  .aa-note-t{font-size:calc(14px*var(--s-t,1));font-weight:400;color:rgba(var(--white-rgb),.78);line-height:1.75}
+  .aa-note-stone{background:var(--bg3)}.aa-note-stone .aa-note-l{color:var(--ink)}.aa-note-stone .aa-note-t{color:var(--ink3)}
+  .aa-note-plain{background:transparent;padding:22px 0 0;border-left:0;border-top:1px solid var(--border)}.aa-note-plain .aa-note-l{color:var(--ink)}.aa-note-plain .aa-note-t{color:var(--ink3)}
   @media(max-width:1024px){.agent-apply-grid{grid-template-columns:1fr;gap:52px}}
 </style>
 
@@ -168,7 +177,43 @@
       "id": "f_message",
       "label": "Additional information label",
       "default": "Additional Information"
-    }
+    },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
+    {"type": "checkbox", "id": "show_text", "label": "Show the paragraph", "default": true},
+    {"type": "checkbox", "id": "show_note", "label": "Show the note", "default": true},
+    {"type": "checkbox", "id": "show_rule", "label": "Hairline above the section", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "layout", "label": "Words", "options": [{"value": "beside", "label": "Beside the form"}, {"value": "above", "label": "Above the form"}], "default": "beside"},
+    {"type": "select", "id": "note_style", "label": "Note style", "options": [{"value": "obsidian", "label": "Obsidian card (as designed)"}, {"value": "stone", "label": "Stone card"}, {"value": "plain", "label": "Plain, under a hairline"}], "default": "obsidian"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "presets": [
     {

@@ -31,13 +31,27 @@
     when 'full'
       assign ph_h = '100vh'
       assign ph_hm = '100svh'
+    when 'custom'
+      assign ph_h = section.settings.height_px | default: 560 | append: 'px'
+      assign ph_hm = section.settings.height_px | default: 560 | times: 0.7 | round | append: 'px'
     else
       assign ph_h = '60vh'
       assign ph_hm = '50vh'
   endcase
+  assign ph_dim = section.settings.dim | default: 52 | divided_by: 100.0
+  assign ph_pos = section.settings.words_position | default: 'design'
+  if ph_pos == 'design'
+    if style == 'guided'
+      assign ph_pos = 'base-centre'
+    else
+      assign ph_pos = 'base-left'
+    endif
+  endif
+  assign ph_scrim = section.settings.scrim | default: 'corner'
 -%}
+{% render 'section-look', section: section, mode: 'hero' %}
 {%- if has_banner -%}
-<section class="page-hero ph-sized pgh-hero" style="--ph-h:{{ ph_h }};--ph-hm:{{ ph_hm }}">
+<section class="page-hero ph-sized pgh-hero ph-pos-{{ ph_pos }} ph-scrim-{{ ph_scrim }}" style="--ph-h:{{ ph_h }};--ph-hm:{{ ph_hm }};--ph-dim:{{ ph_dim }}">
   {%- if bg_video != blank -%}
     <video class="pgh-video" src="{{ bg_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"
       {%- if section.settings.bg_image %} poster="{{ section.settings.bg_image | image_url: width: 1920, height: 1080, crop: focus }}"{% elsif section.settings.bg_image_ext != blank %} poster="{% render 'ext-variant', src: section.settings.bg_image_ext, w: 1920, h: 1080 %}"{% endif %}></video>
@@ -47,42 +61,53 @@
     <img src="{% render 'ext-variant', src: section.settings.bg_image_ext, w: 1920, h: 1080 %}" alt="{{ section.settings.bg_alt | default: page.title | escape }}" loading="eager" fetchpriority="high" width="1920" height="1080" style="object-position:{{ focus }}">
   {%- endif -%}
   <div class="page-hero-ov"></div>
-  <div class="page-hero-content inner"{% if style == 'guided' %} style="text-align:center"{% endif %}>
-    <div class="slabel slabel-dark"{% if style == 'guided' %} style="justify-content:center"{% endif %}>{{ section.settings.label }}</div>
+  <div class="page-hero-content inner">
+    {%- if section.settings.show_label and section.settings.label != blank -%}<div class="slabel slabel-dark">{{ section.settings.label }}</div>{%- endif -%}
     <h1 class="page-h">{{ section.settings.title_html }}</h1>
-    {%- if section.settings.text != blank -%}
-      <p class="page-hero-sub"{% if style == 'guided' %} style="margin-left:auto;margin-right:auto"{% endif %}>{{ section.settings.text }}</p>
+    {%- if section.settings.text != blank and section.settings.show_text -%}
+      <p class="page-hero-sub">{{ section.settings.text }}</p>
     {%- endif -%}
   </div>
 </section>
 <style>
   .page-hero.ph-sized{min-height:max(380px,var(--ph-h,60vh))}
-  .pgh-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.74) saturate(.95)}
-  .pgh-hero .page-hero-sub a{color:var(--white);border-bottom:1px solid rgba(253,251,246,.5)}
+  .pgh-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(calc(1 - var(--ph-dim,.52) * .5)) saturate(.95)}
+  .pgh-hero .page-hero-sub a{color:var(--white);border-bottom:1px solid rgba(var(--white-rgb),.5)}
   @media(max-width:900px){.page-hero.ph-sized{height:auto;min-height:max(320px,var(--ph-hm,50vh))}}
   @media(prefers-reduced-motion:reduce){.pgh-video{display:none}}
 </style>
 {%- else -%}
-<section class="pgh pgh-{{ style }}">
-  <div class="{% if style == 'guided' %}inner-md{% else %}inner{% endif %}"{% if style == 'guided' %} style="text-align:center"{% endif %}>
-    <div class="slabel reveal"{% if style == 'guided' %} style="justify-content:center"{% endif %}>{{ section.settings.label }}</div>
+{%- liquid
+  assign pgh_centre = false
+  if section.settings.text_align == 'centre'
+    assign pgh_centre = true
+  elsif section.settings.text_align == 'left'
+    assign pgh_centre = false
+  elsif style == 'guided'
+    assign pgh_centre = true
+  endif
+-%}
+<section class="pgh pgh-{{ style }}{% if section.settings.show_rule == false %} pgh-norule{% endif %}">
+  <div class="{% if style == 'guided' %}inner-md{% else %}inner{% endif %}"{% if pgh_centre %} style="text-align:center"{% endif %}>
+    {%- if section.settings.show_label and section.settings.label != blank -%}<div class="slabel reveal"{% if pgh_centre %} style="justify-content:center"{% endif %}>{{ section.settings.label }}</div>{%- endif -%}
     <h1 class="reveal d1 pgh-h">{{ section.settings.title_html }}</h1>
-    {%- if section.settings.text != blank -%}
-      <p class="reveal d2 pgh-p">{{ section.settings.text }}</p>
+    {%- if section.settings.text != blank and section.settings.show_text -%}
+      <p class="reveal d2 pgh-p"{% if pgh_centre %} style="margin-left:auto;margin-right:auto"{% endif %}>{{ section.settings.text }}</p>
     {%- endif -%}
   </div>
 </section>
 
 <style>
   .pgh-collection{padding:clamp(130px,18vw,180px) var(--page-pad) clamp(48px,6vw,72px);background:var(--bg);border-bottom:1px solid var(--border)}
-  .pgh-collection .pgh-h{font-family:var(--font-d);font-size:var(--t-display);font-weight:300;line-height:.88;letter-spacing:-.035em;color:var(--ink)}
-  .pgh-collection .pgh-p{font-size:var(--t-body);font-weight:300;line-height:var(--lh-body);color:var(--ink3);max-width:480px;margin-top:28px}
+  .pgh-collection .pgh-h{font-family:var(--font-d);font-size:calc(var(--t-display)*var(--s-h,1));font-weight:300;line-height:.88;letter-spacing:-.035em;color:var(--ink)}
+  .pgh-collection .pgh-p{font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:var(--ink3);max-width:480px;margin-top:28px}
   .pgh-contact{padding:clamp(140px,20vw,200px) var(--page-pad) clamp(52px,8vw,96px);background:var(--bg3);border-bottom:1px solid var(--border)}
-  .pgh-contact .pgh-h{font-family:var(--font-d);font-size:var(--t-display);font-weight:300;line-height:.9;letter-spacing:-.035em;color:var(--ink)}
-  .pgh-contact .pgh-p{font-size:15.5px;font-weight:400;color:var(--ink3);max-width:460px;margin-top:28px;line-height:1.85}
+  .pgh-contact .pgh-h{font-family:var(--font-d);font-size:calc(var(--t-display)*var(--s-h,1));font-weight:300;line-height:.9;letter-spacing:-.035em;color:var(--ink)}
+  .pgh-contact .pgh-p{font-size:calc(15.5px*var(--s-t,1));font-weight:400;color:var(--ink3);max-width:460px;margin-top:28px;line-height:1.85}
   .pgh-guided{padding:clamp(130px,18vw,180px) var(--page-pad) clamp(40px,5vw,64px);background:var(--bg2);border-bottom:1px solid var(--border)}
-  .pgh-guided .pgh-h{font-family:var(--font-d);font-size:clamp(40px,7vw,84px);font-weight:300;line-height:.95;letter-spacing:-.03em;color:var(--ink)}
-  .pgh-guided .pgh-p{font-family:'EB Garamond',Georgia,serif;font-size:var(--t-body);font-weight:300;line-height:var(--lh-body);color:var(--ink3);max-width:480px;margin:20px auto 0}
+  .pgh-norule{border-bottom:0!important}
+  .pgh-guided .pgh-h{font-family:var(--font-d);font-size:calc(clamp(40px,7vw,84px)*var(--s-h,1));font-weight:300;line-height:.95;letter-spacing:-.03em;color:var(--ink)}
+  .pgh-guided .pgh-p{font-family:'EB Garamond',Georgia,serif;font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:var(--ink3);max-width:480px;margin:20px auto 0}
   .pgh .pgh-h em{font-style:italic}
   .pgh .pgh-p a{color:var(--ink);border-bottom:1px solid rgba(41,35,25,.45)}
 </style>
@@ -116,7 +141,8 @@
         { "value": "short", "label": "Short" },
         { "value": "standard", "label": "Standard (same as About and Services)" },
         { "value": "tall", "label": "Tall" },
-        { "value": "full", "label": "Full screen" }
+        { "value": "full", "label": "Full screen" },
+        { "value": "custom", "label": "Set by hand (below)" }
       ],
       "default": "standard"
     },
@@ -130,7 +156,31 @@
         { "value": "right", "label": "Right" }
       ],
       "default": "center"
-    }
+    },
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."},
+    {"type": "header", "content": "Words"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_text", "label": "Show the sub-line", "default": true},
+    {"type": "select", "id": "text_align", "label": "Words sit (plain header)", "options": [{"value": "design", "label": "As the treatment is designed"}, {"value": "left", "label": "Left"}, {"value": "centre", "label": "Centre"}], "default": "design"},
+    {"type": "checkbox", "id": "show_rule", "label": "Hairline under the plain header", "default": true},
+    {"type": "header", "content": "Banner photo or film"},
+    {"type": "range", "id": "dim", "label": "Darken the banner", "min": 0, "max": 100, "step": 4, "default": 52, "unit": "%", "info": "Lower = brighter."},
+    {"type": "select", "id": "scrim", "label": "Veil", "options": [{"value": "corner", "label": "Weighted to the words (as designed)"}, {"value": "base", "label": "Fades up from the base"}, {"value": "even", "label": "Even veil"}, {"value": "none", "label": "None"}], "default": "corner"},
+    {"type": "select", "id": "words_position", "label": "Where the words sit on the banner", "options": [{"value": "design", "label": "As the treatment is designed"}, {"value": "base-left", "label": "Base, left"}, {"value": "base-centre", "label": "Base, centred"}, {"value": "centre", "label": "Centre of the photo"}, {"value": "top-left", "label": "Top, left"}], "default": "design"},
+    {"type": "range", "id": "height_px", "label": "Banner height when set by hand", "min": 320, "max": 1000, "step": 20, "default": 560, "unit": "px", "info": "Used when Banner height is \"Set by hand\"."}
   ],
   "presets": [{ "name": "Page header" }]
 }

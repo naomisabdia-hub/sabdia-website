@@ -34,11 +34,21 @@
   endunless
 -%}
 {%- if folder != blank -%}
-<section class="sw-section" id="scrollwalk" data-base="{{ base }}">
+{% render 'section-look', section: section, mode: 'hero' %}
+{%- liquid
+  assign name_token = '{' | append: 'name' | append: '}'
+  assign sw_heading = section.settings.heading_html
+  if sw_heading == blank
+    assign sw_heading = 'Scroll to move <em>through ' | append: name_token | append: '</em>.'
+  endif
+-%}
+<section class="sw-section sw-{{ section.settings.stage_size | default: 'cinema' }}{% if section.settings.show_rooms == false %} sw-norooms{% endif %}{% if section.settings.show_progress == false %} sw-noprog{% endif %}{% if section.settings.show_caption == false %} sw-nocap{% endif %}{% if section.settings.show_hint == false %} sw-nohint{% endif %}{% if section.settings.frame_border == false %} sw-noborder{% endif %}{% if section.settings.vignette == false %} sw-novig{% endif %}" id="scrollwalk" data-base="{{ base }}" data-pace="{{ section.settings.scroll_pace | default: 12 }}">
+  {%- if section.settings.show_intro -%}
   <div class="sw-intro inner">
-    <div class="slabel reveal">{{ section.settings.walk_label | default: "The Walkthrough" }}</div>
-    <h2 class="sw-h reveal d1">Scroll to move <em>through {{ wt_name }}</em>.</h2>
+    {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.walk_label | default: "The Walkthrough" }}</div>{%- endif -%}
+    <h2 class="sw-h reveal d1">{{ sw_heading | replace: name_token, wt_name }}</h2>
   </div>
+  {%- endif -%}
   <div class="sw-track" style="height:480vh">
     <div class="sw-sticky">
       <div class="sw-stage">
@@ -90,7 +100,8 @@
       canvas.width = m.w;
       canvas.height = m.h;
       /* ~12px of scroll per frame - unhurried but not endless */
-      track.style.height = Math.max(320, Math.round((total * 12) / 8)) + 'vh';
+      var pace = Number(section.dataset.pace) || 12;
+      track.style.height = Math.max(320, Math.round((total * pace) / 8)) + 'vh';
       buildRooms();
       loadFrame(1);
       loadPass();
@@ -318,7 +329,35 @@
       "id": "hint_walk",
       "label": "Hint (mobile)",
       "default": "Scroll to walk"
-    }
+    },
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."},
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_intro", "label": "Show the label and heading above the stage", "default": true},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_rooms", "label": "Show the \"Jump to a room\" rail", "default": true},
+    {"type": "checkbox", "id": "show_caption", "label": "Show the room caption on the stage", "default": true},
+    {"type": "checkbox", "id": "show_progress", "label": "Show the progress line", "default": true},
+    {"type": "checkbox", "id": "show_hint", "label": "Show the \"Scroll to walk\" hint", "default": true},
+    {"type": "checkbox", "id": "frame_border", "label": "Thin gold frame around the stage", "default": true},
+    {"type": "checkbox", "id": "vignette", "label": "Soft vignette on the stage", "default": true},
+    {"type": "header", "content": "Words"},
+    {"type": "html", "id": "heading_html", "label": "Heading", "info": "Write {name} where the residence's name goes. Default: Scroll to move <em>through {name}</em>."},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "stage_size", "label": "Stage", "options": [{"value": "cinema", "label": "Cinema frame (as designed)"}, {"value": "full", "label": "Edge to edge"}], "default": "cinema"},
+    {"type": "range", "id": "scroll_pace", "label": "Scroll per frame", "min": 6, "max": 24, "step": 1, "default": 12, "unit": "px", "info": "Lower = the walk passes faster as you scroll; higher = slower, more scrolling."}
   ],
   "presets": [
     {

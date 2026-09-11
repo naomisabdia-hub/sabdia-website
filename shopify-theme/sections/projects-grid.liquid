@@ -17,7 +17,9 @@
   assign sold_handles = sold_csv | split: ','
 -%}
 
-<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px var(--page-pad)">
+{% render 'section-look', section: section %}
+{%- if section.settings.show_filter -%}
+<div class="s-surface" style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px var(--page-pad)">
   <div class="inner" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
     <span style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)">{{ section.settings.filter_label }}</span>
     <button class="pfilter on" data-filter="all">{{ section.settings.filter_all }}</button>
@@ -25,10 +27,12 @@
     <button class="pfilter" data-filter="sold">{{ section.settings.filter_sold }}</button>
   </div>
 </div>
+{%- endif -%}
 
-<section class="sp" data-proj-section="current">
+{%- if section.settings.show_current -%}
+<section class="sp" data-proj-section="current" style="--pj-cols:{{ section.settings.columns | default: '2' }};--pj-ar:{{ section.settings.card_shape | default: '16/10' }}">
   <div class="inner">
-    <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.current_label }}</div>
+    {%- if section.settings.current_label != blank -%}<div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.current_label }}</div>{%- endif -%}
     <div class="projects-grid">
       {%- for h in live_handles -%}
         {%- assign odd = forloop.index0 | modulo: 2 -%}
@@ -42,11 +46,11 @@
             {%- endif -%}
             <div class="proj-card-ov"></div>
             <div class="proj-card-info">
-              <div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}{{ pstatus }}</div>
+              {%- if section.settings.show_year_status -%}<div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}{{ pstatus }}</div>{%- endif -%}
               <div class="proj-card-name">{{ product.title }}</div>
-              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD - {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
+              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD{% if section.settings.show_specs %} - {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}{% endif %}</div>
             </div>
-            <div class="pc-arrow">&rarr;</div>
+            {%- if section.settings.show_arrow -%}<div class="pc-arrow">&rarr;</div>{%- endif -%}
           </a>
           {%- break -%}
         {%- endfor -%}
@@ -54,10 +58,12 @@
     </div>
   </div>
 </section>
+{%- endif -%}
 
-<section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border)" data-proj-section="sold">
+{%- if section.settings.show_sold -%}
+<section class="sp-sm" style="background:var(--bg2);border-top:1px solid var(--border);--pj-cols:{{ section.settings.columns | default: '2' }};--pj-ar:{{ section.settings.card_shape | default: '16/10' }}" data-proj-section="sold">
   <div class="inner">
-    <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.sold_label }}</div>
+    {%- if section.settings.sold_label != blank -%}<div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.sold_label }}</div>{%- endif -%}
     <div class="projects-grid">
       {%- for h in sold_handles -%}
         {%- assign odd = forloop.index0 | modulo: 2 -%}
@@ -72,11 +78,11 @@
               <img src="{{ product.featured_image | image_url: width: 1200, height: 750, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="750" loading="lazy" decoding="async">
             {%- endif -%}
             <div class="proj-card-ov"></div>
-            <div class="sc-badge">{{ badge }}</div>
+            {%- if section.settings.show_sold_badge -%}<div class="sc-badge">{{ badge }}</div>{%- endif -%}
             <div class="proj-card-info">
-              <div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}Sold</div>
+              {%- if section.settings.show_year_status -%}<div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}Sold</div>{%- endif -%}
               <div class="proj-card-name">{{ product.title }}</div>
-              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD - {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}</div>
+              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD{% if section.settings.show_specs %} - {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}{% endif %}</div>
             </div>
           </a>
           {%- break -%}
@@ -85,6 +91,7 @@
     </div>
   </div>
 </section>
+{%- endif -%}
 
 <style>
   .pfilter{font-size:11px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--taupe-d);transition:color .3s;background:none;border:none;cursor:pointer;padding:0 0 1px;border-bottom:1px solid transparent;font-family:var(--font-u)}
@@ -124,7 +131,45 @@
     { "type": "text", "id": "filter_sold", "label": "Filter - sold", "default": "Sold" },
     { "type": "text", "id": "current_label", "label": "Current group label", "default": "For Sale - Current" },
     { "type": "text", "id": "sold_label", "label": "Sold group label", "default": "Sold Prior to Completion" },
-    { "type": "text", "id": "sold_badge", "label": "Sold card badge", "default": "Sold Prior to Completion", "info": "Wording for residences whose Status is Sold Prior to Completion. Other statuses print their own word." }
+    { "type": "text", "id": "sold_badge", "label": "Sold card badge", "default": "Sold Prior to Completion", "info": "Wording for residences whose Status is Sold Prior to Completion. Other statuses print their own word." },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_filter", "label": "Show the filter bar", "default": true},
+    {"type": "checkbox", "id": "show_current", "label": "Show the current group", "default": true},
+    {"type": "checkbox", "id": "show_sold", "label": "Show the sold group", "default": true},
+    {"type": "checkbox", "id": "show_year_status", "label": "Year and status line on each card", "default": true},
+    {"type": "checkbox", "id": "show_specs", "label": "Bed · bath · garage · land on each card", "default": true},
+    {"type": "checkbox", "id": "show_sold_badge", "label": "Sold badge on sold cards", "default": true},
+    {"type": "checkbox", "id": "show_arrow", "label": "Arrow on hover", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "columns", "label": "Cards across", "options": [{"value": "1", "label": "One"}, {"value": "2", "label": "Two (as designed)"}, {"value": "3", "label": "Three"}], "default": "2"},
+    {"type": "select", "id": "card_shape", "label": "Card shape", "options": [{"value": "16/10", "label": "Landscape 16:10"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "1/1", "label": "Square"}, {"value": "4/5", "label": "Portrait 4:5"}], "default": "16/10"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
   "presets": [{ "name": "Projects grid" }]
 }

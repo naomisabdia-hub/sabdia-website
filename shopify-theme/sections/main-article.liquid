@@ -1,23 +1,106 @@
 {%- comment -%} A Journal story. {%- endcomment -%}
-<article class="sp" style="padding-top:clamp(140px,18vw,220px)">
-  <div class="inner" style="max-width:760px">
-    <div class="slabel reveal">{{ section.settings.label }}</div>
-    <h1 class="about-h reveal d1">{{ article.title }}</h1>
-    <p class="about-p reveal d2" style="margin-top:10px;color:var(--taupe-d)">{{ article.published_at | date: '%-d %B %Y' }}</p>
-    {%- if article.image -%}
-      {%- assign arth = 1520 | divided_by: article.image.aspect_ratio | round -%}<img src="{{ article.image | image_url: width: 1520 }}" alt="{{ article.title | escape }}" width="1520" height="{{ arth }}" style="width:100%;height:auto;margin:36px 0" loading="eager" fetchpriority="high">
+{% render 'section-look', section: section %}
+{%- liquid
+  assign ar_w = section.settings.width | default: '760'
+  if ar_w == 'theme'
+    assign ar_max = 'var(--page-max)'
+  else
+    assign ar_max = ar_w | append: 'px'
+  endif
+  assign ar_img = section.settings.image_position | default: 'below'
+  assign ar_shape = section.settings.image_shape | default: 'auto'
+  if article.image
+    assign arth = 1520 | divided_by: article.image.aspect_ratio | round
+  endif
+-%}
+<article class="sp ar{% if section.settings.align == 'centre' %} ar-centre{% endif %}{% if section.settings.serif_body %} ar-serif{% endif %}{% if section.settings.drop_cap %} ar-dropcap{% endif %}{% if section.settings.first_lead == false %} ar-nolead{% endif %}" style="padding-top:calc(var(--nav-h) + (clamp(140px,18vw,220px) - var(--nav-h)) * var(--sp-top,1))">
+  <div class="inner" style="max-width:{{ ar_max }}">
+    {%- if article.image and section.settings.show_image and ar_img == 'above' -%}
+      <img class="reveal" src="{{ article.image | image_url: width: 1520 }}" alt="{{ article.title | escape }}" width="1520" height="{{ arth }}" style="width:100%;height:auto;margin:0 0 36px;{% if ar_shape != 'auto' %}aspect-ratio:{{ ar_shape }};object-fit:cover{% endif %}" loading="eager" fetchpriority="high">
     {%- endif -%}
-    <div class="reveal d2">
+    {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+    <h1 class="about-h reveal d1">{{ article.title }}</h1>
+    {%- if section.settings.show_date or section.settings.show_author -%}
+    <p class="about-p reveal d2" style="margin-top:10px;color:var(--taupe-d)">{% if section.settings.show_date %}{{ article.published_at | date: '%-d %B %Y' }}{% endif %}{% if section.settings.show_date and section.settings.show_author %} &middot; {% endif %}{% if section.settings.show_author %}{{ article.author }}{% endif %}</p>
+    {%- endif -%}
+    {%- if article.image and section.settings.show_image and ar_img == 'below' -%}
+      <img src="{{ article.image | image_url: width: 1520 }}" alt="{{ article.title | escape }}" width="1520" height="{{ arth }}" style="width:100%;height:auto;margin:36px 0;{% if ar_shape != 'auto' %}aspect-ratio:{{ ar_shape }};object-fit:cover{% endif %}" loading="eager" fetchpriority="high">
+    {%- endif -%}
+    <div class="reveal d2 ar-body">
       {{ article.content | replace: '<p>', '<p class="about-p">' }}
     </div>
+    {%- if section.settings.show_tags and article.tags.size > 0 -%}
+      <div class="jn-tags">{% for tag in article.tags %}<span class="jn-tag">{{ tag }}</span>{% endfor %}</div>
+    {%- endif -%}
+    {%- if section.settings.show_back -%}
+      <p style="margin-top:44px"><a class="btn-g" href="{{ section.settings.back_link | default: blog.url }}">&larr; {{ section.settings.back_label | default: 'Back to the Journal' }}</a></p>
+    {%- endif -%}
   </div>
 </article>
+
+<style>
+  .ar-centre{text-align:center}.ar-centre .slabel{justify-content:center}.ar-centre .about-p{margin-left:auto;margin-right:auto}.ar-centre .jn-tags{justify-content:center}
+  .ar-serif .ar-body .about-p{font-family:var(--font-d);font-size:calc(var(--t-lead)*var(--s-t,1));line-height:1.65;color:var(--ink2);letter-spacing:0}
+  .ar-dropcap .ar-body .about-p:first-of-type::first-letter{font-size:3.2em;float:left;line-height:.82;padding-right:12px;color:var(--ink);font-style:italic}
+  .ar-nolead .ar-body .about-p:first-of-type{font-size:calc(var(--t-body)*var(--s-t,1));line-height:var(--lh-body);letter-spacing:.018em;color:var(--ink3);max-width:560px}
+  .ar-nolead .ar-body .about-p:first-of-type + .about-p{margin-top:20px}
+  .ar-body h2,.ar-body h3{font-family:var(--font-d);font-weight:400;color:var(--ink);line-height:1.2;margin:1.6em 0 .6em}
+  .ar-body h2{font-size:calc(var(--t-h2)*var(--s-h,1))}.ar-body h3{font-size:calc(var(--t-h3)*var(--s-h,1))}
+  .ar-body ul,.ar-body ol{margin:0 0 1.5em 1.2em;font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:var(--ink3)}
+  .ar-body blockquote{font-family:var(--font-d);font-style:italic;font-size:calc(var(--t-lead)*var(--s-t,1));color:var(--ink);line-height:1.65;border-left:1px solid var(--gold);padding-left:26px;margin:2em 0}
+  .ar-body a{color:var(--ink);border-bottom:1px solid rgba(var(--gold-rgb),.45)}
+  .ar-body img{margin:1.5em 0}
+</style>
 
 {% schema %}
 {
   "name": "Journal story",
   "settings": [
-    { "type": "text", "id": "label", "label": "Small label", "default": "The Journal" }
+    { "type": "text", "id": "label", "label": "Small label", "default": "The Journal" },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_date", "label": "Show the date", "default": true},
+    {"type": "checkbox", "id": "show_author", "label": "Show the author", "default": false},
+    {"type": "checkbox", "id": "show_image", "label": "Show the featured image", "default": true},
+    {"type": "checkbox", "id": "show_tags", "label": "Show the tags at the end", "default": false},
+    {"type": "checkbox", "id": "first_lead", "label": "First paragraph larger, as a lead line", "default": true},
+    {"type": "checkbox", "id": "show_back", "label": "Back-to-the-Journal link at the end", "default": false},
+    {"type": "text", "id": "back_label", "label": "Back link label", "default": "Back to the Journal"},
+    {"type": "url", "id": "back_link", "label": "Back link goes to", "info": "Defaults to the Journal listing."},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "width", "label": "Text column", "options": [{"value": "640", "label": "Narrow (640px)"}, {"value": "760", "label": "Reading (760px, as designed)"}, {"value": "900", "label": "Wide (900px)"}, {"value": "theme", "label": "The theme's content width"}], "default": "760"},
+    {"type": "select", "id": "align", "label": "Words sit", "options": [{"value": "left", "label": "Left"}, {"value": "centre", "label": "Centre"}], "default": "left"},
+    {"type": "select", "id": "image_position", "label": "Featured image sits", "options": [{"value": "below", "label": "Under the title and date"}, {"value": "above", "label": "Above the title"}], "default": "below"},
+    {"type": "select", "id": "image_shape", "label": "Featured image shape", "options": [{"value": "auto", "label": "As uploaded"}, {"value": "21/9", "label": "Cinematic 21:9"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "4/3", "label": "Landscape 4:3"}], "default": "auto"},
+    {"type": "checkbox", "id": "serif_body", "label": "Paragraphs in the serif (editorial)", "default": false},
+    {"type": "checkbox", "id": "drop_cap", "label": "Drop capital on the first paragraph", "default": false},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ]
 }
 {% endschema %}
