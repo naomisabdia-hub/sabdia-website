@@ -2,6 +2,18 @@
   "sections": {
     "main": {
       "type": "main-collection-item",
+      "settings": {
+        "hero_media": "film",
+        "show_side_photos": false,
+        "body_film": "same"
+      }
+    },
+    "series": {
+      "type": "series-strip",
+      "settings": {}
+    },
+    "similar": {
+      "type": "collection-similar",
       "settings": {},
       "blocks": {
         "residence-1": {
@@ -128,14 +140,11 @@
         "residence-10",
         "residence-11"
       ]
-    },
-    "series": {
-      "type": "series-strip",
-      "settings": {}
     }
   },
   "order": [
     "main",
-    "series"
+    "series",
+    "similar"
   ]
 }

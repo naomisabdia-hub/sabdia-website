@@ -48,7 +48,8 @@
 
     <div>
       {%- if section.settings.show_form_label and section.settings.form_label != blank -%}<div class="slabel reveal">{{ section.settings.form_label }}</div>{%- endif -%}
-      {%- if section.settings.guided_line_html != blank and section.settings.show_guided -%}
+      {%- comment -%} One switch, Theme settings › Features › Guided Match, hides this pointer everywhere. {%- endcomment -%}
+      {%- if section.settings.guided_line_html != blank and section.settings.show_guided and settings.guided_match_enabled != false -%}
         <p class="reveal d1" style="font-family:'EB Garamond',Georgia,serif;font-size:14px;font-style:italic;color:var(--ink3);margin:10px 0 6px">{{ section.settings.guided_line_html }}</p>
       {%- endif -%}
       {%- if settings.form_backend == 'vercel' -%}
@@ -65,7 +66,7 @@
           <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "How can we help?*" }}</label>
           <select class="fsel" id="cf-interest" name="enquiry-type" required>
             <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
-            <option>For Sale - Current Properties</option>
+            <option>For Sale - Current Residences</option>
             {%- for product in fs.products -%}
               <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
             {%- endfor -%}
@@ -106,7 +107,7 @@
           <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "How can we help?*" }}</label>
           <select class="fsel" id="cf-interest" name="contact[Enquiry type]" required>
             <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
-            <option>For Sale - Current Properties</option>
+            <option>For Sale - Current Residences</option>
             {%- for product in fs.products -%}
               <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
             {%- endfor -%}
@@ -153,20 +154,49 @@
 
 <script>
   /* Links such as /pages/contact?interest=Request%20a%20Viewing (the For Sale
-     page's "Request a Viewing" button) arrive with that enquiry type chosen. */
+     page's "Request a Viewing" button) arrive with the form already chosen.
+     ?interest=<Interest label>  chooses that enquiry type (added to the list if it is not there).
+     ?property=<residence title> chooses that residence from the same list when no interest is
+                                 given; otherwise the message opens with "Regarding <property>: ".
+     ?message=<text>             starts the message (only when the message is still empty).
+     Values are URL-decoded by the browser (Agent%20Access, SOLACE, Hello%20there). */
   (function () {
-    var sel = document.getElementById('cf-interest');
+    var root = document.getElementById('shopify-section-{{ section.id }}') || document;
+    var sel = root.querySelector('#cf-interest');
+    var msg = root.querySelector('#cf-message');
     if (!sel || sel.dataset.prefill) return;
     sel.dataset.prefill = '1';
-    var want = new URLSearchParams(location.search).get('interest');
-    if (!want) return;
-    var found = null;
-    for (var i = 0; i < sel.options.length; i++) {
-      if (sel.options[i].value && sel.options[i].value.toLowerCase() === want.toLowerCase()) { found = sel.options[i]; break; }
+    var q = new URLSearchParams(location.search);
+    var interest = (q.get('interest') || '').trim();
+    var property = (q.get('property') || '').trim();
+    var message = (q.get('message') || '').trim();
+    if (!interest && !property && !message) return;
+    var option = function (test) {
+      for (var i = 0; i < sel.options.length; i++) {
+        var v = sel.options[i].value;
+        if (v && test(v.toLowerCase())) return sel.options[i];
+      }
+      return null;
+    };
+    var pick = null, residencePicked = false;
+    if (interest) {
+      var wantI = interest.toLowerCase();
+      pick = option(function (v) { return v === wantI; });
+      if (!pick) { pick = new Option(interest, interest); sel.add(pick, 1); }
+    } else if (property) {
+      /* The residences for sale sit in this list as "SOLACE - Camp Hill". */
+      var wantP = property.toLowerCase();
+      pick = option(function (v) { return v === wantP || v.indexOf(wantP + ' - ') === 0; });
+      residencePicked = !!pick;
     }
-    if (!found) { found = new Option(want, want); sel.add(found, 1); }
-    sel.value = found.value;
-    sel.dispatchEvent(new Event('change', { bubbles: true }));
+    if (pick) {
+      sel.value = pick.value;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    if (msg && !msg.value.trim()) {
+      var lead = property && !residencePicked ? 'Regarding ' + property + ': ' : '';
+      if (lead || message) msg.value = lead + message;
+    }
   })();
 </script>
 

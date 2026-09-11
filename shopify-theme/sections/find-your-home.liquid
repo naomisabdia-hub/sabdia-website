@@ -25,6 +25,28 @@
 -%}
 
 {% render 'section-look', section: section %}
+{%- if settings.guided_match_enabled == false -%}
+{%- comment -%}
+  Theme settings › Features › Guided Match is off. A visitor who still holds
+  the old link is never stranded: a short centred note sends them to the
+  contact form with the For Sale enquiry type already chosen. The page
+  header above stays as it is.
+{%- endcomment -%}
+<section class="sp-sm fyh-off">
+  <div class="inner-sm fyh-off-in">
+    {%- if section.settings.off_label != blank -%}<div class="slabel reveal" style="justify-content:center">{{ section.settings.off_label }}</div>{%- endif -%}
+    <h2 class="fyh-off-h reveal d1">{{ section.settings.off_heading }}</h2>
+    {%- if section.settings.off_text != blank -%}<p class="fyh-off-p reveal d2">{{ section.settings.off_text }}</p>{%- endif -%}
+    {%- if section.settings.off_cta != blank -%}<a href="{{ section.settings.off_link | default: '/pages/contact?interest=For%20Sale%20-%20Current%20Residences' }}" class="btn-p reveal d3">{{ section.settings.off_cta }}</a>{%- endif -%}
+  </div>
+</section>
+<style>
+  .fyh-off{min-height:40vh;display:flex;align-items:center}
+  .fyh-off-in{text-align:center;display:flex;flex-direction:column;align-items:center}
+  .fyh-off-h{font-family:var(--font-d);font-size:calc(clamp(30px,4.4vw,52px)*var(--s-h,1));font-weight:300;line-height:1.05;letter-spacing:-.02em;color:var(--ink);margin:0 0 18px}
+  .fyh-off-p{font-family:'EB Garamond',Georgia,serif;font-size:calc(17px*var(--s-t,1));font-weight:300;font-style:italic;line-height:1.7;color:var(--ink3);max-width:480px;margin:0 auto 32px}
+</style>
+{%- else -%}
 {%- liquid
   assign fyh_w = section.settings.width | default: 'medium'
   assign fyh_inner = 'inner-md'
@@ -392,6 +414,7 @@
     });
   })();
 </script>
+{%- endif -%}
 
 {% schema %}
 {
@@ -651,6 +674,13 @@
     {"type": "select", "id": "option_columns", "label": "Answers across", "options": [{"value": "auto", "label": "As many as fit (as designed)"}, {"value": "1", "label": "One"}, {"value": "2", "label": "Two"}], "default": "auto"},
     {"type": "select", "id": "results_columns", "label": "Matched residences across", "options": [{"value": "1", "label": "One"}, {"value": "2", "label": "Two (as designed)"}, {"value": "3", "label": "Three"}], "default": "2"},
     {"type": "range", "id": "min_height", "label": "Least height", "min": 30, "max": 90, "step": 5, "default": 60, "unit": "vh", "info": "A share of the window height."},
+    {"type": "header", "content": "When Guided Match is switched off"},
+    {"type": "paragraph", "content": "Theme settings › Features › Guided Match hides every link to this page. Anyone still holding the old link sees this note instead of the questions."},
+    {"type": "text", "id": "off_label", "label": "Small label", "default": "Guided Match"},
+    {"type": "text", "id": "off_heading", "label": "Heading", "default": "Not available right now"},
+    {"type": "textarea", "id": "off_text", "label": "Line", "default": "Tell us what you are looking for and a member of our team will come back with the residences that fit."},
+    {"type": "text", "id": "off_cta", "label": "Button", "default": "Begin a Conversation"},
+    {"type": "text", "id": "off_link", "label": "Button link", "default": "/pages/contact?interest=For%20Sale%20-%20Current%20Residences", "info": "Opens the contact form with that enquiry type already chosen."},
     {"type": "header", "content": "Look"},
     {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
     {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},

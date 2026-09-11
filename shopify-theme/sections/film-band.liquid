@@ -171,7 +171,7 @@
 {%- endif -%}
 </section>
 <style>
-  .film-band .film-frame{aspect-ratio:var(--film-ar,9/16);max-height:min(76vh,var(--film-maxh,680px))}
+  .film-band .film-frame:not(.film-frame-sm){aspect-ratio:var(--film-ar,9/16);max-height:min(76vh,var(--film-maxh,680px))}
   .fb-plain .film-frame{border:0;box-shadow:none;background:transparent}
   .fb-plain .film-frame::after{display:none}
   .fb-centre .film-copy{text-align:center}.fb-centre .film-copy .slabel{justify-content:center}.fb-centre .film-p{margin-left:auto;margin-right:auto}

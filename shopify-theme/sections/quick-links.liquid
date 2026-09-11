@@ -2,13 +2,33 @@
   "You may also be interested in" - the tag/title/description link cards.
 {%- endcomment -%}
 {% render 'section-look', section: section %}
-<section class="sp-sm ql ql-{{ section.settings.card_style | default: 'cards' }}" style="background:var(--bg2);{% if section.settings.show_rule %}border-top:1px solid var(--border);{% endif %}--ql-cols:{{ section.settings.columns | default: '3' }};--ql-gap:{{ section.settings.gap | default: 12 }}px">
+{%- liquid
+  # A card that points at the guided match (/pages/find-your-home) is left out
+  # when Theme settings › Features › Guided Match is off. The grid then takes
+  # as many columns as there are cards, so two cards share the row evenly
+  # instead of leaving an empty cell.
+  assign ql_shown = 0
+  for block in section.blocks
+    if settings.guided_match_enabled == false and block.settings.link contains 'find-your-home'
+      continue
+    endif
+    assign ql_shown = ql_shown | plus: 1
+  endfor
+  assign ql_cols = section.settings.columns | default: '3' | plus: 0
+  if ql_shown > 0 and ql_shown < ql_cols
+    assign ql_cols = ql_shown
+  endif
+-%}
+<section class="sp-sm ql ql-{{ section.settings.card_style | default: 'cards' }}" style="background:var(--bg2);{% if section.settings.show_rule %}border-top:1px solid var(--border);{% endif %}--ql-cols:{{ ql_cols }};--ql-gap:{{ section.settings.gap | default: 12 }}px">
   <div class="inner">
     {%- if section.settings.show_label -%}<div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.label }}</div>{%- endif -%}
     <div class="quick-links-grid">
       {%- assign qdelays = ',d1,d2' | split: ',' -%}
+      {%- assign ql_i = 0 -%}
       {%- for block in section.blocks -%}
-        {%- assign di = forloop.index0 | modulo: 3 -%}
+        {%- if settings.guided_match_enabled == false and block.settings.link contains 'find-your-home' -%}{%- continue -%}{%- endif -%}
+        {%- assign di = ql_i | modulo: 3 -%}
+        {%- assign ql_i = ql_i | plus: 1 -%}
         <a href="{{ block.settings.link }}" class="ql-card reveal {{ qdelays[di] }}" {{ block.shopify_attributes }}>
           {%- if section.settings.show_tag and block.settings.tag != blank -%}<div style="font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--ink);margin-bottom:10px">{{ block.settings.tag }}</div>{%- endif -%}
           <div style="font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:300;color:var(--ink);margin-bottom:8px">{{ block.settings.title }}{% if section.settings.arrow %} <span class="ql-arr">&rarr;</span>{% endif %}</div>

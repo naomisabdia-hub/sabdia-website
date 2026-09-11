@@ -1,0 +1,51 @@
+{%- comment -%}
+  Prints a residence's normalised feature tokens, space-separated, read from
+  Products › the residence › Features (custom.features, a list). A keyword
+  map, so "Pool & Spa", "North-Facing Pool & Terrace" and "Pool" all read as
+  pool. One place to edit when a new chip is wanted on the For Sale toolbar
+  (the chip labels live in the Collection grid section's settings):
+
+    pool    pool
+    views   city view(s) / views
+    lift    lift / elevator
+    cinema  cinema / media room / theatre
+    gym     gym
+    cellar  cellar
+    study   study / home office / library
+    solar   solar / battery
+    butler  butler's pantry
+
+  Usage: {% capture ft %}{% render 'residence-feats', product: p %}{% endcapture %}
+{%- endcomment -%}
+{%- liquid
+  assign raw = product.metafields.custom.features.value | join: '|' | downcase
+  assign out = ''
+  if raw contains 'pool'
+    assign out = out | append: ' pool'
+  endif
+  if raw contains 'city view' or raw contains 'views'
+    assign out = out | append: ' views'
+  endif
+  if raw contains 'lift' or raw contains 'elevator'
+    assign out = out | append: ' lift'
+  endif
+  if raw contains 'cinema' or raw contains 'media room' or raw contains 'theatre'
+    assign out = out | append: ' cinema'
+  endif
+  if raw contains 'gym'
+    assign out = out | append: ' gym'
+  endif
+  if raw contains 'cellar'
+    assign out = out | append: ' cellar'
+  endif
+  if raw contains 'study' or raw contains 'home office' or raw contains 'library'
+    assign out = out | append: ' study'
+  endif
+  if raw contains 'solar' or raw contains 'battery'
+    assign out = out | append: ' solar'
+  endif
+  if raw contains 'butler'
+    assign out = out | append: ' butler'
+  endif
+  echo out | strip
+-%}

@@ -35,7 +35,7 @@
   endif
 -%}
 {% render 'section-look', section: section %}
-<section id="properties" class="pgrid pgrid-{{ pg_layout }}" style="padding:0 0 calc(clamp(80px,12vw,160px) * var(--sp-scale) * var(--sp-bot,1));--proj-gap:{{ section.settings.gap | default: 10 }}px;--pg-hero-min:{{ section.settings.hero_height | default: 560 }}px;--pg-row-ar:{{ section.settings.row_shape | default: '16/10' }}">
+<section id="properties" class="pgrid pgrid-{{ pg_layout }}" style="padding:0 0 calc(clamp(80px,12vw,160px) * var(--sp-scale) * var(--sp-bot,1));--proj-gap:{{ section.settings.gap | default: 10 }}px;--pg-hero-min:{{ section.settings.hero_height | default: 680 }}px;--pg-row-ar:{{ section.settings.row_shape | default: '16/10' }}">
   {%- if section.settings.show_label or section.settings.show_heading or section.settings.show_button -%}
   <div class="inner" style="padding:calc(clamp(80px,12vw,160px) * var(--sp-scale) * var(--sp-top,1)) var(--page-pad) clamp(44px,5vw,60px)">
     <div class="proj-hdr">
@@ -118,7 +118,7 @@
     {"type": "checkbox", "id": "sold_suburb", "label": "Suburb on sold cards", "default": false},
     {"type": "header", "content": "Layout"},
     {"type": "select", "id": "layout", "label": "Layout", "options": [{"value": "editorial", "label": "One large, two small, then rows (as designed)"}, {"value": "rows", "label": "Rows of three"}, {"value": "two", "label": "Two across"}], "default": "editorial"},
-    {"type": "range", "id": "hero_height", "label": "Large card height", "min": 360, "max": 800, "step": 20, "default": 560, "unit": "px", "info": "Editorial layout. The two small cards share it."},
+    {"type": "range", "id": "hero_height", "label": "Large card height", "min": 360, "max": 800, "step": 20, "default": 680, "unit": "px", "info": "Editorial layout. 680 = as designed (the card grows with the window up to 680px); lower caps it. The two small cards share it."},
     {"type": "select", "id": "row_shape", "label": "Shape of the row cards", "options": [{"value": "16/10", "label": "Landscape 16:10"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "1/1", "label": "Square"}, {"value": "4/5", "label": "Portrait 4:5"}], "default": "16/10"},
     {"type": "range", "id": "gap", "label": "Gap between cards", "min": 0, "max": 40, "step": 2, "default": 10, "unit": "px"},
     {"type": "header", "content": "Look"},

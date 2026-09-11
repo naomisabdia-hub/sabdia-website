@@ -1,11 +1,20 @@
 {%- comment -%}
   For Sale - faithful port of properties/index.astro: photographic hero,
-  refine/sort toolbar, the featured-residence banner, the residence grid,
-  the sold band, and the enquiry CTA. Filters read each residence's
-  metafields. On /collections/for-sale and /collections/sold the list is
-  driven by each residence's Status (see residence-status): the
-  collection's manual order leads, then any other residence whose Status
-  belongs here is swept in. Other collections list their own products.
+  refine/sort toolbar, the Now Selling intro band, the featured-residence
+  banner, the residence grid, the sold band, the How It Works strip and the
+  enquiry CTA. Filters read each residence's metafields (suburb, cars,
+  land, build_size, beds, baths, status, year and the normalised feature
+  tokens from residence-feats). On /collections/for-sale and
+  /collections/sold the list is driven by each residence's Status (see
+  residence-status): the collection's manual order leads, then any other
+  residence whose Status belongs here is swept in. Other collections list
+  their own products.
+
+  Each residence's brochure face (metafields custom.name_font /
+  name_font_file / name_font_weight / name_font_caps, the same fields the
+  residence page reads) is loaded once here, so the cards can set the name
+  in it: one Google Fonts stylesheet for every distinct family, and an
+  @font-face for every font file.
 {%- endcomment -%}
 {%- liquid
   if collection.handle == 'for-sale' or collection.handle == 'sold'
@@ -75,6 +84,67 @@
     render 'residence-handles', col: collections['sold'], group: 'sold'
   endcapture
   assign sold_handles = sold_csv | split: ','
+
+  # One pass over the listed residences: the suburbs, the largest bed and
+  # bath counts, the statuses and feature tokens present (so the toolbar
+  # only offers choices that match something), whether any has a year, and
+  # every distinct brochure face to load.
+  assign live_suburbs = ''
+  assign max_beds = 0
+  assign max_baths = 0
+  assign statuses = ''
+  assign feats_all = ''
+  assign has_year = false
+  assign gfonts = ''
+  assign ffiles = ''
+  for h in handles
+    for p in collections.all.products
+      if p.handle != h
+        continue
+      endif
+      assign pm = p.metafields.custom
+      if pm.suburb.value != blank
+        assign live_suburbs = live_suburbs | append: pm.suburb.value | append: '¦'
+      endif
+      assign pb = pm.beds.value | plus: 0
+      if pb > max_beds
+        assign max_beds = pb
+      endif
+      assign pba = pm.baths.value | plus: 0
+      if pba > max_baths
+        assign max_baths = pba
+      endif
+      capture pst
+        render 'residence-status', product: p
+      endcapture
+      assign statuses = statuses | append: pst | append: '¦'
+      capture pft
+        render 'residence-feats', product: p
+      endcapture
+      assign feats_all = feats_all | append: ' ' | append: pft
+      if pm.year.value != blank
+        assign has_year = true
+      endif
+      assign pf = pm.name_font.value | strip
+      assign pff = pm.name_font_file.value | strip
+      assign pfw = pm.name_font_weight.value | default: 400
+      if pff != blank
+        assign pfam = pf
+        if pfam == blank
+          assign pfam = 'ResidenceFace-' | append: p.handle
+        endif
+        assign ffiles = ffiles | append: pfam | append: '¦' | append: pff | append: '¦' | append: pfw | append: '||'
+      elsif pf != blank
+        assign gfonts = gfonts | append: pf | append: ':wght@' | append: pfw | append: '||'
+      endif
+      break
+    endfor
+  endfor
+  assign suburb_list = live_suburbs | split: '¦' | uniq | sort
+  assign status_list = statuses | split: '¦' | uniq
+  assign gfont_list = gfonts | split: '||' | uniq
+  assign ffile_list = ffiles | split: '||' | uniq
+
   # Hero film (uploaded or URL) beats the hero photo. With neither chosen the
   # hero shows a different residence from the featured banner underneath
   # (the second in the order; else the featured home's second photo), so the
@@ -112,23 +182,54 @@
   endif
 -%}
 
+{%- if gfont_list.size > 0 -%}
+  {%- capture gf_query -%}{%- for f in gfont_list -%}{%- unless forloop.first -%}&{%- endunless -%}family={{ f | replace: ' ', '+' }}{%- endfor -%}{%- endcapture -%}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?{{ gf_query }}&display=swap">
+{%- endif -%}
+{%- if ffile_list.size > 0 -%}
+  <style>
+  {%- for f in ffile_list -%}
+    {%- assign fp = f | split: '¦' -%}
+    {%- liquid
+      assign ff_fmt = 'woff2'
+      if fp[1] contains '.ttf'
+        assign ff_fmt = 'truetype'
+      elsif fp[1] contains '.otf'
+        assign ff_fmt = 'opentype'
+      elsif fp[1] contains '.woff2'
+        assign ff_fmt = 'woff2'
+      elsif fp[1] contains '.woff'
+        assign ff_fmt = 'woff'
+      endif
+    -%}
+    @font-face{font-family:'{{ fp[0] }}';src:url('{{ fp[1] }}') format('{{ ff_fmt }}');font-weight:{{ fp[2] | default: 400 }};font-display:swap}
+  {%- endfor -%}
+  </style>
+{%- endif -%}
+
 {% render 'section-look', section: section, mode: 'hero' %}
 {%- liquid
   case section.settings.hero_height
     when 'short'
       assign mc_h = '44vh'
+      assign mc_hm = '40vh'
     when 'tall'
       assign mc_h = '78vh'
+      assign mc_hm = '60vh'
     when 'full'
       assign mc_h = '100vh'
+      assign mc_hm = '100svh'
     else
-      assign mc_h = '60vh'
+      assign mc_h = 'max(460px,60vh)'
+      assign mc_hm = 'max(340px,50vh)'
   endcase
   assign mc_dim = section.settings.hero_dim | default: 52 | divided_by: 100.0
   assign mc_featured = section.settings.show_featured
   assign mc_style = 'aspect-ratio:' | append: section.settings.card_shape | default: '16/10'
 -%}
-<section class="page-hero ph-sized ph-pos-{{ section.settings.hero_words | default: 'base-left' }} ph-scrim-{{ section.settings.hero_scrim | default: 'corner' }}" style="--ph-h:{{ mc_h }};--ph-hm:{{ mc_h }};--ph-dim:{{ mc_dim }}">
+<section class="page-hero ph-sized ph-pos-{{ section.settings.hero_words | default: 'base-left' }} ph-scrim-{{ section.settings.hero_scrim | default: 'corner' }}" style="--ph-h:{{ mc_h }};--ph-hm:{{ mc_hm }};--ph-dim:{{ mc_dim }}">
   {%- if hero_video != blank -%}
     <video class="page-hero-video" src="{{ hero_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if section.settings.image %} poster="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}"{% endif %}></video>
   {%- elsif use_chosen and section.settings.image -%}
@@ -150,17 +251,32 @@
 <div class="prop-toolbar">
   <div class="prop-toolbar-inner">
     <span class="ptool-l">{{ section.settings.refine_label }}</span>
+    {%- if section.settings.show_filter_suburb != false -%}
     <select class="ptool-sel" id="fSuburb" aria-label="Filter by suburb">
       <option value="">{{ section.settings.all_suburbs }}</option>
-      {%- capture suburb_list -%}
-        {%- for h in handles -%}{%- for product in collections.all.products -%}{%- if product.handle == h -%}{{ product.metafields.custom.suburb.value }}¦{%- break -%}{%- endif -%}{%- endfor -%}{%- endfor -%}
-      {%- endcapture -%}
-      {%- assign suburbs = suburb_list | strip | split: '¦' | uniq | sort -%}
-      {%- for s in suburbs -%}
+      {%- for s in suburb_list -%}
         {%- assign st = s | strip -%}
         {%- if st != blank -%}<option value="{{ st | escape }}">{{ st }}</option>{%- endif -%}
       {%- endfor -%}
     </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_beds != false and max_beds >= 4 -%}
+    <select class="ptool-sel" id="fBeds" aria-label="Minimum bedrooms">
+      <option value="">{{ section.settings.filter_any_beds | default: "Any Bedrooms" }}</option>
+      {%- if max_beds >= 4 -%}<option value="4">4+ Bed</option>{%- endif -%}
+      {%- if max_beds >= 5 -%}<option value="5">5+ Bed</option>{%- endif -%}
+      {%- if max_beds >= 6 -%}<option value="6">6+ Bed</option>{%- endif -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_baths != false and max_baths >= 3 -%}
+    <select class="ptool-sel" id="fBaths" aria-label="Minimum bathrooms">
+      <option value="">{{ section.settings.filter_any_baths | default: "Any Bathrooms" }}</option>
+      {%- if max_baths >= 3 -%}<option value="3">3+ Bath</option>{%- endif -%}
+      {%- if max_baths >= 4 -%}<option value="4">4+ Bath</option>{%- endif -%}
+      {%- if max_baths >= 5 -%}<option value="5">5+ Bath</option>{%- endif -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_garage != false -%}
     <select class="ptool-sel" id="fCars" aria-label="Minimum garage spaces">
       <option value="">{{ section.settings.filter_any_garage | default: "Any Garage" }}</option>
       <option value="2">2+ Cars</option>
@@ -168,13 +284,16 @@
       <option value="4">4+ Cars</option>
       <option value="6">6+ Cars</option>
     </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_land != false -%}
     <select class="ptool-sel" id="fLand" aria-label="Land size">
       <option value="">{{ section.settings.filter_any_land | default: "Any Land Size" }}</option>
       <option value="0-600">Up to 600m&sup2;</option>
       <option value="600-800">600&ndash;800m&sup2;</option>
       <option value="800-">800m&sup2;+</option>
     </select>
-    {%- if has_build -%}
+    {%- endif -%}
+    {%- if section.settings.show_filter_build != false and has_build -%}
     <select class="ptool-sel" id="fBuild" aria-label="Build size">
       <option value="">{{ section.settings.filter_any_build | default: "Any Build Size" }}</option>
       <option value="0-450">Up to 450m&sup2;</option>
@@ -182,15 +301,72 @@
       <option value="600-">600m&sup2;+</option>
     </select>
     {%- endif -%}
+    {%- if section.settings.show_filter_status != false and status_list.size > 1 -%}
+    <select class="ptool-sel" id="fStatus" aria-label="Status">
+      <option value="">{{ section.settings.filter_any_status | default: "Any Status" }}</option>
+      {%- for s in status_list -%}
+        {%- assign st = s | strip -%}
+        {%- if st == blank -%}{%- continue -%}{%- endif -%}
+        <option value="{{ st | escape }}">{% if st == 'For Sale' and settings.label_for_sale != blank %}{{ settings.label_for_sale }}{% else %}{{ st }}{% endif %}</option>
+      {%- endfor -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_sort != false -%}
     <select class="ptool-sel" id="fSort" aria-label="Sort properties">
       <option value="featured">{{ section.settings.sort_featured_label | default: "Sort - Featured" }}</option>
       <option value="land">{{ section.settings.filter_land_label | default: "Land Size" }}</option>
+      <option value="beds">{{ section.settings.sort_beds_label | default: "Bedrooms" }}</option>
       <option value="cars">{{ section.settings.filter_garage_label | default: "Garage Spaces" }}</option>
+      {%- if has_year -%}<option value="year">{{ section.settings.sort_newest_label | default: "Newest" }}</option>{%- endif -%}
       <option value="name">{{ section.settings.sort_name_label | default: "Name A–Z" }}</option>
     </select>
-    <span class="ptool-count" id="fCount"></span>
+    {%- endif -%}
+    <div class="ptool-end">
+      <button type="button" class="ptool-clear" id="fClear" hidden>{{ section.settings.clear_label | default: "Clear filters" }}</button>
+      <span class="ptool-count" id="fCount"></span>
+    </div>
+    {%- if section.settings.show_filter_features != false and feats_all != blank -%}
+    <div class="ptool-chips" role="group" aria-label="{{ section.settings.features_label | default: 'Features' | escape }}">
+      <span class="ptool-l ptool-chips-l">{{ section.settings.features_label | default: "Features" }}</span>
+      {%- if feats_all contains 'pool' -%}<button type="button" class="ptool-chip" data-feat="pool" aria-pressed="false">{{ section.settings.chip_pool | default: "Pool" }}</button>{%- endif -%}
+      {%- if feats_all contains 'views' -%}<button type="button" class="ptool-chip" data-feat="views" aria-pressed="false">{{ section.settings.chip_views | default: "City Views" }}</button>{%- endif -%}
+      {%- if feats_all contains 'lift' -%}<button type="button" class="ptool-chip" data-feat="lift" aria-pressed="false">{{ section.settings.chip_lift | default: "Lift" }}</button>{%- endif -%}
+      {%- if feats_all contains 'cinema' -%}<button type="button" class="ptool-chip" data-feat="cinema" aria-pressed="false">{{ section.settings.chip_cinema | default: "Cinema" }}</button>{%- endif -%}
+      {%- if feats_all contains 'gym' -%}<button type="button" class="ptool-chip" data-feat="gym" aria-pressed="false">{{ section.settings.chip_gym | default: "Gym" }}</button>{%- endif -%}
+      {%- if feats_all contains 'cellar' -%}<button type="button" class="ptool-chip" data-feat="cellar" aria-pressed="false">{{ section.settings.chip_cellar | default: "Cellar" }}</button>{%- endif -%}
+      {%- if feats_all contains 'study' -%}<button type="button" class="ptool-chip" data-feat="study" aria-pressed="false">{{ section.settings.chip_study | default: "Study" }}</button>{%- endif -%}
+      {%- if feats_all contains 'solar' -%}<button type="button" class="ptool-chip" data-feat="solar" aria-pressed="false">{{ section.settings.chip_solar | default: "Solar and Battery" }}</button>{%- endif -%}
+      {%- if feats_all contains 'butler' -%}<button type="button" class="ptool-chip" data-feat="butler" aria-pressed="false">{{ section.settings.chip_butler | default: "Butler's Pantry" }}</button>{%- endif -%}
+    </div>
+    {%- endif -%}
   </div>
 </div>
+{%- endif -%}
+
+{%- if show_rich and section.settings.show_intro_band != false -%}
+{%- liquid
+  assign ib_heading = section.settings.intro_band_heading | replace: count_token, count_word
+  if ib_heading == blank
+    if count == 1
+      assign ib_heading = count_word | append: ' residence, <em>inner Brisbane</em>.'
+    else
+      assign ib_heading = count_word | append: ' residences, <em>inner Brisbane</em>.'
+    endif
+  endif
+  assign ib_suburbs = suburb_list | join: ' · '
+-%}
+<section class="mc-intro">
+  <div class="inner mc-intro-grid">
+    <div>
+      {%- if section.settings.intro_band_label != blank -%}<div class="slabel reveal">{{ section.settings.intro_band_label }}</div>{%- endif -%}
+      <h2 class="mc-intro-h reveal d1">{{ ib_heading }}</h2>
+    </div>
+    <div class="mc-intro-side">
+      {%- if section.settings.intro_band_text != blank -%}<p class="mc-intro-p reveal d2">{{ section.settings.intro_band_text }}</p>{%- endif -%}
+      {%- if section.settings.intro_band_suburbs != false and ib_suburbs != blank -%}<div class="mc-intro-suburbs reveal d3">{{ ib_suburbs }}</div>{%- endif -%}
+    </div>
+  </div>
+</section>
 {%- endif -%}
 
 {%- if show_rich -%}
@@ -243,6 +419,7 @@
         {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
         {%- assign mfp = product.metafields.custom -%}
         {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
+        {%- capture pfeats -%}{% render 'residence-feats', product: product %}{%- endcapture -%}
         <div
           data-prop-card
           {% if show_rich and is_first and mc_featured %}data-featured="1" style="display:none"{% endif %}
@@ -250,6 +427,11 @@
           data-cars="{{ mfp.cars.value }}"
           data-land="{{ mfp.land.value }}"
           data-build="{{ mfp.build_size.value }}"
+          data-beds="{{ mfp.beds.value }}"
+          data-baths="{{ mfp.baths.value }}"
+          data-status="{{ pstatus | escape }}"
+          data-feats="{{ pfeats }}"
+          data-year="{{ mfp.year.value }}"
           data-name="{{ product.title | escape }}"
           data-order="{{ order }}"
         >
@@ -293,16 +475,52 @@
   </section>
 {%- endif -%}
 
+{%- if show_rich and section.settings.show_how != false -%}
+{%- liquid
+  # The four steps are numbered settings (how1_title … how4_text); a step
+  # with an empty title is left out and the track closes up.
+  assign how_delays = ',d1,d2,d3' | split: ','
+  assign how_n = 0
+  for i in (1..4)
+    assign tkey = 'how' | append: i | append: '_title'
+    if section.settings[tkey] != blank
+      assign how_n = how_n | plus: 1
+    endif
+  endfor
+-%}
+{%- if how_n > 0 -%}
+<section class="mc-how">
+  <div class="inner">
+    {%- if section.settings.how_label != blank -%}<div class="slabel reveal mc-how-l">{{ section.settings.how_label }}</div>{%- endif -%}
+    <div class="proc-track" style="--proc-cols:{{ how_n }};--proc-n:44px">
+      {%- assign how_i = 0 -%}
+      {%- for i in (1..4) -%}
+        {%- assign tkey = 'how' | append: i | append: '_title' -%}
+        {%- assign dkey = 'how' | append: i | append: '_text' -%}
+        {%- if section.settings[tkey] == blank -%}{%- continue -%}{%- endif -%}
+        <div class="proc-step reveal {{ how_delays[how_i] }}">
+          <div class="proc-n">{{ how_i | plus: 1 }}</div>
+          <div class="proc-t">{{ section.settings[tkey] }}</div>
+          {%- if section.settings[dkey] != blank -%}<div class="proc-d">{{ section.settings[dkey] }}</div>{%- endif -%}
+        </div>
+        {%- assign how_i = how_i | plus: 1 -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+{%- endif -%}
+
 {%- if section.settings.show_cta -%}
 <section class="sp" style="background:var(--bg2);border-top:1px solid var(--border);text-align:center">
   <div class="inner-sm">
     {%- if section.settings.cta_label != blank -%}<div class="slabel reveal" style="justify-content:center;margin-bottom:20px">{{ section.settings.cta_label }}</div>{%- endif -%}
     <h2 class="reveal d1" style="font-family:var(--font-d);font-size:calc(clamp(32px,5vw,64px)*var(--s-h,1));font-weight:300;color:var(--ink);margin-bottom:20px;letter-spacing:-.02em">{{ section.settings.cta_heading_html }}</h2>
     {%- if section.settings.cta_text != blank -%}<p class="reveal d2" style="font-size:calc(13px*var(--s-t,1));font-weight:300;color:var(--ink3);max-width:420px;margin:0 auto 36px;line-height:1.85">{{ section.settings.cta_text }}</p>{%- endif -%}
-    <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+    <div class="reveal d3 mc-cta-row" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       {%- if section.settings.show_cta1 and section.settings.cta1_label != blank -%}<a href="{{ section.settings.cta1_link | default: '/pages/contact?interest=Request%20a%20Viewing' }}" class="btn-p">{{ section.settings.cta1_label }} &rarr;</a>{%- endif -%}
-      {%- if section.settings.show_cta2 and section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link | default: '/pages/agent-access' }}" class="btn-g">{{ section.settings.cta2_label }}</a>{%- endif -%}
-      {%- if section.settings.show_cta3 and section.settings.cta3_label != blank -%}<a href="{{ section.settings.cta3_link | default: '/pages/find-your-home' }}" class="btn-g btn-g-gold">{{ section.settings.cta3_label }}</a>{%- endif -%}
+      {%- if section.settings.show_cta2 and section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link | default: '/pages/contact?interest=Agent%20Access' }}" class="btn-g">{{ section.settings.cta2_label }}</a>{%- endif -%}
+      {%- if section.settings.show_cta3 and section.settings.cta3_label != blank and settings.guided_match_enabled != false -%}<a href="{{ section.settings.cta3_link | default: '/pages/find-your-home' }}" class="btn-g btn-g-gold">{{ section.settings.cta3_label }}</a>{%- endif -%}
     </div>
   </div>
 </section>
@@ -316,51 +534,105 @@
   @media(max-width:768px){.proj-grid-3.mc-grid{grid-template-columns:1fr}}
   @media(prefers-reduced-motion:reduce){.page-hero-video{display:none}}
   .prop-toolbar{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:18px var(--page-pad);background:var(--bg2);border-bottom:1px solid var(--border)}
-  .prop-toolbar-inner{display:flex;gap:28px;align-items:center;flex-wrap:wrap;max-width:var(--page-max);margin:0 auto;width:100%}
+  .prop-toolbar-inner{display:flex;gap:14px 28px;align-items:center;flex-wrap:wrap;max-width:var(--page-max);margin:0 auto;width:100%}
   .ptool-l{font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)}
   .ptool-sel{font-family:var(--font-u);font-size:10.5px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;border:none;border-bottom:1px solid var(--border);padding:4px 22px 4px 0;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23A8874A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center}
   .ptool-sel:focus{outline:none;border-bottom-color:var(--gold)}
-  .ptool-count{margin-left:auto;font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe-d)}
+  .ptool-end{margin-left:auto;display:flex;align-items:center;gap:20px}
+  .ptool-count{font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe-d)}
+  .ptool-clear{font-family:var(--font-u);font-size:10px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:none;border:0;border-bottom:1px solid var(--gold);padding:0 0 2px;cursor:pointer;transition:color .3s,border-color .3s}
+  .ptool-clear:hover{color:var(--ink);border-bottom-color:var(--ink)}
+  .ptool-clear[hidden]{display:none}
+  .ptool-chips{display:flex;align-items:center;gap:8px;flex:1 0 100%;flex-wrap:wrap;padding-top:2px}
+  .ptool-chips-l{margin-right:8px}
+  .ptool-chip{font-family:var(--font-u);font-size:10px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;border:1px solid var(--border);border-radius:999px;padding:7px 14px;cursor:pointer;white-space:nowrap;transition:border-color .3s,color .3s,background .3s}
+  .ptool-chip:hover{border-color:var(--ink);color:var(--ink)}
+  .ptool-chip[aria-pressed="true"]{background:var(--dark);color:var(--white);border-color:var(--dark)}
+  .ptool-chip:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+  @media(max-width:900px){
+    .prop-toolbar{padding:16px var(--page-pad)}
+    .prop-toolbar-inner{gap:14px 20px}
+    .ptool-end{margin-left:auto}
+    .ptool-chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 calc(-1 * var(--page-pad));padding:2px var(--page-pad) 4px}
+    .ptool-chips::-webkit-scrollbar{display:none}
+  }
+  .mc-intro{padding:clamp(56px,7vw,88px) var(--page-pad) clamp(8px,1vw,12px);background:var(--bg)}
+  .mc-intro-grid{display:grid;grid-template-columns:7fr 5fr;gap:32px clamp(32px,6vw,96px);align-items:end}
+  .mc-intro-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:300;line-height:1.05;letter-spacing:-.02em;color:var(--ink);margin:0}
+  .mc-intro-h em{font-style:italic;color:var(--ink)}
+  .mc-intro-p{font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:var(--ink3);letter-spacing:.018em;max-width:460px;margin:0}
+  .mc-intro-suburbs{font-size:var(--t-label);font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:var(--taupe-d);margin-top:18px;line-height:2}
+  @media(max-width:900px){
+    .mc-intro-grid{grid-template-columns:1fr;gap:24px;align-items:start}
+    .mc-intro-suburbs{margin-top:14px}
+  }
+  .mc-how{padding:calc(clamp(56px,7vw,96px)*var(--sp-scale,1)*var(--sp-top,1)) var(--page-pad) calc(clamp(56px,7vw,96px)*var(--sp-scale,1)*var(--sp-bot,1));background:var(--bg);border-top:1px solid var(--border)}
+  .mc-how-l{justify-content:center;margin-bottom:8px}
+  .mc-how .proc-step{padding-top:40px}
+  .mc-how .proc-t{font-size:calc(var(--t-h3)*var(--s-h,1)*.92)}
+  .mc-how .proc-d{max-width:280px;margin:0 auto}
+  @media(max-width:900px){.mc-how .proc-step{padding-top:0}.mc-how .proc-d{max-width:none}}
 </style>
 
 <script>
   (function () {
-    var suburb = document.getElementById('fSuburb');
-    var cars = document.getElementById('fCars');
-    var land = document.getElementById('fLand');
-    var build = document.getElementById('fBuild');
-    var sort = document.getElementById('fSort');
-    var count = document.getElementById('fCount');
-    var empty = document.getElementById('fEmpty');
     var grid = document.getElementById('propGrid');
-    var featuredWrap = document.getElementById('featuredWrap');
-    if (!grid || !suburb || grid.dataset.filterInit) return;
+    if (!grid || grid.dataset.filterInit) return;
     grid.dataset.filterInit = '1';
+    var byId = function (id) { return document.getElementById(id); };
+    var suburb = byId('fSuburb');
+    var beds = byId('fBeds');
+    var baths = byId('fBaths');
+    var cars = byId('fCars');
+    var land = byId('fLand');
+    var build = byId('fBuild');
+    var status = byId('fStatus');
+    var sort = byId('fSort');
+    var count = byId('fCount');
+    var empty = byId('fEmpty');
+    var clear = byId('fClear');
+    var featuredWrap = byId('featuredWrap');
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.ptool-chip'));
+    var selects = [suburb, beds, baths, cars, land, build, status].filter(Boolean);
     var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-prop-card]'));
+    if (!selects.length && !chips.length && !sort) return;
+
+    function val(el) { return el ? el.value : ''; }
+    function inRange(raw, spec, required) {
+      var n = Number(raw);
+      if (!n) return !required;
+      var r = spec.split('-');
+      var lo = Number(r[0] || 0);
+      var hi = r[1] ? Number(r[1]) : Infinity;
+      return n >= lo && n < hi;
+    }
+    function activeFeats() {
+      return chips.filter(function (c) { return c.getAttribute('aria-pressed') === 'true'; })
+        .map(function (c) { return c.dataset.feat; });
+    }
 
     function apply() {
-      var isDefault = !suburb.value && !cars.value && !land.value && !(build && build.value) && sort.value === 'featured';
+      var feats = activeFeats();
+      var sortVal = sort ? sort.value : 'featured';
+      var anyFilter = feats.length > 0 || selects.some(function (el) { return !!el.value; });
+      var isDefault = !anyFilter && sortVal === 'featured';
       if (featuredWrap) featuredWrap.style.display = isDefault ? '' : 'none';
+      if (clear) clear.hidden = isDefault;
 
       var visible = 0;
       cards.forEach(function (c) {
         var ok = true;
         if (isDefault && c.dataset.featured) ok = false; // featured shown in hero block instead
-        if (ok && suburb.value && c.dataset.suburb !== suburb.value) ok = false;
-        if (ok && cars.value && Number(c.dataset.cars) < Number(cars.value)) ok = false;
-        if (ok && land.value) {
-          var range = land.value.split('-');
-          var lo = Number(range[0] || 0);
-          var hi = range[1] ? Number(range[1]) : Infinity;
-          var sqm = Number(c.dataset.land);
-          if (sqm < lo || sqm >= hi) ok = false;
-        }
-        if (ok && build && build.value) {
-          var br = build.value.split('-');
-          var blo = Number(br[0] || 0);
-          var bhi = br[1] ? Number(br[1]) : Infinity;
-          var bsqm = Number(c.dataset.build);
-          if (!bsqm || bsqm < blo || bsqm >= bhi) ok = false;
+        if (ok && val(suburb) && c.dataset.suburb !== suburb.value) ok = false;
+        if (ok && val(beds) && Number(c.dataset.beds) < Number(beds.value)) ok = false;
+        if (ok && val(baths) && Number(c.dataset.baths) < Number(baths.value)) ok = false;
+        if (ok && val(cars) && Number(c.dataset.cars) < Number(cars.value)) ok = false;
+        if (ok && val(land) && !inRange(c.dataset.land, land.value, false)) ok = false;
+        if (ok && val(build) && !inRange(c.dataset.build, build.value, true)) ok = false;
+        if (ok && val(status) && c.dataset.status !== status.value) ok = false;
+        if (ok && feats.length) {
+          var have = (c.dataset.feats || '').split(' ');
+          ok = feats.every(function (f) { return have.indexOf(f) > -1; });
         }
         c.style.display = ok ? '' : 'none';
         if (ok) visible++;
@@ -369,21 +641,37 @@
       });
 
       var sorted = cards.slice().sort(function (a, b) {
-        if (sort.value === 'land') return Number(b.dataset.land) - Number(a.dataset.land);
-        if (sort.value === 'cars') return Number(b.dataset.cars) - Number(a.dataset.cars);
-        if (sort.value === 'name') return a.dataset.name.localeCompare(b.dataset.name);
-        return Number(a.dataset.order) - Number(b.dataset.order);
+        var d = 0;
+        if (sortVal === 'land') d = Number(b.dataset.land) - Number(a.dataset.land);
+        else if (sortVal === 'beds') d = Number(b.dataset.beds) - Number(a.dataset.beds);
+        else if (sortVal === 'cars') d = Number(b.dataset.cars) - Number(a.dataset.cars);
+        else if (sortVal === 'year') d = Number(b.dataset.year || 0) - Number(a.dataset.year || 0);
+        else if (sortVal === 'name') d = a.dataset.name.localeCompare(b.dataset.name);
+        return d || Number(a.dataset.order) - Number(b.dataset.order);
       });
       sorted.forEach(function (c) { grid.appendChild(c); });
 
-      empty.style.display = visible === 0 ? '' : 'none';
-      count.textContent = isDefault
+      if (empty) empty.style.display = visible === 0 ? '' : 'none';
+      if (count) count.textContent = isDefault
         ? ''
         : visible + (visible === 1 ? ' Residence' : ' Residences');
     }
 
-    [suburb, cars, land, build, sort].forEach(function (el) {
-      if (el) el.addEventListener('change', apply);
+    selects.concat(sort ? [sort] : []).forEach(function (el) {
+      el.addEventListener('change', apply);
+    });
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var on = chip.getAttribute('aria-pressed') === 'true';
+        chip.setAttribute('aria-pressed', on ? 'false' : 'true');
+        apply();
+      });
+    });
+    if (clear) clear.addEventListener('click', function () {
+      selects.forEach(function (el) { el.value = ''; });
+      if (sort) sort.value = 'featured';
+      chips.forEach(function (chip) { chip.setAttribute('aria-pressed', 'false'); });
+      apply();
     });
   })();
 </script>
@@ -507,7 +795,8 @@
     {
       "type": "url",
       "id": "cta1_link",
-      "label": "Primary link"
+      "label": "Primary link",
+      "info": "Empty = the contact form with Request a Viewing already chosen."
     },
     {
       "type": "text",
@@ -518,7 +807,8 @@
     {
       "type": "url",
       "id": "cta2_link",
-      "label": "Secondary link"
+      "label": "Secondary link",
+      "info": "Empty = the contact form with Agent Access already chosen (/pages/contact?interest=Agent Access). The Agent Access page itself is parked for launch."
     },
     {
       "type": "text",
@@ -529,7 +819,8 @@
     {
       "type": "url",
       "id": "cta3_link",
-      "label": "Gold button link"
+      "label": "Gold button link",
+      "info": "The Find Your Home page. Hidden site-wide when Theme settings › Guided Match is switched off; the row re-centres on the two buttons left."
     },
     {
       "type": "header",
@@ -561,6 +852,19 @@
     },
     {
       "type": "text",
+      "id": "sort_beds_label",
+      "label": "Sort: bedrooms",
+      "default": "Bedrooms"
+    },
+    {
+      "type": "text",
+      "id": "sort_newest_label",
+      "label": "Sort: newest",
+      "default": "Newest",
+      "info": "Offered once a residence carries a Year in its metafields."
+    },
+    {
+      "type": "text",
       "id": "filter_any_garage",
       "label": "Garage: any",
       "default": "Any Garage"
@@ -578,6 +882,88 @@
       "default": "Any Build Size",
       "info": "The Build size filter appears once at least one residence has a Build size (m²) in its Metafields."
     },
+    {
+      "type": "text",
+      "id": "filter_any_beds",
+      "label": "Bedrooms: any",
+      "default": "Any Bedrooms"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_baths",
+      "label": "Bathrooms: any",
+      "default": "Any Bathrooms"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_status",
+      "label": "Status: any",
+      "default": "Any Status"
+    },
+    {
+      "type": "text",
+      "id": "clear_label",
+      "label": "Clear-filters link",
+      "default": "Clear filters"
+    },
+    {
+      "type": "header",
+      "content": "Filters"
+    },
+    {
+      "type": "paragraph",
+      "content": "Each filter only offers what the residences for sale actually have: bedroom and bathroom steps stop at the largest count, Status appears once more than one Status is in use, and a feature chip appears when at least one residence lists that feature (Products › the residence › Features; the keyword map is the residence-feats snippet)."
+    },
+    {"type": "checkbox", "id": "show_filter_suburb", "label": "Show the Suburb filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_beds", "label": "Show the Bedrooms filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_baths", "label": "Show the Bathrooms filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_garage", "label": "Show the Garage filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_land", "label": "Show the Land size filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_build", "label": "Show the Build size filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_status", "label": "Show the Status filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_features", "label": "Show the Feature chips", "default": true, "info": "Choose more than one and a residence must have them all."},
+    {"type": "checkbox", "id": "show_sort", "label": "Show the Sort menu", "default": true},
+    {"type": "text", "id": "features_label", "label": "Chips label", "default": "Features"},
+    {"type": "text", "id": "chip_pool", "label": "Chip: pool", "default": "Pool"},
+    {"type": "text", "id": "chip_views", "label": "Chip: city views", "default": "City Views"},
+    {"type": "text", "id": "chip_lift", "label": "Chip: lift", "default": "Lift"},
+    {"type": "text", "id": "chip_cinema", "label": "Chip: cinema or media room", "default": "Cinema"},
+    {"type": "text", "id": "chip_gym", "label": "Chip: gym", "default": "Gym"},
+    {"type": "text", "id": "chip_cellar", "label": "Chip: cellar", "default": "Cellar"},
+    {"type": "text", "id": "chip_study", "label": "Chip: study or home office", "default": "Study"},
+    {"type": "text", "id": "chip_solar", "label": "Chip: solar or battery", "default": "Solar and Battery"},
+    {"type": "text", "id": "chip_butler", "label": "Chip: butler's pantry", "default": "Butler's Pantry"},
+    {
+      "type": "header",
+      "content": "Now Selling band"
+    },
+    {
+      "type": "paragraph",
+      "content": "A short editorial band between the toolbar and the featured residence, so the page does not go straight from filters to cards."
+    },
+    {"type": "checkbox", "id": "show_intro_band", "label": "Show the band", "default": true},
+    {"type": "text", "id": "intro_band_label", "label": "Small label", "default": "Now Selling"},
+    {"type": "html", "id": "intro_band_heading", "label": "Heading (HTML)", "info": "Leave empty and the heading counts the residences for you: Five residences, inner Brisbane. Wrap a word in <em> for the italic accent; {count} becomes the number."},
+    {"type": "textarea", "id": "intro_band_text", "label": "Paragraph", "default": "Each residence is drawn, developed and built by the one team. Inspections are by private appointment."},
+    {"type": "checkbox", "id": "intro_band_suburbs", "label": "List the suburbs beneath the paragraph", "default": true, "info": "Read from each residence's Suburb, once each."},
+    {
+      "type": "header",
+      "content": "How It Works strip"
+    },
+    {
+      "type": "paragraph",
+      "content": "A quiet four-step track above the closing band, set like the Process track on the home page. Leave a title empty to drop that step."
+    },
+    {"type": "checkbox", "id": "show_how", "label": "Show the strip", "default": true},
+    {"type": "text", "id": "how_label", "label": "Small label", "default": "How It Works"},
+    {"type": "text", "id": "how1_title", "label": "Step 1 title", "default": "Private inspection"},
+    {"type": "textarea", "id": "how1_text", "label": "Step 1 text", "default": "By appointment, with a member of the Sabdia team who knows the residence."},
+    {"type": "text", "id": "how2_title", "label": "Step 2 title", "default": "A conversation about the residence"},
+    {"type": "textarea", "id": "how2_text", "label": "Step 2 text", "default": "Questions on the drawings, the materials and the way the house was built, answered by the people who made it."},
+    {"type": "text", "id": "how3_title", "label": "Step 3 title", "default": "Contract and settlement"},
+    {"type": "textarea", "id": "how3_text", "label": "Step 3 text", "default": "The contract goes to your solicitor for review. Settlement is arranged between the parties."},
+    {"type": "text", "id": "how4_title", "label": "Step 4 title", "default": "Handover"},
+    {"type": "textarea", "id": "how4_text", "label": "Step 4 text", "default": "The keys and the documents, handed over in person by the team that built the house."},
     {"type": "header", "content": "Space"},
     {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
     {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
@@ -614,7 +1000,7 @@
     {"type": "checkbox", "id": "show_cta", "label": "Show the closing band", "default": true},
     {"type": "checkbox", "id": "show_cta1", "label": "Primary button", "default": true},
     {"type": "checkbox", "id": "show_cta2", "label": "Secondary button", "default": true},
-    {"type": "checkbox", "id": "show_cta3", "label": "Gold button", "default": true}
+    {"type": "checkbox", "id": "show_cta3", "label": "Gold button", "default": true, "info": "Also needs Theme settings › Guided Match to be on."}
   ]
 }
 {% endschema %}

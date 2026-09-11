@@ -107,14 +107,61 @@ try {
 <style>:root{--page-pad:clamp({{ lay_pad_m }}px,{{ lay_pad_vw }}vw,{{ lay_pad }}px);--page-max:{{ lay_max }}px;--sp-scale:{{ lay_sp | divided_by: 100.0 }};--t-slabel:{{ lay_slabel }}px}</style>
 {{ content_for_header }}
 </head>
-<body>
+{%- comment -%}
+  Nav tone, decided automatically (Naomi, 11 Sep 2026: "depending if it is
+  an image or video across the different pages, the navigation must be
+  shown, so it should automatically adjust according to which page and
+  image"). The page is rendered into a string first, the opening of its
+  first section is read, and the body is stamped top-dark when the page
+  opens on a photo, film or dark band (white logo and links sit on it) or
+  top-light when it opens on cream or stone (dark logo and ink links from
+  the very top). main-nav.liquid carries the matching CSS; the scrolled
+  bar (.sc) keeps its own rules. A Look dial moved on that first section
+  (Customize › the section › Look) wins over how the section is designed,
+  so a cream band given a film behind it reads dark, and a dark band set
+  to stone reads light. Only the first 5000 characters of the first
+  section are inspected; the string is rendered once, below.
+{%- endcomment -%}
+{%- capture page_html -%}{{ content_for_layout }}{%- endcapture -%}
+{%- liquid
+  assign top_parts = page_html | split: 'id="shopify-section-'
+  if top_parts.size > 1
+    assign page_top = top_parts[1] | slice: 0, 5000
+  else
+    assign page_top = page_html | slice: 0, 5000
+  endif
+  assign obsidian_hex = '#1F1B14'
+  if settings.design_override
+    assign obsidian_hex = settings.c_dark
+  endif
+  assign obsidian_bg = 'background:' | append: obsidian_hex | append: ';'
+  assign dark_top = false
+  # 1. A Look dial on the opening section: snippets/section-look.liquid writes
+  #    --s-scrim for a photo/film backdrop (obsidian veil = dark tone, cream
+  #    veil = light), the inverted token set when the surface flips the
+  #    section's designed tone (--ink:#F7F3EB = now dark, --ink:#292319 = now
+  #    light), and background:<obsidian> for the Obsidian surface.
+  if page_top contains '--s-scrim:#1F1B14' or page_top contains '--ink:#F7F3EB;' or page_top contains obsidian_bg
+    assign dark_top = true
+  elsif page_top contains '--s-scrim:#F7F3EB' or page_top contains '--ink:#292319;'
+    assign dark_top = false
+  # 2. Otherwise the section as designed: the home hero, the inner-page and
+  #    photographic heroes (page-hero, incl. page-header with a banner and
+  #    the For Sale collection), residence pages (prop-hero), Collection
+  #    residence pages (cd-hero), the agent hero, the password page with
+  #    media, and the dark bands (film-band, about-values, agent-benefits).
+  elsif page_top contains 'class="page-hero' or page_top contains 'class="prop-hero' or page_top contains 'class="cd-hero' or page_top contains 'class="hero ' or page_top contains 'class="hero"' or page_top contains '<section class="ah ' or page_top contains '<section class="ah"' or page_top contains 'pw-has-media' or page_top contains 'class="film-band' or page_top contains '<section class="av ' or page_top contains '<section class="av"' or page_top contains '<section class="ab ' or page_top contains '<section class="ab"'
+    assign dark_top = true
+  endif
+-%}
+<body class="{% if dark_top %}top-dark{% else %}top-light{% endif %}">
 
 <a href="#main" class="skip-link">Skip to content</a>
 
 {% sections 'header-group' %}
 
 <main id="main">
-{{ content_for_layout }}
+{{ page_html }}
 </main>
 
 {% sections 'footer-group' %}

@@ -51,10 +51,23 @@
     {%- endif -%}
     {%- if section.settings.show_buttons -%}
     <div class="reveal d3 cta-btns" style="display:flex;gap:14px;justify-content:{% if cc_left %}flex-start{% else %}center{% endif %};flex-wrap:wrap{% if section.settings.text == blank or section.settings.show_text == false %};margin-top:36px{% endif %}">
-      {%- if section.settings.cta1_label != blank -%}
+      {%- comment -%} A button to the guided match is left out when Theme settings › Features › Guided Match is off; the centred flex row re-centres on its own. {%- endcomment -%}
+      {%- liquid
+        assign cc_hide1 = false
+        assign cc_hide2 = false
+        if settings.guided_match_enabled == false
+          if section.settings.cta1_link contains 'find-your-home'
+            assign cc_hide1 = true
+          endif
+          if section.settings.cta2_link contains 'find-your-home'
+            assign cc_hide2 = true
+          endif
+        endif
+      -%}
+      {%- if section.settings.cta1_label != blank and cc_hide1 == false -%}
         <a href="{{ section.settings.cta1_link }}" class="{% if section.settings.cta1_style == 'ghost' %}btn-g{% if dark %} btn-g-light{% endif %}{% else %}btn-p{% endif %}">{{ section.settings.cta1_label }}</a>
       {%- endif -%}
-      {%- if section.settings.cta2_label != blank -%}
+      {%- if section.settings.cta2_label != blank and cc_hide2 == false -%}
         <a href="{{ section.settings.cta2_link }}" class="btn-g{% if dark %} btn-g-light{% endif %}">{{ section.settings.cta2_label }}</a>
       {%- endif -%}
     </div>

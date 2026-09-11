@@ -34,13 +34,29 @@
   # The residence's own display font (its brochure face): a Google Fonts
   # family by name, or a font file uploaded to Content › Files. Applied to
   # the name wherever it appears on this page.
-  assign nf = section.settings.name_font | strip
-  assign nf_file = section.settings.name_font_file | strip
-  assign nf_weight = section.settings.name_font_weight | default: 400
+  #
+  # The residence's metafields lead (Products › the residence › Residence
+  # name font / font file / weight / capitals: custom.name_font,
+  # name_font_file, name_font_weight, name_font_caps), so the one entry
+  # also sets the face on the For Sale and Collection cards. The section
+  # settings below are the fallback while the metafields are empty.
+  assign nf = mf.name_font.value | strip
+  assign nf_file = mf.name_font_file.value | strip
+  if nf != blank or nf_file != blank
+    assign nf_weight = mf.name_font_weight.value | default: 400
+    assign nf_caps = mf.name_font_caps.value
+    assign nf_fallback = 'ResidenceFace-' | append: product.handle
+  else
+    assign nf = section.settings.name_font | strip
+    assign nf_file = section.settings.name_font_file | strip
+    assign nf_weight = section.settings.name_font_weight | default: 400
+    assign nf_caps = section.settings.name_font_caps
+    assign nf_fallback = 'ResidenceFace'
+  endif
 -%}
 {%- if nf != blank or nf_file != blank -%}
   {%- if nf_file != blank -%}
-    {%- assign nf_family = nf | default: 'ResidenceFace' -%}
+    {%- assign nf_family = nf | default: nf_fallback -%}
     {%- liquid
       assign nf_fmt = 'woff2'
       if nf_file contains '.ttf'
@@ -60,7 +76,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family={{ nf | replace: ' ', '+' }}:wght@{{ nf_weight }}&display=swap">
   {%- endif -%}
   <style>
-    .prop-name,.psb-name,.prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house{font-family:'{{ nf_family }}',var(--font-d);font-weight:{{ nf_weight }}{% if section.settings.name_font_caps %};text-transform:uppercase{% endif %}}
+    .prop-name,.psb-name,.prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house{font-family:'{{ nf_family }}',var(--font-d);font-weight:{{ nf_weight }}{% if nf_caps %};text-transform:uppercase{% endif %}}
     .prop-name{font-size:calc(var(--t-display-xl) * {{ section.settings.name_font_scale | default: 100 | divided_by: 100.0 }});letter-spacing:{{ section.settings.name_font_tracking | default: -4 | divided_by: 100.0 }}em;line-height:.95}
   </style>
 {%- endif -%}
@@ -722,7 +738,7 @@
 <style>
   .prop-hero-centre{align-items:center}.prop-hero-centre .prop-hero-content{text-align:center}.prop-hero-centre .prop-status{justify-content:center}
   .prop-specs-centre .prop-specs-inner{justify-content:center}
-  .prop-body .prop-layout{grid-template-columns:var(--prop-split,7fr 5fr)}
+  @media(min-width:1201px){.prop-body .prop-layout{grid-template-columns:var(--prop-split,7fr 5fr)}}
   .pb-form-first .prop-layout>div:first-child,.pb-form-first-stack .prop-layout>div:first-child{order:2}
   .pb-stack .prop-side,.pb-form-first-stack .prop-side{max-width:640px}
   .pg-nothumbs .pg-strip{display:none}

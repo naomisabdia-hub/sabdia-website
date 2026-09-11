@@ -22,9 +22,22 @@
     </ul>
     {%- endif -%}
     {%- if section.settings.show_buttons -%}
+    {%- comment -%} A button to the guided match is left out when Theme settings › Features › Guided Match is off. Agent enquiries go to /pages/contact?interest=Agent%20Access. {%- endcomment -%}
+    {%- liquid
+      assign ag_hide1 = false
+      assign ag_hide2 = false
+      if settings.guided_match_enabled == false
+        if section.settings.cta1_link contains 'find-your-home'
+          assign ag_hide1 = true
+        endif
+        if section.settings.cta2_link contains 'find-your-home'
+          assign ag_hide2 = true
+        endif
+      endif
+    -%}
     <div class="agent-btns reveal d4">
-      {%- if section.settings.cta1_label != blank -%}<a href="{{ section.settings.cta1_link }}" class="btn-p">{{ section.settings.cta1_label }}</a>{%- endif -%}
-      {%- if section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link }}" class="btn-g">{{ section.settings.cta2_label }}</a>{%- endif -%}
+      {%- if section.settings.cta1_label != blank and ag_hide1 == false -%}<a href="{{ section.settings.cta1_link }}" class="btn-p">{{ section.settings.cta1_label }}</a>{%- endif -%}
+      {%- if section.settings.cta2_label != blank and ag_hide2 == false -%}<a href="{{ section.settings.cta2_link }}" class="btn-g">{{ section.settings.cta2_label }}</a>{%- endif -%}
     </div>
     {%- endif -%}
   </div>
@@ -93,7 +106,8 @@
       "type": "text",
       "id": "cta2_link",
       "label": "Secondary button link",
-      "default": "/pages/agent-access"
+      "default": "/pages/agent-access",
+      "info": "To open the contact form with Agent Access already chosen: /pages/contact?interest=Agent%20Access"
     },
     {"type": "header", "content": "Show"},
     {"type": "checkbox", "id": "show_badge", "label": "Show the badge on the photo", "default": true},

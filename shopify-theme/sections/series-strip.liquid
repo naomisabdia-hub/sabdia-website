@@ -53,7 +53,7 @@
   endif
   assign ss_shown = 0
 -%}
-<section class="series-band{% if section.settings.dark %} on-dark{% endif %}{% if section.settings.show_arrows == false %} series-noarrows{% endif %}{% if section.settings.show_kind == false %} series-nokind{% endif %}" data-series style="--series-w:{{ section.settings.card_width | default: 250 }}px;--series-ar:{{ section.settings.card_shape | default: '9/14' }};--series-gap:{{ section.settings.gap | default: 14 }}px;--series-lines:{{ section.settings.caption_lines | default: 3 }}">
+<section class="series-band{% if section.settings.dark %} on-dark{% endif %}{% if section.settings.show_arrows == false %} series-noarrows{% endif %}{% if section.settings.show_kind == false %} series-nokind{% endif %}" data-series style="--series-w:{% if section.settings.card_width > 0 %}{{ section.settings.card_width }}px{% else %}clamp(200px,22vw,270px){% endif %};--series-ar:{{ section.settings.card_shape | default: '9/14' }};--series-gap:{{ section.settings.gap | default: 14 }}px;--series-lines:{{ section.settings.caption_lines | default: 3 }}">
   <div class="series-hdr">
     <div>
       {%- if section.settings.show_label -%}<div class="slabel {% if section.settings.dark %}slabel-dark {% endif %}reveal">{{ section.settings.label }}</div>{%- endif -%}
@@ -328,7 +328,7 @@
     {"type": "checkbox", "id": "show_kind", "label": "Reel / carousel / post icon on each tile", "default": true},
     {"type": "checkbox", "id": "show_arrows", "label": "Scroll arrows", "default": true},
     {"type": "header", "content": "Layout"},
-    {"type": "range", "id": "card_width", "label": "Tile width", "min": 160, "max": 360, "step": 10, "default": 250, "unit": "px"},
+    {"type": "range", "id": "card_width", "label": "Tile width", "min": 0, "max": 360, "step": 10, "default": 0, "unit": "px", "info": "0 = as designed (200 to 270px, growing with the window)."},
     {"type": "select", "id": "card_shape", "label": "Tile shape", "options": [{"value": "9/14", "label": "Tall 9:14 (as designed)"}, {"value": "4/5", "label": "Portrait 4:5"}, {"value": "1/1", "label": "Square"}, {"value": "3/4", "label": "Portrait 3:4"}], "default": "9/14"},
     {"type": "range", "id": "gap", "label": "Gap between tiles", "min": 4, "max": 40, "step": 2, "default": 14, "unit": "px"},
     {"type": "range", "id": "caption_lines", "label": "Caption lines shown", "min": 1, "max": 5, "step": 1, "default": 3},

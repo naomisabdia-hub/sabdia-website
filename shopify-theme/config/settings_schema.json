@@ -194,6 +194,18 @@
     ]
   },
   {
+    "name": "Features",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "guided_match_enabled",
+        "label": "Guided Match (Find Your Home)",
+        "default": true,
+        "info": "Off hides every link to the guided match across the site and the page itself shows a short note pointing to the contact page. On shows it everywhere it is designed to appear."
+      }
+    ]
+  },
+  {
     "name": "Contact",
     "settings": [
       {

@@ -124,6 +124,54 @@
   .cc-card .cform{padding:clamp(22px,3vw,36px);background:var(--white);border:1px solid var(--border);border-top:2px solid var(--gold)}
 </style>
 
+<script>
+  /* Links such as /?interest=Agent%20Access#contact arrive with this form already
+     chosen, the same way the Contact page works.
+     ?interest=<Interest label>  chooses that enquiry type (added to the list if it is not there).
+     ?property=<residence title> chooses that residence from the same list when no interest is
+                                 given; otherwise the message opens with "Regarding <property>: ".
+     ?message=<text>             starts the message (only when the message is still empty).
+     Values are URL-decoded by the browser (Agent%20Access, SOLACE, Hello%20there). */
+  (function () {
+    var root = document.getElementById('shopify-section-{{ section.id }}') || document;
+    var sel = root.querySelector('#cf-interest');
+    var msg = root.querySelector('#cf-message');
+    if (!sel || sel.dataset.prefill) return;
+    sel.dataset.prefill = '1';
+    var q = new URLSearchParams(location.search);
+    var interest = (q.get('interest') || '').trim();
+    var property = (q.get('property') || '').trim();
+    var message = (q.get('message') || '').trim();
+    if (!interest && !property && !message) return;
+    var option = function (test) {
+      for (var i = 0; i < sel.options.length; i++) {
+        var v = sel.options[i].value;
+        if (v && test(v.toLowerCase())) return sel.options[i];
+      }
+      return null;
+    };
+    var pick = null, residencePicked = false;
+    if (interest) {
+      var wantI = interest.toLowerCase();
+      pick = option(function (v) { return v === wantI; });
+      if (!pick) { pick = new Option(interest, interest); sel.add(pick, 1); }
+    } else if (property) {
+      /* The residences for sale sit in this list as "SOLACE - Camp Hill". */
+      var wantP = property.toLowerCase();
+      pick = option(function (v) { return v === wantP || v.indexOf(wantP + ' - ') === 0; });
+      residencePicked = !!pick;
+    }
+    if (pick) {
+      sel.value = pick.value;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    if (msg && !msg.value.trim()) {
+      var lead = property && !residencePicked ? 'Regarding ' + property + ': ' : '';
+      if (lead || message) msg.value = lead + message;
+    }
+  })();
+</script>
+
 {% schema %}
 {
   "name": "Contact",

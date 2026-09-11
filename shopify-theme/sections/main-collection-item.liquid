@@ -1,9 +1,13 @@
 {%- comment -%}
   Collection residence page - a completed Sabdia home, laid out like the
-  residences for sale but with no enquiry flow: photographic hero, specs
-  bar, the story beside an editorial photo column, the stage + filmstrip
-  gallery, a details mosaic, the film, similar residences and a quiet
-  push to what is for sale now.
+  residences for sale but with no enquiry flow. In order: the hero (the
+  residence's film playing silently behind the name when it has one,
+  else the photo), the specs bar, the story at full measure, the stage +
+  filmstrip gallery, the details mosaic, then the film band with its
+  sound button. The Instagram strip (series-strip) and then Similar
+  residences with the closing push to what is for sale
+  (collection-similar) follow as their own sections, in that order, from
+  the page.collection-item template.
 
   Everything about the residence comes from PAGE metafields (namespace
   custom, Content › Pages › the residence › Metafields):
@@ -14,14 +18,13 @@
     headline   italic line above the story        story   one paragraph per line
     features   short feature lines                series_posts  Instagram posts
   With no story the page stitches one from the strongest Instagram
-  captions, as before. "Similar residences" is chosen from this section's
-  Residence blocks: same style first, then same suburb, then the rest.
+  captions, as before.
 
   Customizer picks: this template is shared by every completed residence,
-  so a hero photo, story-column photos, film or poster picked in the
-  customizer live in a "Residence photos and film" block keyed to the
-  residence's page. A pick wins over that page's metafields; anything left
-  empty keeps the metafield. The Gallery list stays URL-based.
+  so a hero photo, film, poster or second film picked in the customizer
+  live in a "Residence photos and film" block keyed to the residence's
+  page. A pick wins over that page's metafields; anything left empty
+  keeps the metafield. The Gallery list stays URL-based.
 {%- endcomment -%}
 {%- liquid
   assign mf = page.metafields.custom
@@ -48,6 +51,8 @@
   assign hero_pick = false
   assign film_pick = false
   assign poster_pick = false
+  assign film2_pick = false
+  assign poster2_pick = false
   assign side_a_pick = false
   assign side_b_pick = false
   for block in section.blocks
@@ -67,6 +72,12 @@
       if block.settings.side_photo_2
         assign side_b_pick = block.settings.side_photo_2
       endif
+      if block.settings.film_2
+        assign film2_pick = block.settings.film_2
+      endif
+      if block.settings.film_2_poster
+        assign poster2_pick = block.settings.film_2_poster
+      endif
       break
     endif
   endfor
@@ -76,6 +87,38 @@
     if fmp4
       assign film_src = fmp4.url
     endif
+  endif
+  assign film2_src = ''
+  if film2_pick
+    assign f2mp4 = film2_pick.sources | where: 'format', 'mp4' | first
+    if f2mp4
+      assign film2_src = f2mp4.url
+    endif
+  endif
+
+  # The hero: the residence's film, silently on a loop behind the name,
+  # when it has one and the Hero setting allows it; otherwise the photo.
+  # The photo is the film's poster and stands in when motion is reduced.
+  assign hero_film = false
+  if film_src != blank and section.settings.hero_media != 'photo'
+    assign hero_film = true
+  endif
+
+  # The film band in the body (with the sound button): the same film,
+  # a second film picked for this residence, or none. A residence with
+  # no second film picked keeps the same film.
+  assign body_mode = section.settings.body_film | default: 'same'
+  assign body_src = film_src
+  assign body_poster_pick = poster_pick
+  if body_mode == 'none'
+    assign body_src = ''
+  elsif body_mode == 'second' and film2_src != blank
+    assign body_src = film2_src
+    assign body_poster_pick = poster2_pick
+  endif
+  assign show_film_band = false
+  if body_src != blank and section.settings.show_film
+    assign show_film_band = true
   endif
 
   # Story: the Story field, one paragraph per line; else the strongest
@@ -110,14 +153,22 @@
     assign has_specs = true
   endif
 
-  # Editorial side column: photos 2 and 3 (the hero is usually photo 1).
+  # The two photos beside the story are off as designed (Naomi, 11 Sep
+  # 2026): the story runs the full measure and the photos stay in the
+  # gallery. Switched on, photos 2 and 3 (or the picks) return beside it.
   assign side_a = blank
   assign side_b = blank
-  if gcount > 2
-    assign side_a = gallery[1]
-    assign side_b = gallery[2]
-  elsif gcount == 2
-    assign side_a = gallery[1]
+  assign show_side = false
+  if section.settings.show_side_photos
+    if gcount > 2
+      assign side_a = gallery[1]
+      assign side_b = gallery[2]
+    elsif gcount == 2
+      assign side_a = gallery[1]
+    endif
+    if side_a_pick or side_a != blank
+      assign show_side = true
+    endif
   endif
 
   # Details mosaic: five photos from deeper in the set, when there are
@@ -150,11 +201,21 @@
   endif
   assign cd_focus = section.settings.hero_focus | default: 'center'
 -%}
-<section class="cd-hero{% if section.settings.hero_words == 'centre' %} cd-hero-centre{% endif %}" style="--cd-h:{{ cd_h }};--cd-dim:{{ cd_dim }};--cd-focus:{{ cd_focus }}">
-  {%- if hero_pick -%}
-    <img src="{{ hero_pick | image_url: width: 1920, height: 1080, crop: cd_focus }}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="eager" fetchpriority="high" width="1920" height="1080">
-  {%- elsif hero != blank -%}
-    <img src="{% render 'ext-variant', src: hero, w: 1920, h: 1080 %}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="eager" fetchpriority="high" width="1920" height="1080">
+{%- capture hero_poster -%}
+  {%- if hero_pick -%}{{ hero_pick | image_url: width: 1920, height: 1080, crop: cd_focus }}{%- elsif hero != blank -%}{% render 'ext-variant', src: hero, w: 1920, h: 1080 %}{%- endif -%}
+{%- endcapture -%}
+{%- assign hero_poster = hero_poster | strip -%}
+<section class="cd-hero{% if section.settings.hero_words == 'centre' %} cd-hero-centre{% endif %}{% if hero_film %} cd-hero-film cd-hero-fit-{{ section.settings.hero_film_fit | default: 'cover' }}{% endif %}" style="--cd-h:{{ cd_h }};--cd-dim:{{ cd_dim }};--cd-focus:{{ cd_focus }}">
+  {%- if hero_poster != blank -%}
+    <img src="{{ hero_poster }}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="eager" fetchpriority="high" width="1920" height="1080">
+  {%- endif -%}
+  {%- if hero_film -%}
+  {%- comment -%} The residence's real film, silent, on a loop. The photo
+      above is its poster and the whole picture when motion is reduced
+      (the film is hidden by CSS and paused below). {%- endcomment -%}
+  <div class="cd-hero-video" aria-hidden="true">
+    <video src="{{ film_src }}"{% if hero_poster != blank %} poster="{{ hero_poster }}"{% endif %} autoplay muted loop playsinline preload="metadata" tabindex="-1"></video>
+  </div>
   {%- endif -%}
   <div class="cd-hero-ov"></div>
   <div class="cd-hero-content">
@@ -169,6 +230,29 @@
     {%- endif -%}
   </div>
 </section>
+{%- if hero_film -%}
+<script>
+  (function () {
+    var wrap = document.querySelector('.cd-hero-video'), v = wrap && wrap.querySelector('video');
+    if (!v || v.dataset.init) return;
+    v.dataset.init = '1';
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.removeAttribute('autoplay'); v.pause(); return;
+    }
+    /* Some browsers ignore the autoplay attribute on late-loading media;
+       the film also rests while the hero is scrolled out of view. */
+    var want = true;
+    var attempt = function () { if (!want || !v.paused) return; var p = v.play(); if (p && p.catch) p.catch(function () {}); };
+    attempt();
+    v.addEventListener('canplay', attempt);
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (en) { want = en.isIntersecting; if (want) attempt(); else v.pause(); });
+      }, { threshold: 0 }).observe(wrap);
+    }
+  })();
+</script>
+{%- endif -%}
 
 {%- if has_specs and section.settings.hide_specs != true -%}
 <div class="prop-specs-bar cd-specs">
@@ -220,9 +304,9 @@
 {%- endif -%}
 
 {%- if section.settings.show_story -%}
-<div class="prop-body cd-body cd-side-{{ section.settings.side_layout | default: 'offset' }}" style="--cd-split:{{ cd_split }}">
+<div class="prop-body cd-body{% if show_side %} cd-side-{{ section.settings.side_layout | default: 'offset' }}{% else %} cd-solo cd-solo-{{ section.settings.story_align | default: 'left' }}{% endif %}" style="--cd-split:{{ cd_split }}">
   <div class="cd-layout inner">
-    <div class="{% if section.settings.sticky_story %}prop-desc{% endif %} cd-desc">
+    <div class="{% if section.settings.sticky_story and show_side %}prop-desc {% endif %}cd-desc">
       {%- if section.settings.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, page.title }}</div>{%- endif -%}
       {%- if section.settings.show_headline -%}<h2 class="prop-body-h reveal d1">{{ headline }}</h2>{%- endif -%}
       {%- if story.size > 0 -%}
@@ -248,12 +332,12 @@
       {%- if section.settings.show_links -%}
       <div class="cd-desc-links reveal d3">
         {%- if gcount > 0 and section.settings.show_gallery -%}<a href="#gallery" class="btn-g btn-g-gold">{{ section.settings.gallery_button | default: "View the photos" }} ({{ gcount }})</a>{%- endif -%}
-        {%- if film_src != blank and section.settings.show_film -%}<a href="#film" class="btn-g">{{ section.settings.film_button | default: "Watch the film" }}</a>{%- endif -%}
+        {%- if show_film_band -%}<a href="#film" class="btn-g">{{ section.settings.film_button | default: "Watch the film" }}</a>{%- endif -%}
       </div>
       {%- endif -%}
     </div>
 
-    {%- if section.settings.show_side_photos and side_a_pick or section.settings.show_side_photos and side_a != blank -%}
+    {%- if show_side -%}
     <aside class="cd-side" aria-label="{{ page.title | escape }} photos">
       <figure class="cd-side-a reveal-wipe d1">
         {%- if side_a_pick -%}
@@ -432,7 +516,9 @@
   </script>
 {%- endif -%}
 
-{%- if film_src != blank and section.settings.show_film -%}
+{%- if show_film_band -%}
+  {%- comment -%} The film in the body, with its sound button - shown even
+      when the same film already plays silently in the hero. {%- endcomment -%}
   <section class="film-band{% if section.settings.film_side == 'left' %} film-flip{% endif %}" id="film" style="--film-ar:{{ section.settings.film_shape | default: '9/16' }}">
     <div class="film-grid">
       <div class="film-copy">
@@ -442,7 +528,7 @@
       </div>
       <div class="reveal d2">
         <div class="film-frame" data-film>
-          <video src="{{ film_src }}" {% if poster_pick %}poster="{{ poster_pick | image_url: width: 1200, height: 675, crop: 'center' }}"{% elsif hero_pick %}poster="{{ hero_pick | image_url: width: 1200, height: 675, crop: 'center' }}"{% elsif mf.image.value != blank %}poster="{% render 'ext-variant', src: mf.image.value, w: 1200, h: 675 %}"{% endif %} muted loop playsinline preload="none"></video>
+          <video src="{{ body_src }}" {% if body_poster_pick %}poster="{{ body_poster_pick | image_url: width: 1200, height: 675, crop: 'center' }}"{% elsif hero_pick %}poster="{{ hero_pick | image_url: width: 1200, height: 675, crop: 'center' }}"{% elsif mf.image.value != blank %}poster="{% render 'ext-variant', src: mf.image.value, w: 1200, h: 675 %}"{% endif %} muted loop playsinline preload="none"></video>
           <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
             <span data-sound-label>{{ section.settings.sound_label | default: "Sound On" }}</span>
@@ -460,160 +546,20 @@
   <script>if (typeof sabdiaFilmInit === 'function') sabdiaFilmInit();</script>
 {%- endif -%}
 
-{%- comment -%} Similar residences: from the Residence blocks, never this
-    page; same style first, then same suburb, then the rest in block order. {%- endcomment -%}
-{%- capture ranked_raw -%}
-  {%- for pass in (1..3) -%}
-    {%- for block in section.blocks -%}
-      {%- liquid
-        if block.type != 'residence'
-          continue
-        endif
-        assign rp = block.settings.page
-        if rp == blank and block.settings.link contains '/pages/'
-          assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
-          assign rp = pages[rp_handle]
-        endif
-        assign r_name = block.settings.name | default: rp.title
-        if r_name == page.title or r_name == blank
-          continue
-        endif
-        assign r_style = rp.metafields.custom.style.value | strip
-        assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
-        assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
-        assign hit = false
-        if pass == 1 and r_style != blank and r_style == style_name
-          assign hit = true
-        elsif pass == 2 and r_suburb != blank and r_suburb == suburb
-          assign hit = true
-        elsif pass == 3
-          assign hit = true
-        endif
-        if hit
-          echo block.id | append: '¦'
-        endif
-      -%}
-    {%- endfor -%}
-  {%- endfor -%}
-{%- endcapture -%}
-{%- assign ranked = ranked_raw | strip | split: '¦' | uniq -%}
-{%- assign cd_more_n = section.settings.similar_count | default: 3 -%}
-{%- capture more_cards -%}
-  {%- assign shown = 0 -%}
-  {%- for bid in ranked -%}
-    {%- if shown >= cd_more_n -%}{%- break -%}{%- endif -%}
-    {%- for block in section.blocks -%}
-      {%- if block.id != bid -%}{%- continue -%}{%- endif -%}
-      {%- liquid
-        assign rp = block.settings.page
-        if rp == blank and block.settings.link contains '/pages/'
-          assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
-          assign rp = pages[rp_handle]
-        endif
-        assign r_name = block.settings.name | default: rp.title
-        assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
-        assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
-        assign r_style = rp.metafields.custom.style.value
-        assign r_year = rp.metafields.custom.year.value
-        assign r_link = block.settings.link | default: rp.url
-        assign r_video = block.settings.video | default: rp.metafields.custom.video.value
-        if block.settings.video_file
-          assign pmp4 = block.settings.video_file.sources | where: 'format', 'mp4' | first
-          if pmp4
-            assign r_video = pmp4.url
-          endif
-        endif
-        assign r_img = rp.metafields.custom.image.value | default: block.settings.image_ext
-        if rp.metafields.custom.gallery.value.size > 0
-          if r_img == blank or r_img contains '/films/'
-            assign r_img = rp.metafields.custom.gallery.value | first
-          endif
-        endif
-        assign shown = shown | plus: 1
-      -%}
-      <a href="{{ r_link }}" class="pf-card reveal{% if shown == 2 %} d1{% elsif shown == 3 %} d2{% endif %}" data-port-card {{ block.shopify_attributes }}>
-        <div class="pf-media">
-          {%- if block.settings.image -%}
-            <img src="{{ block.settings.image | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ r_name | escape }}" loading="lazy" decoding="async" width="900" height="675">
-          {%- elsif r_img != blank -%}
-            <img src="{% render 'ext-variant', src: r_img, w: 900, h: 675 %}" alt="{{ r_name | escape }}" loading="lazy" decoding="async" width="900" height="675">
-          {%- endif -%}
-          {%- if r_video != blank -%}
-            <video src="{{ r_video }}" muted loop playsinline preload="none" data-port-video></video>
-            <span class="port-film-tag">{{ section.settings.film_tag | default: "Film" }}</span>
-          {%- endif -%}
-        </div>
-        <div class="pf-info">
-          <div class="pf-name">{{ r_name }} <span aria-hidden="true">&rarr;</span></div>
-          <div class="pf-meta">{{ r_suburb }}{% if r_style != blank %} <i>&middot;</i> {{ r_style }}{% endif %}{% if r_year != blank %} <i>&middot;</i> {{ r_year }}{% endif %}</div>
-        </div>
-      </a>
-      {%- break -%}
-    {%- endfor -%}
-  {%- endfor -%}
-{%- endcapture -%}
-{%- assign more_stripped = more_cards | strip -%}
-{%- if more_stripped != blank and section.settings.show_similar -%}
-  <section class="cd-similar" style="--pf-cols:{{ section.settings.similar_columns | default: '3' }}">
-    <div class="inner">
-      <div class="cd-similar-hdr">
-        <div>
-          {%- if section.settings.more_label != blank -%}<div class="slabel reveal">{{ section.settings.more_label }}</div>{%- endif -%}
-          <h2 class="cd-similar-h reveal d1">{{ section.settings.more_heading_html }}</h2>
-        </div>
-        {%- if section.settings.more_button != blank -%}<a href="{{ section.settings.more_link | default: '/pages/collection' }}" class="btn-g reveal d2">{{ section.settings.more_button | default: "The full Collection" }} &rarr;</a>{%- endif -%}
-      </div>
-      <div class="pf-grid pf-grid-3">{{ more_cards }}</div>
-    </div>
-  </section>
-  <script>
-    (function () {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      document.querySelectorAll('.cd-similar [data-port-card]').forEach(function (card) {
-        if (card.dataset.portInit) return;
-        card.dataset.portInit = '1';
-        var video = card.querySelector('[data-port-video]');
-        if (!video) return;
-        card.addEventListener('mouseenter', function () { video.play().then(function () { video.classList.add('playing'); }).catch(function () {}); });
-        card.addEventListener('mouseleave', function () { video.pause(); video.classList.remove('playing'); });
-      });
-    })();
-  </script>
-{%- endif -%}
-
-{%- if section.settings.show_close -%}
-<section class="cd-close cd-close-{{ section.settings.close_style | default: 'obsidian' }}">
-  <div class="inner-sm">
-    {%- if section.settings.cta_label != blank -%}<div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">{{ section.settings.cta_label }}</div>{%- endif -%}
-    <h2 class="cd-close-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, page.title }}</h2>
-    {%- if section.settings.cta_text != blank -%}<p class="cd-close-p reveal d2">{{ section.settings.cta_text | replace: name_token, page.title }}</p>{%- endif -%}
-    <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <a href="{{ section.settings.cta1_link | default: '/collections/for-sale' }}" class="btn-p">{{ section.settings.cta1_label }}</a>
-      {%- if section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link | default: '/pages/collection' }}" class="btn-g btn-g-light">{{ section.settings.cta2_label }}</a>{%- endif -%}
-    </div>
-    {%- assign share_url = shop.url | append: page.url -%}
-    {%- assign share_title = page.title | append: ' - ' | append: suburb | append: ' | Sabdia Constructions' -%}
-    {%- assign eu = share_url | url_encode -%}
-    {%- assign et = share_title | url_encode -%}
-    {%- if section.settings.show_share -%}
-    <div class="share-row cd-share reveal d4" aria-label="Share this page">
-      <span class="share-l">{{ section.settings.share_label | default: "Share" }}</span>
-      <a href="https://www.facebook.com/sharer/sharer.php?u={{ eu }}" target="_blank" rel="noopener" class="share-a">Facebook</a>
-      <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ eu }}" target="_blank" rel="noopener" class="share-a">LinkedIn</a>
-      <a href="mailto:?subject={{ et }}&body={{ et }}%0A{{ eu }}" class="share-a">Email</a>
-      <button type="button" class="share-a share-copy" data-share-url="{{ share_url }}">{{ section.settings.copy_link_label | default: "Copy link" }}</button>
-    </div>
-    {%- endif -%}
-  </div>
-</section>
-{%- endif -%}
-
 <style>
   .cd-hero{min-height:var(--cd-h,88svh)}
   .cd-hero img{object-position:var(--cd-focus,center);filter:brightness(calc(1 - var(--cd-dim,.9) * .5)) saturate(.85)}
   .cd-hero-ov{opacity:calc(var(--cd-dim,.9) / .9)}
+  .cd-hero-video{position:absolute;inset:0}
+  .cd-hero-video video{width:100%;height:100%;object-fit:cover;object-position:var(--cd-focus,center);filter:brightness(calc(1 - var(--cd-dim,.9) * .5)) saturate(.85);display:block}
+  .cd-hero-fit-contain .cd-hero-video video{object-fit:contain}
+  @media(prefers-reduced-motion:reduce){.cd-hero-video{display:none}}
   .cd-hero-centre{align-items:center}.cd-hero-centre .cd-hero-content{text-align:center}.cd-hero-centre .cd-meta{justify-content:center}
-  .cd-body .cd-layout{grid-template-columns:var(--cd-split,7fr 5fr)}
+  @media(min-width:901px){.cd-body .cd-layout{grid-template-columns:var(--cd-split,7fr 5fr)}}
+  .cd-solo .cd-layout{grid-template-columns:minmax(0,1fr);gap:0}
+  .cd-solo .cd-desc{max-width:min(100%,820px)}
+  .cd-solo .prop-body-p{max-width:68ch}
+  .cd-solo-centre .cd-desc{margin:0 auto}
   .cd-side-stack .cd-side-a,.cd-side-stack .cd-side-b{width:100%;margin:0 0 16px!important;border:0;box-shadow:none}
   .cd-side-single .cd-side-b{display:none}.cd-side-single .cd-side-a{width:100%}
   .pg-nothumbs .pg-strip{display:none}
@@ -621,11 +567,6 @@
   .cd-gallery .pg-stage{aspect-ratio:var(--pgs-ar,16/9)}
   .film-band .film-frame{aspect-ratio:var(--film-ar,9/16)}
   @media(min-width:901px){.film-flip .film-grid>.film-copy{order:2}}
-  .cd-similar .pf-grid-3{grid-template-columns:repeat(var(--pf-cols,3),1fr)}
-  .cd-close-stone{background:var(--bg2)}.cd-close-stone .cd-close-h,.cd-close-stone .cd-close-h em{color:var(--ink)}.cd-close-stone .cd-close-p{color:var(--ink3)}
-  .cd-close-stone .slabel-dark{color:var(--ink)}.cd-close-stone .slabel-dark::before{background:var(--gold)}
-  .cd-close-stone .btn-g-light{border-color:var(--border);color:var(--ink2)}.cd-close-stone .btn-g-light:hover{border-color:var(--ink);color:var(--ink)}
-  .cd-close-stone .cd-share{border-top-color:var(--border)}.cd-close-stone .share-l{color:var(--ink3)}.cd-close-stone .share-a{color:var(--ink2);border-bottom-color:rgba(var(--gold-rgb),.35)}.cd-close-stone .share-a:hover{color:var(--ink);border-color:var(--gold)}
   .cd-meta{display:flex;flex-wrap:wrap;align-items:center;gap:0 12px;margin-top:20px;font-size:var(--t-label);font-weight:300;letter-spacing:.24em;text-transform:uppercase;color:rgba(var(--white-rgb),.6)}
   .cd-meta-dot{color:var(--gold2)}
   .cd-specs .prop-spec-item{min-width:0}
@@ -650,21 +591,6 @@
   .cd-m0{grid-column:1/8;aspect-ratio:4/3}
   .cd-m1{grid-column:8/13;aspect-ratio:7/9}
   .cd-m2,.cd-m3,.cd-m4{grid-column:span 4;aspect-ratio:16/10}
-  .cd-similar{padding:clamp(64px,9vw,120px) var(--page-pad);background:var(--bg2);border-top:1px solid var(--border)}
-  .cd-similar-hdr{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:40px}
-  .cd-similar-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:300;color:var(--ink);letter-spacing:-.02em}
-  .cd-similar-h em{font-style:italic;color:var(--ink)}
-  .cd-close{padding:calc(clamp(72px,9vw,132px) * var(--sp-scale) * var(--sp-top,1)) var(--page-pad) calc(clamp(72px,9vw,132px) * var(--sp-scale) * var(--sp-bot,1));background:var(--dark);text-align:center}
-  .cd-close-h{font-family:var(--font-d);font-size:calc(clamp(34px,5vw,64px)*var(--s-h,1));font-weight:300;color:var(--white);letter-spacing:-.02em;margin-bottom:22px}
-  .cd-close-h em{font-style:italic;color:var(--gold2)}
-  .cd-close-p{font-size:calc(13px*var(--s-t,1));font-weight:300;color:rgba(var(--white-rgb),.5);max-width:440px;margin:0 auto 38px;line-height:1.85}
-  .cd-share{justify-content:center;margin-top:52px;padding-top:32px;border-top:1px solid rgba(var(--white-rgb),.08)}
-  .cd-share .share-l{color:rgba(var(--white-rgb),.45)}
-  .cd-share .share-a{color:rgba(var(--white-rgb),.7);border-bottom-color:rgba(var(--gold2-rgb),.35)}
-  .cd-share .share-a:hover{color:var(--white);border-color:var(--gold2)}
-  .share-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-  .share-l{font-size:10px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}
-  .share-a{background:none;border:none;cursor:pointer;padding:4px 0;font-family:var(--font-u);font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(var(--gold-rgb),.35);transition:color .25s,border-color .25s;text-decoration:none}
   @media(max-width:900px){
     .cd-layout{grid-template-columns:1fr;gap:44px}
     .cd-desc{position:static}
@@ -676,24 +602,14 @@
     .cd-m3,.cd-m4{grid-column:span 6;aspect-ratio:4/3}
   }
 </style>
-<script>
-  (function () {
-    document.querySelectorAll('.cd-share .share-copy').forEach(function (b) {
-      if (b.dataset.init) return; b.dataset.init = '1';
-      b.addEventListener('click', function () {
-        var u = b.getAttribute('data-share-url'), t = b.textContent;
-        if (navigator.clipboard) navigator.clipboard.writeText(u).then(function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = t; }, 1600); });
-      });
-    });
-  })();
-</script>
 
 {% schema %}
 {
   "name": "Collection residence",
   "settings": [
     { "type": "paragraph", "content": "Everything about the residence itself - photos, film, style, year, bedrooms, headline, story - is set on the page: Content › Pages › the residence › Metafields. This section sets the shared wording. Write {name} wherever the residence's name should appear." },
-    { "type": "paragraph", "content": "To pick a residence's hero photo, story-column photos, film or poster from your Files instead of the page's metafields: ⊕ Add block › Residence photos and film, choose that residence's page, then pick. One block per residence; the picks apply only on that residence's page. The Gallery photos stay on the page (Metafields › Gallery)." },
+    { "type": "paragraph", "content": "To pick a residence's hero photo, film, poster or a second film from your Files instead of the page's metafields: ⊕ Add block › Residence photos and film, choose that residence's page, then pick. One block per residence; the picks apply only on that residence's page. The Gallery photos stay on the page (Metafields › Gallery)." },
+    { "type": "paragraph", "content": "After this section the template runs The Series (the Instagram strip), then Similar residences and the closing band - each its own section, with its own settings." },
     { "type": "text", "id": "badge", "label": "Hero badge", "default": "The Sabdia Collection" },
     { "type": "text", "id": "completed_word", "label": "Word before the year in the hero", "default": "Completed" },
     { "type": "text", "id": "about_label", "label": "Story label", "default": "About {name}" },
@@ -719,22 +635,6 @@
     { "type": "html", "id": "film_heading_html", "label": "Film heading (HTML - {name})", "default": "Experience <em>{name}</em>." },
     { "type": "textarea", "id": "film_text", "label": "Film text ({name})", "default": "{name}, on film." },
     { "type": "text", "id": "sound_label", "label": "Sound button", "default": "Sound On" },
-    { "type": "header", "content": "Similar residences", "info": "Chosen from the Residence blocks below: same style first, then the same suburb, then the rest. Never the residence being viewed." },
-    { "type": "text", "id": "more_label", "label": "Label", "default": "More from the Collection" },
-    { "type": "html", "id": "more_heading_html", "label": "Heading (HTML)", "default": "Similar <em>residences</em>." },
-    { "type": "text", "id": "more_button", "label": "Button", "default": "The full Collection" },
-    { "type": "url", "id": "more_link", "label": "Button link" },
-    { "type": "text", "id": "film_tag", "label": "Film tag on cards", "default": "Film" },
-    { "type": "header", "content": "Closing band", "info": "No enquiry form on completed residences - this points people to what is for sale now." },
-    { "type": "text", "id": "cta_label", "label": "Label", "default": "Now Selling" },
-    { "type": "html", "id": "cta_heading_html", "label": "Heading (HTML - {name})", "default": "See what is <em>for sale</em> now." },
-    { "type": "textarea", "id": "cta_text", "label": "Text", "default": "Every Sabdia residence is designed and built in-house, to the standard you see in {name}." },
-    { "type": "text", "id": "cta1_label", "label": "Primary button", "default": "View Current Properties" },
-    { "type": "url", "id": "cta1_link", "label": "Primary link" },
-    { "type": "text", "id": "cta2_label", "label": "Secondary button", "default": "Back to the Collection" },
-    { "type": "url", "id": "cta2_link", "label": "Secondary link" },
-    { "type": "text", "id": "share_label", "label": "Share row label", "default": "Share" },
-    { "type": "text", "id": "copy_link_label", "label": "Copy link button", "default": "Copy link" },
     {"type": "header", "content": "Space"},
     {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
     {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
@@ -749,8 +649,10 @@
     {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
     {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
     {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."},
-    {"type": "header", "content": "Hero photo"},
-    {"type": "range", "id": "hero_dim", "label": "Darken the hero photo", "min": 0, "max": 100, "step": 5, "default": 90, "unit": "%", "info": "Lower = brighter."},
+    {"type": "header", "content": "Hero"},
+    {"type": "select", "id": "hero_media", "label": "Behind the name", "options": [{"value": "film", "label": "The film, when the residence has one (as designed)"}, {"value": "photo", "label": "The photo"}], "default": "film", "info": "The residence's real film plays silently on a loop behind the name; the hero photo is its poster and stands in when motion is reduced. A residence without a film shows the photo."},
+    {"type": "select", "id": "hero_film_fit", "label": "Film fit", "options": [{"value": "cover", "label": "Fill the hero, cropped (as designed)"}, {"value": "contain", "label": "The whole frame, on the photo"}], "default": "cover", "info": "The residence films are portrait reels: filled, a wide screen shows their middle band; whole, the reel stands in the middle of the darkened photo."},
+    {"type": "range", "id": "hero_dim", "label": "Darken the hero photo or film", "min": 0, "max": 100, "step": 5, "default": 90, "unit": "%", "info": "Lower = brighter."},
     {"type": "select", "id": "hero_height", "label": "Hero height", "options": [{"value": "tall", "label": "Tall (as designed)"}, {"value": "full", "label": "Full screen"}, {"value": "standard", "label": "Standard"}, {"value": "short", "label": "Short"}], "default": "tall"},
     {"type": "select", "id": "hero_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
     {"type": "select", "id": "hero_words", "label": "Where the words sit", "options": [{"value": "base-left", "label": "Base, left (as designed)"}, {"value": "centre", "label": "Centre"}], "default": "base-left"},
@@ -762,9 +664,10 @@
     {"type": "checkbox", "id": "show_headline", "label": "Show the headline", "default": true},
     {"type": "checkbox", "id": "show_features", "label": "Show the key features", "default": true},
     {"type": "checkbox", "id": "show_links", "label": "Photos and film buttons under the story", "default": true},
-    {"type": "checkbox", "id": "show_side_photos", "label": "Show the two photos beside the story", "default": true},
+    {"type": "select", "id": "story_align", "label": "Story column", "options": [{"value": "left", "label": "Left (as designed)"}, {"value": "centre", "label": "Centred on the page"}], "default": "left", "info": "Applies while the side photos are off: the story runs a reading measure with no empty column beside it."},
+    {"type": "checkbox", "id": "show_side_photos", "label": "Show the two photos beside the story", "default": false, "info": "Off as designed: the photos stay in the gallery below. On, photos 2 and 3 (or the picks in the Residence photos and film block) return beside the story."},
     {"type": "checkbox", "id": "show_side_caption", "label": "Caption under the side photos", "default": true},
-    {"type": "checkbox", "id": "sticky_story", "label": "Story holds while the photos scroll", "default": true},
+    {"type": "checkbox", "id": "sticky_story", "label": "Story holds while the photos scroll", "default": true, "info": "Only with the side photos on."},
     {"type": "select", "id": "story_split", "label": "Column split", "options": [{"value": "7-5", "label": "Story 7 : photos 5 (as designed)"}, {"value": "equal", "label": "Equal halves"}, {"value": "8-4", "label": "Story 8 : photos 4"}], "default": "7-5"},
     {"type": "select", "id": "side_layout", "label": "Side photos", "options": [{"value": "offset", "label": "Overlapping, offset (as designed)"}, {"value": "stack", "label": "Stacked, full width"}, {"value": "single", "label": "One photo"}], "default": "offset"},
     {"type": "header", "content": "Gallery and film"},
@@ -773,33 +676,13 @@
     {"type": "checkbox", "id": "show_expand", "label": "\"View all photos\" button on the stage", "default": true},
     {"type": "checkbox", "id": "show_mosaic", "label": "Details mosaic under the gallery (ten or more photos)", "default": true},
     {"type": "select", "id": "stage_shape", "label": "Stage shape", "options": [{"value": "16/9", "label": "Wide 16:9 (as designed)"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "21/9", "label": "Cinematic 21:9"}], "default": "16/9"},
-    {"type": "checkbox", "id": "show_film", "label": "Show the film", "default": true},
+    {"type": "checkbox", "id": "show_film", "label": "Show the film band", "default": true},
+    {"type": "select", "id": "body_film", "label": "Film in the body", "options": [{"value": "same", "label": "The residence's film (as designed)"}, {"value": "second", "label": "A second film, picked for the residence"}, {"value": "none", "label": "No film band"}], "default": "same", "info": "The band with the sound button, after the gallery. It shows the film even when the same film already plays silently in the hero. A second film comes from the Residence photos and film block; a residence without one keeps its film."},
     {"type": "checkbox", "id": "show_film_caption", "label": "Caption under the film", "default": true},
     {"type": "select", "id": "film_side", "label": "Film sits", "options": [{"value": "right", "label": "Right (as designed)"}, {"value": "left", "label": "Left"}], "default": "right"},
-    {"type": "select", "id": "film_shape", "label": "Film shape", "options": [{"value": "9/16", "label": "Portrait 9:16 (as designed)"}, {"value": "4/5", "label": "Portrait 4:5"}, {"value": "1/1", "label": "Square"}, {"value": "16/9", "label": "Landscape 16:9"}], "default": "9/16"},
-    {"type": "header", "content": "Similar residences and closing"},
-    {"type": "checkbox", "id": "show_similar", "label": "Show similar residences", "default": true},
-    {"type": "range", "id": "similar_count", "label": "Residences shown", "min": 1, "max": 6, "step": 1, "default": 3},
-    {"type": "select", "id": "similar_columns", "label": "Cards across", "options": [{"value": "2", "label": "Two"}, {"value": "3", "label": "Three (as designed)"}, {"value": "4", "label": "Four"}], "default": "3"},
-    {"type": "checkbox", "id": "show_close", "label": "Show the closing band", "default": true},
-    {"type": "select", "id": "close_style", "label": "Closing band", "options": [{"value": "obsidian", "label": "Obsidian (as designed)"}, {"value": "stone", "label": "Stone"}], "default": "obsidian"},
-    {"type": "checkbox", "id": "show_share", "label": "Share row", "default": true}
+    {"type": "select", "id": "film_shape", "label": "Film shape", "options": [{"value": "9/16", "label": "Portrait 9:16 (as designed)"}, {"value": "4/5", "label": "Portrait 4:5"}, {"value": "1/1", "label": "Square"}, {"value": "16/9", "label": "Landscape 16:9"}], "default": "9/16"}
   ],
   "blocks": [
-    {
-      "type": "residence",
-      "name": "Portfolio residence",
-      "settings": [
-        { "type": "page", "id": "page", "label": "Residence page", "info": "Pick the completed residence's page (Content › Pages, template \"collection-item\"). Name, location, style, year, photo and film then come from that page - the fields below only override." },
-        { "type": "text", "id": "name", "label": "Name" },
-        { "type": "text", "id": "loc", "label": "Location line" },
-        { "type": "image_picker", "id": "image", "label": "Image" },
-        { "type": "text", "id": "image_ext", "label": "Current photo (URL)", "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field." },
-        { "type": "video", "id": "video_file", "label": "Hover film (upload, optional)" },
-        { "type": "text", "id": "video", "label": "Current hover film (URL)", "info": "The film playing now is loaded from this address (or the page's Film metafield). Upload a film above and it takes over." },
-        { "type": "url", "id": "link", "label": "Link" }
-      ]
-    },
     {
       "type": "media",
       "name": "Residence photos and film",
@@ -807,10 +690,12 @@
         { "type": "paragraph", "content": "Picks for one completed residence. Choose its page, then pick. A picked photo or film wins over that page's Hero image / Gallery / Film metafields; leave a picker empty to keep the metafield. Ignored on every other residence's page." },
         { "type": "page", "id": "page", "label": "Residence page", "info": "The completed residence these picks belong to (Content › Pages, template collection-item)." },
         { "type": "image_picker", "id": "hero_image", "label": "Hero photo", "info": "Takes over from the page's Hero image metafield. Also the film's poster unless one is picked below." },
-        { "type": "image_picker", "id": "side_photo_1", "label": "Story column, tall photo", "info": "Takes over from the second Gallery photo." },
-        { "type": "image_picker", "id": "side_photo_2", "label": "Story column, wide photo", "info": "Takes over from the third Gallery photo." },
-        { "type": "video", "id": "film", "label": "Film (upload)", "info": "Takes over from the page's Film metafield." },
-        { "type": "image_picker", "id": "film_poster", "label": "Film poster", "info": "The still shown before the film plays. Empty = the hero photo." }
+        { "type": "video", "id": "film", "label": "Film (upload)", "info": "Takes over from the page's Film metafield. Plays silently in the hero and with sound in the body band." },
+        { "type": "image_picker", "id": "film_poster", "label": "Film poster", "info": "The still shown before the body film plays. Empty = the hero photo." },
+        { "type": "video", "id": "film_2", "label": "Second film (upload)", "info": "Shown in the body band instead of the residence's film when Film in the body is set to a second film." },
+        { "type": "image_picker", "id": "film_2_poster", "label": "Second film poster", "info": "Empty = the hero photo." },
+        { "type": "image_picker", "id": "side_photo_1", "label": "Story column, tall photo", "info": "Only with Show the two photos beside the story on. Takes over from the second Gallery photo." },
+        { "type": "image_picker", "id": "side_photo_2", "label": "Story column, wide photo", "info": "Only with the side photos on. Takes over from the third Gallery photo." }
       ]
     }
   ]
