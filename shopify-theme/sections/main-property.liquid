@@ -261,7 +261,7 @@
                 {%- for t in etypes -%}
                   {%- assign parts = t | split: '|' -%}
                   {%- assign tt = parts[0] | strip -%}
-                  {%- if tt != blank -%}<option>{{ tt }}</option>{%- endif -%}
+                  {%- if tt != blank -%}<option>{{ tt | replace: name_token, prop_name }}</option>{%- endif -%}
                 {%- endfor -%}
               </select>
               {%- for t in etypes -%}
@@ -300,7 +300,7 @@
                 {%- for t in etypes -%}
                   {%- assign parts = t | split: '|' -%}
                   {%- assign tt = parts[0] | strip -%}
-                  {%- if tt != blank -%}<option>{{ tt }}</option>{%- endif -%}
+                  {%- if tt != blank -%}<option>{{ tt | replace: name_token, prop_name }}</option>{%- endif -%}
                 {%- endfor -%}
               </select>
               {%- for t in etypes -%}
@@ -839,8 +839,8 @@
       "type": "textarea",
       "id": "enquiry_types",
       "label": "Enquiry types (one per line)",
-      "info": "Add a tailored thank-you after a | on the same line, e.g. Custom home design | Thank you. Sabdia designs and builds every residence in-house, so we do not take on custom commissions - but we will be in touch about our current and upcoming releases.",
-      "default": "Register Interest\nArrange Private Inspection\nRequest Price Guide\nGeneral Enquiry"
+      "info": "{name} becomes the residence's name. The budget, timeline and location questions appear only for an inspection or an interest enquiry (Naomi, 14 Sep 2026). Add a tailored thank-you after a | on the same line, e.g. Custom home design | Thank you. Sabdia designs and builds every residence in-house, so we do not take on custom commissions - but we will be in touch about our current and upcoming releases.",
+      "default": "General enquiry about {name}\nArrange an inspection\nRegister my interest"
     },
     {
       "type": "textarea",
@@ -892,13 +892,13 @@
     { "type": "paragraph", "content": "Three optional dropdowns on the form. Answers arrive in the enquiry email, and budget and timeline become tags on the person in Customers (budget-5m-6m, timeline-ready-now) for segments. If they skip them, the thank-you asks for budget and timeline in your words." },
     { "type": "text", "id": "prequal_budget_label", "label": "Budget label", "default": "Budget range" },
     { "type": "textarea", "id": "prequal_budget", "label": "Budget options (one per line)", "default": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say" },
-    { "type": "text", "id": "prequal_timeline_label", "label": "Timeline label", "default": "Timeline to purchase" },
+    { "type": "text", "id": "prequal_timeline_label", "label": "Timeline label", "default": "Timeline" },
     { "type": "textarea", "id": "prequal_timeline", "label": "Timeline options (one per line)", "default": "Ready now\n1 - 3 months\n3 - 6 months\n6 - 12 months\nJust researching" },
     { "type": "text", "id": "prequal_flex_label", "label": "Flexibility label", "default": "Location and flexibility" },
     { "type": "textarea", "id": "prequal_flex", "label": "Flexibility options (one per line)", "default": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases" },
     { "type": "textarea", "id": "prequal_ask", "label": "Thank-you when budget or timeline is left blank", "default": "Thank you for your interest. So we can send the most relevant information, could you share your approximate budget range and your timeline for purchase? We will follow up with further details on the residence." },
     { "type": "text", "id": "prequal_loc_label", "label": "Locations label (For Sale enquiry)", "default": "Preferred locations" },
-    { "type": "text", "id": "prequal_loc_label_other", "label": "Locations label (residence enquiry)", "default": "Other locations you would also consider (optional)" },
+    { "type": "text", "id": "prequal_loc_label_other", "label": "Locations label (residence enquiry)", "default": "Also considering (optional)" },
     { "type": "textarea", "id": "prequal_locations", "label": "Location options (one per line)", "info": "Leave empty to list the suburbs of the residences for sale plus Other inner Brisbane." },
     { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
     { "type": "header", "content": "Residence name font" },

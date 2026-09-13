@@ -54,14 +54,14 @@
         <option value="">{{ s.prequal_select | default: "Select…" }}</option>
         {%- for o in b_opts -%}{%- assign oo = o | strip -%}{%- if oo != blank -%}<option>{{ oo }}</option>{%- endif -%}{%- endfor -%}
       </select></div>
-    <div class="fg"><label class="fl" for="pq-time-{{ mode }}">{{ s.prequal_timeline_label | default: "Timeline to purchase" }}<span data-prequal-req>*</span></label>
+    <div class="fg"><label class="fl" for="pq-time-{{ mode }}">{{ s.prequal_timeline_label | default: "Timeline" }}<span data-prequal-req>*</span></label>
       <select class="fsel" id="pq-time-{{ mode }}" name="{{ n_t }}" data-prequal-timeline>
         <option value="">{{ s.prequal_select | default: "Select…" }}</option>
         {%- for o in t_opts -%}{%- assign oo = o | strip -%}{%- if oo != blank -%}<option>{{ oo }}</option>{%- endif -%}{%- endfor -%}
       </select></div>
   </div>
   <div class="fg" data-prequal-locwrap>
-    <span class="fl" data-prequal-loclabel data-label-forsale="{{ s.prequal_loc_label | default: "Preferred locations" | escape }}" data-label-residence="{{ s.prequal_loc_label_other | default: "Other locations you would also consider (optional)" | escape }}">{{ s.prequal_loc_label | default: "Preferred locations" }}<span data-prequal-req>*</span></span>
+    <span class="fl" data-prequal-loclabel data-label-forsale="{{ s.prequal_loc_label | default: "Preferred locations" | escape }}" data-label-residence="{{ s.prequal_loc_label_other | default: "Also considering (optional)" | escape }}">{{ s.prequal_loc_label | default: "Preferred locations" }}<span data-prequal-req>*</span></span>
     <div class="chips" role="group" aria-label="{{ s.prequal_loc_label | default: "Preferred locations" | escape }}">
       {%- for o in l_opts -%}{%- assign oo = o | strip -%}{%- if oo != blank -%}
         <label class="chip"><input type="checkbox" value="{{ oo | escape }}" data-prequal-loc><span>{{ oo }}</span></label>

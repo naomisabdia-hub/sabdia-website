@@ -1682,3 +1682,17 @@ html.bk .film-band{padding-top:calc(clamp(52px,6.2vw,92px)*var(--sp-scale)*var(-
 /* A residence name set in its brochure face inside running text (snippets/residence-name). */
 .res-face{display:inline-block;line-height:1;vertical-align:baseline}
 .slabel .res-face,.slabel .prop-house{font-size:calc(1.3em*1);letter-spacing:0}
+/* Enquiry forms: even rhythm between fields, the two-up row bottom-aligned
+   so a wrapped label never pushes one select below the other, chips with
+   room under them (Naomi, 14 Sep 2026: "the spacing needs to be okay"). */
+.prequal{display:flex;flex-direction:column;gap:16px}
+.prequal-row{gap:12px 16px;align-items:end}
+.prequal-row .fg{justify-content:flex-end}
+.chips{margin:8px 0 4px}
+.chip span{padding:9px 14px;line-height:1.2}
+.cform .fsub{margin-top:8px}
+html.bk .fsel{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%233d3d3d' stroke-width='1' fill='none'/%3E%3C/svg%3E")}
+html.bk .chip span{border-color:rgba(var(--dark-rgb),.35)}
+html.bk .chip input:checked+span{border-color:var(--ink);background:var(--bg)}
+html.bk .chip input:focus-visible+span{outline-color:var(--ink)}
+html.bk .prop-enquire{border-top-color:var(--ink)}

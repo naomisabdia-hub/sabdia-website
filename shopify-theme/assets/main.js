@@ -606,7 +606,12 @@ function prequalInit() {
     chips.forEach((c) => c.addEventListener('change', syncLoc));
     const apply = () => {
       let mode = 'none', suburb = '';
-      if (pageSuburb) { mode = 'residence'; suburb = pageSuburb; }
+      if (pageSuburb) {
+        /* Residence page: a general question needs none of this; an inspection
+           or a registration of interest brings the buyer questions up. */
+        const t = sel ? sel.value : '';
+        if (!sel || /inspect|interest|buy|purchase|offer/i.test(t)) { mode = 'residence'; suburb = pageSuburb; }
+      }
       else if (sel) {
         const r = residenceFor(sel.value);
         if (r) { mode = 'residence'; suburb = r.suburb || ''; }
