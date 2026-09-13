@@ -2,6 +2,8 @@
   Agent Access - the benefit cards on the deep band. One block per
   benefit, icon keyed to the benefit-icon snippet.
 {%- endcomment -%}
+{%- comment -%} Theme settings › Features › Agent Access off: this section renders nothing. {%- endcomment -%}
+{%- if settings.agent_access_enabled -%}
 {% render 'section-look', section: section, designed: 'dark' %}
 {%- liquid
   assign ab_cols = section.settings.columns | default: '3'
@@ -39,6 +41,7 @@
   @media(max-width:640px){.agent-bens{grid-template-columns:1fr}}
 </style>
 
+{%- endif -%}
 {% schema %}
 {
   "name": "Agent benefits",

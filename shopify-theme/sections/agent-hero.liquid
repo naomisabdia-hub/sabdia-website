@@ -22,6 +22,21 @@
       assign ah_just = 'flex-end'
   endcase
 -%}
+{%- comment -%}
+  Theme settings › Features › Agent Access is off: the page is hidden until
+  Naomi is ready for agents. Anyone holding the link sees a short note and
+  the contact form; the rest of the page's sections render nothing.
+{%- endcomment -%}
+{%- if settings.agent_access_enabled != true -%}
+<section class="ah-off sp" style="min-height:60vh;display:flex;align-items:center;padding-top:calc(var(--nav-h) + 40px)">
+  <div class="inner-sm" style="text-align:center;display:flex;flex-direction:column;align-items:center">
+    <div class="slabel reveal" style="justify-content:center">{{ section.settings.off_label | default: 'Agent Access' }}</div>
+    <h1 class="about-h reveal d1" style="margin-bottom:18px">{{ section.settings.off_heading | default: 'Not open yet' }}</h1>
+    <p class="about-p reveal d2" style="max-width:480px;margin:0 auto 32px">{{ section.settings.off_text | default: 'Agent access opens with our next release. In the meantime, leave your details and a member of our team will be in touch.' }}</p>
+    <a href="{{ section.settings.off_link | default: '/pages/contact' }}" class="btn-p reveal d3">{{ section.settings.off_cta | default: 'Begin a Conversation' }}</a>
+  </div>
+</section>
+{%- else -%}
 {% render 'section-look', section: section, mode: 'hero' %}
 <section class="ah{% if section.settings.words_align == 'centre' %} ah-centre{% endif %}" style="position:relative;min-height:{{ ah_h }};display:flex;flex-direction:column;justify-content:{{ ah_just }};overflow:hidden;background:var(--dark);--ah-dim:{{ ah_dim }}">
   {%- if section.settings.image -%}
@@ -40,10 +55,17 @@
 </section>
 <style>.ah-centre .inner{text-align:center}</style>
 
+{%- endif -%}
 {% schema %}
 {
   "name": "Agent hero",
   "settings": [
+    {"type": "header", "content": "While Agent Access is off"},
+    {"type": "text", "id": "off_label", "label": "Small label", "default": "Agent Access"},
+    {"type": "text", "id": "off_heading", "label": "Heading", "default": "Not open yet"},
+    {"type": "textarea", "id": "off_text", "label": "Line", "default": "Agent access opens with our next release. In the meantime, leave your details and a member of our team will be in touch."},
+    {"type": "text", "id": "off_cta", "label": "Button", "default": "Begin a Conversation"},
+    {"type": "url", "id": "off_link", "label": "Button goes to", "info": "Defaults to the contact page."},
     {
       "type": "text",
       "id": "label",

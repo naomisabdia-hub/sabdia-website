@@ -27,7 +27,7 @@
       </ul>
       {%- endif -%}
 
-      {%- if section.settings.show_agent and section.settings.agent_body_html != blank -%}
+      {%- if section.settings.show_agent and section.settings.agent_body_html != blank and settings.agent_access_enabled -%}
       <div class="contact-info-block reveal d2">
         <div class="contact-info-h">{{ section.settings.agent_heading }}</div>
         <p class="contact-info-p">{{ section.settings.agent_body_html }}</p>
@@ -71,6 +71,7 @@
               <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
             {%- endfor -%}
             {%- for block in section.blocks -%}
+              {%- if settings.agent_access_enabled != true and block.settings.text contains 'Agent' -%}{%- continue -%}{%- endif -%}
               <option {{ block.shopify_attributes }}>{{ block.settings.text }}</option>
             {%- endfor -%}
           </select>
@@ -112,6 +113,7 @@
               <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
             {%- endfor -%}
             {%- for block in section.blocks -%}
+              {%- if settings.agent_access_enabled != true and block.settings.text contains 'Agent' -%}{%- continue -%}{%- endif -%}
               <option {{ block.shopify_attributes }}>{{ block.settings.text }}</option>
             {%- endfor -%}
           </select>

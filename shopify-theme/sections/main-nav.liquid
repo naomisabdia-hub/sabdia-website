@@ -117,9 +117,11 @@
   <nav class="mob-nav-links" aria-label="Mobile">
     {%- if menu.links.size > 0 -%}
       {%- for link in menu.links -%}
+        {%- if settings.agent_access_enabled != true and link.url contains 'agent-access' -%}{%- continue -%}{%- endif -%}
         {%- if link.links.size > 0 -%}
           <span class="mob-nav-group">{{ link.title }}</span>
           {%- for child in link.links -%}
+            {%- if settings.agent_access_enabled != true and child.url contains 'agent-access' -%}{%- continue -%}{%- endif -%}
             <a href="{{ child.url }}" class="mob-nav-child">{{ child.title }}</a>
           {%- endfor -%}
         {%- else -%}
@@ -131,7 +133,7 @@
       <a href="/pages/collection">Collection</a>
       <a href="/pages/services">Process</a>
       <a href="/pages/about">About</a>
-      {%- if section.settings.show_agent_link -%}<a href="/pages/agent-access">Agent Access</a>{%- endif -%}
+      {%- if section.settings.show_agent_link and settings.agent_access_enabled -%}<a href="/pages/agent-access">Agent Access</a>{%- endif -%}
     {%- endif -%}
     <a href="{{ section.settings.cta_link }}">{{ section.settings.mobile_contact_label }}</a>
   </nav>
@@ -151,11 +153,13 @@
   <ul class="nav-center">
     {%- if menu.links.size > 0 -%}
       {%- for link in menu.links -%}
+        {%- if settings.agent_access_enabled != true and link.url contains 'agent-access' -%}{%- continue -%}{%- endif -%}
         {%- if link.links.size > 0 -%}
           <li class="has-sub">
             <a href="{{ link.url }}" aria-haspopup="true" aria-expanded="false">{{ link.title }}<span class="nav-caret" aria-hidden="true"></span></a>
             <ul class="nav-sub" aria-label="{{ link.title | escape }}">
               {%- for child in link.links -%}
+                {%- if settings.agent_access_enabled != true and child.url contains 'agent-access' -%}{%- continue -%}{%- endif -%}
                 <li><a href="{{ child.url }}">{{ child.title }}</a></li>
               {%- endfor -%}
             </ul>
@@ -169,7 +173,7 @@
       <li><a href="/pages/collection">Collection</a></li>
       <li><a href="/pages/services">Process</a></li>
       <li><a href="/pages/about">About</a></li>
-      {%- if section.settings.show_agent_link -%}<li><a href="/pages/agent-access">Agent Access</a></li>{%- endif -%}
+      {%- if section.settings.show_agent_link and settings.agent_access_enabled -%}<li><a href="/pages/agent-access">Agent Access</a></li>{%- endif -%}
     {%- endif -%}
   </ul>
   <div class="nav-right">

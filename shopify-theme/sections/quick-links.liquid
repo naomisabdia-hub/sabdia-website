@@ -12,6 +12,9 @@
     if settings.guided_match_enabled == false and block.settings.link contains 'find-your-home'
       continue
     endif
+    if settings.agent_access_enabled != true and block.settings.link contains 'agent'
+      continue
+    endif
     assign ql_shown = ql_shown | plus: 1
   endfor
   assign ql_cols = section.settings.columns | default: '3' | plus: 0
@@ -27,6 +30,7 @@
       {%- assign ql_i = 0 -%}
       {%- for block in section.blocks -%}
         {%- if settings.guided_match_enabled == false and block.settings.link contains 'find-your-home' -%}{%- continue -%}{%- endif -%}
+        {%- if settings.agent_access_enabled != true and block.settings.link contains 'agent' -%}{%- continue -%}{%- endif -%}
         {%- assign di = ql_i | modulo: 3 -%}
         {%- assign ql_i = ql_i | plus: 1 -%}
         <a href="{{ block.settings.link }}" class="ql-card reveal {{ qdelays[di] }}" {{ block.shopify_attributes }}>

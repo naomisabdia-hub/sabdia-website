@@ -1,4 +1,6 @@
 {%- comment -%} Port of the Agent Access band - portrait visual + framed badge beside copy, features and CTAs. {%- endcomment -%}
+{%- comment -%} Theme settings › Features › Agent Access off: this section renders nothing. {%- endcomment -%}
+{%- if settings.agent_access_enabled -%}
 {% render 'section-look', section: section %}
 <div class="agent-grid s-surface{% if section.settings.image_side == 'right' %} agent-flip{% endif %}{% if section.settings.frame == false %} agent-noframe{% endif %}" id="agents" style="--agent-min:{{ section.settings.min_height | default: 640 }}px">
   <div class="agent-vis reveal-wipe-x">
@@ -43,6 +45,7 @@
   </div>
 </div>
 
+{%- endif -%}
 {% schema %}
 {
   "name": "Agent access",

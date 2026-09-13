@@ -40,6 +40,7 @@
             {%- for opt in interests -%}
               {%- assign parts = opt | split: '|' -%}
               {%- assign o = parts[0] | strip -%}
+              {%- if settings.agent_access_enabled != true and o contains 'Agent' -%}{%- assign o = '' -%}{%- endif -%}
               {%- if o != blank -%}<option>{{ o }}</option>{%- endif -%}
               {%- if forloop.first -%}
                 {%- comment -%} The residences for sale, same as the Contact page, so both forms behave alike. {%- endcomment -%}
@@ -87,6 +88,7 @@
             {%- for opt in interests -%}
               {%- assign parts = opt | split: '|' -%}
               {%- assign o = parts[0] | strip -%}
+              {%- if settings.agent_access_enabled != true and o contains 'Agent' -%}{%- assign o = '' -%}{%- endif -%}
               {%- if o != blank -%}<option>{{ o }}</option>{%- endif -%}
               {%- if forloop.first -%}
                 {%- comment -%} The residences for sale, same as the Contact page, so both forms behave alike. {%- endcomment -%}

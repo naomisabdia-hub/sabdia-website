@@ -1618,25 +1618,25 @@ body:has(.cc.handoff) #ShopifyChat, body:has(.cc.handoff) shopify-chat, body:has
    thin italic; the italic <em> accent becomes a light-weight accent in the
    same colour; and the hero award line becomes a tracked label. The
    Editorial system never adds the class, so none of this applies there. */
-html.bk{--t-display-xl:clamp(56px,10vw,150px);--t-display:clamp(42px,7.5vw,108px);--t-h1:clamp(32px,4.2vw,56px);--t-h2:clamp(24px,3vw,40px);--t-h3:clamp(18px,1.9vw,24px);--t-lead:clamp(17px,2vw,22px);--t-quote:clamp(20px,2.6vw,34px)}
+html.bk{--t-display-xl:clamp(52px,9vw,130px);--t-display:clamp(38px,6.5vw,92px);--t-h1:clamp(28px,3.6vw,48px);--t-h2:clamp(22px,2.6vw,34px);--t-h3:clamp(17px,1.7vw,22px);--t-lead:clamp(17px,1.9vw,21px);--t-quote:clamp(20px,2.4vw,30px)}
 @media(max-width:560px){html.bk{--t-display-xl:clamp(44px,13vw,88px);--t-display:clamp(36px,11vw,64px);--t-h1:clamp(26px,7.5vw,40px);--t-h2:clamp(22px,5.5vw,30px);--t-h3:clamp(17px,4.5vw,22px);--t-lead:clamp(16px,4.2vw,19px);--t-quote:clamp(18px,4.6vw,24px)}}
-html.bk .about-h{font-size:calc(clamp(34px,3.9vw,58px)*var(--s-h,1))}
+html.bk .about-h{font-size:calc(clamp(30px,3.4vw,50px)*var(--s-h,1));margin-bottom:24px}
 @media(max-width:560px){html.bk .about-h{font-size:calc(var(--t-h1)*var(--s-h,1))}}
 html.bk .stat-n{font-size:calc(clamp(40px,5vw,66px)*var(--s-h,1));font-weight:300;letter-spacing:-.02em}
 html.bk .stats-compact .stat-n{font-size:calc(clamp(34px,4vw,52px)*var(--s-h,1))}
-html.bk .about-h,html.bk .proj-h,html.bk .svc-h,html.bk .agent-h,html.bk .contact-h,html.bk .film-h,html.bk .cs-h,html.bk .prop-cta-h,html.bk .jn-title,html.bk .footer-tag-h,html.bk .svc-detail-h{font-weight:700;line-height:1.06;letter-spacing:-.015em}
-html.bk .page-h{font-weight:700;line-height:.98;letter-spacing:-.02em}
-html.bk .prop-name,html.bk .cd-name{font-weight:700;line-height:.95;letter-spacing:-.025em}
-html.bk .prop-body-h,html.bk .prop-gallery-h,html.bk .prop-related-h,html.bk .series-h,html.bk .sw-h,html.bk .jn-lead-h{font-weight:700;line-height:1.1;letter-spacing:-.01em}
+html.bk .about-h,html.bk .proj-h,html.bk .svc-h,html.bk .agent-h,html.bk .contact-h,html.bk .film-h,html.bk .cs-h,html.bk .prop-cta-h,html.bk .jn-title,html.bk .footer-tag-h,html.bk .svc-detail-h{font-weight:500;line-height:1.1;letter-spacing:-.01em}
+html.bk .page-h{font-weight:500;line-height:1.02;letter-spacing:-.015em}
+html.bk .prop-name,html.bk .cd-name{font-weight:500;line-height:.98;letter-spacing:-.02em}
+html.bk .prop-body-h,html.bk .prop-gallery-h,html.bk .prop-related-h,html.bk .series-h,html.bk .sw-h,html.bk .jn-lead-h{font-weight:500;line-height:1.12;letter-spacing:-.01em}
 html.bk .pc-name,html.bk .sc-name,html.bk .proj-card-name,html.bk .svc-t,html.bk .proc-t,html.bk .prop-features-h,html.bk .prop-enquire-h,html.bk .nl-h,html.bk .cs-col-t,html.bk .jn-card-h,html.bk .pf-name,html.bk .cc-title,html.bk .tl-title,html.bk .award-title,html.bk .h-title-serif .h-title{font-weight:500;letter-spacing:0}
 html.bk .testi-text,html.bk .cs-quote,html.bk .jn-body blockquote,html.bk .nl-done{font-style:normal;font-weight:300;line-height:1.45}
-html.bk .about-h em,html.bk .proj-h em,html.bk .svc-h em,html.bk .agent-h em,html.bk .contact-h em,html.bk .footer-tag-h em,html.bk .page-h em,html.bk .prop-body-h em,html.bk .prop-gallery-h em,html.bk .prop-cta-h em,html.bk .prop-related-h em,html.bk .sw-h em,html.bk .film-h em,html.bk .series-h em,html.bk .cs-h em,html.bk .prop-spec-v em,html.bk .svc-detail-h em,html.bk .jn-title em,html.bk .stats-band .about-h em,html.bk .series-band.on-dark .series-h em,html.bk .cs-dark .cs-h em{font-style:normal;font-weight:300;color:inherit}
+html.bk .about-h em,html.bk .proj-h em,html.bk .svc-h em,html.bk .agent-h em,html.bk .contact-h em,html.bk .footer-tag-h em,html.bk .page-h em,html.bk .prop-body-h em,html.bk .prop-gallery-h em,html.bk .prop-cta-h em,html.bk .prop-related-h em,html.bk .sw-h em,html.bk .film-h em,html.bk .series-h em,html.bk .cs-h em,html.bk .prop-spec-v em,html.bk .svc-detail-h em,html.bk .jn-title em,html.bk .stats-band .about-h em,html.bk .series-band.on-dark .series-h em,html.bk .cs-dark .cs-h em{font-style:normal;font-weight:inherit;color:inherit}
 html.bk .h-award{font-family:var(--font-u);font-size:var(--t-label);font-weight:400;font-style:normal;letter-spacing:.3em;text-transform:uppercase;color:rgba(var(--white-rgb),.85);white-space:normal}
 html.bk .h-award em{font-style:normal}
 html.bk .h-eyebrow-txt,html.bk .h-title-dot{color:rgba(var(--white-rgb),.85)}
 html.bk .h-bottom-rule{background:rgba(var(--white-rgb),.4)}
 html.bk .proc-n{font-family:var(--font-u);font-style:normal;font-weight:500;font-size:calc(var(--proc-n,48px)*.34);letter-spacing:.06em}
-html.bk .svc-num{font-style:normal;font-weight:700;color:rgba(var(--dark-rgb),.07)}
+html.bk .svc-num{font-style:normal;font-weight:500;color:rgba(var(--dark-rgb),.07)}
 html.bk .testi-q-mark{display:none}
 html.bk .slabel::before{background:var(--ink)}
 html.bk .slabel-dark,html.bk .page-hero-content .slabel,html.bk .fct,html.bk .mob-nav-group{color:rgba(var(--white-rgb),.85)}
@@ -1650,7 +1650,11 @@ html.bk .fi:focus,html.bk .fta:focus,html.bk .fsel:focus{border-color:var(--ink)
 html.bk .btn-g-gold{border-color:var(--ink)}
 html.bk .editor-note{border-color:var(--ink);background:rgba(var(--dark-rgb),.05)}
 html.bk .editor-note a{border-color:var(--ink)}html.bk .editor-note a:hover{background:var(--ink)}
-/* Any heading not named above (section-local classes, CMS headings): the
-   accent is a light weight, never an italic, in the brand kit system. */
-html.bk h1 em,html.bk h2 em,html.bk h3 em,html.bk h4 em,html.bk [class$="-h"] em,html.bk [class*="-h "] em,html.bk .cta-h em,html.bk .mc-intro-h em,html.bk .mc-cta-h em,html.bk .testi-h em,html.bk .pcta-h em{font-style:normal;font-weight:300;color:inherit}
+/* Naomi, 13 Sep 2026: a bold or light word inside a heading "signals AI".
+   In the brand kit system every heading is one weight, and <em> inherits it. */
+html.bk h1 em,html.bk h2 em,html.bk h3 em,html.bk h4 em,html.bk [class$="-h"] em,html.bk [class*="-h "] em,html.bk .cta-h em,html.bk .mc-intro-h em,html.bk .mc-cta-h em,html.bk .testi-h em,html.bk .pcta-h em,html.bk em{font-style:normal;font-weight:inherit;color:inherit}
 html.bk .svc-num{margin-bottom:-6px}
+html.bk .proj-h,html.bk .contact-h{line-height:1.1}
+html.bk .slabel{margin-bottom:14px}
+html.bk .film-h{margin-bottom:16px}
+html.bk .ps .about-p{margin-bottom:44px!important}

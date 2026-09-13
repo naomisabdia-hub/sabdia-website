@@ -63,6 +63,14 @@
             assign cc_hide2 = true
           endif
         endif
+        if settings.agent_access_enabled != true
+          if section.settings.cta1_link contains 'agent'
+            assign cc_hide1 = true
+          endif
+          if section.settings.cta2_link contains 'agent'
+            assign cc_hide2 = true
+          endif
+        endif
       -%}
       {%- if section.settings.cta1_label != blank and cc_hide1 == false -%}
         <a href="{{ section.settings.cta1_link }}" class="{% if section.settings.cta1_style == 'ghost' %}btn-g{% if dark %} btn-g-light{% endif %}{% else %}btn-p{% endif %}">{{ section.settings.cta1_label }}</a>

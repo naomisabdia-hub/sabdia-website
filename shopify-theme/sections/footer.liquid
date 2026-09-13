@@ -123,13 +123,14 @@
       <ul class="fcl">
         {%- if company_menu.links.size > 0 -%}
           {%- for link in company_menu.links -%}
+            {%- if settings.agent_access_enabled != true and link.url contains 'agent-access' -%}{%- continue -%}{%- endif -%}
             <li><a href="{{ link.url }}">{{ link.title }}</a></li>
           {%- endfor -%}
         {%- else -%}
           <li><a href="/pages/about">About Sabdia</a></li>
           <li><a href="/pages/services">Process</a></li>
           <li><a href="/pages/collection">Collection</a></li>
-          {%- if section.settings.show_agent_link -%}<li><a href="/pages/agent-access">Agent Access</a></li>{%- endif -%}
+          {%- if section.settings.show_agent_link and settings.agent_access_enabled -%}<li><a href="/pages/agent-access">Agent Access</a></li>{%- endif -%}
           <li><a href="/blogs/journal">The Journal</a></li>
         {%- endif -%}
       </ul>

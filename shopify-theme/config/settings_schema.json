@@ -226,6 +226,13 @@
     "settings": [
       {
         "type": "checkbox",
+        "id": "agent_access_enabled",
+        "label": "Agent Access",
+        "default": false,
+        "info": "Off = hidden everywhere until you are ready for agents: the menu and footer links (even when the Shopify menu still lists it), the Agent Enquiries buttons, the Agent Access enquiry type, the home Agent Access band and the page itself, which shows a short note pointing to the contact form. On = all of it back as designed."
+      },
+      {
+        "type": "checkbox",
         "id": "guided_match_enabled",
         "label": "Guided Match (Find Your Home)",
         "default": false,

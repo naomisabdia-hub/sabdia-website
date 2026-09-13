@@ -3,6 +3,8 @@
   residences as property cards, with a view-all button.
 {%- endcomment -%}
 {%- assign col = section.settings.listings_collection | default: collections['for-sale'] -%}
+{%- comment -%} Theme settings › Features › Agent Access off: this section renders nothing. {%- endcomment -%}
+{%- if settings.agent_access_enabled -%}
 {% render 'section-look', section: section %}
 {%- liquid
   assign al_count = section.settings.count | default: 2
@@ -36,6 +38,7 @@
   @media(max-width:768px){.agent-listings-grid{grid-template-columns:1fr}}
 </style>
 
+{%- endif -%}
 {% schema %}
 {
   "name": "Agent listings",
