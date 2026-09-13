@@ -64,8 +64,10 @@
       assign fr_h = 'max(520px,78vh)'
       assign fr_hm = 'max(420px,64vh)'
   endcase
-  assign fr_cta1 = section.settings.cta1_label | replace: '{name}', res.title
-  assign fr_cta2 = section.settings.cta2_label | replace: '{name}', res.title
+  assign name_tok = '{' | append: 'name' | append: '}'
+  assign fr_cta1 = section.settings.cta1_label | replace: name_tok, res.title
+  assign fr_cta2 = section.settings.cta2_label | replace: name_tok, res.title
+  assign fr_reel_cap = section.settings.reel_caption | replace: name_tok, res.title
   assign fr_cta2_link = section.settings.cta2_link
   if fr_cta2_link == blank
     assign fr_cta2_link = '/pages/contact?interest=Request%20a%20Viewing&property=' | append: res.title | url_encode
@@ -73,10 +75,108 @@
   capture fr_status
     render 'residence-status', product: res
   endcapture
-  assign fr_layout = section.settings.layout | default: 'split'
-  assign fr_side = section.settings.side | default: 'left'
+  assign fr_layout = section.settings.layout | default: 'editorial'
+  assign fr_reel = section.settings.reel_url
+  if section.settings.reel
+    assign rmp4 = section.settings.reel.sources | where: 'format', 'mp4' | first
+    if rmp4
+      assign fr_reel = rmp4.url
+    endif
+  endif
+  if fr_reel == blank and section.settings.show_reel and m.film_video.value != blank
+    assign fr_reel = m.film_video.value
+  endif
+  assign fr_reel_poster = section.settings.reel_poster_url | default: m.film_poster.value
+  assign fr_side = section.settings.side | default: 'right'
 -%}
-{%- if fr_layout == 'split' -%}
+{%- if fr_layout == 'editorial' -%}
+{%- comment -%}
+  Editorial band (as designed, 14 Sep 2026 - one flagship, presented with
+  care): a warm-grey band, the name set large on the left with the headline,
+  a line, the facts and two buttons; on the right the residence's photograph
+  bleeds off the page edge and its own film reel overlaps the corner. Not a
+  hero: no scrim, no words over the photo.
+{%- endcomment -%}
+{% render 'section-look', section: section %}
+<section class="sp fre fre-{{ fr_side }}{% if fr_reel == blank %} fre-noreel{% endif %}" id="featured" style="--fre-ar:{{ section.settings.shape | default: '4/3' }}">
+  <div class="inner fre-grid">
+    <div class="fre-words">
+      {%- if section.settings.show_label and fr_label != blank -%}<div class="slabel reveal">{{ fr_label }}{% if section.settings.show_status and fr_status != blank %}<span class="fre-status">{{ fr_status }}</span>{% endif %}</div>{%- endif -%}
+      <h2 class="fre-name reveal d1">{{ res.title }}</h2>
+      {%- if m.suburb.value != blank -%}<div class="fre-loc reveal d1">{{ m.suburb.value }}{% if m.state.value != blank %}, {{ m.state.value }}{% endif %}</div>{%- endif -%}
+      <div class="fre-rule reveal d2"></div>
+      {%- if fr_heading != blank and fr_heading != res.title -%}<p class="fre-h reveal d2">{{ fr_heading }}</p>{%- endif -%}
+      {%- if fr_text != blank and section.settings.show_text -%}<p class="about-p reveal d2">{{ fr_text }}</p>{%- endif -%}
+      {%- if section.settings.show_facts -%}
+      <dl class="fre-facts reveal d3">
+        {%- if m.beds.value != blank -%}<div><dt>Bedrooms</dt><dd>{{ m.beds.value }}</dd></div>{%- endif -%}
+        {%- if m.baths.value != blank -%}<div><dt>Bathrooms</dt><dd>{{ m.baths.value }}</dd></div>{%- endif -%}
+        {%- if m.cars.value != blank -%}<div><dt>Garage</dt><dd>{{ m.cars.value }}</dd></div>{%- endif -%}
+        {%- if m.land.value != blank -%}<div><dt>Land</dt><dd>{{ m.land.value }}<span>m&sup2;</span></dd></div>{%- endif -%}
+      </dl>
+      {%- endif -%}
+      {%- if section.settings.show_buttons -%}
+      <div class="fre-btns reveal d3">
+        {%- if fr_cta1 != blank -%}<a href="{{ res.url }}" class="btn-p">{{ fr_cta1 }} &rarr;</a>{%- endif -%}
+        {%- if fr_cta2 != blank -%}<a href="{{ fr_cta2_link }}" class="btn-g">{{ fr_cta2 }}</a>{%- endif -%}
+      </div>
+      {%- endif -%}
+    </div>
+    <div class="fre-media">
+      <a href="{{ res.url }}" class="fre-photo reveal-wipe d1" aria-label="{{ res.title }}">
+        {%- if fr_img -%}
+          <img src="{{ fr_img | image_url: width: 1400 }}" srcset="{{ fr_img | image_url: width: 800 }} 800w, {{ fr_img | image_url: width: 1400 }} 1400w, {{ fr_img | image_url: width: 2000 }} 2000w" sizes="(max-width: 900px) 100vw, 60vw" alt="{{ res.title }}, {{ m.suburb.value }}" loading="lazy" decoding="async" width="1400" height="1050" style="object-position:{{ fr_focus }}">
+        {%- endif -%}
+      </a>
+      {%- if fr_reel != blank -%}
+      <div class="fre-reel reveal d3" data-film>
+        <video src="{{ fr_reel }}"{% if fr_reel_poster != blank %} poster="{{ fr_reel_poster }}"{% endif %} muted loop playsinline preload="none" aria-hidden="true"></video>
+        {%- if section.settings.reel_caption != blank -%}<span class="fre-reel-cap">{{ fr_reel_cap }}</span>{%- endif -%}
+      </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+<style>
+  .fre{background:var(--bg2);overflow:hidden}
+  .fre-grid{display:grid;grid-template-columns:5fr 7fr;gap:clamp(36px,5vw,80px);align-items:center}
+  .fre-left .fre-words{order:2}.fre-left .fre-media{order:1}
+  .fre-words{padding:8px 0}
+  .fre-status{margin-left:14px;padding-left:14px;border-left:1px solid var(--border);font-weight:300;color:var(--ink3)}
+  .fre-name{font-family:var(--font-d);font-size:calc(clamp(56px,7.5vw,116px)*var(--s-h,1));font-weight:500;line-height:.92;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);margin:0}
+  .fre-loc{margin-top:14px;font-size:var(--t-label);font-weight:400;letter-spacing:.32em;text-transform:uppercase;color:var(--ink3)}
+  .fre-rule{width:48px;height:1px;background:var(--ink);margin:28px 0 24px;opacity:.6}
+  .fre-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:500;line-height:1.15;color:var(--ink);margin:0 0 14px;letter-spacing:-.01em}
+  .fre-words .about-p{max-width:460px}
+  .fre-facts{margin:28px 0 0;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:12px clamp(20px,3vw,44px)}
+  .fre-facts dt{font-size:var(--t-micro);font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+  .fre-facts dd{margin:0;font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:500;color:var(--ink);line-height:1}
+  .fre-facts dd span{font-size:.6em;margin-left:2px;font-weight:400;color:var(--ink3)}
+  .fre-btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+  /* The photograph runs off the right edge of the page; the reel sits over its lower-left corner. */
+  .fre-media{position:relative;margin-right:calc(-1 * var(--page-pad));padding-bottom:clamp(36px,4vw,56px);padding-left:clamp(40px,5vw,72px)}
+  .fre-left .fre-media{margin-right:0;margin-left:calc(-1 * var(--page-pad));padding-left:0;padding-right:clamp(40px,5vw,72px)}
+  .fre-photo{display:block;position:relative;aspect-ratio:var(--fre-ar,4/3);overflow:hidden;background:var(--bg3)}
+  .fre-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95);transition:transform 1.1s var(--ease)}
+  .fre-photo:hover img{transform:scale(1.03)}
+  .fre-reel{position:absolute;left:0;bottom:0;width:clamp(120px,22%,190px);aspect-ratio:9/16;background:var(--dark);border:1px solid rgba(var(--white-rgb),.6);box-shadow:0 30px 60px -28px rgba(var(--dark-rgb),.55);overflow:hidden}
+  .fre-left .fre-reel{left:auto;right:0}
+  .fre-reel video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .fre-reel-cap{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;font-size:var(--t-micro);letter-spacing:.26em;text-transform:uppercase;color:rgba(var(--white-rgb),.9);background:linear-gradient(to top,rgba(var(--dark-rgb),.6),transparent)}
+  .fre-noreel .fre-media{padding-bottom:0;padding-left:0}
+  @media(max-width:1100px){.fre-grid{grid-template-columns:1fr 1fr}.fre-name{font-size:calc(clamp(48px,6.5vw,90px)*var(--s-h,1))}}
+  @media(max-width:900px){
+    .fre-grid{grid-template-columns:1fr;gap:28px}
+    .fre-left .fre-words,.fre-words{order:2}.fre-left .fre-media,.fre-media{order:1;margin:0 calc(-1 * var(--page-pad));padding:0 0 0 0}
+    .fre-photo{aspect-ratio:4/3}
+    .fre-reel{left:auto;right:16px;bottom:-24px;width:96px;border-width:1px}
+    .fre-noreel .fre-media{margin:0 calc(-1 * var(--page-pad))}
+    .fre-words{padding-top:8px}
+    .fre-facts{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(prefers-reduced-motion:reduce){.fre-reel{display:none}}
+</style>
+{%- elsif fr_layout == 'split' -%}
 {%- comment -%}
   Split card (as designed, Naomi 14 Sep 2026: "having another header just
   looks weird"): the photo on one side, a stone panel with the words on the
@@ -210,9 +310,15 @@
     {"type": "select", "id": "focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
     {"type": "range", "id": "dim", "label": "Darken", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 45},
     {"type": "header", "content": "Layout"},
-    {"type": "select", "id": "layout", "label": "Layout", "options": [{"value": "split", "label": "Split card, photo beside the words"}, {"value": "band", "label": "Full-width band"}], "default": "split"},
-    {"type": "select", "id": "side", "label": "Photo sits (split card)", "options": [{"value": "left", "label": "Left (as designed)"}, {"value": "right", "label": "Right"}], "default": "left"},
-    {"type": "select", "id": "shape", "label": "Photo shape (split card)", "options": [{"value": "4/5", "label": "Portrait 4:5 (as designed)"}, {"value": "1/1", "label": "Square"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}], "default": "4/5"},
+    {"type": "select", "id": "layout", "label": "Layout", "options": [{"value": "editorial", "label": "Editorial band (as designed)"}, {"value": "split", "label": "Split card, photo beside the words"}, {"value": "band", "label": "Full-width band"}], "default": "editorial"},
+    {"type": "header", "content": "Film reel (editorial band)"},
+    {"type": "checkbox", "id": "show_reel", "label": "Show the residence's own film reel over the photo", "default": true, "info": "Uses Products › the residence › Film. Real footage only."},
+    {"type": "video", "id": "reel", "label": "A different reel (upload)"},
+    {"type": "text", "id": "reel_url", "label": "A different reel (URL)"},
+    {"type": "text", "id": "reel_poster_url", "label": "Reel poster (URL)"},
+    {"type": "text", "id": "reel_caption", "label": "Caption on the reel", "default": "{name}, on film"},
+    {"type": "select", "id": "side", "label": "Photo sits", "options": [{"value": "right", "label": "Right (as designed)"}, {"value": "left", "label": "Left"}], "default": "right"},
+    {"type": "select", "id": "shape", "label": "Photo shape", "options": [{"value": "4/5", "label": "Portrait 4:5 (as designed)"}, {"value": "1/1", "label": "Square"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}], "default": "4/5"},
     {"type": "select", "id": "height", "label": "Height (full-width band)", "options": [{"value": "standard", "label": "Standard (as designed)"}, {"value": "short", "label": "Short"}, {"value": "full", "label": "Full screen"}], "default": "standard"},
     {"type": "select", "id": "words", "label": "Words sit", "options": [{"value": "base-left", "label": "Bottom left (as designed)"}, {"value": "base-centre", "label": "Bottom centre"}, {"value": "centre", "label": "Centre"}], "default": "base-left"},
     {"type": "select", "id": "scrim", "label": "Darkening shape", "options": [{"value": "corner", "label": "Corner (as designed)"}, {"value": "base", "label": "Bottom only"}, {"value": "even", "label": "Even"}, {"value": "none", "label": "None"}], "default": "corner"},

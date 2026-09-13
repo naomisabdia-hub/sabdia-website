@@ -1674,3 +1674,7 @@ html.bk .ptool-drop summary:focus-visible{outline-color:var(--ink)}
 /* Headings written with an <em> in section-local styles (contact page, CTA
    bands) outrank the rules above; in the kit no heading word is italic. */
 html.bk h1 em,html.bk h2 em,html.bk h3 em,html.bk [class*="-h"] em,html.bk [class*="-name"] em{font-style:normal!important;font-weight:inherit!important;color:inherit!important}
+/* For Sale: from the header through the toolbar into Now Selling in one
+   breath (Naomi, 14 Sep 2026). The band sits closer to the toolbar. */
+html.bk .mc-intro{padding-top:clamp(36px,4.5vw,60px)}
+html.bk .prop-toolbar{padding-top:14px;padding-bottom:14px}

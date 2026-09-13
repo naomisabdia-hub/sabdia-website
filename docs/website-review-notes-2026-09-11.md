@@ -314,3 +314,13 @@ AETHER, Contact, Agent Access, search, 404. All 200, no Liquid errors.
    before launch.
 8. Hero multi-house cut needs landscape footage; all reels are vertical.
 9. Then `zsh shopify-app/push-live.sh`.
+
+### 14 Sep 2026, morning
+- Flagship = *Featured residence* section, **Editorial band** layout: warm
+  grey band, the name set large with headline, line, facts and two buttons;
+  the residence's photo bleeds off the page edge with its own film reel
+  overlapping the corner. Home order: hero, flagship, About, residences.
+  (Split card, full-width band and the rail are still in the theme, hidden.)
+- For Sale: one **Size** dropdown (Land brackets; Floor area appears once a
+  residence has a build size); suburb list under Now Selling off; band sits
+  closer to the toolbar.

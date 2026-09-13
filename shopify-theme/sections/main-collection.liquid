@@ -342,20 +342,27 @@
       {%- for v in car_list -%}<option value="{{ v }}">{{ v }}+ Cars</option>{%- endfor -%}
     </select>
     {%- endif -%}
-    {%- if section.settings.show_filter_land != false and land_brackets > 1 -%}
-    <select class="ptool-sel" id="fLand" aria-label="Land size">
-      <option value="">{{ section.settings.filter_any_land | default: "Any Land Size" }}</option>
-      {%- if land_small -%}<option value="0-600">Land under 600m&sup2;</option>{%- endif -%}
-      {%- if land_mid -%}<option value="600-800">Land 600&ndash;800m&sup2;</option>{%- endif -%}
-      {%- if land_big -%}<option value="800-">Land 800m&sup2; and over</option>{%- endif -%}
-    </select>
-    {%- endif -%}
-    {%- if section.settings.show_filter_build != false and has_build -%}
-    <select class="ptool-sel" id="fBuild" aria-label="Build size">
-      <option value="">{{ section.settings.filter_any_build | default: "Any Build Size" }}</option>
-      <option value="0-450">Floor area under 450m&sup2;</option>
-      <option value="450-600">Floor area 450&ndash;600m&sup2;</option>
-      <option value="600-">Floor area 600m&sup2; and over</option>
+    {%- comment -%} One Size control (Naomi, 14 Sep 2026): land brackets, and floor-area
+        brackets when any residence carries a build size. {%- endcomment -%}
+    {%- assign size_land = false -%}{%- if section.settings.show_filter_land != false and land_brackets > 1 -%}{%- assign size_land = true -%}{%- endif -%}
+    {%- assign size_build = false -%}{%- if section.settings.show_filter_build != false and has_build -%}{%- assign size_build = true -%}{%- endif -%}
+    {%- if size_land or size_build -%}
+    <select class="ptool-sel" id="fSize" aria-label="Size">
+      <option value="">{{ section.settings.filter_any_land | default: "Any Size" }}</option>
+      {%- if size_land -%}
+      <optgroup label="Land">
+        {%- if land_small -%}<option value="land:0-600">Land under 600m&sup2;</option>{%- endif -%}
+        {%- if land_mid -%}<option value="land:600-800">Land 600&ndash;800m&sup2;</option>{%- endif -%}
+        {%- if land_big -%}<option value="land:800-">Land 800m&sup2; and over</option>{%- endif -%}
+      </optgroup>
+      {%- endif -%}
+      {%- if size_build -%}
+      <optgroup label="Floor area">
+        <option value="build:0-450">Floor area under 450m&sup2;</option>
+        <option value="build:450-600">Floor area 450&ndash;600m&sup2;</option>
+        <option value="build:600-">Floor area 600m&sup2; and over</option>
+      </optgroup>
+      {%- endif -%}
     </select>
     {%- endif -%}
     {%- if section.settings.show_filter_status != false and status_list.size > 1 -%}
@@ -650,8 +657,7 @@
     var beds = byId('fBeds');
     var baths = byId('fBaths');
     var cars = byId('fCars');
-    var land = byId('fLand');
-    var build = byId('fBuild');
+    var size = byId('fSize');
     var status = byId('fStatus');
     var sort = byId('fSort');
     var count = byId('fCount');
@@ -662,7 +668,7 @@
     var chips = Array.prototype.slice.call(document.querySelectorAll('.ptool-opt input[data-feat]'));
     var featSummary = document.querySelector('[data-feat-summary]');
     var featAnyLabel = featSummary ? featSummary.textContent : '';
-    var selects = [suburb, beds, baths, cars, land, build, status].filter(Boolean);
+    var selects = [suburb, beds, baths, cars, size, status].filter(Boolean);
     var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-prop-card]'));
     if (!selects.length && !chips.length && !sort) return;
 
@@ -696,8 +702,11 @@
         if (ok && val(beds) && Number(c.dataset.beds) < Number(beds.value)) ok = false;
         if (ok && val(baths) && Number(c.dataset.baths) < Number(baths.value)) ok = false;
         if (ok && val(cars) && Number(c.dataset.cars) < Number(cars.value)) ok = false;
-        if (ok && val(land) && !inRange(c.dataset.land, land.value, false)) ok = false;
-        if (ok && val(build) && !inRange(c.dataset.build, build.value, true)) ok = false;
+        if (ok && val(size)) {
+          var sz = size.value.split(':');
+          if (sz[0] === 'land' && !inRange(c.dataset.land, sz[1], false)) ok = false;
+          if (sz[0] === 'build' && !inRange(c.dataset.build, sz[1], true)) ok = false;
+        }
         if (ok && val(status) && c.dataset.status !== status.value) ok = false;
         if (ok && feats.length) {
           var have = (c.dataset.feats || '').split(' ');
