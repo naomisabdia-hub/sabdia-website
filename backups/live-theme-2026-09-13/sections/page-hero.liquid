@@ -1,0 +1,178 @@
+{%- comment -%}
+  Photographic page hero shared by About / Services / Projects - the
+  full-bleed image with a label, display title and sub-line at the base.
+{%- endcomment -%}
+{%- liquid
+  assign focus = section.settings.focus | default: 'center'
+  case section.settings.height
+    when 'short'
+      assign ph_h = '44vh'
+      assign ph_hm = '40vh'
+    when 'tall'
+      assign ph_h = '78vh'
+      assign ph_hm = '60vh'
+    when 'full'
+      assign ph_h = '100vh'
+      assign ph_hm = '100svh'
+    when 'custom'
+      assign ph_h = section.settings.height_px | default: 560 | append: 'px'
+      assign ph_hm = section.settings.height_px | default: 560 | times: 0.7 | round | append: 'px'
+    else
+      assign ph_h = '60vh'
+      assign ph_hm = '50vh'
+  endcase
+  assign ph_dim = section.settings.dim | default: 52 | divided_by: 100.0
+  assign ph_pos = section.settings.words_position | default: 'base-left'
+  assign ph_scrim = section.settings.scrim | default: 'corner'
+-%}
+{%- liquid
+  assign ph_video = section.settings.video_url
+  if section.settings.video
+    assign phmp4 = section.settings.video.sources | where: 'format', 'mp4' | first
+    if phmp4
+      assign ph_video = phmp4.url
+    endif
+  endif
+-%}
+{% render 'section-look', section: section, mode: 'hero' %}
+<section class="page-hero ph-sized ph-pos-{{ ph_pos }} ph-scrim-{{ ph_scrim }}" style="--ph-h:{{ ph_h }};--ph-hm:{{ ph_hm }};--ph-dim:{{ ph_dim }}">
+  {%- if ph_video != blank -%}
+    <video class="page-hero-video" src="{{ ph_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if section.settings.image %} poster="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: focus }}"{% elsif section.settings.image_ext != blank %} poster="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}"{% endif %}></video>
+  {%- elsif section.settings.image -%}
+    <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: focus }}" alt="{{ section.settings.image_alt | default: page.title | escape }}" loading="eager" width="1920" height="1080" style="object-position:{{ focus }}">
+  {%- elsif section.settings.image_ext != blank -%}
+    <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}" alt="{{ section.settings.image_alt | default: page.title | escape }}" loading="eager" width="1920" height="1080" style="object-position:{{ focus }}">
+  {%- endif -%}
+  <div class="page-hero-ov"></div>
+  <div class="page-hero-content inner">
+    {%- if section.settings.show_label and section.settings.label != blank -%}<div class="slabel slabel-dark">{{ section.settings.label }}</div>{%- endif -%}
+    {%- if section.settings.show_logo -%}
+      {%- liquid
+        assign ph_logo = 'logo.png' | asset_url
+        if settings.logo
+          assign ph_logo = settings.logo | image_url: width: 1200
+        endif
+      -%}
+      <h1 class="page-h page-h-logo"><img src="{{ ph_logo }}" alt="{{ section.settings.title_html | strip_html | default: settings.site_name | escape }}" width="1200" height="240" style="height:{{ section.settings.logo_size | default: 72 }}px;width:auto;max-width:82vw;filter:invert(1) brightness(10) drop-shadow(0 1px 18px rgba(var(--dark-rgb),.5))"></h1>
+    {%- else -%}
+      <h1 class="page-h">{{ section.settings.title_html }}</h1>
+    {%- endif -%}
+    {%- if section.settings.show_sub and section.settings.sub != blank -%}<p class="page-hero-sub">{{ section.settings.sub }}</p>{%- endif -%}
+  </div>
+</section>
+
+<style>
+  .page-hero.ph-sized{min-height:max(380px,var(--ph-h,60vh))}
+  .page-hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(calc(1 - var(--ph-dim,.52) * .5)) saturate(.95)}
+  @media(prefers-reduced-motion:reduce){.page-hero-video{display:none}}
+  @media(max-width:900px){.page-hero.ph-sized{height:auto;min-height:max(320px,var(--ph-hm,50vh))}}
+</style>
+
+{% schema %}
+{
+  "name": "Page hero (photo)",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label"
+    },
+    {
+      "type": "html",
+      "id": "title_html",
+      "label": "Title (HTML - <em> and <br> allowed)"
+    },
+    {
+      "type": "textarea",
+      "id": "sub",
+      "label": "Sub-line"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "image_ext",
+      "label": "Current photo (URL)",
+      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field."
+    },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Hero film (upload)",
+      "info": "Plays silently on a loop behind the title (Tamsin, 10 Sep 2026: a film behind the Services banner). The hero image becomes its poster."
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Current hero film (URL)",
+      "info": "A direct .mp4 link, used when no film is uploaded above."
+    },
+    { "type": "header", "content": "Wordmark instead of the title" },
+    { "type": "checkbox", "id": "show_logo", "label": "Show the Sabdia wordmark in place of the title", "default": false, "info": "Uses Theme settings › Brand › Logo. The title above still names the page for search engines and screen readers." },
+    { "type": "range", "id": "logo_size", "label": "Wordmark height", "min": 32, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "header", "content": "Size" },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Height",
+      "options": [
+        { "value": "short", "label": "Short" },
+        { "value": "standard", "label": "Standard" },
+        { "value": "tall", "label": "Tall" },
+        { "value": "full", "label": "Full screen" },
+        { "value": "custom", "label": "Set by hand (below)" }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "select",
+      "id": "focus",
+      "label": "Crop focus",
+      "options": [
+        { "value": "center", "label": "Centre" },
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center",
+      "info": "Which part of the photo stays in view as the hero is cropped."
+    },
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."},
+    {"type": "header", "content": "Photo"},
+    {"type": "range", "id": "dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 4, "default": 52, "unit": "%", "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "scrim", "label": "Veil", "options": [{"value": "corner", "label": "Weighted to the words (as designed)"}, {"value": "base", "label": "Fades up from the base"}, {"value": "even", "label": "Even veil"}, {"value": "none", "label": "None"}], "default": "corner"},
+    {"type": "header", "content": "Words"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_sub", "label": "Show the sub-line", "default": true},
+    {"type": "select", "id": "words_position", "label": "Where the words sit", "options": [{"value": "base-left", "label": "Base, left (as designed)"}, {"value": "base-centre", "label": "Base, centred"}, {"value": "centre", "label": "Centre of the photo"}, {"value": "top-left", "label": "Top, left"}], "default": "base-left"},
+    {"type": "range", "id": "height_px", "label": "Height when set by hand", "min": 320, "max": 1000, "step": 20, "default": 560, "unit": "px", "info": "Used when Height is \"Set by hand\"."}
+  ],
+  "presets": [
+    {
+      "name": "Page hero (photo)"
+    }
+  ]
+}
+{% endschema %}

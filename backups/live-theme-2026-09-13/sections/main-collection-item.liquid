@@ -1,0 +1,703 @@
+{%- comment -%}
+  Collection residence page - a completed Sabdia home, laid out like the
+  residences for sale but with no enquiry flow. In order: the hero (the
+  residence's film playing silently behind the name when it has one,
+  else the photo), the specs bar, the story at full measure, the stage +
+  filmstrip gallery, an optional details mosaic, then the film band with its
+  sound button. The Instagram strip (series-strip) and then Similar
+  residences with the closing push to what is for sale
+  (collection-similar) follow as their own sections, in that order, from
+  the page.collection-item template.
+
+  Everything about the residence comes from PAGE metafields (namespace
+  custom, Content › Pages › the residence › Metafields):
+    loc        "Camp Hill QLD, Australia"        image   hero URL
+    video      film URL (optional)               gallery list of photo URLs
+    style      Mediterranean / Palm Springs / Hamptons / Contemporary / Moroccan
+    year       completed                          beds / baths / cars / land
+    headline   italic line above the story        story   one paragraph per line
+    features   short feature lines                series_posts  Instagram posts
+  With no story the page stitches one from the strongest Instagram
+  captions, as before.
+
+  Customizer picks: this template is shared by every completed residence,
+  so a hero photo, film, poster or second film picked in the customizer
+  live in a "Residence photos and film" block keyed to the residence's
+  page. A pick wins over that page's metafields; anything left empty
+  keeps the metafield. The Gallery list stays URL-based.
+{%- endcomment -%}
+{%- liquid
+  assign mf = page.metafields.custom
+  assign posts = mf.series_posts.value
+  assign gallery = mf.gallery.value
+  # The film poster (a portrait reel frame) is not a hero: when the Hero
+  # image is one of those and the page has photos, the first photo leads.
+  assign hero = mf.image.value
+  if gallery.size > 0
+    if hero == blank or hero contains '/films/'
+      assign hero = gallery[0]
+    endif
+  endif
+  assign name_token = '{' | append: 'name' | append: '}'
+  assign loc = mf.loc.value
+  assign suburb = loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+  assign style_name = mf.style.value | strip
+  assign year = mf.year.value
+  assign gcount = gallery.size
+
+  # Customizer picks for this residence: the "Residence photos and film"
+  # block whose Residence page is this page. A picked photo or film wins
+  # over the page's metafields; anything left empty keeps the metafield.
+  assign hero_pick = false
+  assign film_pick = false
+  assign poster_pick = false
+  assign film2_pick = false
+  assign poster2_pick = false
+  assign side_a_pick = false
+  assign side_b_pick = false
+  for block in section.blocks
+    if block.type == 'media' and block.settings.page != blank and block.settings.page.handle == page.handle
+      if block.settings.hero_image
+        assign hero_pick = block.settings.hero_image
+      endif
+      if block.settings.film
+        assign film_pick = block.settings.film
+      endif
+      if block.settings.film_poster
+        assign poster_pick = block.settings.film_poster
+      endif
+      if block.settings.side_photo_1
+        assign side_a_pick = block.settings.side_photo_1
+      endif
+      if block.settings.side_photo_2
+        assign side_b_pick = block.settings.side_photo_2
+      endif
+      if block.settings.film_2
+        assign film2_pick = block.settings.film_2
+      endif
+      if block.settings.film_2_poster
+        assign poster2_pick = block.settings.film_2_poster
+      endif
+      break
+    endif
+  endfor
+  assign film_src = mf.video.value
+  if film_pick
+    assign fmp4 = film_pick.sources | where: 'format', 'mp4' | first
+    if fmp4
+      assign film_src = fmp4.url
+    endif
+  endif
+  assign film2_src = ''
+  if film2_pick
+    assign f2mp4 = film2_pick.sources | where: 'format', 'mp4' | first
+    if f2mp4
+      assign film2_src = f2mp4.url
+    endif
+  endif
+
+  # The hero: the residence's film, silently on a loop behind the name,
+  # when it has one and the Hero setting allows it; otherwise the photo.
+  # The photo is the film's poster and stands in when motion is reduced.
+  assign hero_film = false
+  if film_src != blank and section.settings.hero_media != 'photo'
+    assign hero_film = true
+  endif
+
+  # The film band in the body (with the sound button): the same film,
+  # a second film picked for this residence, or none. A residence with
+  # no second film picked keeps the same film.
+  assign body_mode = section.settings.body_film | default: 'same'
+  assign body_src = film_src
+  assign body_poster_pick = poster_pick
+  if body_mode == 'none'
+    assign body_src = ''
+  elsif body_mode == 'second' and film2_src != blank
+    assign body_src = film2_src
+    assign body_poster_pick = poster2_pick
+  endif
+  assign show_film_band = false
+  if body_src != blank and section.settings.show_film
+    assign show_film_band = true
+  endif
+
+  # Story: the Story field, one paragraph per line; else the strongest
+  # Instagram captions (over 60 characters), deduplicated, first three.
+  assign story = '' | split: '¦'
+  if mf.story.value != blank
+    assign story = mf.story.value | strip | newline_to_br | split: '<br />'
+  elsif posts.size > 0
+    capture story_raw
+      for p in posts
+        if p.caption.size > 60 and p.hidden != true
+          echo p.caption | strip | append: '¦'
+        endif
+      endfor
+    endcapture
+    assign story = story_raw | split: '¦' | uniq
+  endif
+
+  assign headline = mf.headline.value
+  if headline == blank
+    if style_name != blank and suburb != blank
+      assign headline = 'A ' | append: style_name | append: ' residence, <em>in ' | append: suburb | append: '</em>.'
+    elsif suburb != blank
+      assign headline = 'Designed and built, <em>in ' | append: suburb | append: '</em>.'
+    else
+      assign headline = 'Designed and built <em>by Sabdia</em>.'
+    endif
+  endif
+
+  assign has_specs = false
+  if mf.beds.value != blank or mf.baths.value != blank or mf.cars.value != blank or mf.land.value != blank or year != blank or style_name != blank
+    assign has_specs = true
+  endif
+
+  # The two photos beside the story are off as designed (Naomi, 11 Sep
+  # 2026): the story runs the full measure and the photos stay in the
+  # gallery. Switched on, photos 2 and 3 (or the picks) return beside it.
+  assign side_a = blank
+  assign side_b = blank
+  assign show_side = false
+  if section.settings.show_side_photos
+    if gcount > 2
+      assign side_a = gallery[1]
+      assign side_b = gallery[2]
+    elsif gcount == 2
+      assign side_a = gallery[1]
+    endif
+    if side_a_pick or side_a != blank
+      assign show_side = true
+    endif
+  endif
+
+  # Details mosaic: five photos from deeper in the set, when there are
+  # enough for it to add something the stage has not already shown.
+  assign mosaic = false
+  if gcount >= 10
+    assign mosaic = true
+    assign m_start = gcount | minus: 6
+  endif
+-%}
+
+{% render 'section-look', section: section, mode: 'hero' %}
+{%- liquid
+  assign cd_dim = section.settings.hero_dim | default: 90 | divided_by: 100.0
+  case section.settings.hero_height
+    when 'full'
+      assign cd_h = '100svh'
+    when 'standard'
+      assign cd_h = '70svh'
+    when 'short'
+      assign cd_h = '56svh'
+    else
+      assign cd_h = '88svh'
+  endcase
+  assign cd_split = '7fr 5fr'
+  if section.settings.story_split == 'equal'
+    assign cd_split = '1fr 1fr'
+  elsif section.settings.story_split == '8-4'
+    assign cd_split = '8fr 4fr'
+  endif
+  assign cd_focus = section.settings.hero_focus | default: 'center'
+-%}
+{%- capture hero_poster -%}
+  {%- if hero_pick -%}{{ hero_pick | image_url: width: 1920, height: 1080, crop: cd_focus }}{%- elsif hero != blank -%}{% render 'ext-variant', src: hero, w: 1920, h: 1080 %}{%- endif -%}
+{%- endcapture -%}
+{%- assign hero_poster = hero_poster | strip -%}
+<section class="cd-hero{% if section.settings.hero_words == 'centre' %} cd-hero-centre{% endif %}{% if hero_film %} cd-hero-film cd-hero-fit-{{ section.settings.hero_film_fit | default: 'cover' }}{% endif %}" style="--cd-h:{{ cd_h }};--cd-dim:{{ cd_dim }};--cd-focus:{{ cd_focus }}">
+  {%- if hero_poster != blank -%}
+    <img src="{{ hero_poster }}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="eager" fetchpriority="high" width="1920" height="1080">
+  {%- endif -%}
+  {%- if hero_film -%}
+  {%- comment -%} The residence's real film, silent, on a loop. The photo
+      above is its poster and the whole picture when motion is reduced
+      (the film is hidden by CSS and paused below). {%- endcomment -%}
+  <div class="cd-hero-video" aria-hidden="true">
+    <video src="{{ film_src }}"{% if hero_poster != blank %} poster="{{ hero_poster }}"{% endif %} autoplay muted loop playsinline preload="metadata" tabindex="-1"></video>
+  </div>
+  {%- endif -%}
+  <div class="cd-hero-ov"></div>
+  <div class="cd-hero-content">
+    {%- if section.settings.show_badge and section.settings.badge != blank -%}<div class="cd-badge reveal">{{ section.settings.badge }}</div>{%- endif -%}
+    <h1 class="cd-name reveal d1">{{ page.title }}</h1>
+    {%- if section.settings.show_meta -%}
+    <div class="cd-meta reveal d2">
+      {%- if suburb != blank -%}<span>{{ suburb }}</span>{%- endif -%}
+      {%- if style_name != blank -%}<span class="cd-meta-dot" aria-hidden="true">&middot;</span><span>{{ style_name }}</span>{%- endif -%}
+      {%- if year != blank -%}<span class="cd-meta-dot" aria-hidden="true">&middot;</span><span>{{ section.settings.completed_word | default: "Completed" }} {{ year }}</span>{%- endif -%}
+    </div>
+    {%- endif -%}
+  </div>
+</section>
+{%- if hero_film -%}
+<script>
+  (function () {
+    var wrap = document.querySelector('.cd-hero-video'), v = wrap && wrap.querySelector('video');
+    if (!v || v.dataset.init) return;
+    v.dataset.init = '1';
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.removeAttribute('autoplay'); v.pause(); return;
+    }
+    /* Some browsers ignore the autoplay attribute on late-loading media;
+       the film also rests while the hero is scrolled out of view. */
+    var want = true;
+    var attempt = function () { if (!want || !v.paused) return; var p = v.play(); if (p && p.catch) p.catch(function () {}); };
+    attempt();
+    v.addEventListener('canplay', attempt);
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (en) { want = en.isIntersecting; if (want) attempt(); else v.pause(); });
+      }, { threshold: 0 }).observe(wrap);
+    }
+  })();
+</script>
+{%- endif -%}
+
+{%- if has_specs and section.settings.hide_specs != true -%}
+<div class="prop-specs-bar cd-specs">
+  <div class="prop-specs-inner">
+    {%- if suburb != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ section.settings.spec_location | default: "Location" }}</div>
+      <div class="prop-spec-v" style="font-size:16px">{{ suburb }}</div>
+    </div>
+    {%- endif -%}
+    {%- if style_name != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ section.settings.spec_style | default: "Style" }}</div>
+      <div class="prop-spec-v" style="font-size:16px">{{ style_name }}</div>
+    </div>
+    {%- endif -%}
+    {%- if year != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ section.settings.spec_year | default: "Completed" }}</div>
+      <div class="prop-spec-v">{{ year }}</div>
+    </div>
+    {%- endif -%}
+    {%- if mf.beds.value != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ section.settings.spec_beds | default: "Bedrooms" }}</div>
+      <div class="prop-spec-v">{{ mf.beds.value }}</div>
+    </div>
+    {%- endif -%}
+    {%- if mf.baths.value != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ section.settings.spec_baths | default: "Bathrooms" }}</div>
+      <div class="prop-spec-v">{{ mf.baths.value }}</div>
+    </div>
+    {%- endif -%}
+    {%- if mf.cars.value != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ section.settings.spec_cars | default: "Garages" }}</div>
+      <div class="prop-spec-v">{{ mf.cars.value }}</div>
+    </div>
+    {%- endif -%}
+    {%- if mf.land.value != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ section.settings.spec_land | default: "Land Size" }}</div>
+      <div class="prop-spec-v">{{ mf.land.value }}<em>m&sup2;</em></div>
+    </div>
+    {%- endif -%}
+  </div>
+</div>
+{%- endif -%}
+
+{%- if section.settings.show_story -%}
+<div class="prop-body cd-body{% if show_side %} cd-side-{{ section.settings.side_layout | default: 'offset' }}{% else %} cd-solo cd-solo-{{ section.settings.story_align | default: 'left' }}{% endif %}" style="--cd-split:{{ cd_split }}">
+  <div class="cd-layout inner">
+    <div class="{% if section.settings.sticky_story and show_side %}prop-desc {% endif %}cd-desc">
+      {%- if section.settings.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, page.title }}</div>{%- endif -%}
+      {%- if section.settings.show_headline -%}<h2 class="prop-body-h reveal d1">{{ headline }}</h2>{%- endif -%}
+      {%- if story.size > 0 -%}
+        {%- for p in story limit: 4 -%}
+          {%- assign pt = p | strip -%}
+          {%- if pt == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign last = pt | slice: -1, 1 -%}
+          <p class="prop-body-p reveal d2">{{ pt }}{% unless last == '.' or last == '!' or last == '?' %}.{% endunless %}</p>
+        {%- endfor -%}
+      {%- elsif section.settings.fallback_text != blank -%}
+        <p class="prop-body-p reveal d2">{{ section.settings.fallback_text | replace: name_token, page.title }}</p>
+      {%- endif -%}
+      {%- if mf.features.value.size > 0 and section.settings.show_features -%}
+        <div class="prop-features reveal d3">
+          <div class="prop-features-h">{{ section.settings.features_heading }}</div>
+          <div class="prop-feat-grid">
+            {%- for f in mf.features.value -%}
+              <div class="prop-feat">{{ f }}</div>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+      {%- if section.settings.show_links -%}
+      <div class="cd-desc-links reveal d3">
+        {%- if gcount > 0 and section.settings.show_gallery -%}<a href="#gallery" class="btn-g btn-g-gold">{{ section.settings.gallery_button | default: "View the photos" }} ({{ gcount }})</a>{%- endif -%}
+        {%- if show_film_band -%}<a href="#film" class="btn-g">{{ section.settings.film_button | default: "Watch the film" }}</a>{%- endif -%}
+      </div>
+      {%- endif -%}
+    </div>
+
+    {%- if show_side -%}
+    <aside class="cd-side" aria-label="{{ page.title | escape }} photos">
+      <figure class="cd-side-a reveal-wipe d1">
+        {%- if side_a_pick -%}
+        <img src="{{ side_a_pick | image_url: width: 900, height: 1125, crop: 'center' }}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="1125">
+        {%- else -%}
+        <img src="{% render 'ext-variant', src: side_a, w: 900, h: 1125 %}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="1125">
+        {%- endif -%}
+      </figure>
+      {%- if side_b_pick or side_b != blank -%}
+      <figure class="cd-side-b reveal-wipe d3">
+        {%- if side_b_pick -%}
+        <img src="{{ side_b_pick | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="675">
+        {%- else -%}
+        <img src="{% render 'ext-variant', src: side_b, w: 900, h: 675 %}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="675">
+        {%- endif -%}
+      </figure>
+      {%- endif -%}
+      {%- if section.settings.show_side_caption -%}<div class="cd-side-cap reveal d4"><b>{{ page.title }}</b>{% if loc != blank %}<span>{{ loc }}</span>{% endif %}</div>{%- endif -%}
+    </aside>
+    {%- endif -%}
+  </div>
+</div>
+{%- endif -%}
+
+{%- if gcount > 0 and section.settings.show_gallery -%}
+  {%- comment -%} Photo gallery - the same stage + filmstrip as the residences for sale,
+      fed by the page's Gallery photos. Thumbnails live beside the photos
+      (…/media/collection-thumbs/…); a photo without one just uses itself. {%- endcomment -%}
+  <section class="cd-gallery{% if section.settings.show_thumbs == false %} pg-nothumbs{% endif %}{% if section.settings.show_expand == false %} pg-noexpand{% endif %}" id="gallery" style="--pgs-ar:{{ section.settings.stage_shape | default: '16/9' }}">
+    <div class="prop-gallery inner">
+      {%- if section.settings.gallery_label != blank -%}<div class="slabel reveal">{{ section.settings.gallery_label }}</div>{%- endif -%}
+      <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, page.title }}</h2>
+      <div hidden id="pgData">
+        {%- for u in gallery -%}
+          {%- assign t = u | replace: '/media/collection/', '/media/collection-thumbs/' -%}
+          <span data-lb-item data-src="{{ u }}" data-stage="{{ u }}" data-thumb="{{ t }}" data-alt="{{ page.title | escape }}{% if suburb != blank %} &middot; {{ suburb | escape }}{% endif %}"></span>
+        {%- endfor -%}
+      </div>
+      <div class="pg reveal d1" id="pg" data-house="{{ page.title | escape }}">
+        <div class="pg-stage" id="pgStage" tabindex="0" aria-roledescription="carousel" aria-label="{{ page.title | escape }} photos">
+          <img class="pg-img" id="pgImgA" alt="" decoding="async" width="1800" height="1013">
+          <img class="pg-img" id="pgImgB" alt="" decoding="async" width="1800" height="1013">
+          <div class="pg-veil" aria-hidden="true"></div>
+          <div class="pg-top"><span class="pg-house">{{ page.title }}{% if suburb != blank %} &middot; {{ suburb }}{% endif %}</span><span class="pg-count" id="pgCount"></span></div>
+          <button type="button" class="pg-arrow pg-prev" id="pgPrev" aria-label="Previous photo">&larr;</button>
+          <button type="button" class="pg-arrow pg-next" id="pgNext" aria-label="Next photo">&rarr;</button>
+          <button type="button" class="pg-expand" id="pgExpand"><span aria-hidden="true">&#x2922;</span> {{ section.settings.gallery_all_label | default: "View all photos" }} ({{ gcount }})</button>
+        </div>
+        <div class="pg-strip" id="pgStrip" role="tablist" aria-label="Photo thumbnails"></div>
+      </div>
+    </div>
+  </section>
+
+  {%- if mosaic and section.settings.show_mosaic -%}
+  <section class="cd-mosaic-wrap">
+    <div class="inner">
+      <div class="cd-mosaic">
+        {%- for i in (0..4) -%}
+          {%- assign gi = m_start | plus: i -%}
+          {%- assign u = gallery[gi] -%}
+          {%- if u == blank -%}{%- continue -%}{%- endif -%}
+          {%- case i -%}
+            {%- when 0 -%}{%- assign mw = 1200 -%}{%- assign mh = 900 -%}
+            {%- when 1 -%}{%- assign mw = 700 -%}{%- assign mh = 900 -%}
+            {%- else -%}{%- assign mw = 800 -%}{%- assign mh = 450 -%}
+          {%- endcase -%}
+          <button type="button" class="cd-mosaic-item cd-m{{ i }} reveal-wipe{% if i > 0 %} d{{ i }}{% endif %}" data-cd-open="{{ gi }}" aria-label="View photo {{ gi | plus: 1 }} of {{ gcount }}">
+            <img src="{% render 'ext-variant', src: u, w: mw, h: mh %}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="{{ mw }}" height="{{ mh }}">
+          </button>
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+  {%- endif -%}
+
+  <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+    <img id="lbImg" src="" alt="" width="2000" height="1400">
+    <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&larr;</button>
+    <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&rarr;</button>
+    <button class="lb-close" id="lbClose" aria-label="Close">&#10005;</button>
+    <div class="lb-meta"><span class="lb-cap" id="lbCap"></span><span id="lbCount"></span></div>
+  </div>
+  <script>
+    (function () {
+      var pg = document.getElementById('pg'), lb = document.getElementById('lb');
+      if (!pg || !lb || pg.dataset.init) return;
+      pg.dataset.init = '1';
+      var data = Array.prototype.slice.call(document.querySelectorAll('#pgData [data-lb-item]'));
+      if (!data.length) { pg.hidden = true; return; }
+      var house = pg.getAttribute('data-house') || '';
+      var imgs = [document.getElementById('pgImgA'), document.getElementById('pgImgB')];
+      var count = document.getElementById('pgCount'), strip = document.getElementById('pgStrip'), stage = document.getElementById('pgStage');
+      var lbImg = document.getElementById('lbImg'), lbCap = document.getElementById('lbCap'), lbCount = document.getElementById('lbCount');
+      var i = 0, on = 0, li = 0, lastFocus = null;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function srcOf(n) { return data[n].getAttribute('data-src'); }
+      function capOf(n) { return data[n].getAttribute('data-alt') || house; }
+      function preload(n) { [n + 1, n - 1].forEach(function (k) { var p = new Image(); p.src = srcOf((k + data.length) % data.length); }); }
+      /* Filmstrip */
+      data.forEach(function (el, n) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'pg-thumb'; b.setAttribute('role', 'tab'); b.setAttribute('aria-label', house + ' photo ' + (n + 1));
+        var im = document.createElement('img'); im.loading = 'lazy'; im.decoding = 'async'; im.alt = '';
+        im.src = el.getAttribute('data-thumb') || el.getAttribute('data-src');
+        im.addEventListener('error', function () { if (im.src !== el.getAttribute('data-src')) im.src = el.getAttribute('data-src'); }, { once: true });
+        b.appendChild(im); b.addEventListener('click', function () { show(n); });
+        strip.appendChild(b);
+      });
+      function show(n, instant) {
+        i = (n + data.length) % data.length;
+        var nxt = imgs[1 - on], src = srcOf(i);
+        var swap = function () { imgs[on].classList.remove('is-on'); nxt.classList.add('is-on'); on = 1 - on; nxt.onload = null; };
+        nxt.alt = house + ' photo ' + (i + 1);
+        if (nxt.getAttribute('src') === src && nxt.complete) swap(); else { nxt.onload = swap; nxt.src = src; }
+        count.textContent = (i + 1) + ' / ' + data.length;
+        var th = strip.children;
+        for (var k = 0; k < th.length; k++) { th[k].classList.toggle('is-on', k === i); th[k].setAttribute('aria-selected', k === i ? 'true' : 'false'); }
+        if (th[i]) strip.scrollTo({ left: th[i].offsetLeft - strip.clientWidth / 2 + th[i].offsetWidth / 2, behavior: (instant || reduce) ? 'auto' : 'smooth' });
+        preload(i);
+      }
+      /* Full-screen viewer */
+      function lbShow(n) {
+        li = (n + data.length) % data.length;
+        lbImg.src = srcOf(li); lbImg.alt = house + ' photo ' + (li + 1);
+        lbCap.textContent = capOf(li); lbCount.textContent = (li + 1) + ' / ' + data.length;
+        preload(li);
+      }
+      function openAt(n, e) {
+        if (e) e.stopPropagation();
+        lastFocus = document.activeElement;
+        lb.hidden = false; requestAnimationFrame(function () { lb.classList.add('open'); });
+        document.documentElement.style.overflow = 'hidden';
+        lbShow(typeof n === 'number' ? n : i); document.getElementById('lbClose').focus();
+      }
+      function openFull(e) { openAt(i, e); }
+      function close() {
+        lb.classList.remove('open'); document.documentElement.style.overflow = '';
+        setTimeout(function () { lb.hidden = true; }, 350);
+        show(li, true);
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }
+      document.getElementById('pgPrev').addEventListener('click', function (e) { e.stopPropagation(); show(i - 1); });
+      document.getElementById('pgNext').addEventListener('click', function (e) { e.stopPropagation(); show(i + 1); });
+      document.getElementById('pgExpand').addEventListener('click', openFull);
+      stage.addEventListener('click', function (e) { if (e.target.closest('button')) return; openFull(); });
+      stage.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { e.preventDefault(); show(i + 1); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); show(i - 1); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFull(); }
+      });
+      /* The details mosaic opens the viewer on its own photo */
+      document.querySelectorAll('[data-cd-open]').forEach(function (b) {
+        b.addEventListener('click', function (e) { openAt(Number(b.getAttribute('data-cd-open')) || 0, e); });
+      });
+      document.getElementById('lbPrev').addEventListener('click', function () { lbShow(li - 1); });
+      document.getElementById('lbNext').addEventListener('click', function () { lbShow(li + 1); });
+      document.getElementById('lbClose').addEventListener('click', close);
+      lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+      document.addEventListener('keydown', function (e) {
+        if (lb.hidden) return;
+        if (e.key === 'Escape') close();
+        else if (e.key === 'ArrowRight') lbShow(li + 1);
+        else if (e.key === 'ArrowLeft') lbShow(li - 1);
+      });
+      /* Swipe on touch screens - stage and viewer */
+      [stage, lb].forEach(function (el, which) {
+        var tx = null;
+        el.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].clientX; }, { passive: true });
+        el.addEventListener('touchend', function (e) {
+          if (tx === null) return; var dx = e.changedTouches[0].clientX - tx; tx = null;
+          if (Math.abs(dx) > 40) { if (which) lbShow(dx < 0 ? li + 1 : li - 1); else show(dx < 0 ? i + 1 : i - 1); }
+        }, { passive: true });
+      });
+      show(0, true);
+    })();
+  </script>
+{%- endif -%}
+
+{%- if show_film_band -%}
+  {%- comment -%} The film in the body, with its sound button - shown even
+      when the same film already plays silently in the hero. {%- endcomment -%}
+  <section class="film-band{% if section.settings.film_side == 'left' %} film-flip{% endif %}" id="film" style="--film-ar:{{ section.settings.film_shape | default: '9/16' }}">
+    <div class="film-grid">
+      <div class="film-copy">
+        {%- if section.settings.film_label != blank -%}<div class="slabel slabel-dark reveal">{{ section.settings.film_label }}</div>{%- endif -%}
+        <h2 class="film-h reveal d1">{{ section.settings.film_heading_html | replace: name_token, page.title }}</h2>
+        <p class="film-p reveal d2">{{ section.settings.film_text | replace: name_token, page.title }}</p>
+      </div>
+      <div class="reveal d2">
+        <div class="film-frame" data-film>
+          <video src="{{ body_src }}" {% if body_poster_pick %}poster="{{ body_poster_pick | image_url: width: 1200, height: 675, crop: 'center' }}"{% elsif hero_pick %}poster="{{ hero_pick | image_url: width: 1200, height: 675, crop: 'center' }}"{% elsif mf.image.value != blank %}poster="{% render 'ext-variant', src: mf.image.value, w: 1200, h: 675 %}"{% endif %} muted loop playsinline preload="none"></video>
+          <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            <span data-sound-label>{{ section.settings.sound_label | default: "Sound On" }}</span>
+          </button>
+        </div>
+        {%- if section.settings.show_film_caption -%}
+        <div class="film-caption">
+          <span><b>{{ page.title }} - On Film</b></span>
+          <span>{{ loc }}</span>
+        </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </section>
+  <script>if (typeof sabdiaFilmInit === 'function') sabdiaFilmInit();</script>
+{%- endif -%}
+
+<style>
+  .cd-hero{min-height:var(--cd-h,88svh)}
+  .cd-hero img{object-position:var(--cd-focus,center);filter:brightness(calc(1 - var(--cd-dim,.9) * .5)) saturate(.85)}
+  .cd-hero-ov{opacity:calc(var(--cd-dim,.9) / .9)}
+  .cd-hero-video{position:absolute;inset:0}
+  .cd-hero-video video{width:100%;height:100%;object-fit:cover;object-position:var(--cd-focus,center);filter:brightness(calc(1 - var(--cd-dim,.9) * .5)) saturate(.85);display:block}
+  .cd-hero-fit-contain .cd-hero-video video{object-fit:contain}
+  @media(prefers-reduced-motion:reduce){.cd-hero-video{display:none}}
+  .cd-hero-centre{align-items:center}.cd-hero-centre .cd-hero-content{text-align:center}.cd-hero-centre .cd-meta{justify-content:center}
+  @media(min-width:901px){.cd-body .cd-layout{grid-template-columns:var(--cd-split,7fr 5fr)}}
+  .cd-solo .cd-layout{grid-template-columns:minmax(0,1fr);gap:0}
+  .cd-solo .cd-desc{max-width:min(100%,820px)}
+  .cd-solo .prop-body-p{max-width:68ch}
+  .cd-solo-centre .cd-desc{margin:0 auto}
+  .cd-side-stack .cd-side-a,.cd-side-stack .cd-side-b{width:100%;margin:0 0 16px!important;border:0;box-shadow:none}
+  .cd-side-single .cd-side-b{display:none}.cd-side-single .cd-side-a{width:100%}
+  .pg-nothumbs .pg-strip{display:none}
+  .pg-noexpand .pg-expand{display:none}
+  .cd-gallery .pg-stage{aspect-ratio:var(--pgs-ar,16/9)}
+  .film-band .film-frame{aspect-ratio:var(--film-ar,9/16)}
+  @media(min-width:901px){.film-flip .film-grid>.film-copy{order:2}}
+  .cd-meta{display:flex;flex-wrap:wrap;align-items:center;gap:0 12px;margin-top:20px;font-size:var(--t-label);font-weight:300;letter-spacing:.24em;text-transform:uppercase;color:rgba(var(--white-rgb),.6)}
+  .cd-meta-dot{color:var(--gold2)}
+  .cd-specs .prop-spec-item{min-width:0}
+  .cd-layout{display:grid;grid-template-columns:7fr 5fr;gap:clamp(48px,7vw,110px);max-width:var(--page-max);margin:0 auto;align-items:start}
+  .cd-desc-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:40px}
+  .cd-side{position:relative;padding-top:clamp(0px,2vw,24px)}
+  .cd-side figure{margin:0;overflow:hidden;background:var(--bg3)}
+  .cd-side img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.96);transition:transform 1.2s var(--ease)}
+  .cd-side figure:hover img{transform:scale(1.03)}
+  .cd-side-a{aspect-ratio:4/5;width:78%}
+  .cd-side-b{aspect-ratio:4/3;width:62%;margin-left:auto!important;margin-top:-18%!important;box-shadow:0 30px 60px -30px rgba(var(--dark-rgb),.45);border:6px solid var(--bg)}
+  .cd-side-cap{display:flex;justify-content:space-between;gap:16px;margin-top:22px;font-size:var(--t-label);font-weight:300;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)}
+  .cd-side-cap b{font-weight:400;color:var(--ink)}
+  .cd-gallery{padding-top:0}
+  .cd-gallery .pg{margin-top:32px}
+  .cd-mosaic-wrap{padding:0 var(--page-pad) clamp(64px,9vw,130px)}
+  .cd-mosaic{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:auto;gap:8px}
+  .cd-mosaic-item{display:block;padding:0;border:0;background:var(--bg3);cursor:zoom-in;overflow:hidden;position:relative}
+  .cd-mosaic-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95);transition:transform 1.1s var(--ease),filter .5s}
+  .cd-mosaic-item:hover img{transform:scale(1.03);filter:saturate(1)}
+  .cd-mosaic-item:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+  .cd-m0{grid-column:1/8;aspect-ratio:4/3}
+  .cd-m1{grid-column:8/13;aspect-ratio:7/9}
+  .cd-m2,.cd-m3,.cd-m4{grid-column:span 4;aspect-ratio:16/10}
+  @media(max-width:900px){
+    .cd-layout{grid-template-columns:1fr;gap:44px}
+    .cd-desc{position:static}
+    .cd-side-a{width:86%}
+    .cd-side-b{width:64%;margin-top:-16%!important}
+    .cd-m0{grid-column:1/13;aspect-ratio:16/10}
+    .cd-m1{grid-column:1/7;aspect-ratio:4/5}
+    .cd-m2{grid-column:7/13;aspect-ratio:4/5}
+    .cd-m3,.cd-m4{grid-column:span 6;aspect-ratio:4/3}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Collection residence",
+  "settings": [
+    { "type": "paragraph", "content": "Everything about the residence itself - photos, film, style, year, bedrooms, headline, story - is set on the page: Content › Pages › the residence › Metafields. This section sets the shared wording. Write {name} wherever the residence's name should appear." },
+    { "type": "paragraph", "content": "To pick a residence's hero photo, film, poster or a second film from your Files instead of the page's metafields: ⊕ Add block › Residence photos and film, choose that residence's page, then pick. One block per residence; the picks apply only on that residence's page. The Gallery photos stay on the page (Metafields › Gallery)." },
+    { "type": "paragraph", "content": "After this section the template runs The Series (the Instagram strip), then Similar residences and the closing band - each its own section, with its own settings." },
+    { "type": "text", "id": "badge", "label": "Hero badge", "default": "The Sabdia Collection" },
+    { "type": "text", "id": "completed_word", "label": "Word before the year in the hero", "default": "Completed" },
+    { "type": "text", "id": "about_label", "label": "Story label", "default": "About {name}" },
+    { "type": "textarea", "id": "fallback_text", "label": "Story when the page has none", "default": "{name} was designed, developed and built entirely in-house by Sabdia - one team from the first sketch to handover.", "info": "Shown only when the page has no Story and no Instagram captions yet." },
+    { "type": "text", "id": "features_heading", "label": "Features heading", "default": "Key Features" },
+    { "type": "text", "id": "gallery_button", "label": "Photos button", "default": "View the photos" },
+    { "type": "text", "id": "film_button", "label": "Film button", "default": "Watch the film" },
+    { "type": "header", "content": "Specs bar" },
+    { "type": "checkbox", "id": "hide_specs", "label": "Hide the specs bar", "default": false },
+    { "type": "text", "id": "spec_location", "label": "Location label", "default": "Location" },
+    { "type": "text", "id": "spec_style", "label": "Style label", "default": "Style" },
+    { "type": "text", "id": "spec_year", "label": "Completed label", "default": "Completed" },
+    { "type": "text", "id": "spec_beds", "label": "Bedrooms label", "default": "Bedrooms" },
+    { "type": "text", "id": "spec_baths", "label": "Bathrooms label", "default": "Bathrooms" },
+    { "type": "text", "id": "spec_cars", "label": "Garages label", "default": "Garages" },
+    { "type": "text", "id": "spec_land", "label": "Land size label", "default": "Land Size" },
+    { "type": "header", "content": "Gallery", "info": "Shows when the page has Gallery photos (Content › Pages › the residence › Metafields). With ten or more photos a details mosaic follows the gallery." },
+    { "type": "text", "id": "gallery_label", "label": "Gallery label", "default": "The Residence" },
+    { "type": "html", "id": "gallery_heading_html", "label": "Gallery heading (HTML - {name})", "default": "Inside <em>{name}</em>." },
+    { "type": "text", "id": "gallery_all_label", "label": "View all button", "default": "View all photos" },
+    { "type": "header", "content": "Film" },
+    { "type": "text", "id": "film_label", "label": "Film label", "default": "The Film" },
+    { "type": "html", "id": "film_heading_html", "label": "Film heading (HTML - {name})", "default": "Experience <em>{name}</em>." },
+    { "type": "textarea", "id": "film_text", "label": "Film text ({name})", "default": "{name}, on film." },
+    { "type": "text", "id": "sound_label", "label": "Sound button", "default": "Sound On" },
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."},
+    {"type": "header", "content": "Hero"},
+    {"type": "select", "id": "hero_media", "label": "Behind the name", "options": [{"value": "film", "label": "The film, when the residence has one (as designed)"}, {"value": "photo", "label": "The photo"}], "default": "film", "info": "The residence's real film plays silently on a loop behind the name; the hero photo is its poster and stands in when motion is reduced. A residence without a film shows the photo."},
+    {"type": "select", "id": "hero_film_fit", "label": "Film fit", "options": [{"value": "cover", "label": "Fill the hero, cropped (as designed)"}, {"value": "contain", "label": "The whole frame, on the photo"}], "default": "cover", "info": "The residence films are portrait reels: filled, a wide screen shows their middle band; whole, the reel stands in the middle of the darkened photo."},
+    {"type": "range", "id": "hero_dim", "label": "Darken the hero photo or film", "min": 0, "max": 100, "step": 5, "default": 90, "unit": "%", "info": "Lower = brighter."},
+    {"type": "select", "id": "hero_height", "label": "Hero height", "options": [{"value": "tall", "label": "Tall (as designed)"}, {"value": "full", "label": "Full screen"}, {"value": "standard", "label": "Standard"}, {"value": "short", "label": "Short"}], "default": "tall"},
+    {"type": "select", "id": "hero_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "hero_words", "label": "Where the words sit", "options": [{"value": "base-left", "label": "Base, left (as designed)"}, {"value": "centre", "label": "Centre"}], "default": "base-left"},
+    {"type": "checkbox", "id": "show_badge", "label": "Show the badge", "default": true},
+    {"type": "checkbox", "id": "show_meta", "label": "Suburb · style · year under the name", "default": true},
+    {"type": "header", "content": "Story"},
+    {"type": "checkbox", "id": "show_story", "label": "Show the story", "default": true},
+    {"type": "checkbox", "id": "show_about_label", "label": "Show the story label", "default": true},
+    {"type": "checkbox", "id": "show_headline", "label": "Show the headline", "default": true},
+    {"type": "checkbox", "id": "show_features", "label": "Show the key features", "default": true},
+    {"type": "checkbox", "id": "show_links", "label": "Photos and film buttons under the story", "default": true},
+    {"type": "select", "id": "story_align", "label": "Story column", "options": [{"value": "left", "label": "Left (as designed)"}, {"value": "centre", "label": "Centred on the page"}], "default": "left", "info": "Applies while the side photos are off: the story runs a reading measure with no empty column beside it."},
+    {"type": "checkbox", "id": "show_side_photos", "label": "Show the two photos beside the story", "default": true, "info": "The large photo with the smaller one overlapping it, beside the story (Naomi, 11 Sep 2026). Photos 2 and 3, or the picks in the Residence photos and film block."},
+    {"type": "checkbox", "id": "show_side_caption", "label": "Caption under the side photos", "default": true},
+    {"type": "checkbox", "id": "sticky_story", "label": "Story holds while the photos scroll", "default": true, "info": "Only with the side photos on."},
+    {"type": "select", "id": "story_split", "label": "Column split", "options": [{"value": "7-5", "label": "Story 7 : photos 5 (as designed)"}, {"value": "equal", "label": "Equal halves"}, {"value": "8-4", "label": "Story 8 : photos 4"}], "default": "7-5"},
+    {"type": "select", "id": "side_layout", "label": "Side photos", "options": [{"value": "offset", "label": "Overlapping, offset (as designed)"}, {"value": "stack", "label": "Stacked, full width"}, {"value": "single", "label": "One photo"}], "default": "offset"},
+    {"type": "header", "content": "Gallery and film"},
+    {"type": "checkbox", "id": "show_gallery", "label": "Show the gallery", "default": true},
+    {"type": "checkbox", "id": "show_thumbs", "label": "Filmstrip of thumbnails", "default": true},
+    {"type": "checkbox", "id": "show_expand", "label": "\"View all photos\" button on the stage", "default": true},
+    {"type": "checkbox", "id": "show_mosaic", "label": "Details mosaic under the gallery (ten or more photos)", "default": false, "info": "Off since 11 Sep 2026 (Naomi): the gallery already shows every photo, so the mosaic repeated them."},
+    {"type": "select", "id": "stage_shape", "label": "Stage shape", "options": [{"value": "16/9", "label": "Wide 16:9 (as designed)"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "21/9", "label": "Cinematic 21:9"}], "default": "16/9"},
+    {"type": "checkbox", "id": "show_film", "label": "Show the film band", "default": true},
+    {"type": "select", "id": "body_film", "label": "Film in the body", "options": [{"value": "same", "label": "The residence's film (as designed)"}, {"value": "second", "label": "A second film, picked for the residence"}, {"value": "none", "label": "No film band"}], "default": "same", "info": "The band with the sound button, after the gallery. It shows the film even when the same film already plays silently in the hero. A second film comes from the Residence photos and film block; a residence without one keeps its film."},
+    {"type": "checkbox", "id": "show_film_caption", "label": "Caption under the film", "default": true},
+    {"type": "select", "id": "film_side", "label": "Film sits", "options": [{"value": "right", "label": "Right (as designed)"}, {"value": "left", "label": "Left"}], "default": "right"},
+    {"type": "select", "id": "film_shape", "label": "Film shape", "options": [{"value": "9/16", "label": "Portrait 9:16 (as designed)"}, {"value": "4/5", "label": "Portrait 4:5"}, {"value": "1/1", "label": "Square"}, {"value": "16/9", "label": "Landscape 16:9"}], "default": "9/16"}
+  ],
+  "blocks": [
+    {
+      "type": "media",
+      "name": "Residence photos and film",
+      "settings": [
+        { "type": "paragraph", "content": "Picks for one completed residence. Choose its page, then pick. A picked photo or film wins over that page's Hero image / Gallery / Film metafields; leave a picker empty to keep the metafield. Ignored on every other residence's page." },
+        { "type": "page", "id": "page", "label": "Residence page", "info": "The completed residence these picks belong to (Content › Pages, template collection-item)." },
+        { "type": "image_picker", "id": "hero_image", "label": "Hero photo", "info": "Takes over from the page's Hero image metafield. Also the film's poster unless one is picked below." },
+        { "type": "video", "id": "film", "label": "Film (upload)", "info": "Takes over from the page's Film metafield. Plays silently in the hero and with sound in the body band." },
+        { "type": "image_picker", "id": "film_poster", "label": "Film poster", "info": "The still shown before the body film plays. Empty = the hero photo." },
+        { "type": "video", "id": "film_2", "label": "Second film (upload)", "info": "Shown in the body band instead of the residence's film when Film in the body is set to a second film." },
+        { "type": "image_picker", "id": "film_2_poster", "label": "Second film poster", "info": "Empty = the hero photo." },
+        { "type": "image_picker", "id": "side_photo_1", "label": "Story column, tall photo", "info": "Only with Show the two photos beside the story on. Takes over from the second Gallery photo." },
+        { "type": "image_picker", "id": "side_photo_2", "label": "Story column, wide photo", "info": "Only with the side photos on. Takes over from the third Gallery photo." }
+      ]
+    }
+  ]
+}
+{% endschema %}

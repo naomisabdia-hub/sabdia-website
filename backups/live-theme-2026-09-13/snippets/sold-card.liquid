@@ -1,0 +1,59 @@
+{%- comment -%}
+  Port of SoldCard.astro, fed by a residence whose Status is in the Sold
+  group (see residence-status). The badge prints that Status word. The
+  name is set in the residence's own brochure face when the product carries
+  one (see property-card for the metafields), and the card carries the same
+  data attributes as property-card so a mixed grid filters the same way.
+  Params: product, class, img_w, img_h, show_suburb (default false here)
+{%- endcomment -%}
+{%- liquid
+  assign mf = product.metafields.custom
+  assign img_w2 = img_w | times: 2
+  assign img_h2 = img_h | times: 2
+  capture pstatus
+    render 'residence-status', product: product
+  endcapture
+  assign badge = pstatus
+  if pstatus == 'Sold Prior to Completion' and settings.label_sold_badge != blank
+    assign badge = settings.label_sold_badge
+  endif
+  capture feats
+    render 'residence-feats', product: product
+  endcapture
+  assign nf = mf.name_font.value | strip
+  assign nf_file = mf.name_font_file.value | strip
+  assign nf_style = ''
+  if nf != blank or nf_file != blank
+    assign nf_family = nf
+    if nf_family == blank
+      assign nf_family = 'ResidenceFace-' | append: product.handle
+    endif
+    assign nf_weight = mf.name_font_weight.value | default: 400
+    assign nf_style = "font-family:'" | append: nf_family | append: "',var(--font-d);font-weight:" | append: nf_weight
+    if mf.name_font_caps.value
+      assign nf_style = nf_style | append: ';text-transform:uppercase'
+    endif
+  endif
+-%}
+<a href="{{ product.url }}" class="sc-card {{ class }}" data-beds="{{ mf.beds.value }}" data-baths="{{ mf.baths.value }}" data-status="{{ pstatus | escape }}" data-feats="{{ feats }}" data-year="{{ mf.year.value }}">
+  {%- if product.featured_image -%}
+    <img
+      src="{{ product.featured_image | image_url: width: img_w, height: img_h, crop: 'center' }}"
+      srcset="{{ product.featured_image | image_url: width: img_w, height: img_h, crop: 'center' }} 1x, {{ product.featured_image | image_url: width: img_w2, height: img_h2, crop: 'center' }} 2x"
+      alt="{{ product.title | escape }}" loading="lazy" decoding="async" width="{{ img_w }}" height="{{ img_h }}">
+  {%- endif -%}
+  <div class="sc-ov"></div>
+  <div class="sc-badge">{{ badge }}</div>
+  <div class="sc-info">
+    <div class="sc-name"{% if nf_style != blank %} style="{{ nf_style | escape }}"{% endif %}>{{ product.title }}</div>
+    {%- if show_suburb and mf.suburb.value != blank -%}
+      <div class="pc-loc">{% render 'spec-icon', icon: 'pin' %}{{ mf.suburb.value }}, QLD</div>
+    {%- endif -%}
+    <ul class="pc-specs">
+      {%- if mf.beds.value != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'beds' %}<span>{{ mf.beds.value }} Bed</span></li>{%- endif -%}
+      {%- if mf.baths.value != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'baths' %}<span>{{ mf.baths.value }} Bath</span></li>{%- endif -%}
+      {%- if mf.cars.value != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'cars' %}<span>{{ mf.cars.value }} Garage</span></li>{%- endif -%}
+      {%- if mf.land.value != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'land' %}<span>{{ mf.land.value }}m&sup2;{% if mf.land_over.value %}+{% endif %}</span></li>{%- endif -%}
+    </ul>
+  </div>
+</a>

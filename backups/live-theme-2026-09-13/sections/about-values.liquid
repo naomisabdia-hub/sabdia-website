@@ -1,0 +1,103 @@
+{%- comment -%}
+  About - values: the obsidian band of numbered values.
+{%- endcomment -%}
+{% render 'section-look', section: section, designed: 'dark' %}
+{%- liquid
+  assign av_cols = section.settings.columns | default: '3'
+  assign av_num = section.settings.numeral_style | default: 'serif'
+-%}
+<section class="av av-num-{{ av_num }}{% if section.settings.dividers == false %} av-nodiv{% endif %}{% if section.settings.align == 'centre' %} av-centre{% endif %}" style="background:var(--dark);--av-cols:{{ av_cols }};--av-n:{{ section.settings.numeral_size | default: 56 }}px">
+  <div style="padding:calc(clamp(80px,12vw,160px)*var(--sp-scale)*var(--sp-top,1)) var(--page-pad) calc(clamp(80px,12vw,160px)*var(--sp-scale)*var(--sp-bot,1))">
+    <div class="inner">
+      {%- if section.settings.show_label -%}<div class="slabel slabel-dark reveal" style="margin-bottom:{% if section.settings.heading_html != blank %}20px{% else %}52px{% endif %}">{{ section.settings.label }}</div>{%- endif -%}
+      {%- if section.settings.heading_html != blank -%}<h2 class="about-h reveal d1" style="color:var(--white);margin-bottom:{% if section.settings.text != blank %}20px{% else %}52px{% endif %}">{{ section.settings.heading_html }}</h2>{%- endif -%}
+      {%- if section.settings.text != blank -%}<p class="about-p reveal d2" style="color:rgba(var(--white-rgb),.72);margin-bottom:52px">{{ section.settings.text }}</p>{%- endif -%}
+      <div class="vals-grid">
+        {%- assign vdelays = ',d1,d2' | split: ',' -%}
+        {%- for block in section.blocks -%}
+          {%- assign di = forloop.index0 | modulo: 3 -%}
+          <div class="reveal {{ vdelays[di] }}" {{ block.shopify_attributes }}>
+            {%- if section.settings.show_numerals -%}<div class="av-numeral" style="font-family:var(--font-d);font-size:var(--av-n,56px);font-weight:300;color:rgba(var(--gold3-rgb),.7);line-height:1;margin-bottom:20px">{{ block.settings.numeral }}</div>{%- endif -%}
+            <div style="font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:300;color:var(--white);margin-bottom:12px">{{ block.settings.title }}</div>
+            {%- comment -%} .72, not .4 - at .4 the descriptions were near-invisible on the obsidian band (Tamsin, 2026-09-01). {%- endcomment -%}
+            <div style="font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:rgba(var(--white-rgb),.86)">{{ block.settings.desc }}</div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .vals-grid{display:grid;grid-template-columns:repeat(var(--av-cols,3),1fr);gap:2px}
+  .av-nodiv .vals-grid>div{border-right:none!important;border-bottom:none!important}
+  .av-centre .slabel{justify-content:center}.av-centre .about-h,.av-centre .about-p,.av-centre .vals-grid>div{text-align:center}.av-centre .about-p{margin-left:auto;margin-right:auto}
+  .av-num-caps .av-numeral{font-family:var(--font-u)!important;font-size:var(--t-label)!important;letter-spacing:.3em;text-transform:uppercase;color:var(--gold2)!important}
+  .vals-grid>div{padding:44px 36px;border-right:1px solid rgba(var(--white-rgb),.07)}
+  .vals-grid>div:last-child{border-right:none}
+  @media(max-width:900px){
+    .vals-grid{grid-template-columns:1fr}
+    .vals-grid>div{padding:32px 0;border-right:none;border-bottom:1px solid rgba(var(--white-rgb),.07)}
+    .vals-grid>div:last-child{border-bottom:none}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "About - values",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Our Values" },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_numerals", "label": "Show the numerals", "default": true},
+    {"type": "header", "content": "Words"},
+    {"type": "html", "id": "heading_html", "label": "Heading (optional)", "info": "Wrap a word in <em> for the italic accent."},
+    {"type": "textarea", "id": "text", "label": "Intro line (optional)"},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "columns", "label": "Values across", "options": [{"value": "2", "label": "Two"}, {"value": "3", "label": "Three"}, {"value": "4", "label": "Four"}], "default": "3", "info": "Phones always stack to one."},
+    {"type": "select", "id": "align", "label": "Words sit", "options": [{"value": "left", "label": "Left"}, {"value": "centre", "label": "Centre"}], "default": "left"},
+    {"type": "checkbox", "id": "dividers", "label": "Hairlines between the values", "default": true},
+    {"type": "select", "id": "numeral_style", "label": "Numeral style", "options": [{"value": "serif", "label": "Large serif, gold"}, {"value": "caps", "label": "Small tracked capitals"}], "default": "serif"},
+    {"type": "range", "id": "numeral_size", "label": "Numeral size", "min": 24, "max": 96, "step": 4, "default": 56, "unit": "px", "info": "Large serif style only."},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ],
+  "blocks": [
+    {
+      "type": "value",
+      "name": "Value",
+      "settings": [
+        { "type": "text", "id": "numeral", "label": "Numeral", "default": "i.", "info": "e.g. i. / ii. / iii." },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "textarea", "id": "desc", "label": "Description" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "About - values" }]
+}
+{% endschema %}

@@ -1,0 +1,108 @@
+{%- comment -%}
+  Agent Access - the benefit cards on the deep band. One block per
+  benefit, icon keyed to the benefit-icon snippet.
+{%- endcomment -%}
+{% render 'section-look', section: section, designed: 'dark' %}
+{%- liquid
+  assign ab_cols = section.settings.columns | default: '3'
+  assign ab_style = section.settings.card_style | default: 'tinted'
+-%}
+<section class="ab ab-{{ ab_style }}" style="background:var(--dark2);padding:calc(clamp(80px,12vw,160px)*var(--sp-scale)*var(--sp-top,1)) var(--page-pad) calc(clamp(80px,12vw,160px)*var(--sp-scale)*var(--sp-bot,1));--ab-cols:{{ ab_cols }}">
+  <div class="inner">
+    {%- if section.settings.show_label -%}<div class="slabel slabel-dark reveal" style="margin-bottom:20px">{{ section.settings.label }}</div>{%- endif -%}
+    {%- if section.settings.show_heading -%}<h2 class="reveal d1" style="font-family:var(--font-d);font-size:calc(clamp(36px,5vw,64px)*var(--s-h,1));font-weight:300;color:var(--white);letter-spacing:-.02em;max-width:700px">{{ section.settings.heading_html }}</h2>{%- endif -%}
+    {%- if section.settings.text != blank -%}<p class="reveal d2" style="font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:rgba(var(--white-rgb),.72);max-width:560px;margin-top:20px">{{ section.settings.text }}</p>{%- endif -%}
+    <div class="agent-bens">
+      {%- assign bdelays = ',d1,d2,d1,d2,d3' | split: ',' -%}
+      {%- for block in section.blocks -%}
+        {%- assign di = forloop.index0 | modulo: 6 -%}
+        <div class="agent-ben reveal {{ bdelays[di] }}" {{ block.shopify_attributes }}>
+          {%- if section.settings.show_icons -%}<div class="agent-ben-icon">{% render 'benefit-icon', icon: block.settings.icon %}</div>{%- endif -%}
+          <div class="agent-ben-t">{{ block.settings.title }}</div>
+          <div class="agent-ben-d">{{ block.settings.desc }}</div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .agent-bens{display:grid;grid-template-columns:repeat(var(--ab-cols,3),1fr);gap:2px;margin-top:64px}
+  .ab-outlined .agent-ben{background:transparent;border-color:rgba(var(--gold2-rgb),.3)}
+  .ab-plain .agent-ben{background:transparent;border:0;padding:24px 0}
+  .agent-ben{padding:40px 32px;background:rgba(var(--white-rgb),.03);border:1px solid rgba(var(--white-rgb),.06);transition:background .3s,border-color .3s}
+  .agent-ben:hover{background:rgba(var(--gold-rgb),.06);border-color:rgba(var(--gold-rgb),.2)}
+  .agent-ben-icon{width:44px;height:44px;border:1px solid rgba(var(--gold2-rgb),.25);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);margin-bottom:20px}
+  .agent-ben-t{font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:300;color:var(--white);margin-bottom:10px}
+  .agent-ben-d{font-size:calc(14px*var(--s-t,1));font-weight:400;line-height:1.78;color:rgba(var(--white-rgb),.72)}
+  @media(max-width:1024px){.agent-bens{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:640px){.agent-bens{grid-template-columns:1fr}}
+</style>
+
+{% schema %}
+{
+  "name": "Agent benefits",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "Why Join" },
+    { "type": "html", "id": "heading_html", "label": "Heading (HTML)" },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
+    {"type": "checkbox", "id": "show_icons", "label": "Show the icons", "default": true},
+    {"type": "textarea", "id": "text", "label": "Intro line (optional)"},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "columns", "label": "Benefits across", "options": [{"value": "2", "label": "Two"}, {"value": "3", "label": "Three"}], "default": "3"},
+    {"type": "select", "id": "card_style", "label": "Card style", "options": [{"value": "tinted", "label": "Tinted cards (as designed)"}, {"value": "outlined", "label": "Outlined"}, {"value": "plain", "label": "Plain, no cards"}], "default": "tinted"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        {
+          "type": "select", "id": "icon", "label": "Icon",
+          "options": [
+            { "value": "layers", "label": "Layers" },
+            { "value": "plan", "label": "Floor plan" },
+            { "value": "phone", "label": "Phone" },
+            { "value": "dollar", "label": "Dollar" },
+            { "value": "users", "label": "People" },
+            { "value": "star", "label": "Star" }
+          ],
+          "default": "star"
+        },
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "textarea", "id": "desc", "label": "Description" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Agent benefits" }]
+}
+{% endschema %}

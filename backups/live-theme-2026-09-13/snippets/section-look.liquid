@@ -1,0 +1,189 @@
+{%- comment -%}
+  Section look - the shared dials every section carries in Customize › the
+  section › Look: a background (or a photo / film behind it with a darken
+  dial), space above and below, content width, side margins, heading, text
+  and label sizes, the fade-in, hairlines and an anchor name.
+
+  Rendered once, before the section's root element:
+    {% render 'section-look', section: section %}
+    {% render 'section-look', section: section, designed: 'dark' %}
+    {% render 'section-look', section: section, mode: 'hero' %}
+
+  designed - 'light' (default) or 'dark': how the section is coloured as
+    designed. Choosing a surface of the other tone flips the palette. Every
+    colour in style.css is a token (the rgba() colours read r,g,b tokens),
+    so the flip is one set of variables scoped to this section's id.
+  mode - 'full' (default) or 'hero'. Hero sections keep their own media and
+    scrim dials, so only space, type and finishing apply there.
+
+  Nothing is written unless a dial has been moved: a section left "as
+  designed" gets no style block at all.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign sid = section.id
+  assign mode = mode | default: 'full'
+  assign designed = designed | default: 'light'
+
+  # ── Surface ──────────────────────────────────────────────
+  assign surface = s.look_surface | default: 'design'
+  if mode == 'hero'
+    assign surface = 'design'
+  endif
+  assign cream = '#F7F3EB'
+  assign stone = '#F0EADE'
+  assign obsidian = '#1F1B14'
+  if settings.design_override
+    assign cream = settings.c_bg
+    assign stone = settings.c_bg2
+    assign obsidian = settings.c_dark
+  endif
+  assign bg = ''
+  assign tone = designed
+  assign has_media = false
+  assign film_src = ''
+  assign poster_src = ''
+  case surface
+    when 'cream'
+      assign bg = cream
+      assign tone = 'light'
+    when 'stone'
+      assign bg = stone
+      assign tone = 'light'
+    when 'obsidian'
+      assign bg = obsidian
+      assign tone = 'dark'
+    when 'custom'
+      assign bg = s.look_color | default: stone
+      assign tone = s.look_tone | default: 'light'
+    when 'media'
+      assign tone = s.look_media_tone | default: 'dark'
+      if s.look_video
+        assign mp4 = s.look_video.sources | where: 'format', 'mp4' | first
+        if mp4
+          assign film_src = mp4.url
+        endif
+      endif
+      if film_src == blank and s.look_video_url != blank
+        assign film_src = s.look_video_url
+      endif
+      if s.look_image
+        assign poster_src = s.look_image | image_url: width: 1920
+      endif
+      if film_src != blank or poster_src != blank
+        assign has_media = true
+      endif
+      if tone == 'dark'
+        assign bg = obsidian
+      else
+        assign bg = cream
+      endif
+  endcase
+  assign invert = false
+  if surface != 'design' and tone != designed
+    assign invert = true
+  endif
+
+  # ── Declarations for the section wrapper ─────────────────
+  assign decl = ''
+  if bg != blank
+    assign decl = decl | append: 'position:relative;background:' | append: bg | append: ';'
+  endif
+  if invert
+    if tone == 'dark'
+      assign decl = decl | append: '--bg:#1F1B14;--bg2:#2A251D;--bg3:#352F25;--dark:#F7F3EB;--dark2:#F0EADE;--dark3:#E7DFCE;--ink:#F7F3EB;--ink2:#F0EADE;--ink3:#BDB5A6;--taupe:#B4AB9C;--taupe-d:#C9C0AF;--gold:#C3A45E;--gold2:#C3A45E;--gold3:#D8C48E;--white:#1F1B14;--border:rgba(var(--gold3-rgb),.16);--border-dk:rgba(var(--gold-rgb),.3);--white-rgb:41,35,25;--dark-rgb:247,243,235;--bg-rgb:31,27,20;'
+    else
+      assign decl = decl | append: '--bg:#F7F3EB;--bg2:#F0EADE;--bg3:#E7DFCE;--dark:#1F1B14;--dark2:#2A251D;--dark3:#352F25;--ink:#292319;--ink2:#453D2F;--ink3:#6B6152;--taupe:#8A7E6E;--taupe-d:#6E6355;--gold:#A8874A;--gold2:#A8874A;--gold3:#A8874A;--white:#292319;--border:rgba(var(--gold-rgb),.3);--border-dk:rgba(var(--gold-rgb),.3);--white-rgb:41,35,25;--dark-rgb:247,243,235;--bg-rgb:247,243,235;'
+    endif
+  endif
+
+  assign sp_top = s.look_space_top | default: 100
+  assign sp_bot = s.look_space_bottom | default: 100
+  if sp_top != 100
+    assign sp_top_n = sp_top | divided_by: 100.0
+    assign decl = decl | append: '--sp-top:' | append: sp_top_n | append: ';'
+  endif
+  if sp_bot != 100
+    assign sp_bot_n = sp_bot | divided_by: 100.0
+    assign decl = decl | append: '--sp-bot:' | append: sp_bot_n | append: ';'
+  endif
+
+  assign width = s.look_width | default: 'theme'
+  if width == 'edge'
+    assign decl = decl | append: '--page-max:none;'
+  elsif width != 'theme'
+    assign decl = decl | append: '--page-max:' | append: width | append: 'px;'
+  endif
+
+  assign margins = s.look_margins | default: 100
+  if margins != 100
+    assign lay_pad = settings.page_pad | default: 200
+    assign lay_pad_vw = settings.page_pad_vw | default: 10
+    assign lay_pad_m = settings.page_pad_mobile | default: 22
+    assign decl = decl | append: '--page-pad:calc(clamp(' | append: lay_pad_m | append: 'px,' | append: lay_pad_vw | append: 'vw,' | append: lay_pad | append: 'px)*' | append: margins | append: '/100);'
+  endif
+
+  assign hs = s.look_heading | default: 100
+  if hs != 100
+    assign hs_n = hs | divided_by: 100.0
+    assign decl = decl | append: '--s-h:' | append: hs_n | append: ';'
+  endif
+  assign ts = s.look_text | default: 100
+  if ts != 100
+    assign ts_n = ts | divided_by: 100.0
+    assign decl = decl | append: '--s-t:' | append: ts_n | append: ';'
+  endif
+  assign ls = s.look_label | default: 0
+  if ls > 0
+    assign decl = decl | append: '--t-slabel:' | append: ls | append: 'px;'
+  endif
+  if s.look_rule_top
+    assign decl = decl | append: 'border-top:1px solid var(--border);'
+  endif
+  if s.look_rule_bottom
+    assign decl = decl | append: 'border-bottom:1px solid var(--border);'
+  endif
+
+  assign animate = true
+  if s.look_animate == false
+    assign animate = false
+  endif
+  assign anchor = s.look_anchor | strip | handleize
+-%}
+{%- if decl != blank or animate == false -%}
+<style>
+{%- if decl != blank -%}
+#shopify-section-{{ sid }}{ {{ decl }} }
+{%- endif -%}
+{%- if bg != blank -%}
+#shopify-section-{{ sid }}>section,#shopify-section-{{ sid }}>article,#shopify-section-{{ sid }}>footer,#shopify-section-{{ sid }}>.s-surface{background:transparent!important;position:relative;z-index:1}
+{%- endif -%}
+{%- if animate == false -%}
+html.js #shopify-section-{{ sid }} .reveal,html.js #shopify-section-{{ sid }} .reveal-x,html.js #shopify-section-{{ sid }} .reveal-r{opacity:1;transform:none;transition:none}
+html.js #shopify-section-{{ sid }} .reveal-wipe,html.js #shopify-section-{{ sid }} .reveal-wipe-x{clip-path:none;transition:none}
+html.js #shopify-section-{{ sid }} .slabel.reveal::before{width:24px;transition:none}
+html.js #shopify-section-{{ sid }} .proc-track::before{transform:scaleX(1);transition:none}
+html.js #shopify-section-{{ sid }} .proc-track .proc-n{transform:none;opacity:1;transition:none}
+{%- endif -%}
+</style>
+{%- endif -%}
+{%- if has_media -%}
+  {%- liquid
+    assign dim = s.look_dim | default: 55 | divided_by: 100.0
+    assign focus = s.look_focus | default: 'center'
+    assign scrim = '#1F1B14'
+    if tone == 'light'
+      assign scrim = '#F7F3EB'
+    endif
+  -%}
+  <div class="s-backdrop" aria-hidden="true" style="--s-dim:{{ dim }};--s-focus:{{ focus }};--s-scrim:{{ scrim }}">
+    {%- if film_src != blank -%}
+      <video src="{{ film_src }}"{% if poster_src != blank %} poster="{{ poster_src }}"{% endif %} autoplay muted loop playsinline preload="metadata" tabindex="-1"></video>
+    {%- else -%}
+      <img src="{{ poster_src }}" srcset="{{ s.look_image | image_url: width: 768 }} 768w, {{ s.look_image | image_url: width: 1280 }} 1280w, {{ s.look_image | image_url: width: 1920 }} 1920w" sizes="100vw" alt="" width="1920" height="1080" loading="lazy" decoding="async">
+    {%- endif -%}
+  </div>
+{%- endif -%}
+{%- if anchor != blank -%}
+<div id="{{ anchor }}" class="s-anchor"></div>
+{%- endif -%}

@@ -1,0 +1,519 @@
+{%- comment -%}
+  Collection - the completed residences only (For Sale has its own page;
+  sold and completed are the same thing here). From the page header down:
+  an intro band (label, "Completed residences, N and counting", one line
+  in the Sabdia voice, the suburbs present), then a filter bar that sticks
+  under the nav, then one editorial grid of photo tiles. Films belong on
+  each residence's own page; "Film on hover" is there as a dial only.
+
+  Each Residence block points at the residence's page (Content › Pages,
+  template "collection-item"); its name, location, style, completed
+  year, photo and film all come from that page's metafields, so a page
+  edited in Pages updates the card too. The block's own fields only
+  override.
+
+  Sticky bar (11 Sep 2026): the nav is 80px tall at the top of the page
+  and 68px once scrolled (60 / 56 on phones), so a bar pinned at
+  top: var(--nav-h) sat 12px below the scrolled nav with the tiles
+  showing through the strip. The bar now measures the nav (ResizeObserver
+  on #mainNav) and pins itself to its live height.
+
+  Scale: with twenty or more residences the style chips and suburb list
+  are still deduplicated from every block, and "Show more" (off by
+  default) keeps the first N tiles on the page and reveals the rest on a
+  button, no reload; filters always search the whole set.
+{%- endcomment -%}
+{%- liquid
+  assign sid = section.id
+  assign pcount = 0
+  capture styles_raw
+    for block in section.blocks
+      assign rp = block.settings.page
+      if rp == blank and block.settings.link contains '/pages/'
+        assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
+        assign rp = pages[rp_handle]
+      endif
+      assign r_style = block.settings.style | default: rp.metafields.custom.style.value | strip
+      if r_style != blank
+        echo r_style | append: '¦'
+      endif
+    endfor
+  endcapture
+  assign styles = styles_raw | strip | split: '¦' | uniq | sort
+  capture suburbs_raw
+    for block in section.blocks
+      assign rp = block.settings.page
+      if rp == blank and block.settings.link contains '/pages/'
+        assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
+        assign rp = pages[rp_handle]
+      endif
+      assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
+      assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+      if r_suburb != blank
+        echo r_suburb | append: '¦'
+      endif
+    endfor
+  endcapture
+  assign suburbs = suburbs_raw | strip | split: '¦' | uniq | sort
+  # Switched off for launch (10 Sep 2026): For Sale has its own page. Turn
+  # "Include residences from Products" on and the current homes lead the
+  # grid again, tagged For Sale / Sold, with matching filter chips.
+  assign show_current = section.settings.show_current
+  assign scope = section.settings.current_scope | default: 'all'
+  assign current_handles = '' | split: ','
+  if show_current
+    if scope == 'all'
+      capture live_csv
+        render 'residence-handles', col: collections['for-sale'], group: 'live'
+      endcapture
+      assign live_handles = live_csv | split: ','
+      assign current_handles = current_handles | concat: live_handles
+    endif
+    capture sold_csv
+      render 'residence-handles', col: collections['sold'], group: 'sold'
+    endcapture
+    assign sold_handles = sold_csv | split: ','
+    assign current_handles = current_handles | concat: sold_handles
+  endif
+  assign total = section.blocks.size
+  if show_current
+    assign total = total | plus: current_handles.size
+  endif
+  assign count_token = '{' | append: 'count' | append: '}'
+  assign tile_media = section.settings.tile_media | default: 'photo'
+  assign more_after = 0
+  if section.settings.show_more
+    assign more_after = section.settings.show_more_after | default: 12
+  endif
+  assign show_lead = true
+  if section.settings.show_lead == false
+    assign show_lead = false
+  endif
+  assign lead_heading = section.settings.lead_heading
+  if lead_heading == blank
+    assign lead_heading = 'Completed residences, <em>' | append: count_token | append: ' and counting</em>.'
+  endif
+  assign lead_heading = lead_heading | replace: count_token, total
+-%}
+
+{% render 'section-look', section: section %}
+{%- if show_lead -%}
+<section class="pf-lead" id="pfLead-{{ sid }}">
+  <div class="inner pf-lead-grid">
+    <div class="pf-lead-a">
+      {%- if section.settings.lead_label != blank -%}<div class="slabel reveal">{{ section.settings.lead_label }}</div>{%- endif -%}
+      <h2 class="pf-lead-h reveal d1">{{ lead_heading }}</h2>
+    </div>
+    <div class="pf-lead-b reveal d2">
+      {%- if section.settings.lead_text != blank -%}<p class="pf-lead-p">{{ section.settings.lead_text | replace: count_token, total }}</p>{%- endif -%}
+      {%- if section.settings.show_lead_where and suburbs.size > 0 -%}
+        <p class="pf-lead-where" aria-label="Suburbs">
+          {%- for s in suburbs -%}{%- unless forloop.first %} <i>&middot;</i> {% endunless -%}<span>{{ s }}</span>{%- endfor -%}
+        </p>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+{%- if section.settings.show_filter and section.blocks.size > 3 -%}
+<div class="pf-bar s-surface{% if section.settings.filter_sticky == false %} pf-static{% endif %}" data-pf-bar="{{ sid }}">
+  <div class="inner pf-bar-inner">
+    {%- comment -%} A dropdown, like the suburb one beside it and the For Sale
+        toolbar, rather than a row of chips (Naomi, 11 Sep 2026). {%- endcomment -%}
+    <div class="pf-chips">
+      <span class="pf-bar-l">{{ section.settings.filter_label }}</span>
+      <select class="pf-sel" id="pfStyle-{{ sid }}" aria-label="Filter by style">
+        <option value="">{{ section.settings.filter_all }}</option>
+        {%- if show_current -%}
+          {%- if scope == 'all' -%}<option value="{{ section.settings.filter_live | default: 'For Sale' | escape }}">{{ section.settings.filter_live | default: "For Sale" }}</option>{%- endif -%}
+          <option value="{{ section.settings.filter_sold | default: 'Sold' | escape }}">{{ section.settings.filter_sold | default: "Sold" }}</option>
+        {%- endif -%}
+        {%- for s in styles -%}<option value="{{ s | escape }}">{{ s }}</option>{%- endfor -%}
+      </select>
+    </div>
+    {%- if suburbs.size > 1 -%}
+    <select class="pf-sel" id="pfSuburb-{{ sid }}" aria-label="Filter by suburb">
+      <option value="">{{ section.settings.all_suburbs | default: "All Suburbs" }}</option>
+      {%- for s in suburbs -%}<option value="{{ s | escape }}">{{ s }}</option>{%- endfor -%}
+    </select>
+    {%- endif -%}
+    <span class="pf-count" id="pfCount-{{ sid }}" aria-live="polite"></span>
+  </div>
+</div>
+{%- endif -%}
+
+<section class="pf-wrap{% if section.settings.name_style == 'caps' %} pf-caps{% endif %}{% if section.settings.hover_zoom == false %} pf-nozoom{% endif %}" id="port-{{ sid }}" style="--pf-cols:{{ section.settings.columns | default: '3' }};--pf-ar:{{ section.settings.card_shape | default: '4/3' }};{% if section.settings.gap_y > 0 %}--pf-gap-y:{{ section.settings.gap_y }}px;{% endif %}{% if section.settings.gap_x > 0 %}--pf-gap-x:{{ section.settings.gap_x }}px;{% endif %}">
+  <div class="inner">
+    {%- if section.settings.intro != blank -%}
+      <p class="pf-intro reveal">{{ section.settings.intro | replace: count_token, total }}</p>
+    {%- endif -%}
+    <div class="pf-grid" id="pfGrid-{{ sid }}"{% if more_after > 0 %} data-pf-limit="{{ more_after }}"{% endif %}>
+      {%- if show_current -%}
+        {%- for h in current_handles -%}
+          {%- for product in collections.all.products -%}
+            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+            {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
+            {%- assign grp = section.settings.filter_live | default: 'For Sale' -%}
+            {%- if pstatus contains 'Sold' -%}{%- assign grp = section.settings.filter_sold | default: 'Sold' -%}{%- endif -%}
+            {%- assign pcount = pcount | plus: 1 -%}
+            <a href="{{ product.url }}" class="pf-card reveal{% if more_after > 0 and pcount > more_after %} pf-more{% endif %}" data-port-card data-style="{{ grp | escape }}" data-suburb="{{ product.metafields.custom.suburb.value | escape }}">
+              <div class="pf-media">
+                {%- if product.featured_image -%}
+                  <img src="{{ product.featured_image | image_url: width: 1200, height: 900, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="900" loading="lazy" decoding="async">
+                {%- endif -%}
+                <span class="port-film-tag">{{ pstatus }}</span>
+              </div>
+              <div class="pf-info">
+                <div class="pf-name">{{ product.title }} <span aria-hidden="true">&rarr;</span></div>
+                <div class="pf-meta">{{ product.metafields.custom.suburb.value }}{% if product.metafields.custom.year.value != blank %} <i>&middot;</i> {{ product.metafields.custom.year.value }}{% endif %}</div>
+              </div>
+            </a>
+            {%- break -%}
+          {%- endfor -%}
+        {%- endfor -%}
+      {%- endif -%}
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign rp = block.settings.page
+          if rp == blank and block.settings.link contains '/pages/'
+            assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
+            assign rp = pages[rp_handle]
+          endif
+          assign r_name = block.settings.name | default: rp.title
+          assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
+          assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+          assign r_style = block.settings.style | default: rp.metafields.custom.style.value | strip
+          assign r_year = rp.metafields.custom.year.value
+          assign r_image_ext = rp.metafields.custom.image.value | default: block.settings.image_ext
+          if rp.metafields.custom.gallery.value.size > 0
+            if r_image_ext == blank or r_image_ext contains '/films/'
+              assign r_image_ext = rp.metafields.custom.gallery.value | first
+            endif
+          endif
+          assign r_video = ''
+          if tile_media == 'film'
+            assign r_video = block.settings.video | default: rp.metafields.custom.video.value
+            if block.settings.video_file
+              assign pmp4 = block.settings.video_file.sources | where: 'format', 'mp4' | first
+              if pmp4
+                assign r_video = pmp4.url
+              endif
+            endif
+          endif
+          assign r_link = block.settings.link | default: rp.url
+          # A small taste before the whole house: the Teaser line, else the
+          # Headline, else the first strong Instagram caption, kept short.
+          assign r_teaser = block.settings.teaser | default: rp.metafields.custom.teaser.value
+          if r_teaser == blank and rp.metafields.custom.headline.value != blank
+            assign r_teaser = rp.metafields.custom.headline.value | strip_html
+          endif
+          if r_teaser == blank
+            for post in rp.metafields.custom.series_posts.value
+              assign cap_l = post.caption | downcase
+              assign skip = false
+              if cap_l contains 'sold' or cap_l contains 'handed over'
+                assign skip = true
+              endif
+              if post.caption.size > 60 and post.hidden != true and skip == false
+                assign r_teaser = post.caption | strip_html | split: '. ' | first | split: ' - ' | first | split: ' — ' | first | split: ' – ' | first | truncatewords: 16, '…'
+                break
+              endif
+            endfor
+          endif
+          assign r_beds = rp.metafields.custom.beds.value
+          assign r_baths = rp.metafields.custom.baths.value
+          assign r_land = rp.metafields.custom.land.value
+          assign pcount = pcount | plus: 1
+          assign di = forloop.index0 | modulo: 3
+          assign card_more = false
+          if more_after > 0 and pcount > more_after
+            assign card_more = true
+          endif
+        -%}
+        {%- capture card_inner -%}
+          <div class="pf-media">
+            {%- if block.settings.image -%}
+              <img src="{{ block.settings.image | image_url: width: 1200, height: 900, crop: 'center' }}" alt="{{ r_name | escape }}{% if r_suburb != blank %}, {{ r_suburb | escape }}{% endif %}" width="1200" height="900" loading="lazy" decoding="async">
+            {%- elsif r_image_ext != blank -%}
+              <img src="{% render 'ext-variant', src: r_image_ext, w: 1200, h: 900 %}" alt="{{ r_name | escape }}{% if r_suburb != blank %}, {{ r_suburb | escape }}{% endif %}" width="1200" height="900" loading="lazy" decoding="async">
+            {%- endif -%}
+            {%- if r_video != blank -%}
+              <video src="{{ r_video }}" muted loop playsinline preload="none" data-port-video></video>
+              {%- if section.settings.show_film_tag -%}<span class="port-film-tag">{{ section.settings.film_tag | default: "Film" }}</span>{%- endif -%}
+            {%- endif -%}
+            {%- if r_style != blank and section.settings.style_on_card -%}
+              <span class="pf-style">{{ r_style }}</span>
+            {%- endif -%}
+          </div>
+          <div class="pf-info">
+            <div class="pf-name">{{ r_name }}{% if r_link != blank and section.settings.show_arrow %} <span aria-hidden="true">&rarr;</span>{% endif %}</div>
+            {%- if section.settings.show_meta -%}<div class="pf-meta">{{ r_suburb }}{% if r_style != blank %} <i>&middot;</i> {{ r_style }}{% endif %}{% if r_year != blank %} <i>&middot;</i> {{ r_year }}{% endif %}</div>{%- endif -%}
+          </div>
+          {%- if section.settings.show_teaser and r_teaser != blank -%}
+            <p class="pf-teaser">{{ r_teaser }}</p>
+          {%- endif -%}
+          {%- if section.settings.show_facts -%}
+            {%- if r_beds != blank or r_baths != blank or r_land != blank -%}
+            <div class="pf-facts">
+              {%- if r_beds != blank -%}<span>{{ r_beds }} {{ section.settings.word_bed | default: "Bed" }}</span>{%- endif -%}
+              {%- if r_baths != blank -%}<span>{{ r_baths }} {{ section.settings.word_bath | default: "Bath" }}</span>{%- endif -%}
+              {%- if r_land != blank -%}<span>{{ r_land }}m&sup2;</span>{%- endif -%}
+            </div>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endcapture -%}
+        {%- if r_link != blank -%}
+          <a href="{{ r_link }}" class="pf-card reveal{% if di == 1 %} d1{% elsif di == 2 %} d2{% endif %}{% if card_more %} pf-more{% endif %}" data-port-card data-style="{{ r_style | escape }}" data-suburb="{{ r_suburb | escape }}" {{ block.shopify_attributes }}>{{ card_inner }}</a>
+        {%- else -%}
+          <div class="pf-card reveal{% if di == 1 %} d1{% elsif di == 2 %} d2{% endif %}{% if card_more %} pf-more{% endif %}" data-port-card data-style="{{ r_style | escape }}" data-suburb="{{ r_suburb | escape }}" {{ block.shopify_attributes }}>{{ card_inner }}</div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+    <p class="pf-empty" id="pfEmpty-{{ sid }}" hidden>{{ section.settings.empty_text }}</p>
+    {%- if more_after > 0 and total > more_after -%}
+      <div class="pf-more-row">
+        <button type="button" class="btn-g pf-more-btn" id="pfMore-{{ sid }}" aria-controls="pfGrid-{{ sid }}">{{ section.settings.show_more_label | default: "Show more residences" }} <span class="pf-more-n" data-pf-more-n>{{ total | minus: more_after }}</span></button>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  /* Intro band: label, heading and the line about the houses on the left;
+     the one-paragraph voice line and the suburbs present on the right. */
+  .pf-lead{padding:calc(clamp(56px,7vw,96px)*var(--sp-scale)*var(--sp-top,1)) var(--page-pad) clamp(36px,4.5vw,60px);background:var(--bg)}
+  .pf-lead-grid{display:grid;grid-template-columns:7fr 5fr;gap:clamp(32px,6vw,96px);align-items:end}
+  .pf-lead-h{font-family:var(--font-d);font-size:calc(clamp(34px,4vw,60px)*var(--s-h,1));font-weight:300;line-height:1.02;letter-spacing:-.025em;color:var(--ink);margin:0;max-width:14ch}
+  .pf-lead-h em{font-style:italic;color:var(--ink)}
+  .pf-lead-p{font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:var(--ink3);margin:0;max-width:44ch}
+  .pf-lead-where{font-family:var(--font-u);font-size:var(--t-label);font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:var(--taupe-d);margin:18px 0 0;line-height:2}
+  .pf-lead-where i{font-style:normal;color:var(--gold);margin:0 2px}
+  .pf-lead-where span{white-space:nowrap}
+
+  /* Filter bar: pinned to the nav's live height (--pf-top is set from
+     #mainNav's measured height, so 80 / 68 / 60 / 56 all land flush), a
+     near-solid cream over blur so tiles never show through, one hairline
+     below, and always beneath the nav (nav is z 1000). */
+  #shopify-section-{{ sid }} .pf-bar{position:sticky;top:var(--pf-top,var(--nav-h));z-index:20;padding:16px var(--page-pad);background:rgba(var(--bg-rgb),.96)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+  #shopify-section-{{ sid }} .pf-bar.pf-static{position:static}
+  .pf-bar-inner{gap:20px 28px}
+  .pf-chips{display:flex;align-items:center;gap:14px}
+  .pf-count{white-space:nowrap}
+
+  /* No stray space between the bar and the first row: the grid carries no
+     top margin, the wrap keeps one small, constant breath under the bar
+     (the Look "Space above" dial now belongs to the intro band). */
+  #port-{{ sid }}.pf-wrap{padding-top:clamp(28px,3.5vw,44px)}
+  #port-{{ sid }} .pf-grid{margin-top:0}
+  #port-{{ sid }} .pf-intro{margin-top:0}
+
+  /* Show more: the tiles past the limit are hidden before paint (js gate,
+     so a browser without script still sees every residence). */
+  html.js #port-{{ sid }} .pf-card.pf-more{display:none}
+  .pf-more-row{display:flex;justify-content:center;margin-top:clamp(40px,5vw,64px)}
+  .pf-more-btn{font-family:var(--font-u);background:none;cursor:pointer}
+  .pf-more-btn[hidden]{display:none}
+  .pf-more-n{font-size:var(--t-micro);letter-spacing:.2em;color:var(--gold);margin-left:2px}
+  html:not(.js) .pf-more-row{display:none}
+
+  @media(max-width:900px){
+    .pf-lead{padding-bottom:clamp(28px,5vw,40px)}
+    .pf-lead-grid{grid-template-columns:1fr;gap:22px;align-items:start}
+    .pf-lead-h{max-width:none}
+    .pf-lead-where span{white-space:normal}
+    /* Many styles on a phone: one scrolling row of chips rather than a
+       stack of five; the bar itself stays in flow on phones (as designed). */
+    #shopify-section-{{ sid }} .pf-bar{position:static}
+    .pf-bar-inner{gap:12px 16px}
+    .pf-chips{width:100%}
+    .pf-chips .pf-sel{flex:1}
+    .pf-sel{width:100%;margin-left:0}
+    .pf-count{min-width:0;text-align:left}
+    #port-{{ sid }}.pf-wrap{padding-top:clamp(24px,5vw,32px)}
+  }
+</style>
+
+<script>
+  (function () {
+    var sid = {{ sid | json }};
+    var grid = document.getElementById('pfGrid-' + sid);
+    if (!grid || grid.dataset.init) return;
+    grid.dataset.init = '1';
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-port-card]'));
+    var bar = document.querySelector('[data-pf-bar="' + sid + '"]');
+    var styleSel = document.getElementById('pfStyle-' + sid);
+    var suburb = document.getElementById('pfSuburb-' + sid);
+    var count = document.getElementById('pfCount-' + sid);
+    var empty = document.getElementById('pfEmpty-' + sid);
+    var more = document.getElementById('pfMore-' + sid);
+    var moreN = more ? more.querySelector('[data-pf-more-n]') : null;
+    var limit = parseInt(grid.getAttribute('data-pf-limit') || '0', 10) || 0;
+    var expanded = false;
+    var style = '';
+
+    /* One pass decides every tile: it matches the style chip and the
+       suburb, and it is inside the Show-more limit (or the limit is off,
+       or the visitor has opened the rest). Filters search the whole set,
+       so a chip that matches three houses shows all three. */
+    function apply(initial) {
+      var sub = suburb ? suburb.value : '';
+      var matched = 0, shown = 0;
+      cards.forEach(function (c) {
+        var ok = true;
+        if (style && c.dataset.style !== style) ok = false;
+        if (ok && sub && c.dataset.suburb !== sub) ok = false;
+        if (ok) matched++;
+        var show = ok && (expanded || !limit || matched <= limit);
+        if (show) shown++;
+        var was = !c.hidden && !c.classList.contains('pf-more');
+        c.hidden = !show;
+        c.classList.remove('pf-more');
+        if (show && !initial) {
+          if (!was) c.classList.add('fastin');
+          c.classList.add('vis');
+        }
+      });
+      var rest = matched - shown;
+      if (empty) empty.hidden = matched > 0;
+      if (more) {
+        more.hidden = rest <= 0;
+        if (moreN) moreN.textContent = rest;
+      }
+      if (count) {
+        if (style || sub) count.textContent = matched + (matched === 1 ? ' Residence' : ' Residences');
+        else if (rest > 0) count.textContent = shown + ' of ' + matched;
+        else count.textContent = '';
+      }
+    }
+    if (styleSel) styleSel.addEventListener('change', function () { style = styleSel.value || ''; apply(); });
+    if (suburb) suburb.addEventListener('change', function () { apply(); });
+    if (more) more.addEventListener('click', function () { expanded = true; apply(); });
+    apply(true);
+
+    /* Pin the bar to the nav's live height. The nav shrinks from 80px to
+       68px once the page has scrolled (60 / 56 on phones), so a fixed
+       top: var(--nav-h) left a strip between the two. */
+    var nav = document.getElementById('mainNav');
+    if (bar && nav) {
+      var setTop = function () {
+        bar.style.setProperty('--pf-top', Math.round(nav.getBoundingClientRect().height) + 'px');
+      };
+      setTop();
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(setTop).observe(nav);
+      } else {
+        window.addEventListener('scroll', setTop, { passive: true });
+        window.addEventListener('resize', setTop);
+      }
+    }
+    {%- if tile_media == 'film' %}
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    cards.forEach(function (card) {
+      var video = card.querySelector('[data-port-video]');
+      if (!video) return;
+      card.addEventListener('mouseenter', function () { video.play().then(function () { video.classList.add('playing'); }).catch(function () {}); });
+      card.addEventListener('mouseleave', function () { video.pause(); video.classList.remove('playing'); });
+    });
+    {%- endif %}
+  })();
+</script>
+
+
+{% schema %}
+{
+  "name": "Collection grid",
+  "settings": [
+    { "type": "paragraph", "content": "Completed residences only. Homes for sale live on their own page (For Sale); nothing from Products appears here. Add one Residence block per completed home and pick its page - the card fills itself from that page's metafields (Content › Pages › the residence › Metafields: Style, Completed year, Hero image, Film)." },
+    { "type": "header", "content": "Intro band" },
+    { "type": "checkbox", "id": "show_lead", "label": "Show the intro band above the filter bar", "default": true },
+    { "type": "text", "id": "lead_label", "label": "Small label", "default": "The Collection" },
+    { "type": "html", "id": "lead_heading", "label": "Heading (HTML - <em> allowed)", "default": "Completed residences, <em>{count} and counting</em>.", "info": "{count} becomes the number of residences on this page." },
+    { "type": "textarea", "id": "lead_text", "label": "One paragraph", "default": "Every residence here was drawn, developed and built by Sabdia, in inner Brisbane, and handed over complete." },
+    { "type": "checkbox", "id": "show_lead_where", "label": "List the suburbs present", "default": true, "info": "Drawn from each residence page's Location line, one entry per suburb." },
+    { "type": "header", "content": "Filter bar" },
+    { "type": "checkbox", "id": "show_filter", "label": "Show the filter bar", "default": true, "info": "Style chips come from each residence page's Style field; the suburb list from its Location line. Appears once there are four or more residences." },
+    { "type": "checkbox", "id": "style_on_card", "label": "Show the style on the photo on hover", "default": true },
+    { "type": "header", "content": "A taste before the whole house" },
+    { "type": "textarea", "id": "intro", "label": "Optional line above the grid", "info": "Sits between the filter bar and the first row. {count} becomes the number of residences. Empty (as designed) hides it; the intro band above carries the count." },
+    { "type": "checkbox", "id": "show_teaser", "label": "One-line teaser under each name", "default": true, "info": "From the page's Teaser line (Content › Pages › the residence › Metafields), else its Headline, else its first Instagram caption." },
+    { "type": "checkbox", "id": "show_facts", "label": "Bed · bath · land under the teaser", "default": true, "info": "Shows whatever the page has filled in." },
+    { "type": "text", "id": "word_bed", "label": "Word after bedrooms", "default": "Bed" },
+    { "type": "text", "id": "word_bath", "label": "Word after bathrooms", "default": "Bath" },
+    { "type": "text", "id": "filter_label", "label": "Filter label", "default": "Style" },
+    { "type": "text", "id": "filter_all", "label": "All chip", "default": "All" },
+    { "type": "text", "id": "all_suburbs", "label": "All-suburbs option", "default": "All Suburbs" },
+    { "type": "text", "id": "empty_text", "label": "No-matches text", "default": "Nothing matches those filters. Try widening them." },
+    { "type": "text", "id": "film_tag", "label": "Film tag", "default": "Film" },
+    { "type": "header", "content": "Many residences" },
+    { "type": "checkbox", "id": "show_more", "label": "Show more button after the first tiles", "default": false, "info": "Keeps the page quick as the collection grows: the first tiles load, a button reveals the rest in place. Filters always search every residence." },
+    { "type": "range", "id": "show_more_after", "label": "Tiles shown before the button", "min": 6, "max": 36, "step": 3, "default": 12 },
+    { "type": "text", "id": "show_more_label", "label": "Button wording", "default": "Show more residences", "info": "The number still to come follows the wording." },
+    { "type": "header", "content": "Residences from Products (For Sale / Sold)" },
+    { "type": "checkbox", "id": "show_current", "label": "Include residences from Products", "default": false, "info": "Off since 10 Sep 2026 (Tamsin): For Sale has its own page. On = the current homes lead the grid, tagged by their Status, with For Sale / Sold filter chips." },
+    { "type": "select", "id": "current_scope", "label": "Which ones", "options": [ { "value": "sold", "label": "Sold only (past projects)" }, { "value": "all", "label": "For Sale and Sold" } ], "default": "all" },
+    { "type": "text", "id": "filter_live", "label": "For Sale chip", "default": "For Sale" },
+    { "type": "text", "id": "filter_sold", "label": "Sold chip", "default": "Sold" },
+    {"type": "header", "content": "Cards"},
+    {"type": "select", "id": "tile_media", "label": "Tile media", "options": [{"value": "photo", "label": "Photo only (as designed)"}, {"value": "film", "label": "Film on hover"}], "default": "photo", "info": "Photo only keeps the page light; each residence's film plays on its own page. Film on hover needs a Film on the residence page or block."},
+    {"type": "checkbox", "id": "show_film_tag", "label": "Film tag on cards that have one", "default": true, "info": "Only with Film on hover."},
+    {"type": "checkbox", "id": "show_arrow", "label": "Arrow after each name", "default": true},
+    {"type": "checkbox", "id": "show_meta", "label": "Suburb · style · year under each name", "default": true},
+    {"type": "checkbox", "id": "hover_zoom", "label": "Photos zoom gently on hover", "default": true},
+    {"type": "checkbox", "id": "filter_sticky", "label": "Filter bar sticks under the nav while scrolling", "default": true, "info": "On phones the bar stays in flow either way."},
+    {"type": "select", "id": "name_style", "label": "Name style", "options": [{"value": "serif", "label": "Serif (as designed)"}, {"value": "caps", "label": "Small tracked capitals"}], "default": "serif"},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "columns", "label": "Cards across", "options": [{"value": "2", "label": "Two"}, {"value": "3", "label": "Three (as designed)"}, {"value": "4", "label": "Four"}], "default": "3"},
+    {"type": "select", "id": "card_shape", "label": "Card shape", "options": [{"value": "16/10", "label": "Landscape 16:10"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "1/1", "label": "Square"}, {"value": "4/5", "label": "Portrait 4:5"}], "default": "4/3"},
+    {"type": "range", "id": "gap_y", "label": "Gap between rows", "min": 0, "max": 80, "step": 4, "default": 0, "unit": "px", "info": "0 = as designed (grows with the window)."},
+    {"type": "range", "id": "gap_x", "label": "Gap between columns", "min": 0, "max": 60, "step": 4, "default": 0, "unit": "px", "info": "0 = as designed (grows with the window)."},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ],
+  "blocks": [
+    {
+      "type": "residence",
+      "name": "Residence",
+      "settings": [
+        { "type": "page", "id": "page", "label": "Residence page", "info": "Pick the completed residence's page (Content › Pages, theme template \"collection-item\"). Its name, location line, style, year, photo, film and link then fill in by themselves - the fields below only override." },
+        { "type": "text", "id": "name", "label": "Name", "info": "Leave empty to use the page title." },
+        { "type": "text", "id": "loc", "label": "Location line" },
+        { "type": "text", "id": "style", "label": "Style (override)", "info": "Normally set on the page itself (Metafields › Style) so the residence page shows it too." },
+        { "type": "text", "id": "teaser", "label": "Teaser line (override)", "info": "Normally the page's Teaser line." },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_ext", "label": "Current photo (URL)", "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field." },
+        { "type": "video", "id": "video_file", "label": "Hover film (upload, optional)", "info": "Used only when Cards › Tile media is Film on hover." },
+        { "type": "text", "id": "video", "label": "Current hover film (URL)", "info": "Upload a film above and it takes over." },
+        { "type": "url", "id": "link", "label": "Link (optional)" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Collection grid" }
+  ]
+}
+{% endschema %}

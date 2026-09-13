@@ -1,0 +1,359 @@
+{%- comment -%}
+  Port of Footer.astro - tagline band, newsletter band (posts into the
+  Sabdia leads/subscriber system via the forms endpoint), link grid and
+  the legal row. For Sale links come from the for-sale collection (or a
+  chosen menu); company and legal links from Shopify menus with the
+  original Sabdia links as fallback.
+{%- endcomment -%}
+{%- liquid
+  assign logo_src = 'logo.png' | asset_url
+  if settings.logo
+    assign logo_src = settings.logo | image_url: width: 400
+  endif
+  assign for_sale_menu = linklists[section.settings.for_sale_menu]
+  assign company_menu = linklists[section.settings.company_menu]
+  assign legal_menu = linklists[section.settings.legal_menu]
+  assign for_sale_collection = collections['for-sale']
+-%}
+{% render 'section-look', section: section, designed: 'dark' %}
+{%- liquid
+  case section.settings.columns_layout
+    when 'equal'
+      assign f_cols = '1fr 1fr 1fr 1fr'
+    when 'wide'
+      assign f_cols = '3fr 1fr 1fr 1fr'
+    else
+      assign f_cols = '2fr 1fr 1fr 1fr'
+  endcase
+-%}
+<footer class="{% if section.settings.newsletter_style == 'stacked' %}f-nl-stack{% endif %}" style="--f-cols:{{ f_cols }};--f-logo:{{ section.settings.logo_height | default: 22 }}px">
+  {%- if section.settings.show_tagline -%}
+  <div class="footer-tagline">
+    <div class="footer-tagline-inner">
+      <h2 class="footer-tag-h">{{ section.settings.tagline_html }}</h2>
+      <p class="footer-tag-sub">{{ section.settings.tagline_sub }}</p>
+    </div>
+  </div>
+  {%- endif -%}
+  {%- if section.settings.show_newsletter -%}
+  <div class="nl-band">
+    <div class="nl-inner">
+      <div class="nl-copy">
+        <div class="nl-h">{{ section.settings.nl_heading }}</div>
+        <p class="nl-t">{{ section.settings.nl_text }}</p>
+      </div>
+      {%- if settings.form_backend == 'vercel' -%}
+        <form class="nl-form" id="nlForm" method="POST" action="{{ settings.forms_endpoint }}/api/subscribe" data-success="{{ section.settings.nl_success | escape }}">
+          <p style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+          <label class="sr-only" for="nlEmail">Email address</label>
+          <input class="nl-in" id="nlEmail" type="email" name="email" placeholder="{{ section.settings.nl_placeholder | escape }}" autocomplete="email" required>
+          <button class="nl-btn" type="submit">{{ section.settings.nl_button }}</button>
+          <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+        </form>
+      {%- else -%}
+        {%- comment -%} Shopify-native signup: files the subscriber under
+            Customers with email marketing consent. {%- endcomment -%}
+        {% form 'customer', class: 'nl-form', id: 'nlForm' %}
+          <span hidden data-nl-success>{{ section.settings.nl_success }}</span>
+          {%- if form.posted_successfully? -%}
+            <p class="nl-done">{{ section.settings.nl_success }}</p>
+          {%- else -%}
+            {%- comment -%} On a residence page the subscriber is also tagged with that house, so Customers › Segments can filter "customer_tags CONTAINS 'qasr'". {%- endcomment -%}
+            <input type="hidden" name="contact[tags]" value="newsletter{% if product %}, {{ product.handle }}{% endif %}">
+            <label class="sr-only" for="nlEmail">Email address</label>
+            <input class="nl-in" id="nlEmail" type="email" name="contact[email]" placeholder="{{ section.settings.nl_placeholder | escape }}" autocomplete="email" required>
+            <button class="nl-btn" type="submit">{{ section.settings.nl_button }}</button>
+            {%- if form.errors -%}<p class="sr-status" role="status">{{ form.errors | default_errors }}</p>{%- endif -%}
+          {%- endif -%}
+        {% endform %}
+      {%- endif -%}
+    </div>
+  </div>
+  {%- endif -%}
+  <div class="fg-grid">
+    <div>
+      {%- if section.settings.show_logo -%}
+      <a href="/" class="flogo" aria-label="{{ settings.site_name }}">
+        <img src="{{ logo_src }}" alt="{{ settings.site_name }}">
+      </a>
+      {%- endif -%}
+      {%- if section.settings.show_blurb and section.settings.blurb_html != blank -%}<p class="ftag">{{ section.settings.blurb_html }}</p>{%- endif -%}
+      {%- if section.settings.show_socials -%}
+      <div class="fsoc">
+        <a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" class="fsl" aria-label="Instagram">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="{{ settings.facebook_url }}" target="_blank" rel="noopener" class="fsl" aria-label="Facebook">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener" class="fsl" aria-label="LinkedIn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+      </div>
+      {%- endif -%}
+    </div>
+    {%- if section.settings.show_for_sale_col -%}
+    <div>
+      <div class="fct">{{ section.settings.col_for_sale | default: "For Sale" }}</div>
+      <ul class="fcl">
+        {%- if for_sale_menu.links.size > 0 -%}
+          {%- for link in for_sale_menu.links -%}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {%- endfor -%}
+        {%- else -%}
+          {%- comment -%} Same source as every other list: each residence's Status (residence-handles), the collection only orders. {%- endcomment -%}
+          {%- capture live_csv -%}{% render 'residence-handles', col: for_sale_collection, group: 'live' %}{%- endcapture -%}
+          {%- assign live_handles = live_csv | split: ',' -%}
+          {%- assign fs_limit = section.settings.for_sale_limit | default: 8 -%}
+          {%- for h in live_handles limit: fs_limit -%}
+            {%- for p in collections.all.products -%}
+              {%- if p.handle != h -%}{%- continue -%}{%- endif -%}
+              <li><a href="{{ p.url }}">{{ p.title }}{% if p.metafields.custom.suburb.value != blank %} - {{ p.metafields.custom.suburb.value }}{% endif %}</a></li>
+              {%- break -%}
+            {%- endfor -%}
+          {%- endfor -%}
+        {%- endif -%}
+        {%- if section.settings.show_view_all -%}<li><a href="/collections/for-sale">{{ section.settings.view_all_label | default: "View All Properties" }}</a></li>{%- endif -%}
+      </ul>
+    </div>
+    {%- endif -%}
+    {%- if section.settings.show_company_col -%}
+    <div>
+      <div class="fct">{{ section.settings.col_company | default: "Company" }}</div>
+      <ul class="fcl">
+        {%- if company_menu.links.size > 0 -%}
+          {%- for link in company_menu.links -%}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {%- endfor -%}
+        {%- else -%}
+          <li><a href="/pages/about">About Sabdia</a></li>
+          <li><a href="/pages/services">Process</a></li>
+          <li><a href="/pages/collection">Collection</a></li>
+          {%- if section.settings.show_agent_link -%}<li><a href="/pages/agent-access">Agent Access</a></li>{%- endif -%}
+          <li><a href="/blogs/journal">The Journal</a></li>
+        {%- endif -%}
+      </ul>
+    </div>
+    {%- endif -%}
+    {%- if section.settings.show_connect_col -%}
+    <div>
+      <div class="fct">{{ section.settings.col_connect | default: "Connect" }}</div>
+      <ul class="fcl">
+        <li><a href="/pages/contact">{{ section.settings.contact_us_label | default: "Contact Us" }}</a></li>
+        {%- if settings.contact_phone != blank -%}
+          <li><a href="tel:{{ settings.contact_phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}">{{ settings.contact_phone }}</a></li>
+        {%- endif -%}
+        {%- if settings.contact_email != blank -%}
+          <li><a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a></li>
+        {%- endif -%}
+        <li><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener">Instagram {{ settings.instagram_label }}</a></li>
+        <li><a href="{{ settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a></li>
+        <li><a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a></li>
+        {%- if section.settings.show_domain and settings.domain_display != blank and settings.domain_url != blank -%}
+          <li><a href="{{ settings.domain_url }}" target="_blank" rel="noopener">{{ settings.domain_display }}</a></li>
+        {%- endif -%}
+      </ul>
+    </div>
+    {%- endif -%}
+  </div>
+  {%- if section.settings.show_legal_row -%}
+  <div class="fbot">
+    <div class="fcopy">
+      &copy; {{ 'now' | date: '%Y' }} {{ settings.legal_name }}. All rights reserved.
+      {%- if settings.qbcc_licence != blank or settings.abn != blank -%}
+        <span class="flegal">
+          {%- if settings.qbcc_licence != blank -%}<span>QBCC Licence {{ settings.qbcc_licence }}</span>{%- endif -%}
+          {%- if settings.qbcc_licence != blank and settings.abn != blank -%}<span aria-hidden="true"> &middot; </span>{%- endif -%}
+          {%- if settings.abn != blank -%}<span>ABN {{ settings.abn }}</span>{%- endif -%}
+        </span>
+      {%- endif -%}
+    </div>
+    {%- if section.settings.show_legal_links -%}
+    <div class="flinks">
+      {%- if legal_menu.links.size > 0 -%}
+        {%- for link in legal_menu.links -%}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {%- endfor -%}
+      {%- else -%}
+        <a href="/pages/accessibility">Accessibility</a>
+        <a href="/pages/privacy">Privacy</a>
+        <a href="/pages/terms">Terms</a>
+      {%- endif -%}
+    </div>
+    {%- endif -%}
+  </div>
+  {%- endif -%}
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_tagline",
+      "label": "Show the \"Design. Develop. Construct.\" band",
+      "default": false,
+      "info": "Off since 10 Sep 2026 (Tamsin and Naomi): the footer keeps the Journal band and the link columns only."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_domain",
+      "label": "Show the website address in the Connect column",
+      "default": false,
+      "info": "Off since 10 Sep 2026 (Tamsin): the site does not need to link to itself."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_agent_link",
+      "label": "Show the Agent Access link in the Company column",
+      "default": false,
+      "info": "Agent Access is parked for launch (10 Sep 2026). Only applies when no Company menu is chosen below."
+    },
+    {
+      "type": "html",
+      "id": "tagline_html",
+      "label": "Tagline",
+      "default": "Design. <em>Develop.</em><br>Construct."
+    },
+    {
+      "type": "text",
+      "id": "tagline_sub",
+      "label": "Tagline subtitle",
+      "default": "Boutique home builder and developer. Inner Brisbane, since 2013."
+    },
+    {
+      "type": "html",
+      "id": "blurb_html",
+      "label": "Footer blurb",
+      "default": "Boutique Luxury Home Builder &<br>Developer - Brisbane, QLD"
+    },
+    {
+      "type": "header",
+      "content": "Newsletter band"
+    },
+    {
+      "type": "text",
+      "id": "nl_heading",
+      "label": "Heading",
+      "default": "The Sabdia Journal"
+    },
+    {
+      "type": "textarea",
+      "id": "nl_text",
+      "label": "Text",
+      "default": "New releases and finished homes, a few times a year. Unsubscribe any time."
+    },
+    {
+      "type": "text",
+      "id": "nl_placeholder",
+      "label": "Email placeholder",
+      "default": "Your email address"
+    },
+    {
+      "type": "text",
+      "id": "nl_button",
+      "label": "Button label",
+      "default": "Subscribe"
+    },
+    {
+      "type": "text",
+      "id": "nl_success",
+      "label": "Success message",
+      "default": "Welcome - you're on the list."
+    },
+    {
+      "type": "header",
+      "content": "Link columns"
+    },
+    {
+      "type": "link_list",
+      "id": "for_sale_menu",
+      "label": "For Sale menu",
+      "info": "Leave unset to list the for-sale collection automatically."
+    },
+    {
+      "type": "link_list",
+      "id": "company_menu",
+      "label": "Company menu"
+    },
+    {
+      "type": "link_list",
+      "id": "legal_menu",
+      "label": "Legal menu"
+    },
+    {
+      "type": "header",
+      "content": "Wording"
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "\"View all\" link",
+      "default": "View All Properties"
+    },
+    {
+      "type": "text",
+      "id": "contact_us_label",
+      "label": "\"Contact us\" link",
+      "default": "Contact Us"
+    },
+    {
+      "type": "text",
+      "id": "col_connect",
+      "label": "Connect column heading",
+      "default": "Connect"
+    },
+    {
+      "type": "text",
+      "id": "col_company",
+      "label": "Company column heading",
+      "default": "Company"
+    },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_newsletter", "label": "Show the Journal sign-up band", "default": true},
+    {"type": "checkbox", "id": "show_logo", "label": "Show the wordmark", "default": true},
+    {"type": "checkbox", "id": "show_blurb", "label": "Show the blurb under the wordmark", "default": true},
+    {"type": "checkbox", "id": "show_socials", "label": "Show the social icons", "default": true},
+    {"type": "checkbox", "id": "show_for_sale_col", "label": "Show the For Sale column", "default": true},
+    {"type": "checkbox", "id": "show_view_all", "label": "\"View all\" link at the end of the For Sale column", "default": true},
+    {"type": "checkbox", "id": "show_company_col", "label": "Show the Company column", "default": true},
+    {"type": "checkbox", "id": "show_connect_col", "label": "Show the Connect column", "default": true},
+    {"type": "checkbox", "id": "show_legal_row", "label": "Show the copyright row", "default": true},
+    {"type": "checkbox", "id": "show_legal_links", "label": "Show the legal links", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "columns_layout", "label": "Column widths", "options": [{"value": "brand", "label": "Brand column double width (as designed)"}, {"value": "wide", "label": "Brand column triple width"}, {"value": "equal", "label": "Four equal columns"}], "default": "brand"},
+    {"type": "select", "id": "newsletter_style", "label": "Sign-up band", "options": [{"value": "inline", "label": "Words beside the field (as designed)"}, {"value": "stacked", "label": "Field under the words"}], "default": "inline"},
+    {"type": "range", "id": "logo_height", "label": "Wordmark height", "min": 14, "max": 48, "step": 2, "default": 22, "unit": "px"},
+    {"type": "range", "id": "for_sale_limit", "label": "Residences listed in the For Sale column", "min": 1, "max": 12, "step": 1, "default": 8},
+    {"type": "text", "id": "col_for_sale", "label": "For Sale column heading", "default": "For Sale"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ]
+}
+{% endschema %}

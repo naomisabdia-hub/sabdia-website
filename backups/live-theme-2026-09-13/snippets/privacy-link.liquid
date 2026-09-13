@@ -1,0 +1,23 @@
+{%- comment -%}
+  Point-of-collection privacy notice for every enquiry form (Australian
+  Privacy Principle 5). Pass the form's note as `note`: if the note
+  already says "Privacy Policy" that phrase becomes the link; otherwise
+  the link is appended after the note. Label and target live in Theme
+  settings › Site plumbing; blank the label to hide the link.
+{%- endcomment -%}
+{%- liquid
+  assign label = settings.privacy_link_label
+  assign href = settings.privacy_link_url | default: '/pages/privacy'
+  capture anchor
+    echo '<a href="' | append: href | append: '" class="form-note-link">' | append: label | append: '</a>'
+  endcapture
+  if label == blank or note contains '<a '
+    echo note
+  elsif note contains label
+    echo note | replace: label, anchor
+  elsif note != blank
+    echo note | append: ' ' | append: anchor
+  else
+    echo anchor
+  endif
+-%}

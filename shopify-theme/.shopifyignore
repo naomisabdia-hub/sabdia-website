@@ -4,8 +4,11 @@
 # dedicated page ports — still reach the store on their first push.
 # After a new template's first push, add it here: from then on the store
 # copy is the source of truth.
-# templates/password.json is NOT ignored: it must carry the Password page
-# section (main-password) so the locked store still has a password form.
+# templates/password.json shipped its section (main-password) on the first
+# push, so the locked store has its password form. From 11 Sep 2026 the store
+# copy is the source of truth like the others: Naomi set the coming-soon film
+# in the customizer, and pushing the local {} would wipe it.
+templates/password.json
 templates/index.json
 templates/product.json
 templates/collection.json

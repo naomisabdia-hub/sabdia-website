@@ -1,0 +1,62 @@
+{%- comment -%}
+  Loads every residence's own brochure face (Products › the residence ›
+  Residence name font / font file / weight) so a card can print its name in
+  it. Rendered by any section that prints residence cards:
+
+    {% render 'residence-faces' %}
+
+  Without it the card still asks for the face and the browser falls back to
+  the theme serif - which is why the For Sale page, the home grid and the
+  related row all render this. The For Sale page builds the same list inline
+  while it walks its residences; this snippet is for the sections that do not.
+{%- endcomment -%}
+{%- liquid
+  assign gfonts = ''
+  assign ffiles = ''
+  for p in collections.all.products
+    unless p.tags contains 'property'
+      continue
+    endunless
+    assign pm = p.metafields.custom
+    assign pf = pm.name_font.value | strip
+    assign pff = pm.name_font_file.value | strip
+    assign pfw = pm.name_font_weight.value | default: 400
+    if pff != blank
+      assign pfam = pf
+      if pfam == blank
+        assign pfam = 'ResidenceFace-' | append: p.handle
+      endif
+      assign ffiles = ffiles | append: pfam | append: '¦' | append: pff | append: '¦' | append: pfw | append: '||'
+    elsif pf != blank
+      assign gfonts = gfonts | append: pf | append: ':wght@' | append: pfw | append: '||'
+    endif
+  endfor
+  assign gfont_list = gfonts | split: '||' | uniq
+  assign ffile_list = ffiles | split: '||' | uniq
+-%}
+{%- if gfont_list.size > 0 -%}
+  {%- capture gf_query -%}{%- for f in gfont_list -%}{%- unless forloop.first -%}&{%- endunless -%}family={{ f | replace: ' ', '+' }}{%- endfor -%}{%- endcapture -%}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?{{ gf_query }}&display=swap">
+{%- endif -%}
+{%- if ffile_list.size > 0 -%}
+  <style>
+  {%- for f in ffile_list -%}
+    {%- assign fp = f | split: '¦' -%}
+    {%- liquid
+      assign ff_fmt = 'woff2'
+      if fp[1] contains '.ttf'
+        assign ff_fmt = 'truetype'
+      elsif fp[1] contains '.otf'
+        assign ff_fmt = 'opentype'
+      elsif fp[1] contains '.woff2'
+        assign ff_fmt = 'woff2'
+      elsif fp[1] contains '.woff'
+        assign ff_fmt = 'woff'
+      endif
+    -%}
+    @font-face{font-family:'{{ fp[0] }}';src:url('{{ fp[1] }}') format('{{ ff_fmt }}');font-weight:{{ fp[2] | default: 400 }};font-display:swap}
+  {%- endfor -%}
+  </style>
+{%- endif -%}

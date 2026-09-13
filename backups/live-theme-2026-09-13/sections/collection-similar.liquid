@@ -1,0 +1,317 @@
+{%- comment -%}
+  Similar residences and the closing band of a Collection residence page
+  (template page.collection-item: main-collection-item, then The Series
+  Instagram strip, then this section). Moved out of main-collection-item
+  on 11 Sep 2026 so the Instagram strip sits above Similar residences.
+
+  Similar residences are chosen from this section's Residence blocks,
+  never the residence being viewed: same style first, then the same
+  suburb, then the rest in block order. The residence's own style, suburb
+  and name come from its page metafields (custom.style, custom.loc), as
+  on the main section. The closing band has no enquiry form: it points
+  people to what is for sale now, with a share row.
+{%- endcomment -%}
+{%- liquid
+  assign mf = page.metafields.custom
+  assign name_token = '{' | append: 'name' | append: '}'
+  assign loc = mf.loc.value
+  assign suburb = loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+  assign style_name = mf.style.value | strip
+-%}
+{% render 'section-look', section: section %}
+{%- comment -%} Similar residences: from the Residence blocks, never this
+    page; same style first, then same suburb, then the rest in block order. {%- endcomment -%}
+{%- capture ranked_raw -%}
+  {%- for pass in (1..3) -%}
+    {%- for block in section.blocks -%}
+      {%- liquid
+        if block.type != 'residence'
+          continue
+        endif
+        assign rp = block.settings.page
+        if rp == blank and block.settings.link contains '/pages/'
+          assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
+          assign rp = pages[rp_handle]
+        endif
+        assign r_name = block.settings.name | default: rp.title
+        if r_name == page.title or r_name == blank
+          continue
+        endif
+        assign r_style = rp.metafields.custom.style.value | strip
+        assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
+        assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+        assign hit = false
+        if pass == 1 and r_style != blank and r_style == style_name
+          assign hit = true
+        elsif pass == 2 and r_suburb != blank and r_suburb == suburb
+          assign hit = true
+        elsif pass == 3
+          assign hit = true
+        endif
+        if hit
+          echo block.id | append: '¦'
+        endif
+      -%}
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- assign ranked = ranked_raw | strip | split: '¦' | uniq -%}
+{%- assign cd_more_n = section.settings.similar_count | default: 3 -%}
+{%- capture more_cards -%}
+  {%- assign shown = 0 -%}
+  {%- for bid in ranked -%}
+    {%- if shown >= cd_more_n -%}{%- break -%}{%- endif -%}
+    {%- for block in section.blocks -%}
+      {%- if block.id != bid -%}{%- continue -%}{%- endif -%}
+      {%- liquid
+        assign rp = block.settings.page
+        if rp == blank and block.settings.link contains '/pages/'
+          assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
+          assign rp = pages[rp_handle]
+        endif
+        assign r_name = block.settings.name | default: rp.title
+        assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
+        assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+        assign r_style = rp.metafields.custom.style.value
+        assign r_year = rp.metafields.custom.year.value
+        assign r_link = block.settings.link | default: rp.url
+        assign r_video = block.settings.video | default: rp.metafields.custom.video.value
+        if block.settings.video_file
+          assign pmp4 = block.settings.video_file.sources | where: 'format', 'mp4' | first
+          if pmp4
+            assign r_video = pmp4.url
+          endif
+        endif
+        assign r_img = rp.metafields.custom.image.value | default: block.settings.image_ext
+        if rp.metafields.custom.gallery.value.size > 0
+          if r_img == blank or r_img contains '/films/'
+            assign r_img = rp.metafields.custom.gallery.value | first
+          endif
+        endif
+        assign shown = shown | plus: 1
+      -%}
+      <a href="{{ r_link }}" class="pf-card reveal{% if shown == 2 %} d1{% elsif shown == 3 %} d2{% endif %}" data-port-card {{ block.shopify_attributes }}>
+        <div class="pf-media">
+          {%- if block.settings.image -%}
+            <img src="{{ block.settings.image | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ r_name | escape }}" loading="lazy" decoding="async" width="900" height="675">
+          {%- elsif r_img != blank -%}
+            <img src="{% render 'ext-variant', src: r_img, w: 900, h: 675 %}" alt="{{ r_name | escape }}" loading="lazy" decoding="async" width="900" height="675">
+          {%- endif -%}
+          {%- if r_video != blank -%}
+            <video src="{{ r_video }}" muted loop playsinline preload="none" data-port-video></video>
+            <span class="port-film-tag">{{ section.settings.film_tag | default: "Film" }}</span>
+          {%- endif -%}
+        </div>
+        <div class="pf-info">
+          <div class="pf-name">{{ r_name }} <span aria-hidden="true">&rarr;</span></div>
+          <div class="pf-meta">{{ r_suburb }}{% if r_style != blank %} <i>&middot;</i> {{ r_style }}{% endif %}{% if r_year != blank %} <i>&middot;</i> {{ r_year }}{% endif %}</div>
+        </div>
+      </a>
+      {%- break -%}
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- assign more_stripped = more_cards | strip -%}
+{%- comment -%} The closing band is obsidian and so is the footer, so it sits
+    ABOVE More from the Collection: the light row separates the two dark
+    surfaces (Naomi, 11 Sep 2026). Turn the order back with "Closing band
+    last" in the section's settings. {%- endcomment -%}
+{%- unless section.settings.close_last -%}
+{%- if section.settings.show_close -%}
+<section class="cd-close cd-close-{{ section.settings.close_style | default: 'obsidian' }}">
+  <div class="inner-sm">
+    {%- if section.settings.cta_label != blank -%}<div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">{{ section.settings.cta_label }}</div>{%- endif -%}
+    <h2 class="cd-close-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, page.title }}</h2>
+    {%- if section.settings.cta_text != blank -%}<p class="cd-close-p reveal d2">{{ section.settings.cta_text | replace: name_token, page.title }}</p>{%- endif -%}
+    <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="{{ section.settings.cta1_link | default: '/collections/for-sale' }}" class="btn-p">{{ section.settings.cta1_label }}</a>
+      {%- if section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link | default: '/pages/collection' }}" class="btn-g btn-g-light">{{ section.settings.cta2_label }}</a>{%- endif -%}
+    </div>
+    {%- assign share_url = shop.url | append: page.url -%}
+    {%- assign share_title = page.title | append: ' - ' | append: suburb | append: ' | Sabdia Constructions' -%}
+    {%- assign eu = share_url | url_encode -%}
+    {%- assign et = share_title | url_encode -%}
+    {%- if section.settings.show_share -%}
+    <div class="share-row cd-share reveal d4" aria-label="Share this page">
+      <span class="share-l">{{ section.settings.share_label | default: "Share" }}</span>
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{ eu }}" target="_blank" rel="noopener" class="share-a">Facebook</a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ eu }}" target="_blank" rel="noopener" class="share-a">LinkedIn</a>
+      <a href="mailto:?subject={{ et }}&body={{ et }}%0A{{ eu }}" class="share-a">Email</a>
+      <button type="button" class="share-a share-copy" data-share-url="{{ share_url }}">{{ section.settings.copy_link_label | default: "Copy link" }}</button>
+    </div>
+    {%- endif -%}
+  </div>
+</section>
+{%- endif -%}
+
+{%- endunless -%}
+
+{%- if more_stripped != blank and section.settings.show_similar -%}
+  <section class="cd-similar" style="--pf-cols:{{ section.settings.similar_columns | default: '3' }}">
+    <div class="inner">
+      <div class="cd-similar-hdr">
+        <div>
+          {%- if section.settings.more_label != blank -%}<div class="slabel reveal">{{ section.settings.more_label }}</div>{%- endif -%}
+          <h2 class="cd-similar-h reveal d1">{{ section.settings.more_heading_html }}</h2>
+        </div>
+        {%- if section.settings.more_button != blank -%}<a href="{{ section.settings.more_link | default: '/pages/collection' }}" class="btn-g reveal d2">{{ section.settings.more_button | default: "The full Collection" }} &rarr;</a>{%- endif -%}
+      </div>
+      <div class="pf-grid pf-grid-3">{{ more_cards }}</div>
+    </div>
+  </section>
+  <script>
+    (function () {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.querySelectorAll('.cd-similar [data-port-card]').forEach(function (card) {
+        if (card.dataset.portInit) return;
+        card.dataset.portInit = '1';
+        var video = card.querySelector('[data-port-video]');
+        if (!video) return;
+        card.addEventListener('mouseenter', function () { video.play().then(function () { video.classList.add('playing'); }).catch(function () {}); });
+        card.addEventListener('mouseleave', function () { video.pause(); video.classList.remove('playing'); });
+      });
+    })();
+  </script>
+{%- endif -%}
+
+{%- if section.settings.close_last -%}
+{%- if section.settings.show_close -%}
+<section class="cd-close cd-close-{{ section.settings.close_style | default: 'obsidian' }}">
+  <div class="inner-sm">
+    {%- if section.settings.cta_label != blank -%}<div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">{{ section.settings.cta_label }}</div>{%- endif -%}
+    <h2 class="cd-close-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, page.title }}</h2>
+    {%- if section.settings.cta_text != blank -%}<p class="cd-close-p reveal d2">{{ section.settings.cta_text | replace: name_token, page.title }}</p>{%- endif -%}
+    <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a href="{{ section.settings.cta1_link | default: '/collections/for-sale' }}" class="btn-p">{{ section.settings.cta1_label }}</a>
+      {%- if section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link | default: '/pages/collection' }}" class="btn-g btn-g-light">{{ section.settings.cta2_label }}</a>{%- endif -%}
+    </div>
+    {%- assign share_url = shop.url | append: page.url -%}
+    {%- assign share_title = page.title | append: ' - ' | append: suburb | append: ' | Sabdia Constructions' -%}
+    {%- assign eu = share_url | url_encode -%}
+    {%- assign et = share_title | url_encode -%}
+    {%- if section.settings.show_share -%}
+    <div class="share-row cd-share reveal d4" aria-label="Share this page">
+      <span class="share-l">{{ section.settings.share_label | default: "Share" }}</span>
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{ eu }}" target="_blank" rel="noopener" class="share-a">Facebook</a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ eu }}" target="_blank" rel="noopener" class="share-a">LinkedIn</a>
+      <a href="mailto:?subject={{ et }}&body={{ et }}%0A{{ eu }}" class="share-a">Email</a>
+      <button type="button" class="share-a share-copy" data-share-url="{{ share_url }}">{{ section.settings.copy_link_label | default: "Copy link" }}</button>
+    </div>
+    {%- endif -%}
+  </div>
+</section>
+{%- endif -%}
+
+{%- endif -%}
+
+<style>
+  .cd-similar{padding:calc(clamp(64px,9vw,120px) * var(--sp-scale) * var(--sp-top,1)) var(--page-pad) calc(clamp(64px,9vw,120px) * var(--sp-scale) * var(--sp-bot,1));background:var(--bg2);border-top:1px solid var(--border)}
+  @media(min-width:901px){.cd-similar .pf-grid-3{grid-template-columns:repeat(var(--pf-cols,3),1fr)}}
+  .cd-similar-hdr{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:40px}
+  .cd-similar-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:300;color:var(--ink);letter-spacing:-.02em}
+  .cd-similar-h em{font-style:italic;color:var(--ink)}
+  .cd-close{padding:calc(clamp(72px,9vw,132px) * var(--sp-scale) * var(--sp-top,1)) var(--page-pad) calc(clamp(72px,9vw,132px) * var(--sp-scale) * var(--sp-bot,1));background:var(--dark);text-align:center}
+  .cd-close-h{font-family:var(--font-d);font-size:calc(clamp(34px,5vw,64px)*var(--s-h,1));font-weight:300;color:var(--white);letter-spacing:-.02em;margin-bottom:22px}
+  .cd-close-h em{font-style:italic;color:var(--gold2)}
+  .cd-close-p{font-size:calc(13px*var(--s-t,1));font-weight:300;color:rgba(var(--white-rgb),.5);max-width:440px;margin:0 auto 38px;line-height:1.85}
+  .cd-close-stone{background:var(--bg2)}.cd-close-stone .cd-close-h,.cd-close-stone .cd-close-h em{color:var(--ink)}.cd-close-stone .cd-close-p{color:var(--ink3)}
+  .cd-close-stone .slabel-dark{color:var(--ink)}.cd-close-stone .slabel-dark::before{background:var(--gold)}
+  .cd-close-stone .btn-g-light{border-color:var(--border);color:var(--ink2)}.cd-close-stone .btn-g-light:hover{border-color:var(--ink);color:var(--ink)}
+  .cd-close-stone .cd-share{border-top-color:var(--border)}.cd-close-stone .share-l{color:var(--ink3)}.cd-close-stone .share-a{color:var(--ink2);border-bottom-color:rgba(var(--gold-rgb),.35)}.cd-close-stone .share-a:hover{color:var(--ink);border-color:var(--gold)}
+  .cd-share{justify-content:center;margin-top:52px;padding-top:32px;border-top:1px solid rgba(var(--white-rgb),.08)}
+  .cd-share .share-l{color:rgba(var(--white-rgb),.45)}
+  .cd-share .share-a{color:rgba(var(--white-rgb),.7);border-bottom-color:rgba(var(--gold2-rgb),.35)}
+  .cd-share .share-a:hover{color:var(--white);border-color:var(--gold2)}
+  .share-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .share-l{font-size:10px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}
+  .share-a{background:none;border:none;cursor:pointer;padding:4px 0;font-family:var(--font-u);font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(var(--gold-rgb),.35);transition:color .25s,border-color .25s;text-decoration:none}
+</style>
+<script>
+  (function () {
+    document.querySelectorAll('.cd-share .share-copy').forEach(function (b) {
+      if (b.dataset.init) return; b.dataset.init = '1';
+      b.addEventListener('click', function () {
+        var u = b.getAttribute('data-share-url'), t = b.textContent;
+        if (navigator.clipboard) navigator.clipboard.writeText(u).then(function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = t; }, 1600); });
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Similar residences",
+  "settings": [
+    { "type": "paragraph", "content": "The last two bands of a completed residence's page, after The Series. Similar residences are chosen from the Residence blocks below: same style first, then the same suburb, then the rest - never the residence being viewed. The closing band has no enquiry form; it points people to what is for sale now. Write {name} wherever the residence's name should appear." },
+    { "type": "header", "content": "Similar residences" },
+    { "type": "text", "id": "more_label", "label": "Label", "default": "More from the Collection" },
+    { "type": "html", "id": "more_heading_html", "label": "Heading (HTML)", "default": "Similar <em>residences</em>." },
+    { "type": "text", "id": "more_button", "label": "Button", "default": "The full Collection" },
+    { "type": "url", "id": "more_link", "label": "Button link" },
+    { "type": "text", "id": "film_tag", "label": "Film tag on cards", "default": "Film" },
+    { "type": "header", "content": "Closing band" },
+    { "type": "text", "id": "cta_label", "label": "Label", "default": "Now Selling" },
+    { "type": "html", "id": "cta_heading_html", "label": "Heading (HTML - {name})", "default": "See what is <em>for sale</em> now." },
+    { "type": "textarea", "id": "cta_text", "label": "Text", "default": "Every Sabdia residence is designed and built in-house, to the standard you see in {name}." },
+    { "type": "text", "id": "cta1_label", "label": "Primary button", "default": "View Current Properties" },
+    { "type": "url", "id": "cta1_link", "label": "Primary link" },
+    { "type": "text", "id": "cta2_label", "label": "Secondary button", "default": "Back to the Collection" },
+    { "type": "url", "id": "cta2_link", "label": "Secondary link" },
+    { "type": "text", "id": "share_label", "label": "Share row label", "default": "Share" },
+    { "type": "text", "id": "copy_link_label", "label": "Copy link button", "default": "Copy link" },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_similar", "label": "Show similar residences", "default": true},
+    {"type": "range", "id": "similar_count", "label": "Residences shown", "min": 1, "max": 6, "step": 1, "default": 3},
+    {"type": "select", "id": "similar_columns", "label": "Cards across", "options": [{"value": "2", "label": "Two"}, {"value": "3", "label": "Three (as designed)"}, {"value": "4", "label": "Four"}], "default": "3"},
+    {"type": "checkbox", "id": "close_last", "label": "Closing band last, under More from the Collection", "default": false, "info": "Off since 11 Sep 2026 (Naomi): the band is dark and so is the footer, so it reads better above the lighter row."},
+    {"type": "checkbox", "id": "show_close", "label": "Show the closing band", "default": true},
+    {"type": "select", "id": "close_style", "label": "Closing band", "options": [{"value": "obsidian", "label": "Obsidian (as designed)"}, {"value": "stone", "label": "Stone"}], "default": "obsidian"},
+    {"type": "checkbox", "id": "show_share", "label": "Share row", "default": true},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ],
+  "blocks": [
+    {
+      "type": "residence",
+      "name": "Portfolio residence",
+      "settings": [
+        { "type": "page", "id": "page", "label": "Residence page", "info": "Pick the completed residence's page (Content › Pages, template \"collection-item\"). Name, location, style, year, photo and film then come from that page - the fields below only override." },
+        { "type": "text", "id": "name", "label": "Name" },
+        { "type": "text", "id": "loc", "label": "Location line" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_ext", "label": "Current photo (URL)", "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field." },
+        { "type": "video", "id": "video_file", "label": "Hover film (upload, optional)" },
+        { "type": "text", "id": "video", "label": "Current hover film (URL)", "info": "The film playing now is loaded from this address (or the page's Film metafield). Upload a film above and it takes over." },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "templates": ["page"],
+  "presets": [{ "name": "Similar residences" }]
+}
+{% endschema %}

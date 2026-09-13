@@ -1,0 +1,210 @@
+{%- comment -%}
+  Port of Nav.astro - cursor dots, nav progress, the black SABDIA
+  navigation veil, the once-per-session homepage loader, mobile menu and
+  the fixed primary nav. Menu links come from a Shopify navigation menu;
+  until one is chosen the original Sabdia items render as the fallback.
+{%- endcomment -%}
+{%- liquid
+  assign logo_src = 'logo.png' | asset_url
+  if settings.logo
+    assign logo_src = settings.logo | image_url: width: 400
+  endif
+
+  assign tkey = template.name
+  if template.suffix != blank
+    assign tkey = template.name | append: '.' | append: template.suffix
+  endif
+  # Manual override only. The nav tone is decided automatically in
+  # layout/theme.liquid (body.top-dark / body.top-light from the page's
+  # opening section); this list forces the dark-on-light nav on a template
+  # regardless, for the rare page the detection cannot read.
+  assign on_light = false
+  if section.settings.light_templates != blank
+    assign light_list = section.settings.light_templates | split: ','
+    for t in light_list
+      assign tt = t | strip
+      if tt == tkey
+        assign on_light = true
+      endif
+    endfor
+  endif
+
+  assign menu = linklists[section.settings.menu]
+-%}
+{%- liquid
+  assign nav_h = section.settings.bar_height | default: 80
+  assign nav_link = section.settings.link_size | default: 12.5
+  assign nav_gap = section.settings.link_gap | default: 40
+  assign nav_track = section.settings.link_tracking | default: 22
+  assign mob_link = section.settings.mobile_link_size | default: 52
+-%}
+<style>
+  :root{--nav-pad:{{ section.settings.nav_pad | default: 28 }}px;--nav-pad-m:{{ section.settings.nav_pad | default: 28 | times: 0.64 | round }}px;--nav-h:{{ nav_h }}px;--nav-link:{{ nav_link }}px;--nav-gap:{{ nav_gap }}px;--nav-track:{{ nav_track }};--mob-link:{{ mob_link }}px}
+  @media(min-width:769px){#mainNav.sc{height:{{ nav_h | times: 0.85 | round }}px}}
+  {%- if section.settings.menu_case == 'as-written' -%}
+  .nav-center a{text-transform:none;letter-spacing:.04em;font-size:calc(var(--nav-link) + 2px)}
+  {%- endif -%}
+  /* Tablet and small laptop: the five links plus the button overran the bar. */
+  @media(min-width:769px) and (max-width:1120px){
+    .nav-center{gap:clamp(14px,2.2vw,var(--nav-gap))}
+    .nav-center a{font-size:calc(var(--nav-link) - 1px);letter-spacing:.14em}
+    .nav-cta{padding:9px 16px}
+  }
+
+  /* Automatic tone (layout/theme.liquid stamps body.top-light when the page
+     opens on cream or stone, body.top-dark when it opens on a photo, film
+     or dark band). Until the bar scrolls solid (.sc) a light opening gets
+     the dark logo, ink links, gold-ruled button and ink menu lines - the
+     same treatment style.css gives nav.on-light (the manual override) and
+     #mainNav.sc; those keep their own rules. */
+  body.top-light #mainNav:not(.sc) .logo-light{display:none}
+  body.top-light #mainNav:not(.sc) .logo-dark{display:block}
+  body.top-light #mainNav:not(.sc) .nav-center a{color:var(--ink3)}
+  body.top-light #mainNav:not(.sc) .nav-center a:hover{color:var(--ink)}
+  body.top-light #mainNav:not(.sc) .nav-cta{border-color:var(--gold);color:var(--ink)}
+  body.top-light #mainNav:not(.sc) .nav-cta:hover{background:var(--dark);color:var(--white);border-color:var(--ink)}
+  body.top-light #mainNav:not(.sc) .mob-btn span{background:var(--ink)}
+  /* Mobile menu open: the overlay is obsidian, so the wordmark and the
+     close lines go white for the unscrolled bar whichever tone the page
+     opened with (the scrolled cream bar keeps its dark logo). */
+  body:has(.mob-nav.open) #mainNav:not(.sc) .logo-light{display:block}
+  body:has(.mob-nav.open) #mainNav:not(.sc) .logo-dark{display:none}
+  body:has(.mob-nav.open) #mainNav:not(.sc) .mob-btn span{background:var(--white)}
+  {%- if section.settings.cta_style == 'solid' -%}
+  .nav-cta,#mainNav.sc .nav-cta,nav.on-light .nav-cta,body.top-light #mainNav:not(.sc) .nav-cta{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+  .nav-cta:hover,#mainNav.sc .nav-cta:hover,nav.on-light .nav-cta:hover,body.top-light #mainNav:not(.sc) .nav-cta:hover{background:var(--gold2);border-color:var(--gold2);color:var(--ink)}
+  {%- elsif section.settings.cta_style == 'text' -%}
+  .nav-cta,#mainNav.sc .nav-cta,nav.on-light .nav-cta,body.top-light #mainNav:not(.sc) .nav-cta{border-color:transparent;padding-left:0;padding-right:0;background:none}
+  {%- endif -%}
+  {%- if section.settings.scrolled_bar == 'obsidian' -%}
+  #mainNav.sc{background:rgba(var(--dark-rgb),.94);border-color:rgba(var(--gold3-rgb),.16)}
+  #mainNav.sc .logo-light{display:block}#mainNav.sc .logo-dark{display:none}
+  #mainNav.sc .nav-center a{color:rgba(var(--white-rgb),.75)}#mainNav.sc .nav-center a:hover{color:var(--white)}
+  #mainNav.sc .nav-cta{border-color:rgba(var(--white-rgb),.45);color:rgba(var(--white-rgb),.85)}
+  #mainNav.sc .mob-btn span{background:var(--white)}
+  {%- endif -%}
+  {%- if section.settings.show_progress == false -%}
+  .nav-progress{display:none}
+  {%- endif -%}
+</style>
+<div id="cur" aria-hidden="true"></div>
+<div id="cur-r" aria-hidden="true"></div>
+
+<div class="nav-load" id="navLoad" aria-hidden="true"></div>
+
+{%- comment -%} The opening loader and navigation veil are full-screen
+    wordmark overlays. The theme editor re-injects this section without
+    re-running the script that dismisses them, which left a giant stuck
+    logo over the preview - so they simply never render in design mode. {%- endcomment -%}
+{%- unless request.design_mode -%}
+<div id="navVeil" aria-hidden="true">
+  <img src="{{ logo_src }}" alt="" loading="eager">
+  <div class="nv-rule"></div>
+</div>
+
+{%- if template.name == 'index' -%}
+  <div id="loader" aria-hidden="true" data-hold="{{ section.settings.loader_hold | default: 3 | times: 1000 | round }}">
+    <div class="ld-logo">
+      <img src="{{ logo_src }}" alt="" loading="eager">
+    </div>
+    <div class="ld-rule"></div>
+    <div class="ld-meta">{{ section.settings.loader_meta }}</div>
+  </div>
+{%- endif -%}
+{%- endunless -%}
+
+<div class="mob-nav" id="mobNav" aria-hidden="true">
+  <nav class="mob-nav-links" aria-label="Mobile">
+    {%- if menu.links.size > 0 -%}
+      {%- for link in menu.links -%}
+        {%- if link.links.size > 0 -%}
+          <span class="mob-nav-group">{{ link.title }}</span>
+          {%- for child in link.links -%}
+            <a href="{{ child.url }}" class="mob-nav-child">{{ child.title }}</a>
+          {%- endfor -%}
+        {%- else -%}
+          <a href="{{ link.url }}">{{ link.title }}</a>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- else -%}
+      <a href="/collections/for-sale">For Sale</a>
+      <a href="/pages/collection">Collection</a>
+      <a href="/pages/services">Process</a>
+      <a href="/pages/about">About</a>
+      {%- if section.settings.show_agent_link -%}<a href="/pages/agent-access">Agent Access</a>{%- endif -%}
+    {%- endif -%}
+    <a href="{{ section.settings.cta_link }}">{{ section.settings.mobile_contact_label }}</a>
+  </nav>
+  <div class="mob-nav-rule"></div>
+  <div class="mob-nav-sub">
+    <a href="{{ settings.instagram_url }}" target="_blank" rel="noopener">Instagram</a>
+    <a href="{{ settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a>
+    <a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+</div>
+
+<nav id="mainNav" {% if on_light %}class="on-light"{% endif %} aria-label="Primary">
+  <a href="/" class="nav-logo" aria-label="{{ settings.site_name }} - Home">
+    <img class="logo-light" src="{{ logo_src }}" alt="{{ settings.site_name }} - Design Develop Construct" style="filter:invert(1) brightness(10)">
+    <img class="logo-dark" src="{{ logo_src }}" alt="{{ settings.site_name }} - Design Develop Construct">
+  </a>
+  <ul class="nav-center">
+    {%- if menu.links.size > 0 -%}
+      {%- for link in menu.links -%}
+        {%- if link.links.size > 0 -%}
+          <li class="has-sub">
+            <a href="{{ link.url }}" aria-haspopup="true" aria-expanded="false">{{ link.title }}<span class="nav-caret" aria-hidden="true"></span></a>
+            <ul class="nav-sub" aria-label="{{ link.title | escape }}">
+              {%- for child in link.links -%}
+                <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </li>
+        {%- else -%}
+          <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- else -%}
+      <li><a href="/collections/for-sale">For Sale</a></li>
+      <li><a href="/pages/collection">Collection</a></li>
+      <li><a href="/pages/services">Process</a></li>
+      <li><a href="/pages/about">About</a></li>
+      {%- if section.settings.show_agent_link -%}<li><a href="/pages/agent-access">Agent Access</a></li>{%- endif -%}
+    {%- endif -%}
+  </ul>
+  <div class="nav-right">
+    {%- if section.settings.show_cta -%}<a href="{{ section.settings.cta_link }}" class="nav-cta">{{ section.settings.cta_label }}</a>{%- endif -%}
+    <button class="mob-btn" id="mobBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobNav"><span></span><span></span></button>
+  </div>
+  <div class="nav-progress" id="navProgress" aria-hidden="true"></div>
+</nav>
+
+{% schema %}
+{
+  "name": "Navigation",
+  "settings": [
+    { "type": "checkbox", "id": "show_agent_link", "label": "Show Agent Access in the built-in menu", "default": false, "info": "Parked for launch (10 Sep 2026). Only applies when no menu is chosen in Content › Menus; with a menu, add or remove the link there." },
+    { "type": "range", "id": "nav_pad", "label": "Space from the edges", "min": 12, "max": 200, "step": 4, "unit": "px", "default": 28, "info": "How far the wordmark and the Enquire button sit from the corners. 28px since 11 Sep 2026 (Naomi: in the corners); raise it to line them up with the page margins." },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Enquire" },
+    { "type": "text", "id": "cta_link", "label": "Button link", "default": "/pages/contact" },
+    { "type": "text", "id": "mobile_contact_label", "label": "Mobile menu - final link label", "default": "Contact" },
+    { "type": "text", "id": "loader_meta", "label": "Homepage loader caption", "default": "Sabdia · Est. 2013" },
+    { "type": "range", "id": "loader_hold", "label": "Homepage loader stays for", "min": 0.5, "max": 5, "step": 0.5, "unit": "s", "default": 3, "info": "How long the SABDIA opening screen holds on the first visit of a session (Naomi, 11 Sep 2026: 2.5 to 3 seconds). It shows once per visit, on the home page only." },
+    { "type": "text", "id": "light_templates", "label": "Force dark-on-light nav on these templates (optional)", "info": "Normally leave blank: the nav reads each page's opening section by itself and turns dark-on-light over cream or stone, white over a photo, film or dark band. Comma-separated template names (for example: blog, page.contact) force the dark-on-light nav there regardless." },
+    {"type": "header", "content": "Bar"},
+    {"type": "range", "id": "bar_height", "label": "Bar height", "min": 60, "max": 110, "step": 2, "default": 80, "unit": "px", "info": "The scrolled bar is 15% shorter. Every page hero clears this height by itself."},
+    {"type": "select", "id": "scrolled_bar", "label": "Bar once scrolled", "options": [{"value": "cream", "label": "Cream (as designed)"}, {"value": "obsidian", "label": "Obsidian"}], "default": "cream"},
+    {"type": "checkbox", "id": "show_progress", "label": "Thin gold reading-progress line under the bar", "default": true},
+    {"type": "header", "content": "Links"},
+    {"type": "range", "id": "link_size", "label": "Link size", "min": 9, "max": 16, "step": 0.5, "default": 12.5, "unit": "px"},
+    {"type": "range", "id": "link_gap", "label": "Gap between links", "min": 20, "max": 64, "step": 2, "default": 40, "unit": "px"},
+    {"type": "range", "id": "link_tracking", "label": "Letter spacing", "min": 0, "max": 40, "step": 2, "default": 22, "info": "Hundredths of an em."},
+    {"type": "select", "id": "menu_case", "label": "Links set in", "options": [{"value": "caps", "label": "Tracked capitals (as designed)"}, {"value": "as-written", "label": "As written in the menu"}], "default": "caps"},
+    {"type": "range", "id": "mobile_link_size", "label": "Mobile menu link size", "min": 24, "max": 60, "step": 2, "default": 52, "unit": "px", "info": "52 = as designed (32 to 52px, growing with the phone)."},
+    {"type": "header", "content": "Button"},
+    {"type": "checkbox", "id": "show_cta", "label": "Show the Enquire button", "default": true},
+    {"type": "select", "id": "cta_style", "label": "Button style", "options": [{"value": "outlined", "label": "Outlined (as designed)"}, {"value": "solid", "label": "Solid gold"}, {"value": "text", "label": "Plain text"}], "default": "outlined"}
+  ]
+}
+{% endschema %}

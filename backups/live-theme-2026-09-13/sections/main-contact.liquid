@@ -1,0 +1,514 @@
+{%- comment -%}
+  Contact - the two-column body: direct-contact details (from theme
+  settings), the dark agent-enquiries block and map card on the left;
+  the enquiry form on the right. The form posts to the existing Vercel
+  API so leads keep landing in the Sabdia inbox. The enquiry-type select
+  lists each for-sale residence, then the editable interest options.
+{%- endcomment -%}
+{%- assign fs = section.settings.listings_collection | default: collections['for-sale'] -%}
+{% render 'section-look', section: section %}
+<section class="sp cp cp-{{ section.settings.layout | default: 'beside' }} cp-agent-{{ section.settings.agent_style | default: 'obsidian' }}{% if section.settings.form_style == 'card' %} cp-card{% endif %}" style="--cm-map-ar:{{ section.settings.map_shape | default: '16/9' }}">
+  <div class="inner contact-page-grid">
+    <div>
+      {%- if section.settings.show_direct -%}
+      {%- if section.settings.direct_label != blank -%}<div class="slabel reveal">{{ section.settings.direct_label }}</div>{%- endif -%}
+      <ul class="cdet reveal d1" style="margin-top:12px">
+        {%- if section.settings.d_show_location -%}<li class="cd"><span class="cd-l">{{ section.settings.d_location | default: "Location" }}</span><span class="cd-v">{{ settings.location }}</span></li>{%- endif -%}
+        {%- if settings.contact_phone != blank and section.settings.d_show_phone -%}
+          <li class="cd"><span class="cd-l">{{ section.settings.d_phone | default: "Phone" }}</span><a href="tel:{{ settings.contact_phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}" class="cd-v">{{ settings.contact_phone }}</a></li>
+        {%- endif -%}
+        {%- if settings.contact_email != blank and section.settings.d_show_email -%}
+          <li class="cd"><span class="cd-l">{{ section.settings.d_email | default: "Email" }}</span><a href="mailto:{{ settings.contact_email }}" class="cd-v">{{ settings.contact_email }}</a></li>
+        {%- endif -%}
+        {%- if section.settings.d_show_instagram -%}<li class="cd"><span class="cd-l">{{ section.settings.d_instagram | default: "Instagram" }}</span><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.instagram_label }}</a></li>{%- endif -%}
+        {%- if section.settings.d_show_facebook -%}<li class="cd"><span class="cd-l">{{ section.settings.d_facebook | default: "Facebook" }}</span><a href="{{ settings.facebook_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.facebook_label | default: settings.site_name }}</a></li>{%- endif -%}
+        {%- if section.settings.d_show_linkedin -%}<li class="cd"><span class="cd-l">{{ section.settings.d_linkedin | default: "LinkedIn" }}</span><a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener" class="cd-v">{{ section.settings.linkedin_label | default: settings.site_name }}</a></li>{%- endif -%}
+        {%- if section.settings.d_show_website -%}<li class="cd"><span class="cd-l">{{ section.settings.d_website | default: "Website" }}</span><a href="{{ settings.domain_url }}" target="_blank" rel="noopener" class="cd-v">{{ settings.domain_display }}</a></li>{%- endif -%}
+      </ul>
+      {%- endif -%}
+
+      {%- if section.settings.show_agent and section.settings.agent_body_html != blank -%}
+      <div class="contact-info-block reveal d2">
+        <div class="contact-info-h">{{ section.settings.agent_heading }}</div>
+        <p class="contact-info-p">{{ section.settings.agent_body_html }}</p>
+      </div>
+      {%- endif -%}
+
+      {%- if section.settings.show_map -%}
+      <div class="contact-map-placeholder reveal d3" style="margin-top:32px">
+        {%- if section.settings.map_image -%}
+          <img src="{{ section.settings.map_image | image_url: width: 900, height: 500, crop: 'center' }}" alt="{{ section.settings.map_label | escape }}" loading="lazy" width="900" height="500">
+        {%- elsif section.settings.map_image_ext != blank -%}
+          <img src="{% render 'ext-variant', src: section.settings.map_image_ext, w: 900, h: 500 %}" alt="{{ section.settings.map_label | escape }}" loading="lazy" width="900" height="500">
+        {%- endif -%}
+        {%- if section.settings.map_label != blank -%}<div class="contact-map-placeholder-label">{{ section.settings.map_label }}</div>{%- endif -%}
+      </div>
+      {%- endif -%}
+    </div>
+
+    <div>
+      {%- if section.settings.show_form_label and section.settings.form_label != blank -%}<div class="slabel reveal">{{ section.settings.form_label }}</div>{%- endif -%}
+      {%- comment -%} One switch, Theme settings › Features › Guided Match, hides this pointer everywhere. {%- endcomment -%}
+      {%- if section.settings.guided_line_html != blank and section.settings.show_guided and settings.guided_match_enabled != false -%}
+        <p class="reveal d1" style="font-family:'EB Garamond',Georgia,serif;font-size:14px;font-style:italic;color:var(--ink3);margin:10px 0 6px">{{ section.settings.guided_line_html }}</p>
+      {%- endif -%}
+      {%- if settings.form_backend == 'vercel' -%}
+      <form class="cform reveal d1" id="cform" style="margin-top:12px" name="contact" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
+        <input type="hidden" name="form-name" value="contact">
+        <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <div class="frow">
+          <div class="fg"><label class="fl" for="cf-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="{{ section.settings.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
+        </div>
+        <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email Address*" }}</label><input type="email" id="cf-email" name="email" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone Number" }}</label><input type="tel" id="cf-phone" name="phone" class="fi" required placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
+        <div class="fg">
+          <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "How can we help?*" }}</label>
+          <select class="fsel" id="cf-interest" name="enquiry-type" required>
+            <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
+            <option>For Sale - Current Residences</option>
+            {%- for product in fs.products -%}
+              <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
+            {%- endfor -%}
+            {%- for block in section.blocks -%}
+              <option {{ block.shopify_attributes }}>{{ block.settings.text }}</option>
+            {%- endfor -%}
+          </select>
+          {%- for block in section.blocks -%}
+            {%- if block.settings.thanks != blank -%}<span hidden data-thanks-for="{{ block.settings.text | escape }}">{{ block.settings.thanks }}</span>{%- endif -%}
+          {%- endfor -%}
+        </div>
+        {% render 'prequal-fields', mode: 'vercel', s: section.settings %}
+        <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
+          <p class="form-note" style="margin:0">{% render 'privacy-link', note: section.settings.form_note %}</p>
+        </div>
+        <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+      </form>
+      {%- else -%}
+      {%- comment -%} Shopify-native: emails the store's sender address and
+          files the enquirer under Customers. {%- endcomment -%}
+      {% form 'contact', id: 'cform', class: 'cform reveal d1', style: 'margin-top:12px' %}
+        <span hidden data-thanks>{{ section.settings.success_text }}</span>
+        {%- if form.posted_successfully? -%}
+          {% render 'form-thanks', text: section.settings.success_text %}
+        {%- else -%}
+        {%- if form.errors -%}
+          <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
+        {%- endif -%}
+        <div class="frow">
+          <div class="fg"><label class="fl" for="cf-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="contact[First name]" class="fi" placeholder="{{ section.settings.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
+          <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="contact[Last name]" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
+        </div>
+        <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email Address*" }}</label><input type="email" id="cf-email" name="contact[email]" class="fi" placeholder="your@email.com" autocomplete="email" required></div>
+        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone Number" }}</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" required placeholder="+61 4xx xxx xxx" autocomplete="tel"></div>
+        <div class="fg">
+          <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "How can we help?*" }}</label>
+          <select class="fsel" id="cf-interest" name="contact[Enquiry type]" required>
+            <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
+            <option>For Sale - Current Residences</option>
+            {%- for product in fs.products -%}
+              <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
+            {%- endfor -%}
+            {%- for block in section.blocks -%}
+              <option {{ block.shopify_attributes }}>{{ block.settings.text }}</option>
+            {%- endfor -%}
+          </select>
+          {%- for block in section.blocks -%}
+            {%- if block.settings.thanks != blank -%}<span hidden data-thanks-for="{{ block.settings.text | escape }}">{{ block.settings.thanks }}</span>{%- endif -%}
+          {%- endfor -%}
+        </div>
+        {% render 'prequal-fields', mode: 'shopify', s: section.settings %}
+        <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          {% render 'form-optin', label: section.settings.optin_label %}
+          <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
+          <p class="form-note" style="margin:0">{% render 'privacy-link', note: section.settings.form_note %}</p>
+        </div>
+      {%- endif -%}
+        {% endform %}
+        {%- assign cm_uid = 'cm-' | append: section.id -%}{% render 'customer-mirror', uid: cm_uid, residence: '' %}
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-page-grid{display:grid;grid-template-columns:5fr 7fr;gap:96px;align-items:start}
+  .cp-flip .contact-page-grid>div:first-child{order:2}
+  .cp-formonly .contact-page-grid{grid-template-columns:1fr;max-width:760px}
+  .cp-formonly .contact-page-grid>div:first-child{display:none}
+  .cp-above .contact-page-grid{grid-template-columns:1fr;gap:48px}
+  .cp-card .cform{padding:clamp(22px,3vw,36px);background:var(--white);border:1px solid var(--border);border-top:2px solid var(--gold)}
+  .contact-info-block{padding:44px;background:var(--dark);color:var(--white);margin-top:44px}
+  .contact-info-h{font-family:var(--font-d);font-size:calc(18px*var(--s-h,1));font-weight:300;color:var(--white);margin-bottom:20px}
+  .contact-info-p{font-size:calc(14px*var(--s-t,1));font-weight:400;color:rgba(var(--white-rgb),.78);line-height:1.8}
+  .cp-agent-stone .contact-info-block{background:var(--bg3);color:var(--ink)}.cp-agent-stone .contact-info-h{color:var(--ink)}.cp-agent-stone .contact-info-p{color:var(--ink3)}
+  .cp-agent-plain .contact-info-block{background:transparent;padding:28px 0 0;border-top:1px solid var(--border);color:var(--ink)}.cp-agent-plain .contact-info-h{color:var(--ink)}.cp-agent-plain .contact-info-p{color:var(--ink3)}
+  .contact-map-placeholder{width:100%;aspect-ratio:var(--cm-map-ar,16/9);background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-top:44px;position:relative;overflow:hidden}
+  .contact-map-placeholder img{width:100%;height:100%;object-fit:cover;filter:saturate(.75) brightness(.98)}
+  .contact-map-placeholder-label{position:absolute;bottom:20px;left:20px;padding:8px 16px;background:rgba(var(--dark-rgb),.8);backdrop-filter:blur(8px);font-size:10px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:rgba(var(--white-rgb),.7)}
+  @media(max-width:1000px){.contact-page-grid{grid-template-columns:1fr;gap:52px}}
+</style>
+
+<script>
+  /* Links such as /pages/contact?interest=Request%20a%20Viewing (the For Sale
+     page's "Request a Viewing" button) arrive with the form already chosen.
+     ?interest=<Interest label>  chooses that enquiry type (added to the list if it is not there).
+     ?property=<residence title> chooses that residence from the same list when no interest is
+                                 given; otherwise the message opens with "Regarding <property>: ".
+     ?message=<text>             starts the message (only when the message is still empty).
+     Values are URL-decoded by the browser (Agent%20Access, SOLACE, Hello%20there). */
+  (function () {
+    var root = document.getElementById('shopify-section-{{ section.id }}') || document;
+    var sel = root.querySelector('#cf-interest');
+    var msg = root.querySelector('#cf-message');
+    if (!sel || sel.dataset.prefill) return;
+    sel.dataset.prefill = '1';
+    var q = new URLSearchParams(location.search);
+    var interest = (q.get('interest') || '').trim();
+    var property = (q.get('property') || '').trim();
+    var message = (q.get('message') || '').trim();
+    if (!interest && !property && !message) return;
+    var option = function (test) {
+      for (var i = 0; i < sel.options.length; i++) {
+        var v = sel.options[i].value;
+        if (v && test(v.toLowerCase())) return sel.options[i];
+      }
+      return null;
+    };
+    var pick = null, residencePicked = false;
+    if (interest) {
+      var wantI = interest.toLowerCase();
+      pick = option(function (v) { return v === wantI; });
+      if (!pick) { pick = new Option(interest, interest); sel.add(pick, 1); }
+    } else if (property) {
+      /* The residences for sale sit in this list as "SOLACE - Camp Hill". */
+      var wantP = property.toLowerCase();
+      pick = option(function (v) { return v === wantP || v.indexOf(wantP + ' - ') === 0; });
+      residencePicked = !!pick;
+    }
+    if (pick) {
+      sel.value = pick.value;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    if (msg && !msg.value.trim()) {
+      var lead = property && !residencePicked ? 'Regarding ' + property + ': ' : '';
+      if (lead || message) msg.value = lead + message;
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Contact body",
+  "settings": [
+    {
+      "type": "text",
+      "id": "direct_label",
+      "label": "Direct-contact label",
+      "default": "Direct Contact"
+    },
+    {
+      "type": "text",
+      "id": "facebook_label",
+      "label": "Facebook display name"
+    },
+    {
+      "type": "text",
+      "id": "linkedin_label",
+      "label": "LinkedIn display name"
+    },
+    {
+      "type": "text",
+      "id": "agent_heading",
+      "label": "Agent block heading",
+      "default": "Agent Enquiries"
+    },
+    {
+      "type": "html",
+      "id": "agent_body_html",
+      "label": "Agent block text (HTML links allowed)"
+    },
+    {
+      "type": "image_picker",
+      "id": "map_image",
+      "label": "Map card image"
+    },
+    {
+      "type": "text",
+      "id": "map_image_ext",
+      "label": "Current map image (URL)",
+      "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field."
+    },
+    {
+      "type": "text",
+      "id": "map_label",
+      "label": "Map card label",
+      "default": "Brisbane, Queensland"
+    },
+    {
+      "type": "text",
+      "id": "form_label",
+      "label": "Form label",
+      "default": "Send a Message"
+    },
+    {
+      "type": "html",
+      "id": "guided_line_html",
+      "label": "Guided-match pointer line (HTML)"
+    },
+    {
+      "type": "collection",
+      "id": "listings_collection",
+      "label": "Residences in the enquiry list",
+      "info": "Defaults to for-sale"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit button",
+      "default": "Submit Enquiry"
+    },
+    {
+      "type": "text",
+      "id": "form_note",
+      "label": "Note beside the button",
+      "default": "We respond within one business day."
+    },
+    {
+      "type": "textarea",
+      "id": "success_text",
+      "label": "Success message (Shopify mode)",
+      "default": "Thank you. We have received your enquiry and will be in touch within one business day."
+    },
+    { "type": "header", "content": "Pre-qualification (budget, timeline, flexibility)" },
+    { "type": "paragraph", "content": "Three optional dropdowns on the form. Answers arrive in the enquiry email, and budget and timeline become tags on the person in Customers (budget-5m-6m, timeline-ready-now) for segments. If they skip them, the thank-you asks for budget and timeline in your words." },
+    { "type": "text", "id": "prequal_budget_label", "label": "Budget label", "default": "Budget range" },
+    { "type": "textarea", "id": "prequal_budget", "label": "Budget options (one per line)", "default": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say" },
+    { "type": "text", "id": "prequal_timeline_label", "label": "Timeline label", "default": "Timeline to purchase" },
+    { "type": "textarea", "id": "prequal_timeline", "label": "Timeline options (one per line)", "default": "Ready now\n1 - 3 months\n3 - 6 months\n6 - 12 months\nJust researching" },
+    { "type": "text", "id": "prequal_flex_label", "label": "Flexibility label", "default": "Location and flexibility" },
+    { "type": "textarea", "id": "prequal_flex", "label": "Flexibility options (one per line)", "default": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases" },
+    { "type": "textarea", "id": "prequal_ask", "label": "Thank-you when budget or timeline is left blank", "default": "Thank you for your interest. So we can send the most relevant information, could you share your approximate budget range and your timeline for purchase? We will follow up with further details on the residence." },
+    { "type": "text", "id": "prequal_loc_label", "label": "Locations label (For Sale enquiry)", "default": "Preferred locations" },
+    { "type": "text", "id": "prequal_loc_label_other", "label": "Locations label (residence enquiry)", "default": "Other locations you would also consider (optional)" },
+    { "type": "textarea", "id": "prequal_locations", "label": "Location options (one per line)", "info": "Leave empty to list the suburbs of the residences for sale plus Other inner Brisbane." },
+    { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
+    {
+      "type": "header",
+      "content": "Form wording"
+    },
+    {
+      "type": "text",
+      "id": "f_first",
+      "label": "First name label",
+      "default": "First Name*"
+    },
+    {
+      "type": "text",
+      "id": "f_first_ph",
+      "label": "First name placeholder",
+      "default": "First name"
+    },
+    {
+      "type": "text",
+      "id": "f_last",
+      "label": "Last name label",
+      "default": "Last Name*"
+    },
+    {
+      "type": "text",
+      "id": "f_last_ph",
+      "label": "Last name placeholder",
+      "default": "Last name"
+    },
+    {
+      "type": "text",
+      "id": "f_email",
+      "label": "Email label",
+      "default": "Email*"
+    },
+    {
+      "type": "text",
+      "id": "f_email_ph",
+      "label": "Email placeholder",
+      "default": "Email address"
+    },
+    {
+      "type": "text",
+      "id": "f_phone",
+      "label": "Phone label",
+      "default": "Phone"
+    },
+    {
+      "type": "text",
+      "id": "f_phone_ph",
+      "label": "Phone placeholder",
+      "default": "Phone number"
+    },
+    {
+      "type": "text",
+      "id": "f_interest",
+      "label": "Interest label",
+      "default": "Interest"
+    },
+    {
+      "type": "text",
+      "id": "f_message",
+      "label": "Message label",
+      "default": "Message*"
+    },
+    {
+      "type": "text",
+      "id": "f_message_ph",
+      "label": "Message placeholder",
+      "default": "Tell us about your interest..."
+    },
+    {
+      "type": "text",
+      "id": "f_submit",
+      "label": "Button",
+      "default": "Submit"
+    },
+    {
+      "type": "header",
+      "content": "Details column"
+    },
+    {
+      "type": "text",
+      "id": "d_location",
+      "label": "Location row label",
+      "default": "Location"
+    },
+    {
+      "type": "text",
+      "id": "d_instagram",
+      "label": "Instagram row label",
+      "default": "Instagram"
+    },
+    {
+      "type": "text",
+      "id": "d_facebook",
+      "label": "Facebook row label",
+      "default": "Facebook"
+    },
+    {
+      "type": "text",
+      "id": "d_facebook_v",
+      "label": "Facebook display text",
+      "default": "Sabdia Constructions"
+    },
+    {
+      "type": "text",
+      "id": "d_linkedin",
+      "label": "LinkedIn row label",
+      "default": "LinkedIn"
+    },
+    {
+      "type": "text",
+      "id": "d_linkedin_v",
+      "label": "LinkedIn display text",
+      "default": "Sabdia Constructions"
+    },
+    {
+      "type": "header",
+      "content": "Wording"
+    },
+    {
+      "type": "text",
+      "id": "f_interest_ph",
+      "label": "Interest placeholder",
+      "default": "Select an enquiry type…"
+    },
+    {
+      "type": "text",
+      "id": "d_phone",
+      "label": "Phone row label",
+      "default": "Phone"
+    },
+    {
+      "type": "text",
+      "id": "d_email",
+      "label": "Email row label",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "d_website",
+      "label": "Website row label",
+      "default": "Website"
+    },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_direct", "label": "Show the direct-contact list", "default": true},
+    {"type": "checkbox", "id": "d_show_location", "label": "Location row", "default": true},
+    {"type": "checkbox", "id": "d_show_phone", "label": "Phone row", "default": true},
+    {"type": "checkbox", "id": "d_show_email", "label": "Email row", "default": true},
+    {"type": "checkbox", "id": "d_show_instagram", "label": "Instagram row", "default": true},
+    {"type": "checkbox", "id": "d_show_facebook", "label": "Facebook row", "default": true},
+    {"type": "checkbox", "id": "d_show_linkedin", "label": "LinkedIn row", "default": true},
+    {"type": "checkbox", "id": "d_show_website", "label": "Website row", "default": true},
+    {"type": "checkbox", "id": "show_agent", "label": "Show the agent block", "default": true},
+    {"type": "checkbox", "id": "show_map", "label": "Show the map card", "default": true},
+    {"type": "checkbox", "id": "show_form_label", "label": "Show the form label", "default": true},
+    {"type": "checkbox", "id": "show_guided", "label": "Show the guided-match line", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "layout", "label": "Details and form", "options": [{"value": "beside", "label": "Details beside the form (as designed)"}, {"value": "flip", "label": "Form first, details after"}, {"value": "above", "label": "Details above the form"}, {"value": "formonly", "label": "Form only"}], "default": "beside"},
+    {"type": "select", "id": "agent_style", "label": "Agent block style", "options": [{"value": "obsidian", "label": "Obsidian card (as designed)"}, {"value": "stone", "label": "Stone card"}, {"value": "plain", "label": "Plain, under a hairline"}], "default": "obsidian"},
+    {"type": "select", "id": "map_shape", "label": "Map card shape", "options": [{"value": "16/9", "label": "Wide 16:9 (as designed)"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "1/1", "label": "Square"}], "default": "16/9"},
+    {"type": "select", "id": "form_style", "label": "Form style", "options": [{"value": "plain", "label": "Fields on the page (as designed)"}, {"value": "card", "label": "In a white card"}], "default": "plain"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ],
+  "blocks": [
+    {
+      "type": "interest",
+      "name": "Enquiry option",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Option"
+        },
+        {
+          "type": "textarea",
+          "id": "thanks",
+          "label": "Thank-you for this option",
+          "info": "Shown instead of the usual thank-you when this option is chosen, e.g. for Custom home design: everything at Sabdia is designed and built in-house, so we do not take on custom commissions."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact body"
+    }
+  ]
+}
+{% endschema %}

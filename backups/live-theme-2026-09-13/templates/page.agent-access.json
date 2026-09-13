@@ -1,0 +1,117 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "agent-hero",
+      "settings": {
+        "label": "For Real Estate Professionals",
+        "title_html": "Agent<br><em style=\"color:var(--gold2)\">Access</em>.",
+        "text": "Available to select agents only. Join the Sabdia register to hear about the next release before it reaches the market. We also keep agents on file for the areas we build in next.",
+        "image_ext": "/images/agent-portrait.jpg",
+        "image_alt": "Agent Access"
+      }
+    },
+    "benefits": {
+      "type": "agent-benefits",
+      "settings": {
+        "label": "What Access Means",
+        "heading_html": "Pre-release access, for <em>select agents</em>."
+      },
+      "blocks": {
+        "benefit-1": {
+          "type": "benefit",
+          "settings": {
+            "icon": "layers",
+            "title": "Pre-Release Access",
+            "desc": "Hear about unreleased projects and developments before they reach the market."
+          }
+        },
+        "benefit-2": {
+          "type": "benefit",
+          "settings": {
+            "icon": "plan",
+            "title": "Floor Plans & Brochures",
+            "desc": "Plans and brochures for upcoming residences, on request, before launch."
+          }
+        },
+        "benefit-5": {
+          "type": "benefit",
+          "settings": {
+            "icon": "users",
+            "title": "Private Walkthroughs",
+            "desc": "Walk through homes before they launch, at agent-only previews."
+          }
+        },
+        "benefit-3": {
+          "type": "benefit",
+          "settings": {
+            "icon": "phone",
+            "title": "Priority Communication",
+            "desc": "One person at Sabdia to call, from first enquiry to settlement."
+          },
+          "disabled": true
+        },
+        "benefit-4": {
+          "type": "benefit",
+          "settings": {
+            "icon": "dollar",
+            "title": "Exclusive Commissions",
+            "desc": "Commission structures for agents on the list."
+          },
+          "disabled": true
+        },
+        "benefit-6": {
+          "type": "benefit",
+          "settings": {
+            "icon": "star",
+            "title": "Award-Winning Product",
+            "desc": "Award-winning homes your clients will already know by name."
+          },
+          "disabled": true
+        }
+      },
+      "block_order": [
+        "benefit-1",
+        "benefit-2",
+        "benefit-3",
+        "benefit-4",
+        "benefit-5",
+        "benefit-6"
+      ]
+    },
+    "listings": {
+      "type": "agent-listings",
+      "settings": {
+        "label": "Now Selling",
+        "heading_html": "Residences available <em>now</em>.",
+        "cta_label": "View All Residences",
+        "cta_link": "/collections/for-sale"
+      }
+    },
+    "apply": {
+      "type": "agent-apply",
+      "settings": {
+        "label": "Apply for Access",
+        "heading_html": "Join the <em>register</em>.",
+        "text": "Leave your details and the Sabdia team will be in touch within a business day.",
+        "note_label": "Please note",
+        "note_text": "Licensed agents only. We may ask to see your licence. Your details are handled in line with our <a href=\"/pages/privacy\">Privacy Policy</a>.",
+        "submit_label": "Submit Application"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "benefits",
+    "listings",
+    "apply"
+  ]
+}

@@ -1,0 +1,90 @@
+{%- comment -%} Port of the homepage stats band - counters count up on reveal. {%- endcomment -%}
+{%- assign delays = ',d1,d2,d3,d4,d5' | split: ',' -%}
+{% render 'section-look', section: section %}
+{%- liquid
+  assign st_cols = section.settings.columns | default: 'auto'
+  if st_cols == 'auto'
+    assign st_cols = section.blocks.size | at_least: 1 | at_most: 6
+  endif
+-%}
+<div class="stats-band sp-sm s-surface{% if section.settings.size == 'compact' %} stats-compact{% endif %}{% if section.settings.dividers == false %} stats-nodiv{% endif %}{% if section.settings.rules == false %} stats-norules{% endif %}{% if section.settings.align == 'left' %} stats-left{% endif %}" style="--stat-cols:{{ st_cols }};--stat-u:{{ section.settings.suffix_size | default: '.7em' }};--stat-l:{{ section.settings.label_size | default: 10.5 }}px">
+  {%- if section.settings.label != blank or section.settings.heading_html != blank -%}
+  <div class="inner stats-head">
+    {%- if section.settings.label != blank -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+    {%- if section.settings.heading_html != blank -%}<h2 class="about-h reveal d1" style="margin-bottom:0">{{ section.settings.heading_html }}</h2>{%- endif -%}
+  </div>
+  {%- endif -%}
+  <div class="stats-grid inner">
+    {%- for block in section.blocks -%}
+      <div class="stat reveal {{ delays[forloop.index0] }}" {{ block.shopify_attributes }}>
+        <span class="stat-n">
+          {%- if block.settings.count -%}
+            <span class="counter" data-target="{{ block.settings.target }}">{{ block.settings.target }}</span>
+          {%- else -%}
+            {{ block.settings.target }}
+          {%- endif -%}<span class="stat-u">{{ block.settings.suffix }}</span>
+        </span>
+        <div class="stat-l">{{ block.settings.label }}</div>
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Stats band",
+  "settings": [
+    { "type": "select", "id": "size", "label": "Size", "options": [ { "value": "standard", "label": "Standard" }, { "value": "compact", "label": "Compact (Tamsin: a touch smaller)" } ], "default": "compact" },
+    {"type": "header", "content": "Words (optional)"},
+    {"type": "text", "id": "label", "label": "Small label", "info": "Leave empty for numbers only, as designed."},
+    {"type": "html", "id": "heading_html", "label": "Heading", "info": "Wrap a word in <em> for the italic accent."},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "columns", "label": "Numbers across", "options": [{"value": "auto", "label": "One per number (as designed)"}, {"value": "2", "label": "Two"}, {"value": "3", "label": "Three"}, {"value": "4", "label": "Four"}], "default": "auto", "info": "Phones show two across."},
+    {"type": "select", "id": "align", "label": "Numbers sit", "options": [{"value": "centre", "label": "Centre"}, {"value": "left", "label": "Left"}], "default": "centre"},
+    {"type": "checkbox", "id": "dividers", "label": "Vertical rules between the numbers", "default": true},
+    {"type": "checkbox", "id": "rules", "label": "Rules above and below the band", "default": true},
+    {"type": "select", "id": "suffix_size", "label": "Suffix (+, %, ★) size", "options": [{"value": ".7em", "label": "Smaller than the number (as designed)"}, {"value": ".5em", "label": "Much smaller"}, {"value": "1em", "label": "Same as the number"}], "default": ".7em"},
+    {"type": "range", "id": "label_size", "label": "Label size", "min": 8, "max": 14, "step": 0.5, "default": 10.5, "unit": "px"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        { "type": "text", "id": "target", "label": "Number", "default": "100" },
+        { "type": "text", "id": "suffix", "label": "Suffix", "default": "+" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Residences Delivered" },
+        { "type": "checkbox", "id": "count", "label": "Count up on reveal", "default": false }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Stats band" }]
+}
+{% endschema %}

@@ -1,0 +1,87 @@
+{%- comment -%}
+  Port of PropertyCard.astro, fed by a product. Specs come from the
+  product's metafields (custom.beds / baths / cars / land / land_over /
+  suburb); the image crops around the focal point set on it in Shopify.
+  The chip prints the residence's Status word (see residence-status).
+
+  The name is set in the residence's own brochure face when the product
+  carries one (metafields custom.name_font, a Google Fonts family, or
+  custom.name_font_file, a font file link; weight from name_font_weight,
+  capitals from name_font_caps). The card only writes the font-family
+  inline: the page that lists the cards loads the face once (the For Sale
+  page does; a page without the <link> simply falls back to the serif).
+
+  Data attributes on the card (beds, baths, status, feats, year) feed the
+  For Sale toolbar; feats are the normalised tokens from residence-feats.
+
+  Params: product, class, style, img_w, img_h, show_cars (optional), show_land (default true)
+{%- endcomment -%}
+{%- liquid
+  assign mf = product.metafields.custom
+  assign img_w2 = img_w | times: 2
+  assign img_h2 = img_h | times: 2
+  capture pstatus
+    render 'residence-status', product: product
+  endcapture
+  assign chip = pstatus
+  if pstatus == 'For Sale' and settings.label_for_sale != blank
+    assign chip = settings.label_for_sale
+  endif
+  assign dot_class = ''
+  if pstatus contains 'Sold'
+    assign dot_class = 'sold'
+  elsif pstatus != 'For Sale'
+    assign dot_class = 'still'
+  endif
+  capture feats
+    render 'residence-feats', product: product
+  endcapture
+
+  # Brochure face (see the comment above). Nothing is written unless the
+  # residence has a face of its own.
+  assign nf = mf.name_font.value | strip
+  assign nf_file = mf.name_font_file.value | strip
+  assign nf_style = ''
+  if nf != blank or nf_file != blank
+    assign nf_family = nf
+    if nf_family == blank
+      assign nf_family = 'ResidenceFace-' | append: product.handle
+    endif
+    assign nf_weight = mf.name_font_weight.value | default: 400
+    assign nf_style = "font-family:'" | append: nf_family | append: "',var(--font-d);font-weight:" | append: nf_weight
+    if mf.name_font_caps.value
+      assign nf_style = nf_style | append: ';text-transform:uppercase'
+    endif
+  endif
+-%}
+<a href="{{ product.url }}" class="pc {{ class }}" {% if style != blank %}style="{{ style }}"{% endif %} data-beds="{{ mf.beds.value }}" data-baths="{{ mf.baths.value }}" data-status="{{ pstatus | escape }}" data-feats="{{ feats }}" data-year="{{ mf.year.value }}">
+  {%- if product.featured_image -%}
+    <img
+      src="{{ product.featured_image | image_url: width: img_w, height: img_h, crop: 'center' }}"
+      srcset="{{ product.featured_image | image_url: width: img_w, height: img_h, crop: 'center' }} 1x, {{ product.featured_image | image_url: width: img_w2, height: img_h2, crop: 'center' }} 2x"
+      alt="{{ product.title | escape }}" loading="lazy" decoding="async" width="{{ img_w }}" height="{{ img_h }}">
+  {%- endif -%}
+  <div class="pc-ov"></div>
+  <div class="pc-status-chip"><span class="pc-dot {{ dot_class }}"></span>{{ chip }}</div>
+  <div class="pc-info">
+    <div class="pc-name"{% if nf_style != blank %} style="{{ nf_style | escape }}"{% endif %}>{{ product.title }}</div>
+    {%- if mf.suburb.value != blank -%}
+      <div class="pc-loc">{% render 'spec-icon', icon: 'pin' %}{{ mf.suburb.value }}, QLD</div>
+    {%- endif -%}
+    <ul class="pc-specs">
+      {%- if mf.beds.value != blank -%}
+        <li class="pc-spec">{% render 'spec-icon', icon: 'beds' %}<span>{{ mf.beds.value }} Bed</span></li>
+      {%- endif -%}
+      {%- if mf.baths.value != blank -%}
+        <li class="pc-spec">{% render 'spec-icon', icon: 'baths' %}<span>{{ mf.baths.value }} Bath</span></li>
+      {%- endif -%}
+      {%- if show_cars and mf.cars.value != blank -%}
+        <li class="pc-spec">{% render 'spec-icon', icon: 'cars' %}<span>{{ mf.cars.value }} Garage</span></li>
+      {%- endif -%}
+      {%- if mf.land.value != blank and show_land != false -%}
+        <li class="pc-spec">{% render 'spec-icon', icon: 'land' %}<span>{{ mf.land.value }}m&sup2;{% if mf.land_over.value %}+{% endif %}</span></li>
+      {%- endif -%}
+    </ul>
+  </div>
+  <div class="pc-arrow">&rarr;</div>
+</a>

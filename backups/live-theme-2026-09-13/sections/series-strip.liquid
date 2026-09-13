@@ -1,0 +1,367 @@
+{%- liquid
+  # "SABDIA" in capitals inside captions (Tamsin, 10 Sep 2026) - a switch.
+  assign brand_from = 'Sabdia'
+  assign brand_to = 'SABDIA'
+  if section.settings.brand_caps == false
+    assign brand_to = 'Sabdia'
+  endif
+-%}
+{%- comment -%}
+  "The Series" - the horizontally scrolling strip of Instagram posts
+  documenting this residence, from first render to final reveal (port of
+  SeriesStrip.astro). Posts come from the product's custom.series_posts
+  JSON metafield: [{ "date", "thumb", "caption", "url"?, "video"?,
+  "slides"?, "type"?, "hidden"? }, …] - real captures of the published
+  posts. The Instagram sync (shopify-app/sync-instagram.mjs, run daily by
+  GitHub Actions) fills this automatically from @_sabdia: reels bring a
+  "video", carousels bring "slides", every post its Instagram "url".
+  Renders nothing when the residence has no posts.
+
+  Clicking a tile: the "Reels and carousels" setting decides whether they
+  play here on the site (with a "View on Instagram" link in the player) or
+  open the real post on Instagram.
+{%- endcomment -%}
+{%- liquid
+  # Works on product pages AND on collection-item pages: the posts and
+  # the residence name come from whichever the template provides.
+  assign posts = product.metafields.custom.series_posts.value
+  assign series_name = product.title
+  if posts == blank and page
+    assign posts = page.metafields.custom.series_posts.value
+    assign series_name = page.title
+  endif
+  assign visible = 0
+  for item in posts
+    unless item.hidden == true
+      assign visible = visible | plus: 1
+    endunless
+  endfor
+-%}
+{%- if visible > 0 -%}
+{%- liquid
+  assign look_designed = 'light'
+  if section.settings.dark
+    assign look_designed = 'dark'
+  endif
+-%}
+{% render 'section-look', section: section, designed: look_designed %}
+{%- liquid
+  assign ss_limit = section.settings.limit | default: 0
+  assign ss_posts = posts
+  if section.settings.order == 'reverse'
+    assign ss_posts = posts | reverse
+  endif
+  assign ss_shown = 0
+-%}
+<section class="series-band{% if section.settings.dark %} on-dark{% endif %}{% if section.settings.show_arrows == false %} series-noarrows{% endif %}{% if section.settings.show_kind == false %} series-nokind{% endif %}" data-series style="--series-w:{% if section.settings.card_width > 0 %}{{ section.settings.card_width }}px{% else %}clamp(200px,22vw,270px){% endif %};--series-ar:{{ section.settings.card_shape | default: '9/14' }};--series-gap:{{ section.settings.gap | default: 14 }}px;--series-lines:{{ section.settings.caption_lines | default: 3 }}">
+  <div class="series-hdr">
+    <div>
+      {%- if section.settings.show_label -%}<div class="slabel {% if section.settings.dark %}slabel-dark {% endif %}reveal">{{ section.settings.label }}</div>{%- endif -%}
+      {%- if section.settings.show_heading -%}<h2 class="series-h reveal d1">{{ section.settings.heading_prefix }} <em>{{ series_name }}</em>.</h2>{%- endif -%}
+      {%- if section.settings.show_handle -%}
+      <a href="{{ section.settings.instagram_url | default: settings.instagram_url }}" target="_blank" rel="noopener" class="series-handle reveal d2">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+        {{ section.settings.handle_line }} {{ section.settings.handle | default: settings.instagram_label }}
+      </a>
+      {%- endif -%}
+    </div>
+    {%- if section.settings.show_sub and section.settings.sub != blank -%}<p class="series-sub reveal d2">{{ section.settings.sub }}</p>{%- endif -%}
+  </div>
+  <div class="series-track-wrap">
+    <button class="series-nav series-prev" type="button" aria-label="Scroll back" data-series-prev>&larr;</button>
+    <button class="series-nav series-next" type="button" aria-label="Scroll forward" data-series-next>&rarr;</button>
+    <div class="series-track" data-series-track>
+      {%- for item in ss_posts -%}
+        {%- if item.hidden == true -%}{%- continue -%}{%- endif -%}
+        {%- if ss_limit > 0 and ss_shown >= ss_limit -%}{%- break -%}{%- endif -%}
+        {%- assign ss_shown = ss_shown | plus: 1 -%}
+        {%- liquid
+          # Where does a click go? On-site player when the setting says so
+          # and we hold the media; otherwise the Instagram post itself - or
+          # the @_sabdia profile while a post has no link of its own yet.
+          assign ig_link = item.url
+          if ig_link == blank
+            assign ig_link = section.settings.instagram_url | default: settings.instagram_url
+          endif
+          assign has_media = false
+          if item.video != blank or item.slides.size > 0
+            assign has_media = true
+          endif
+          assign on_site = false
+          if section.settings.reel_mode == 'site' and has_media
+            assign on_site = true
+          endif
+          assign kind = item.type | default: ''
+          if kind == blank
+            if item.video != blank
+              assign kind = 'REEL'
+            elsif item.slides.size > 0
+              assign kind = 'CAROUSEL'
+            endif
+          endif
+          assign alt = item.caption | replace: brand_from, brand_to | default: series_name | escape
+        -%}
+        {%- capture card_meta -%}
+          <div class="series-card-ov"></div>
+          {%- if kind == 'REEL' -%}
+            <div class="series-play" aria-hidden="true" title="Reel">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            </div>
+          {%- elsif kind == 'CAROUSEL' -%}
+            <div class="series-play" aria-hidden="true" title="Carousel">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="14" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v11"/></svg>
+            </div>
+          {%- else -%}
+            <div class="series-play" aria-hidden="true" title="Instagram post">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+            </div>
+          {%- endif -%}
+          <div class="series-card-meta">
+            {%- if section.settings.show_dates -%}<div class="series-card-date">{{ item.date | date: "%b %Y" }}</div>{%- endif -%}
+            {%- if item.caption != blank and section.settings.show_captions -%}<div class="series-card-cap">{{ item.caption | replace: brand_from, brand_to }}</div>{%- endif -%}
+          </div>
+        {%- endcapture -%}
+        {%- if on_site -%}
+          <div
+            class="series-card"
+            data-series-card
+            {% if item.video != blank %}data-video="{{ item.video }}"{% endif %}
+            {% if item.slides.size > 0 %}data-slides="{{ item.slides | join: '|' | escape }}"{% endif %}
+            {% if item.url != blank %}data-url="{{ item.url }}"{% endif %}
+            data-caption="{{ item.caption | replace: brand_from, brand_to | escape }}"
+            role="button" tabindex="0"
+            aria-label="{% if item.video != blank %}Play reel{% else %}View carousel{% endif %}: {{ alt }}"
+          >
+            <img src="{{ item.thumb }}" alt="{{ alt }}" loading="lazy" width="540" height="840">
+            {{ card_meta }}
+          </div>
+        {%- else -%}
+          {%- comment -%} The click-through: the post opens on Instagram
+              itself, where the view and any engagement count. {%- endcomment -%}
+          <a class="series-card" href="{{ ig_link }}" target="_blank" rel="noopener"
+             aria-label="{{ alt }} - view on Instagram">
+            <img src="{{ item.thumb }}" alt="{{ alt }}" loading="lazy" width="540" height="840">
+            {{ card_meta }}
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<div class="lbv" id="lbv" role="dialog" aria-modal="true" aria-label="Post viewer">
+  <video id="lbvVideo" controls playsinline preload="none" hidden></video>
+  <div class="lbv-slides" id="lbvSlides" hidden>
+    <img id="lbvSlide" alt="" width="1080" height="1350">
+    <button class="lbv-arrow lbv-arrow-prev" id="lbvPrev" type="button" aria-label="Previous slide">&larr;</button>
+    <button class="lbv-arrow lbv-arrow-next" id="lbvNext" type="button" aria-label="Next slide">&rarr;</button>
+    <div class="lbv-dots" id="lbvDots" aria-hidden="true"></div>
+  </div>
+  <button class="lb-close" id="lbvClose" aria-label="Close">&#10005;</button>
+  <div class="lbv-cap" id="lbvCap">
+    <span id="lbvCapText"></span>
+    <a class="lbv-ig" id="lbvIg" target="_blank" rel="noopener" hidden>{{ section.settings.view_on_instagram | default: 'View on Instagram' }} &nearr;</a>
+  </div>
+</div>
+
+<style>
+  .lbv [hidden]{display:none!important}
+  .lbv-slides{position:relative;display:flex;align-items:center;justify-content:center;max-width:calc(100vw - 100px);max-height:calc(100vh - 120px)}
+  .lbv-slides img{display:block;width:auto;height:auto;max-width:calc(100vw - 100px);max-height:calc(100vh - 190px);object-fit:contain;background:#000;box-shadow:0 30px 90px rgba(0,0,0,.7);border:1px solid rgba(var(--gold2-rgb),.25)}
+  .lbv video{max-height:calc(100vh - 190px)}
+  #lbvCapText{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .lbv-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:1px solid rgba(var(--white-rgb),.25);background:rgba(10,9,8,.55);color:rgba(var(--white-rgb),.75);font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--font-u);transition:border-color .3s,color .3s}
+  .lbv-arrow:hover{border-color:var(--gold2);color:var(--gold2)}
+  .lbv-arrow-prev{left:-22px}.lbv-arrow-next{right:-22px}
+  .lbv-arrow[disabled]{opacity:.25;cursor:default}
+  .lbv-dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:6px}
+  .lbv-dots i{width:5px;height:5px;border-radius:50%;background:rgba(var(--white-rgb),.35)}
+  .lbv-dots i.on{background:var(--gold2)}
+  .lbv-ig{display:inline-block;margin-top:10px;color:var(--gold2);text-decoration:none;font-size:9px;letter-spacing:.22em;text-transform:uppercase;white-space:nowrap}
+  .lbv-ig:hover{text-decoration:underline}
+  @media (max-width:640px){
+    .lbv-slides,.lbv-slides img{max-width:calc(100vw - 24px)}
+    .lbv-arrow-prev{left:6px}.lbv-arrow-next{right:6px}
+  }
+</style>
+
+<script>
+  (function () {
+    document.addEventListener('keydown', function (e) {
+      var lbv = document.getElementById('lbv');
+      if (!lbv || !lbv.classList.contains('open')) return;
+      if (e.key === 'Escape') closeSeriesFilm(lbv);
+      if (e.key === 'ArrowLeft') lbv.dispatchEvent(new CustomEvent('lbv:step', { detail: -1 }));
+      if (e.key === 'ArrowRight') lbv.dispatchEvent(new CustomEvent('lbv:step', { detail: 1 }));
+    });
+
+    function closeSeriesFilm(lbv) {
+      var video = document.getElementById('lbvVideo');
+      lbv.classList.remove('open');
+      document.body.style.overflow = '';
+      if (video) {
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+      }
+    }
+
+    document.querySelectorAll('[data-series]').forEach(function (band) {
+      if (band.dataset.init) return;
+      band.dataset.init = '1';
+      var track = band.querySelector('[data-series-track]');
+      var prev = band.querySelector('[data-series-prev]');
+      var next = band.querySelector('[data-series-next]');
+
+      function step() { return Math.min(track.clientWidth * 0.7, 560); }
+      function update() {
+        prev.disabled = track.scrollLeft < 40;
+        next.disabled = track.scrollLeft > track.scrollWidth - track.clientWidth - 40;
+      }
+      prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+      next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+      track.addEventListener('scroll', update, { passive: true });
+      update();
+    });
+
+    var lbv = document.getElementById('lbv');
+    if (lbv && !lbv.dataset.init) {
+      lbv.dataset.init = '1';
+      var video = document.getElementById('lbvVideo');
+      var slides = document.getElementById('lbvSlides');
+      var slideImg = document.getElementById('lbvSlide');
+      var dots = document.getElementById('lbvDots');
+      var prevBtn = document.getElementById('lbvPrev');
+      var nextBtn = document.getElementById('lbvNext');
+      var capText = document.getElementById('lbvCapText');
+      var igLink = document.getElementById('lbvIg');
+      var list = [];
+      var idx = 0;
+
+      function show(i) {
+        if (!list.length) return;
+        idx = Math.max(0, Math.min(list.length - 1, i));
+        slideImg.src = list[idx];
+        prevBtn.disabled = idx === 0;
+        nextBtn.disabled = idx === list.length - 1;
+        dots.innerHTML = '';
+        list.forEach(function (_, n) {
+          var d = document.createElement('i');
+          if (n === idx) d.className = 'on';
+          dots.appendChild(d);
+        });
+        // warm the neighbours
+        [idx + 1, idx - 1].forEach(function (n) { if (list[n]) { var im = new Image(); im.src = list[n]; } });
+      }
+
+      function open(card) {
+        var src = card.dataset.video;
+        list = card.dataset.slides ? card.dataset.slides.split('|') : [];
+        capText.textContent = card.dataset.caption || '';
+        if (card.dataset.url) { igLink.href = card.dataset.url; igLink.hidden = false; } else { igLink.hidden = true; }
+        video.hidden = !src;
+        slides.hidden = !!src || !list.length;
+        lbv.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        if (src) {
+          video.src = src;
+          video.play().catch(function () {});
+        } else if (list.length) {
+          show(0);
+        }
+      }
+      function close() { closeSeriesFilm(lbv); }
+
+      document.querySelectorAll('[data-series-card]').forEach(function (card) {
+        card.addEventListener('click', function () { open(card); });
+        card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(card); } });
+      });
+      prevBtn.addEventListener('click', function () { show(idx - 1); });
+      nextBtn.addEventListener('click', function () { show(idx + 1); });
+      lbv.addEventListener('lbv:step', function (e) { if (!slides.hidden) show(idx + e.detail); });
+      var tx = null;
+      slides.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+      slides.addEventListener('touchend', function (e) {
+        if (tx === null) return;
+        var dx = e.changedTouches[0].clientX - tx;
+        tx = null;
+        if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1));
+      }, { passive: true });
+      document.getElementById('lbvClose').addEventListener('click', close);
+      lbv.addEventListener('click', function (e) { if (e.target === lbv) close(); });
+    }
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "The Series",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Small label", "default": "The Series" },
+    { "type": "text", "id": "heading_prefix", "label": "Heading before the name", "default": "The story of", "info": "Renders as “The story of <name>.”" },
+    { "type": "text", "id": "handle_line", "label": "Handle line prefix", "default": "As documented on" },
+    { "type": "text", "id": "handle", "label": "Instagram handle", "info": "Defaults to the theme's Instagram label" },
+    { "type": "url", "id": "instagram_url", "label": "Instagram URL", "info": "Defaults to the theme's Instagram URL" },
+    { "type": "text", "id": "sub", "label": "Sub-line", "default": "The build, as it was posted." },
+    {
+      "type": "select",
+      "id": "reel_mode",
+      "label": "Reels and carousels",
+      "options": [
+        { "value": "instagram", "label": "Open the post on Instagram" },
+        { "value": "site", "label": "Play here on the site (with a link to the post)" }
+      ],
+      "default": "instagram",
+      "info": "Posts arrive automatically from @_sabdia via the Instagram sync - see docs/INSTAGRAM-SERIES.md. A post without its own link opens the @_sabdia profile."
+    },
+    { "type": "text", "id": "view_on_instagram", "label": "Player link text", "default": "View on Instagram" },
+    { "type": "checkbox", "id": "brand_caps", "label": "Write SABDIA in capitals inside captions", "default": true },
+    { "type": "checkbox", "id": "dark", "label": "Dark band", "default": false },
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
+    {"type": "checkbox", "id": "show_handle", "label": "Show the Instagram handle line", "default": true},
+    {"type": "checkbox", "id": "show_sub", "label": "Show the sub-line", "default": true},
+    {"type": "checkbox", "id": "show_dates", "label": "Date on each post", "default": true},
+    {"type": "checkbox", "id": "show_captions", "label": "Caption on each post", "default": true},
+    {"type": "checkbox", "id": "show_kind", "label": "Reel / carousel / post icon on each tile", "default": true},
+    {"type": "checkbox", "id": "show_arrows", "label": "Scroll arrows", "default": true},
+    {"type": "header", "content": "Layout"},
+    {"type": "range", "id": "card_width", "label": "Tile width", "min": 0, "max": 360, "step": 10, "default": 0, "unit": "px", "info": "0 = as designed (200 to 270px, growing with the window)."},
+    {"type": "select", "id": "card_shape", "label": "Tile shape", "options": [{"value": "9/14", "label": "Tall 9:14 (as designed)"}, {"value": "4/5", "label": "Portrait 4:5"}, {"value": "1/1", "label": "Square"}, {"value": "3/4", "label": "Portrait 3:4"}], "default": "9/14"},
+    {"type": "range", "id": "gap", "label": "Gap between tiles", "min": 4, "max": 40, "step": 2, "default": 14, "unit": "px"},
+    {"type": "range", "id": "caption_lines", "label": "Caption lines shown", "min": 1, "max": 5, "step": 1, "default": 3},
+    {"type": "range", "id": "limit", "label": "Most posts shown", "min": 0, "max": 40, "step": 1, "default": 0, "info": "0 = every post."},
+    {"type": "select", "id": "order", "label": "Order", "options": [{"value": "posted", "label": "As posted"}, {"value": "reverse", "label": "Reversed"}], "default": "posted"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ],
+  "presets": [{ "name": "The Series" }]
+}
+{% endschema %}

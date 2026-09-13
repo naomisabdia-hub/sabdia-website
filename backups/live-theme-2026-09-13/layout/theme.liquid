@@ -1,0 +1,237 @@
+{%- comment -%}
+  Sabdia theme shell - a faithful port of the Astro site's Base.astro.
+  Same stylesheet, same fonts, same body structure (skip link → nav →
+  main → footer → main.js), so every page renders identically to the
+  Vercel site. Header/footer live in section groups so they are editable
+  in the theme customizer.
+{%- endcomment -%}
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F7F3EB">
+{%- liquid
+  # Routes the site does not use still exist on every store; give them a
+  # neutral title instead of Shopify's "Your Shopping Cart".
+  assign title_text = page_title
+  case template.name
+    when 'password'
+      assign title_text = shop.name
+    when 'cart'
+      assign title_text = 'Not in use'
+    when 'search'
+      assign title_text = 'Search'
+    when 'list-collections'
+      assign title_text = 'Residences'
+  endcase
+-%}
+<title>{{ title_text }}{% unless title_text contains 'Sabdia' or title_text == blank %} | Sabdia Constructions{% endunless %}</title>
+{%- liquid
+  # Customizer-driven logo size (Brand → Logo size); the stylesheet falls
+  # back to the reviewed 38px/30px when the vars are absent.
+  assign lh = settings.logo_height | default: 38
+  assign lhm = lh | times: 0.79 | round
+-%}
+<style>:root{--logo-h:{{ lh }}px;--logo-h-m:{{ lhm }}px}</style>
+{%- liquid
+  # The homepage has no page-level SEO fields of its own, so its meta
+  # description is a theme setting (Search & sharing) - editable in the
+  # customizer like everything else.
+  assign meta_description = page_description
+  if template.name == 'index' and settings.seo_home_description != blank
+    assign meta_description = settings.seo_home_description
+  endif
+  # Never ship a page without a description: fall back to the store's
+  # own description (Settings › Store details) or the homepage one.
+  if meta_description == blank
+    assign meta_description = shop.description | default: settings.seo_home_description
+  endif
+-%}
+{%- if meta_description -%}<meta name="description" content="{{ meta_description | escape }}">{%- endif -%}
+<link rel="canonical" href="{{ canonical_url }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ 'favicon-32.png' | asset_url }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ 'favicon-16.png' | asset_url }}">
+<link rel="apple-touch-icon" href="{{ 'apple-touch-icon.png' | asset_url }}">
+<script>
+document.documentElement.classList.add('js');
+/* Runs before first paint so the loader never flashes on a repeat visit.
+   sessionStorage, not localStorage: the opening is worth seeing once per
+   visit, not once per lifetime. Wrapped because Safari private mode throws
+   on storage access - a failure here just means the loader plays. */
+try {
+  if (sessionStorage.getItem('sabdia:seen')) document.documentElement.classList.add('no-loader');
+  else sessionStorage.setItem('sabdia:seen', '1');
+} catch (e) {}
+</script>
+{% render 'meta-tags' %}
+{% render 'structured-data' %}
+<link rel="preconnect" href="https://fvczsjcrvwzqtcbforgo.supabase.co" crossorigin>
+{%- liquid
+  # Two typefaces only: Cormorant Garamond (self-hosted) for the large
+  # headings, and the body/interface font from Theme settings › Design
+  # (Open Sans by default) for everything else, served by Shopify.
+  assign body_font = settings.font_body
+  assign body_font_light = body_font | font_modify: 'weight', '300'
+  assign body_font_medium = body_font | font_modify: 'weight', '500'
+  assign body_font_bold = body_font | font_modify: 'weight', 'bold'
+  assign body_font_italic = body_font | font_modify: 'style', 'italic'
+-%}
+<link rel="preload" as="font" type="font/woff2" href="{{ 'cormorant-garamond-var.woff2' | asset_url }}" crossorigin>
+{%- if body_font -%}<link rel="preload" as="font" type="font/woff2" href="{{ body_font | font_url }}" crossorigin>{%- endif -%}
+{{ 'style.css' | asset_url | stylesheet_tag }}
+{%- if body_font -%}
+<style>
+  {{ body_font | font_face: font_display: 'swap' }}
+  {{ body_font_light | font_face: font_display: 'swap' }}
+  {{ body_font_medium | font_face: font_display: 'swap' }}
+  {{ body_font_bold | font_face: font_display: 'swap' }}
+  {{ body_font_italic | font_face: font_display: 'swap' }}
+  :root{--font-u:{{ body_font.family }},{{ body_font.fallback_families }}}
+</style>
+{%- endif -%}
+{%- comment -%}
+  Theme settings → Design. Must come AFTER the stylesheet: style.css sets
+  the same :root variables, and the later declaration wins.
+{%- endcomment -%}
+{%- if settings.design_override -%}
+<style>:root{--bg:{{ settings.c_bg }};--bg2:{{ settings.c_bg2 }};--dark:{{ settings.c_dark }};--ink:{{ settings.c_ink }};--gold:{{ settings.c_gold }};--gold2:{{ settings.c_gold2 }};--bg-rgb:{{ settings.c_bg.red }},{{ settings.c_bg.green }},{{ settings.c_bg.blue }};--dark-rgb:{{ settings.c_dark.red }},{{ settings.c_dark.green }},{{ settings.c_dark.blue }};--gold-rgb:{{ settings.c_gold.red }},{{ settings.c_gold.green }},{{ settings.c_gold.blue }};--gold2-rgb:{{ settings.c_gold2.red }},{{ settings.c_gold2.green }},{{ settings.c_gold2.blue }}}</style>
+{%- endif -%}
+{%- comment -%} Theme settings › Layout: side margins, content width, section spacing. {%- endcomment -%}
+{%- liquid
+  assign lay_pad = settings.page_pad | default: 200
+  assign lay_pad_vw = settings.page_pad_vw | default: 10
+  assign lay_pad_m = settings.page_pad_mobile | default: 22
+  assign lay_max = settings.page_max | default: 1400
+  assign lay_sp = settings.section_space | default: 100
+  assign lay_slabel = settings.slabel_size | default: 13
+-%}
+<style>:root{--page-pad:clamp({{ lay_pad_m }}px,{{ lay_pad_vw }}vw,{{ lay_pad }}px);--page-max:{{ lay_max }}px;--sp-scale:{{ lay_sp | divided_by: 100.0 }};--t-slabel:{{ lay_slabel }}px}</style>
+{%- if template.name == 'password' -%}
+{%- comment -%}
+  Shopify already keeps a locked storefront out of the index; saying it in
+  the page too means nothing of the pre-launch site is indexed even if the
+  address is crawled from a link someone shares.
+{%- endcomment -%}
+<meta name="robots" content="noindex,nofollow">
+<style>html,body{background:var(--dark)}body.pw-page{min-height:100svh;display:flex;flex-direction:column}body.pw-page main{flex:1;display:flex;flex-direction:column}body.pw-page .pw-band{flex:1}</style>
+{%- endif -%}
+{{ content_for_header }}
+</head>
+{%- comment -%}
+  Nav tone, decided automatically (Naomi, 11 Sep 2026: "depending if it is
+  an image or video across the different pages, the navigation must be
+  shown, so it should automatically adjust according to which page and
+  image"). The page is rendered into a string first, the opening of its
+  first section is read, and the body is stamped top-dark when the page
+  opens on a photo, film or dark band (white logo and links sit on it) or
+  top-light when it opens on cream or stone (dark logo and ink links from
+  the very top). main-nav.liquid carries the matching CSS; the scrolled
+  bar (.sc) keeps its own rules. A Look dial moved on that first section
+  (Customize › the section › Look) wins over how the section is designed,
+  so a cream band given a film behind it reads dark, and a dark band set
+  to stone reads light. Only the first 5000 characters of the first
+  section are inspected; the string is rendered once, below.
+{%- endcomment -%}
+{%- capture page_html -%}{{ content_for_layout }}{%- endcapture -%}
+{%- liquid
+  assign top_parts = page_html | split: 'id="shopify-section-'
+  if top_parts.size > 1
+    assign page_top = top_parts[1] | slice: 0, 5000
+  else
+    assign page_top = page_html | slice: 0, 5000
+  endif
+  assign obsidian_hex = '#1F1B14'
+  if settings.design_override
+    assign obsidian_hex = settings.c_dark
+  endif
+  assign obsidian_bg = 'background:' | append: obsidian_hex | append: ';'
+  assign dark_top = false
+  # 1. A Look dial on the opening section: snippets/section-look.liquid writes
+  #    --s-scrim for a photo/film backdrop (obsidian veil = dark tone, cream
+  #    veil = light), the inverted token set when the surface flips the
+  #    section's designed tone (--ink:#F7F3EB = now dark, --ink:#292319 = now
+  #    light), and background:<obsidian> for the Obsidian surface.
+  if page_top contains '--s-scrim:#1F1B14' or page_top contains '--ink:#F7F3EB;' or page_top contains obsidian_bg
+    assign dark_top = true
+  elsif page_top contains '--s-scrim:#F7F3EB' or page_top contains '--ink:#292319;'
+    assign dark_top = false
+  # 2. Otherwise the section as designed: the home hero, the inner-page and
+  #    photographic heroes (page-hero, incl. page-header with a banner and
+  #    the For Sale collection), residence pages (prop-hero), Collection
+  #    residence pages (cd-hero), the agent hero, the password page with
+  #    media, and the dark bands (film-band, about-values, agent-benefits).
+  elsif page_top contains 'class="page-hero' or page_top contains 'class="prop-hero' or page_top contains 'class="cd-hero' or page_top contains 'class="hero ' or page_top contains 'class="hero"' or page_top contains '<section class="ah ' or page_top contains '<section class="ah"' or page_top contains 'pw-band pw-has-media' or page_top contains 'class="film-band' or page_top contains '<section class="av ' or page_top contains '<section class="av"' or page_top contains '<section class="ab ' or page_top contains '<section class="ab"'
+    assign dark_top = true
+  endif
+-%}
+{%- comment -%}
+  The locked store (Online Store › Preferences › Restrict access) renders
+  templates/password.json through this layout, so the coming-soon page is
+  made by leaving the furniture out. The nav and the footer would list
+  every page and every residence before they are announced, and each of
+  those links bounces the visitor straight back to /password, which reads
+  as a broken site. One screen instead: the film, the wordmark, a line and
+  a discreet way in. Everything else in the shell is unchanged, so the
+  page keeps the site's fonts, colours and spacing.
+{%- endcomment -%}
+{%- assign locked = false -%}
+{%- if template.name == 'password' -%}{%- assign locked = true -%}{%- endif -%}
+<body class="{% if dark_top %}top-dark{% else %}top-light{% endif %}{% if locked %} pw-page{% endif %}">
+{%- unless locked %}
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+{% sections 'header-group' %}
+{% endunless %}
+<main id="main">
+{{ page_html }}
+</main>
+{%- unless locked %}
+
+{% sections 'footer-group' %}
+{% endunless -%}
+{%- comment -%}
+  Ask Sabdia (sections/concierge.liquid) is the front chat: scripted answers
+  edited in Customize › Sabdia replies, live residence facts from Products
+  (never a price), and the enquiry form inside the chat. Shopify Inbox stays
+  installed as the hand-over only: style.css hides its bubble while the
+  concierge is present and shows it when the visitor chooses "Chat with a
+  person" (.cc.handoff). Naomi, 11 Sep 2026.
+{%- endcomment -%}
+{%- unless locked %}{% section 'concierge' %}{% endunless -%}
+{%- if locked -%}
+{%- comment -%}
+  Nothing about the site itself goes onto the closed page. SabdiaForms
+  lists every residence by handle, title and suburb, which view-source
+  hands to anyone who looks, and the concierge replies describe the
+  company; main.js is 1300 lines of behaviour for furniture this page does
+  not have, and it guards every window.SabdiaForms read, so leaving both
+  out breaks nothing. What remains is the one thing the page still needs:
+  style.css hides .reveal under html.js, so something has to clear it.
+  Twice, because a film in the page can make load late.
+{%- endcomment -%}
+<script>
+(function () {
+  function show() {
+    var els = document.querySelectorAll('.reveal, .reveal-x, .reveal-r');
+    for (var i = 0; i < els.length; i++) els[i].classList.add('vis');
+  }
+  requestAnimationFrame(function () { requestAnimationFrame(show); });
+  addEventListener('load', show);
+})();
+</script>
+{%- else -%}
+{%- capture res_handles -%}{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{{ p.handle }},{%- endif -%}{%- endfor -%}{%- endcapture -%}
+{%- capture res_map -%}[{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{"handle":{{ p.handle | json }},"title":{{ p.title | json }},"suburb":{{ p.metafields.custom.suburb.value | default: '' | json }}},{%- endif -%}{%- endfor -%}]{%- endcapture -%}
+<script>window.SabdiaForms={residences:{{ res_handles | split: ',' | compact | json }},residenceMap:{{ res_map | replace: ',]', ']' }},mode:{{ settings.form_backend | json }},mirror:{% if settings.forms_endpoint != blank %}{{ settings.forms_endpoint | append: '/api/contact' | json }}{% else %}null{% endif %},thanks:{"heading":"Thank you","text":"Thank you for your interest - we appreciate you reaching out. A member of our team will be in touch with you as soon as possible."},replies:[
+{"match":"renovat|custom|client build|build (my|our|a) |our block|my block|our land|my land|knock ?down|extension|quote","text":"Thank you so much for reaching out and for thinking of us for your project. At the moment we aren't taking on client builds or renovations - our focus is solely on designing and building our own development projects. We really appreciate your interest and support, and hopefully our paths cross in the future."},
+{"match":"agent|agency|licen","text":"Thank you for reaching out. We will review your details and be in touch about agent access as soon as possible."},
+{"match":"inspect|view|walk ?through|open home","text":"Thank you for your interest - we appreciate you reaching out. Inspections are by private appointment. To help us provide the most relevant information, could you please share your approximate budget range and your intended timeline for purchase? A member of our team will then be in touch to arrange a time."},
+{"match":"price|guide|cost|how much|budget","text":"Thank you for your interest - we appreciate you reaching out. We talk through pricing directly rather than publishing a guide. To help us provide the most relevant information, could you please share your approximate budget range and your intended timeline for purchase? A member of our team will then be in touch with you as soon as possible."},
+{"match":"about sabdia|tell me more|who (are|is) sabdia|your company|your team|history","text":"Thank you for reaching out. Sabdia is a boutique Brisbane developer, in-house from the first sketch to handover, with more than 100 homes since 2013. A member of our team will be in touch with you as soon as possible."}
+]};</script>
+<script src="{{ 'main.js' | asset_url }}"></script>
+{%- endif -%}
+</body>
+</html>

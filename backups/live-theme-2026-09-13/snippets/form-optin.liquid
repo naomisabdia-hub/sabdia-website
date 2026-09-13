@@ -1,0 +1,4 @@
+{%- comment -%} "Keep me updated" box inside an enquiry form. Ticked (default)
+    tags the person "newsletter" in Customers, which is the mass mailing list
+    (Customers › Segments › customer_tags CONTAINS 'newsletter'). {%- endcomment -%}
+<label class="form-optin"><input type="checkbox" name="contact[Keep me updated]" value="Yes" checked data-optin><span>{{ label | default: "Keep me updated on new Sabdia releases" }}</span></label>

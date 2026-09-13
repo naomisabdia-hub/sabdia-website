@@ -1,0 +1,360 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Sabdia",
+    "theme_version": "1.0.0",
+    "theme_author": "Sabdia Constructions",
+    "theme_documentation_url": "https://www.sabdiaconstructions.com.au",
+    "theme_support_url": "https://www.sabdiaconstructions.com.au"
+  },
+  {
+    "name": "Brand",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo",
+        "info": "The wordmark used in the nav, loader and footer. Leave empty to use the built-in logo."
+      },
+      {
+        "type": "range",
+        "id": "logo_height",
+        "label": "Logo size",
+        "min": 16,
+        "max": 44,
+        "step": 2,
+        "unit": "px",
+        "default": 24,
+        "info": "Height of the SABDIA wordmark in the nav (32px reads proportionate against the 80px bar; the site's earlier review used 38px). Mobile scales in step."
+      },
+      {
+        "type": "text",
+        "id": "site_name",
+        "label": "Site name",
+        "default": "Sabdia Constructions"
+      },
+      {
+        "type": "text",
+        "id": "legal_name",
+        "label": "Legal name",
+        "default": "Sabdia Constructions Pty Ltd",
+        "info": "Shown in the footer copyright."
+      },
+      {
+        "type": "text",
+        "id": "abn",
+        "label": "ABN",
+        "info": "Shown in the footer legal line, e.g. 12 345 678 901. Leave empty to hide."
+      },
+      {
+        "type": "text",
+        "id": "qbcc_licence",
+        "label": "QBCC licence number",
+        "info": "Queensland requires a licensed builder to show its QBCC licence number in advertising, and this website advertises the business. Leave empty to hide - but fill it in before launch."
+      },
+      {
+        "type": "text",
+        "id": "location",
+        "label": "Location line",
+        "default": "Brisbane, Queensland, Australia"
+      }
+    ]
+  },
+  {
+    "name": "Design",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Colours flow into every page of the site. Off = the built-in Sabdia palette. Side margins, content width and section spacing are in the Layout group below."
+      },
+      {
+        "type": "font_picker",
+        "id": "font_body",
+        "label": "Body and interface font",
+        "default": "open_sans_n4",
+        "info": "Everything except the large serif headings: paragraphs, labels, buttons, forms, the nav. Open Sans by default. The headings stay in Cormorant Garamond."
+      },
+      {
+        "type": "checkbox",
+        "id": "design_override",
+        "label": "Use the colours below",
+        "default": false,
+        "info": "Leave off to keep the built-in palette. Turn on to apply your own colours site-wide."
+      },
+      {
+        "type": "color",
+        "id": "c_bg",
+        "label": "Page background",
+        "default": "#F7F3EB"
+      },
+      {
+        "type": "color",
+        "id": "c_bg2",
+        "label": "Soft panel background",
+        "default": "#F0EADE"
+      },
+      {
+        "type": "color",
+        "id": "c_dark",
+        "label": "Dark bands",
+        "default": "#1F1B14"
+      },
+      {
+        "type": "color",
+        "id": "c_ink",
+        "label": "Text on light",
+        "default": "#292319"
+      },
+      {
+        "type": "color",
+        "id": "c_gold",
+        "label": "Gold - rules and borders",
+        "default": "#A8874A",
+        "info": "Decoration only on light backgrounds; never body text (contrast)."
+      },
+      {
+        "type": "color",
+        "id": "c_gold2",
+        "label": "Gold - text on dark",
+        "default": "#C3A45E"
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "One place for the whole site's spacing. Every section reads these, so a change here moves every page together. The side margin is a share of the window, held between the phone and desktop limits, so a laptop and a large monitor read the same."
+      },
+      {
+        "type": "range",
+        "id": "page_pad_vw",
+        "label": "Side margins (share of the window)",
+        "min": 4,
+        "max": 18,
+        "step": 1,
+        "unit": "%",
+        "default": 10,
+        "info": "10% since 11 Sep 2026 (Naomi). 5% was the original tight setting."
+      },
+      {
+        "type": "range",
+        "id": "page_pad",
+        "label": "Side margins, most on a large screen",
+        "min": 40,
+        "max": 320,
+        "step": 8,
+        "unit": "px",
+        "default": 200
+      },
+      {
+        "type": "range",
+        "id": "page_pad_mobile",
+        "label": "Side margins, least on a phone",
+        "min": 14,
+        "max": 40,
+        "step": 2,
+        "unit": "px",
+        "default": 22
+      },
+      {
+        "type": "range",
+        "id": "page_max",
+        "label": "Content width",
+        "min": 1100,
+        "max": 1800,
+        "step": 20,
+        "unit": "px",
+        "default": 1400,
+        "info": "The widest the content runs before it centres with space either side."
+      },
+      {
+        "type": "range",
+        "id": "section_space",
+        "label": "Space above and below sections",
+        "min": 60,
+        "max": 140,
+        "step": 5,
+        "unit": "%",
+        "default": 100,
+        "info": "100 = as designed. Lower is tighter, higher is airier."
+      },
+      {
+        "type": "range",
+        "id": "slabel_size",
+        "label": "Section label size",
+        "min": 10,
+        "max": 18,
+        "step": 0.5,
+        "unit": "px",
+        "default": 13,
+        "info": "The small tracked labels that open each section - ABOUT SABDIA, THE SABDIA STORY, FOR SALE. Was 10.5px; 13 since 11 Sep 2026 (Naomi: hierarchy)."
+      }
+    ]
+  },
+  {
+    "name": "Features",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "guided_match_enabled",
+        "label": "Guided Match (Find Your Home)",
+        "default": true,
+        "info": "Off hides every link to the guided match across the site and the page itself shows a short note pointing to the contact page. On shows it everywhere it is designed to appear."
+      }
+    ]
+  },
+  {
+    "name": "Contact",
+    "settings": [
+      {
+        "type": "text",
+        "id": "contact_email",
+        "label": "Contact email",
+        "default": "sales@sabdia.com.au"
+      },
+      {
+        "type": "text",
+        "id": "contact_phone",
+        "label": "Phone",
+        "info": "Leave empty to hide."
+      }
+    ]
+  },
+  {
+    "name": "Social links",
+    "settings": [
+      {
+        "type": "text",
+        "id": "instagram_url",
+        "label": "Instagram URL",
+        "default": "https://www.instagram.com/_sabdia/"
+      },
+      {
+        "type": "text",
+        "id": "instagram_label",
+        "label": "Instagram display name",
+        "default": "@_sabdia"
+      },
+      {
+        "type": "text",
+        "id": "facebook_url",
+        "label": "Facebook URL",
+        "default": "https://www.facebook.com/sabdiaconstructions/"
+      },
+      {
+        "type": "text",
+        "id": "linkedin_url",
+        "label": "LinkedIn URL",
+        "default": "https://www.linkedin.com/company/sabdia-constructions/"
+      }
+    ]
+  },
+  {
+    "name": "Search & sharing",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "share_image",
+        "label": "Social share image",
+        "info": "Shown when pages are shared - 1200×630 works best."
+      },
+      {
+        "type": "textarea",
+        "id": "seo_home_description",
+        "label": "Homepage meta description",
+        "default": "Boutique luxury home builder and developer delivering award-winning residences across inner Brisbane since 2013. Design. Develop. Construct.",
+        "info": "Shown in search results for the homepage."
+      }
+    ]
+  },
+  {
+    "name": "Site plumbing",
+    "settings": [
+      {
+        "type": "select",
+        "id": "form_backend",
+        "label": "Enquiry handling",
+        "options": [
+          {
+            "value": "shopify",
+            "label": "Shopify - email notifications + customer records"
+          },
+          {
+            "value": "vercel",
+            "label": "Sabdia API - existing leads inbox (Supabase)"
+          }
+        ],
+        "default": "vercel",
+        "info": "Shopify mode emails each enquiry to the store's sender email (Settings → Notifications) and files the person under Customers. Sabdia API mode posts to the existing Vercel endpoint instead."
+      },
+      {
+        "type": "paragraph",
+        "content": "Advanced - these keep the enquiry forms and walkthroughs working. Only change them with your developer."
+      },
+      {
+        "type": "text",
+        "id": "forms_endpoint",
+        "label": "Forms endpoint",
+        "default": "https://sabdia-website.vercel.app",
+        "info": "Enquiries and subscriptions post here, into the Sabdia leads inbox."
+      },
+      {
+        "type": "text",
+        "id": "privacy_link_label",
+        "label": "Privacy link beside forms",
+        "default": "Privacy Policy",
+        "info": "Shown after the note under every enquiry form. Leave blank to hide."
+      },
+      {
+        "type": "url",
+        "id": "privacy_link_url",
+        "label": "Privacy link goes to",
+        "info": "Defaults to /pages/privacy."
+      },
+      {
+        "type": "text",
+        "id": "media_base",
+        "label": "Media library base URL",
+        "default": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media",
+        "info": "Where walkthrough frames and clips are stored."
+      },
+      {
+        "type": "text",
+        "id": "domain_display",
+        "label": "Domain display text",
+        "default": "sabdiaconstructions.com.au"
+      },
+      {
+        "type": "text",
+        "id": "domain_url",
+        "label": "Domain URL",
+        "default": "https://www.sabdiaconstructions.com.au"
+      }
+    ]
+  },
+  {
+    "name": "Labels",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Small words that appear on residence cards across the site."
+      },
+      {
+        "type": "text",
+        "id": "label_for_sale",
+        "label": "For-sale chip",
+        "default": "For Sale",
+        "info": "Wording on cards whose Status is For Sale. Other statuses (Under Offer, Coming Soon…) print their own word - Products › the residence › Status."
+      },
+      {
+        "type": "text",
+        "id": "label_sold_badge",
+        "label": "Sold badge",
+        "default": "Sold Prior to Completion",
+        "info": "Wording on cards whose Status is Sold Prior to Completion. A residence whose Status is plain Sold prints Sold."
+      }
+    ]
+  }
+]

@@ -1,0 +1,38 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-property",
+      "settings": {
+        "sold_notice": "This residence has been sold. View our current properties for sale below.",
+        "cta_text": "Inspections are by private appointment. Leave your details and we will be in touch within a business day."
+      }
+    },
+    "walkthrough": {
+      "type": "scroll-walk",
+      "settings": {}
+    },
+    "series": {
+      "type": "series-strip",
+      "settings": {}
+    },
+    "related": {
+      "type": "related-properties",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main",
+    "walkthrough",
+    "series",
+    "related"
+  ]
+}

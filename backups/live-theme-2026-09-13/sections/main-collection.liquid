@@ -1,0 +1,1071 @@
+{%- comment -%}
+  For Sale - faithful port of properties/index.astro: photographic hero,
+  refine/sort toolbar, the Now Selling intro band, the featured-residence
+  banner, the residence grid, the sold band, the How It Works strip and the
+  enquiry CTA. Filters read each residence's metafields (suburb, cars,
+  land, build_size, beds, baths, status, year and the normalised feature
+  tokens from residence-feats). On /collections/for-sale and
+  /collections/sold the list is driven by each residence's Status (see
+  residence-status): the collection's manual order leads, then any other
+  residence whose Status belongs here is swept in. Other collections list
+  their own products.
+
+  Each residence's brochure face (metafields custom.name_font /
+  name_font_file / name_font_weight / name_font_caps, the same fields the
+  residence page reads) is loaded once here, so the cards can set the name
+  in it: one Google Fonts stylesheet for every distinct family, and an
+  @font-face for every font file.
+{%- endcomment -%}
+{%- liquid
+  if collection.handle == 'for-sale' or collection.handle == 'sold'
+    assign group = 'live'
+    if collection.handle == 'sold'
+      assign group = 'sold'
+    endif
+    capture list_csv
+      render 'residence-handles', col: collection, group: group
+    endcapture
+  else
+    capture list_csv
+      for p in collection.products
+        unless forloop.first
+          echo ','
+        endunless
+        echo p.handle
+      endfor
+    endcapture
+  endif
+  assign handles = list_csv | split: ','
+  assign count = handles.size
+  case count
+    when 1
+      assign count_word = 'One'
+    when 2
+      assign count_word = 'Two'
+    when 3
+      assign count_word = 'Three'
+    when 4
+      assign count_word = 'Four'
+    when 5
+      assign count_word = 'Five'
+    when 6
+      assign count_word = 'Six'
+    when 7
+      assign count_word = 'Seven'
+    when 8
+      assign count_word = 'Eight'
+    when 9
+      assign count_word = 'Nine'
+    else
+      assign count_word = count
+  endcase
+  assign count_token = '{' | append: 'count' | append: '}'
+  assign intro = section.settings.intro_template | replace: count_token, count_word
+  if count == 1
+    assign intro = intro | replace: ' residences ', ' residence ' | replace: ' homes ', ' home ' | replace: ', each ', ', '
+  endif
+  assign show_rich = true
+  if collection.handle == 'sold'
+    assign show_rich = false
+  endif
+  assign has_build = false
+  for p in collections.all.products
+    if p.metafields.custom.build_size.value != blank
+      assign has_build = true
+      break
+    endif
+  endfor
+  assign featured = false
+  assign first_handle = handles.first
+  for p in collections.all.products
+    if p.handle == first_handle
+      assign featured = p
+      break
+    endif
+  endfor
+  capture sold_csv
+    render 'residence-handles', col: collections['sold'], group: 'sold'
+  endcapture
+  assign sold_handles = sold_csv | split: ','
+
+  # One pass over the listed residences: the suburbs, the largest bed and
+  # bath counts, the statuses and feature tokens present (so the toolbar
+  # only offers choices that match something), whether any has a year, and
+  # every distinct brochure face to load.
+  assign live_suburbs = ''
+  assign max_beds = 0
+  assign max_baths = 0
+  # Every distinct count in use, so a step is only offered when a residence
+  # has it (Naomi, 11 Sep 2026: every home has five bedrooms, so "4+" was
+  # offering a choice nothing could answer).
+  assign bed_vals = ''
+  assign bath_vals = ''
+  assign car_vals = ''
+  assign land_vals = ''
+  assign statuses = ''
+  assign feats_all = ''
+  assign has_year = false
+  assign gfonts = ''
+  assign ffiles = ''
+  for h in handles
+    for p in collections.all.products
+      if p.handle != h
+        continue
+      endif
+      assign pm = p.metafields.custom
+      if pm.suburb.value != blank
+        assign live_suburbs = live_suburbs | append: pm.suburb.value | append: '¦'
+      endif
+      assign pb = pm.beds.value | plus: 0
+      if pb > max_beds
+        assign max_beds = pb
+      endif
+      if pb > 0
+        assign bed_vals = bed_vals | append: pb | append: '¦'
+      endif
+      assign pba = pm.baths.value | plus: 0
+      if pba > max_baths
+        assign max_baths = pba
+      endif
+      if pba > 0
+        assign bath_vals = bath_vals | append: pba | append: '¦'
+      endif
+      assign pc = pm.cars.value | plus: 0
+      if pc > 0
+        assign car_vals = car_vals | append: pc | append: '¦'
+      endif
+      assign pl = pm.land.value | plus: 0
+      if pl > 0
+        assign land_vals = land_vals | append: pl | append: '¦'
+      endif
+      capture pst
+        render 'residence-status', product: p
+      endcapture
+      assign statuses = statuses | append: pst | append: '¦'
+      capture pft
+        render 'residence-feats', product: p
+      endcapture
+      assign feats_all = feats_all | append: ' ' | append: pft
+      if pm.year.value != blank
+        assign has_year = true
+      endif
+      assign pf = pm.name_font.value | strip
+      assign pff = pm.name_font_file.value | strip
+      assign pfw = pm.name_font_weight.value | default: 400
+      if pff != blank
+        assign pfam = pf
+        if pfam == blank
+          assign pfam = 'ResidenceFace-' | append: p.handle
+        endif
+        assign ffiles = ffiles | append: pfam | append: '¦' | append: pff | append: '¦' | append: pfw | append: '||'
+      elsif pf != blank
+        assign gfonts = gfonts | append: pf | append: ':wght@' | append: pfw | append: '||'
+      endif
+      break
+    endfor
+  endfor
+  assign suburb_list = live_suburbs | split: '¦' | uniq | sort
+  assign status_list = statuses | split: '¦' | uniq
+  assign bed_list = bed_vals | split: '¦' | uniq | sort_natural
+  assign bath_list = bath_vals | split: '¦' | uniq | sort_natural
+  assign car_list = car_vals | split: '¦' | uniq | sort_natural
+  assign land_nums = land_vals | split: '¦'
+  assign land_small = false
+  assign land_mid = false
+  assign land_big = false
+  for lv in land_nums
+    assign lvn = lv | plus: 0
+    if lvn < 600
+      assign land_small = true
+    elsif lvn < 800
+      assign land_mid = true
+    else
+      assign land_big = true
+    endif
+  endfor
+  assign gfont_list = gfonts | split: '||' | uniq
+  assign ffile_list = ffiles | split: '||' | uniq
+
+  # Hero film (uploaded or URL) beats the hero photo. With neither chosen the
+  # hero shows a different residence from the featured banner underneath
+  # (the second in the order; else the featured home's second photo), so the
+  # page never opens on the same house twice.
+  assign hero_video = section.settings.hero_video_url
+  if section.settings.hero_video
+    assign hmp4 = section.settings.hero_video.sources | where: 'format', 'mp4' | first
+    if hmp4
+      assign hero_video = hmp4.url
+    endif
+  endif
+  assign hero_auto = false
+  assign use_chosen = true
+  if section.settings.hero_source == 'auto'
+    assign use_chosen = false
+  endif
+  if section.settings.image == blank and section.settings.image_ext == blank
+    assign use_chosen = false
+  endif
+  if use_chosen == false and featured
+    assign second_handle = handles[1]
+    for p in collections.all.products
+      if p.handle == second_handle and p.featured_image
+        assign hero_auto = p.featured_image
+        break
+      endif
+    endfor
+    if hero_auto == false
+      if featured.images.size > 1
+        assign hero_auto = featured.images[1]
+      else
+        assign hero_auto = featured.featured_image
+      endif
+    endif
+  endif
+-%}
+
+{%- if gfont_list.size > 0 -%}
+  {%- capture gf_query -%}{%- for f in gfont_list -%}{%- unless forloop.first -%}&{%- endunless -%}family={{ f | replace: ' ', '+' }}{%- endfor -%}{%- endcapture -%}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?{{ gf_query }}&display=swap">
+{%- endif -%}
+{%- if ffile_list.size > 0 -%}
+  <style>
+  {%- for f in ffile_list -%}
+    {%- assign fp = f | split: '¦' -%}
+    {%- liquid
+      assign ff_fmt = 'woff2'
+      if fp[1] contains '.ttf'
+        assign ff_fmt = 'truetype'
+      elsif fp[1] contains '.otf'
+        assign ff_fmt = 'opentype'
+      elsif fp[1] contains '.woff2'
+        assign ff_fmt = 'woff2'
+      elsif fp[1] contains '.woff'
+        assign ff_fmt = 'woff'
+      endif
+    -%}
+    @font-face{font-family:'{{ fp[0] }}';src:url('{{ fp[1] }}') format('{{ ff_fmt }}');font-weight:{{ fp[2] | default: 400 }};font-display:swap}
+  {%- endfor -%}
+  </style>
+{%- endif -%}
+
+{% render 'section-look', section: section, mode: 'hero' %}
+{%- liquid
+  case section.settings.hero_height
+    when 'short'
+      assign mc_h = '44vh'
+      assign mc_hm = '40vh'
+    when 'tall'
+      assign mc_h = '78vh'
+      assign mc_hm = '60vh'
+    when 'full'
+      assign mc_h = '100vh'
+      assign mc_hm = '100svh'
+    else
+      assign mc_h = 'max(460px,60vh)'
+      assign mc_hm = 'max(340px,50vh)'
+  endcase
+  assign mc_dim = section.settings.hero_dim | default: 52 | divided_by: 100.0
+  assign mc_featured = section.settings.show_featured
+  assign mc_style = 'aspect-ratio:' | append: section.settings.card_shape | default: '16/10'
+-%}
+<section class="page-hero ph-sized ph-pos-{{ section.settings.hero_words | default: 'base-left' }} ph-scrim-{{ section.settings.hero_scrim | default: 'corner' }}" style="--ph-h:{{ mc_h }};--ph-hm:{{ mc_hm }};--ph-dim:{{ mc_dim }}">
+  {%- if hero_video != blank -%}
+    <video class="page-hero-video" src="{{ hero_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if section.settings.image %} poster="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}"{% endif %}></video>
+  {%- elsif use_chosen and section.settings.image -%}
+    <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
+  {%- elsif use_chosen and section.settings.image_ext != blank -%}
+    <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}" alt="" loading="eager" width="1920" height="1080">
+  {%- elsif hero_auto -%}
+    <img src="{{ hero_auto | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
+  {%- endif -%}
+  <div class="page-hero-ov"></div>
+  <div class="page-hero-content inner">
+    {%- liquid
+      # The Sold collection is served by these same settings, so its hero takes the
+      # collection's own words rather than the For Sale label and heading.
+      assign hero_label = section.settings.label | default: collection.title
+      assign hero_heading = section.settings.heading_html | default: collection.title
+      unless show_rich
+        assign hero_label = collection.title
+        assign hero_heading = collection.title
+      endunless
+    -%}
+    {%- if section.settings.show_label -%}<div class="slabel slabel-dark">{{ hero_label }}</div>{%- endif -%}
+    <h1 class="page-h">{{ hero_heading }}</h1>
+    {%- if section.settings.show_intro -%}<p class="page-hero-sub">{{ intro }}</p>{%- endif -%}
+  </div>
+</section>
+
+{%- if show_rich and section.settings.show_toolbar -%}
+<div class="prop-toolbar">
+  <div class="prop-toolbar-inner">
+    <span class="ptool-l">{{ section.settings.refine_label }}</span>
+    {%- if section.settings.show_filter_suburb != false -%}
+    <select class="ptool-sel" id="fSuburb" aria-label="Filter by suburb">
+      <option value="">{{ section.settings.all_suburbs }}</option>
+      {%- for s in suburb_list -%}
+        {%- assign st = s | strip -%}
+        {%- if st != blank -%}<option value="{{ st | escape }}">{{ st }}</option>{%- endif -%}
+      {%- endfor -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_beds != false and bed_list.size > 0 -%}
+    <select class="ptool-sel" id="fBeds" aria-label="Minimum bedrooms">
+      <option value="">{{ section.settings.filter_any_beds | default: "Any Bedrooms" }}</option>
+      {%- for v in bed_list -%}<option value="{{ v }}">{{ v }}+ Bed</option>{%- endfor -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_baths != false and bath_list.size > 0 -%}
+    <select class="ptool-sel" id="fBaths" aria-label="Minimum bathrooms">
+      <option value="">{{ section.settings.filter_any_baths | default: "Any Bathrooms" }}</option>
+      {%- for v in bath_list -%}<option value="{{ v }}">{{ v }}+ Bath</option>{%- endfor -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_garage != false and car_list.size > 0 -%}
+    <select class="ptool-sel" id="fCars" aria-label="Minimum garage spaces">
+      <option value="">{{ section.settings.filter_any_garage | default: "Any Garage" }}</option>
+      {%- for v in car_list -%}<option value="{{ v }}">{{ v }}+ Cars</option>{%- endfor -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_land != false -%}
+    <select class="ptool-sel" id="fLand" aria-label="Land size">
+      <option value="">{{ section.settings.filter_any_land | default: "Any Land Size" }}</option>
+      {%- if land_small -%}<option value="0-600">Up to 600m&sup2;</option>{%- endif -%}
+      {%- if land_mid -%}<option value="600-800">600&ndash;800m&sup2;</option>{%- endif -%}
+      {%- if land_big -%}<option value="800-">800m&sup2;+</option>{%- endif -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_build != false and has_build -%}
+    <select class="ptool-sel" id="fBuild" aria-label="Build size">
+      <option value="">{{ section.settings.filter_any_build | default: "Any Build Size" }}</option>
+      <option value="0-450">Up to 450m&sup2;</option>
+      <option value="450-600">450&ndash;600m&sup2;</option>
+      <option value="600-">600m&sup2;+</option>
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_status != false and status_list.size > 1 -%}
+    <select class="ptool-sel" id="fStatus" aria-label="Status">
+      <option value="">{{ section.settings.filter_any_status | default: "Any Status" }}</option>
+      {%- for s in status_list -%}
+        {%- assign st = s | strip -%}
+        {%- if st == blank -%}{%- continue -%}{%- endif -%}
+        <option value="{{ st | escape }}">{% if st == 'For Sale' and settings.label_for_sale != blank %}{{ settings.label_for_sale }}{% else %}{{ st }}{% endif %}</option>
+      {%- endfor -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_sort != false -%}
+    <select class="ptool-sel" id="fSort" aria-label="Sort properties">
+      <option value="featured">{{ section.settings.sort_featured_label | default: "Sort - Featured" }}</option>
+      <option value="land">{{ section.settings.filter_land_label | default: "Land Size" }}</option>
+      <option value="beds">{{ section.settings.sort_beds_label | default: "Bedrooms" }}</option>
+      <option value="cars">{{ section.settings.filter_garage_label | default: "Garage Spaces" }}</option>
+      {%- if has_year -%}<option value="year">{{ section.settings.sort_newest_label | default: "Newest" }}</option>{%- endif -%}
+      <option value="name">{{ section.settings.sort_name_label | default: "Name A–Z" }}</option>
+    </select>
+    {%- endif -%}
+    <div class="ptool-end">
+      <button type="button" class="ptool-clear" id="fClear" hidden>{{ section.settings.clear_label | default: "Clear filters" }}</button>
+      <span class="ptool-count" id="fCount"></span>
+    </div>
+    {%- comment -%} Features read as a dropdown like the rest of the toolbar, with a
+        box beside each one so several can be chosen (Naomi, 11 Sep 2026). {%- endcomment -%}
+    {%- if section.settings.show_filter_features != false and feats_all != blank -%}
+    <details class="ptool-drop" data-feat-drop>
+      <summary class="ptool-sel ptool-sel-drop" aria-label="{{ section.settings.features_label | default: 'Features' | escape }}">
+        <span data-feat-summary>{{ section.settings.filter_any_features | default: "Any Features" }}</span>
+      </summary>
+      <div class="ptool-menu" role="group" aria-label="{{ section.settings.features_label | default: 'Features' | escape }}">
+        {%- if feats_all contains 'pool' -%}<label class="ptool-opt"><input type="checkbox" data-feat="pool"><span>{{ section.settings.chip_pool | default: "Pool" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'views' -%}<label class="ptool-opt"><input type="checkbox" data-feat="views"><span>{{ section.settings.chip_views | default: "City Views" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'lift' -%}<label class="ptool-opt"><input type="checkbox" data-feat="lift"><span>{{ section.settings.chip_lift | default: "Lift" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'cinema' -%}<label class="ptool-opt"><input type="checkbox" data-feat="cinema"><span>{{ section.settings.chip_cinema | default: "Cinema" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'gym' -%}<label class="ptool-opt"><input type="checkbox" data-feat="gym"><span>{{ section.settings.chip_gym | default: "Gym" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'cellar' -%}<label class="ptool-opt"><input type="checkbox" data-feat="cellar"><span>{{ section.settings.chip_cellar | default: "Cellar" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'study' -%}<label class="ptool-opt"><input type="checkbox" data-feat="study"><span>{{ section.settings.chip_study | default: "Study" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'solar' -%}<label class="ptool-opt"><input type="checkbox" data-feat="solar"><span>{{ section.settings.chip_solar | default: "Solar and Battery" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'butler' -%}<label class="ptool-opt"><input type="checkbox" data-feat="butler"><span>{{ section.settings.chip_butler | default: "Butler's Pantry" }}</span></label>{%- endif -%}
+      </div>
+    </details>
+    {%- endif -%}
+  </div>
+</div>
+{%- endif -%}
+
+{%- if show_rich and section.settings.show_intro_band != false -%}
+{%- liquid
+  assign ib_heading = section.settings.intro_band_heading | replace: count_token, count_word
+  if ib_heading == blank
+    if count == 1
+      assign ib_heading = count_word | append: ' residence, <em>inner Brisbane</em>.'
+    else
+      assign ib_heading = count_word | append: ' residences, <em>inner Brisbane</em>.'
+    endif
+  endif
+  assign ib_suburbs = suburb_list | join: ' · '
+-%}
+<section class="mc-intro">
+  <div class="inner mc-intro-grid">
+    <div>
+      {%- if section.settings.intro_band_label != blank -%}<div class="slabel reveal">{{ section.settings.intro_band_label }}</div>{%- endif -%}
+      <h2 class="mc-intro-h reveal d1">{{ ib_heading }}</h2>
+    </div>
+    <div class="mc-intro-side">
+      {%- if section.settings.intro_band_text != blank -%}<p class="mc-intro-p reveal d2">{{ section.settings.intro_band_text }}</p>{%- endif -%}
+      {%- if section.settings.intro_band_suburbs != false and ib_suburbs != blank -%}<div class="mc-intro-suburbs reveal d3">{{ ib_suburbs }}</div>{%- endif -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+{%- if show_rich -%}
+{%- if featured and mc_featured -%}
+  {%- assign fmf = featured.metafields.custom -%}
+  {%- capture fstatus -%}{% render 'residence-status', product: featured %}{%- endcapture -%}
+  {%- if fstatus == 'For Sale' and settings.label_for_sale != blank -%}{%- assign fstatus = settings.label_for_sale -%}{%- endif -%}
+  <section style="padding:clamp(40px,5vw,64px) var(--page-pad) 0;background:var(--bg)" id="featuredWrap">
+    <div class="inner">
+      <a href="{{ featured.url }}" class="reveal" style="display:block;position:relative;overflow:hidden;height:min({{ section.settings.featured_height | default: 680 }}px,clamp(400px,52vw,680px));cursor:pointer;text-decoration:none">
+        {%- if featured.featured_image -%}
+          <img src="{{ featured.featured_image | image_url: width: 1600, height: 900, crop: 'center' }}" alt="{{ featured.title | escape }}" width="1600" height="900" loading="eager" fetchpriority="high"
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.98) saturate(.96);transition:filter .7s,transform .7s">
+        {%- endif -%}
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(var(--dark-rgb),.88) 0%,rgba(var(--dark-rgb),.1) 50%,transparent 100%);transition:opacity .4s"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:clamp(28px,4vw,52px)">
+          <div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
+            <div style="width:5px;height:5px;border-radius:50%;background:var(--gold2);{% if fstatus == 'For Sale' or fstatus == settings.label_for_sale %}animation:pulse 2s ease-in-out infinite;{% endif %}flex-shrink:0"></div>
+            <span style="font-size:10.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2)">{{ fstatus }}</span>
+          </div>
+          <div style="font-family:var(--font-d);font-size:calc(var(--t-display)*var(--s-h,1));font-weight:300;line-height:.88;letter-spacing:-.04em;color:var(--white);margin-bottom:10px">{{ featured.title }}</div>
+          <div style="font-size:11.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--white-rgb),.78);margin-bottom:18px">{{ fmf.suburb.value }}, {{ fmf.state.value | default: 'QLD' }}</div>
+          {%- if section.settings.featured_specs -%}
+          <div style="display:flex;gap:18px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.beds.value }} Bed</span>
+            <span style="font-size:11px;color:rgba(var(--white-rgb),.45)">&middot;</span>
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.baths.value }} Bath</span>
+            <span style="font-size:11px;color:rgba(var(--white-rgb),.45)">&middot;</span>
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.cars.value }} Garage</span>
+            <span style="font-size:11px;color:rgba(var(--white-rgb),.45)">&middot;</span>
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.land.value }}m&sup2;{% if fmf.land_over.value %}+{% endif %}</span>
+          </div>
+          {%- endif -%}
+        </div>
+        <div style="position:absolute;top:clamp(18px,3vw,32px);right:clamp(18px,3vw,32px);width:44px;height:44px;border:1px solid rgba(var(--gold2-rgb),.45);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);font-size:16px">&rarr;</div>
+      </a>
+    </div>
+  </section>
+{%- endif -%}
+{%- endif -%}
+
+<section style="padding:clamp(8px,1vw,10px) var(--page-pad) 0;background:var(--bg);--pgc-cols:{{ section.settings.columns | default: '3' }};--pgc-gap:{{ section.settings.gap | default: 10 }}px">
+  <div class="inner">
+    <div class="proj-grid-3 mc-grid" id="propGrid" {% unless show_rich and mc_featured %}style="padding-top:clamp(32px,4vw,56px)"{% endunless %}>
+      {%- for h in handles -%}
+        {%- assign delay = forloop.index0 | modulo: 3 -%}
+        {%- assign is_first = forloop.first -%}
+        {%- assign order = forloop.index -%}
+        {%- for product in collections.all.products -%}
+        {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+        {%- assign mfp = product.metafields.custom -%}
+        {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
+        {%- capture pfeats -%}{% render 'residence-feats', product: product %}{%- endcapture -%}
+        <div
+          data-prop-card
+          {% if show_rich and is_first and mc_featured %}data-featured="1" style="display:none"{% endif %}
+          data-suburb="{{ mfp.suburb.value | escape }}"
+          data-cars="{{ mfp.cars.value }}"
+          data-land="{{ mfp.land.value }}"
+          data-build="{{ mfp.build_size.value }}"
+          data-beds="{{ mfp.beds.value }}"
+          data-baths="{{ mfp.baths.value }}"
+          data-status="{{ pstatus | escape }}"
+          data-feats="{{ pfeats }}"
+          data-year="{{ mfp.year.value }}"
+          data-name="{{ product.title | escape }}"
+          data-order="{{ order }}"
+        >
+          {%- if pstatus contains 'Sold' -%}
+            {% render 'sold-card', product: product, class: 'reveal-wipe', img_w: 800, img_h: 500, show_suburb: true %}
+          {%- elsif delay == 1 -%}
+            {% render 'property-card', product: product, class: 'reveal d1', style: mc_style, img_w: 900, img_h: 562, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}
+          {%- elsif delay == 2 -%}
+            {% render 'property-card', product: product, class: 'reveal d2', style: mc_style, img_w: 900, img_h: 562, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}
+          {%- else -%}
+            {% render 'property-card', product: product, class: 'reveal', style: mc_style, img_w: 900, img_h: 562, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}
+          {%- endif -%}
+        </div>
+        {%- break -%}
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+    <p id="fEmpty" style="display:none;padding:56px 0;text-align:center;font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:300;font-style:italic;color:var(--taupe-d)">{{ section.settings.empty_text }}</p>
+  </div>
+</section>
+
+{%- if show_rich and section.settings.show_sold_band and sold_handles.size > 0 -%}
+  <section style="padding:clamp(64px,8vw,100px) var(--page-pad) clamp(80px,10vw,120px);background:var(--bg)">
+    <div class="inner">
+      <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.sold_label }}</div>
+      <div class="proj-grid-sold" style="margin-top:0">
+        {%- for h in sold_handles -%}
+          {%- assign sdelay = forloop.index0 | modulo: 2 -%}
+          {%- for product in collections.all.products -%}
+            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+            {%- if sdelay == 1 -%}
+              {% render 'sold-card', product: product, class: 'reveal d1', img_w: 900, img_h: 560 %}
+            {%- else -%}
+              {% render 'sold-card', product: product, class: 'reveal', img_w: 900, img_h: 560 %}
+            {%- endif -%}
+            {%- break -%}
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{%- if show_rich and section.settings.show_how != false -%}
+{%- liquid
+  # The four steps are numbered settings (how1_title … how4_text); a step
+  # with an empty title is left out and the track closes up.
+  assign how_delays = ',d1,d2,d3' | split: ','
+  assign how_n = 0
+  for i in (1..4)
+    assign tkey = 'how' | append: i | append: '_title'
+    if section.settings[tkey] != blank
+      assign how_n = how_n | plus: 1
+    endif
+  endfor
+-%}
+{%- if how_n > 0 -%}
+<section class="mc-how">
+  <div class="inner">
+    {%- if section.settings.how_label != blank -%}<div class="slabel reveal mc-how-l">{{ section.settings.how_label }}</div>{%- endif -%}
+    <div class="proc-track" style="--proc-cols:{{ how_n }};--proc-n:44px">
+      {%- assign how_i = 0 -%}
+      {%- for i in (1..4) -%}
+        {%- assign tkey = 'how' | append: i | append: '_title' -%}
+        {%- assign dkey = 'how' | append: i | append: '_text' -%}
+        {%- if section.settings[tkey] == blank -%}{%- continue -%}{%- endif -%}
+        <div class="proc-step reveal {{ how_delays[how_i] }}">
+          <div class="proc-n">{{ how_i | plus: 1 }}</div>
+          <div class="proc-t">{{ section.settings[tkey] }}</div>
+          {%- if section.settings[dkey] != blank -%}<div class="proc-d">{{ section.settings[dkey] }}</div>{%- endif -%}
+        </div>
+        {%- assign how_i = how_i | plus: 1 -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+{%- endif -%}
+
+{%- if section.settings.show_cta -%}
+<section class="sp" style="background:var(--bg2);border-top:1px solid var(--border);text-align:center">
+  <div class="inner-sm">
+    {%- if section.settings.cta_label != blank -%}<div class="slabel reveal" style="justify-content:center;margin-bottom:20px">{{ section.settings.cta_label }}</div>{%- endif -%}
+    <h2 class="reveal d1" style="font-family:var(--font-d);font-size:calc(clamp(32px,5vw,64px)*var(--s-h,1));font-weight:300;color:var(--ink);margin-bottom:20px;letter-spacing:-.02em">{{ section.settings.cta_heading_html }}</h2>
+    {%- if section.settings.cta_text != blank -%}<p class="reveal d2" style="font-size:calc(13px*var(--s-t,1));font-weight:300;color:var(--ink3);max-width:420px;margin:0 auto 36px;line-height:1.85">{{ section.settings.cta_text }}</p>{%- endif -%}
+    <div class="reveal d3 mc-cta-row" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      {%- if section.settings.show_cta1 and section.settings.cta1_label != blank -%}<a href="{{ section.settings.cta1_link | default: '/pages/contact?interest=Request%20a%20Viewing' }}" class="btn-p">{{ section.settings.cta1_label }} &rarr;</a>{%- endif -%}
+      {%- if section.settings.show_cta2 and section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link | default: '/pages/contact?interest=Agent%20Access' }}" class="btn-g">{{ section.settings.cta2_label }}</a>{%- endif -%}
+      {%- if section.settings.show_cta3 and section.settings.cta3_label != blank and settings.guided_match_enabled != false -%}<a href="{{ section.settings.cta3_link | default: '/pages/find-your-home' }}" class="btn-g btn-g-gold">{{ section.settings.cta3_label }}</a>{%- endif -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+<style>
+  .page-hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(calc(1 - var(--ph-dim,.52) * .5)) saturate(.95)}
+  .page-hero.ph-sized{min-height:max(380px,var(--ph-h,60vh))}
+  .proj-grid-3.mc-grid{grid-template-columns:repeat(var(--pgc-cols,3),1fr);gap:var(--pgc-gap,10px)}
+  @media(max-width:1100px){.proj-grid-3.mc-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:768px){.proj-grid-3.mc-grid{grid-template-columns:1fr}}
+  @media(prefers-reduced-motion:reduce){.page-hero-video{display:none}}
+  .prop-toolbar{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:18px var(--page-pad);background:var(--bg2);border-bottom:1px solid var(--border)}
+  .prop-toolbar-inner{display:flex;gap:14px 28px;align-items:center;flex-wrap:wrap;max-width:var(--page-max);margin:0 auto;width:100%}
+  .ptool-l{font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)}
+  .ptool-sel{font-family:var(--font-u);font-size:10.5px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;border:none;border-bottom:1px solid var(--border);padding:4px 22px 4px 0;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23A8874A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center}
+  .ptool-sel:focus{outline:none;border-bottom-color:var(--gold)}
+  .ptool-end{margin-left:auto;display:flex;align-items:center;gap:20px}
+  .ptool-count{font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe-d)}
+  .ptool-clear{font-family:var(--font-u);font-size:10px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:none;border:0;border-bottom:1px solid var(--gold);padding:0 0 2px;cursor:pointer;transition:color .3s,border-color .3s}
+  .ptool-clear:hover{color:var(--ink);border-bottom-color:var(--ink)}
+  .ptool-clear[hidden]{display:none}
+  .ptool-drop{position:relative}
+  .ptool-drop summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .ptool-drop summary::-webkit-details-marker{display:none}
+  .ptool-drop summary::after{content:'';width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--gold);flex-shrink:0}
+  .ptool-drop[open] summary::after{transform:rotate(180deg)}
+  .ptool-drop summary:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
+  .ptool-menu{position:absolute;top:calc(100% + 10px);left:0;z-index:30;min-width:232px;max-height:62vh;overflow-y:auto;background:var(--bg);border:1px solid var(--border);box-shadow:0 20px 44px -20px rgba(var(--dark-rgb),.35);padding:6px 0}
+  .ptool-opt{display:flex;align-items:center;gap:11px;padding:9px 16px;cursor:pointer;font-family:var(--font-u);font-size:11px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+  .ptool-opt:hover{background:var(--bg2);color:var(--ink)}
+  .ptool-opt input{width:13px;height:13px;accent-color:var(--gold);flex-shrink:0;margin:0}
+  @media(max-width:900px){
+    .prop-toolbar{padding:16px var(--page-pad)}
+    .prop-toolbar-inner{gap:14px 20px}
+    .ptool-end{margin-left:auto}
+    .ptool-menu{left:auto;right:0}
+  }
+  .mc-intro{padding:clamp(56px,7vw,88px) var(--page-pad) clamp(8px,1vw,12px);background:var(--bg)}
+  .mc-intro-grid{display:grid;grid-template-columns:7fr 5fr;gap:32px clamp(32px,6vw,96px);align-items:end}
+  .mc-intro-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:300;line-height:1.05;letter-spacing:-.02em;color:var(--ink);margin:0}
+  .mc-intro-h em{font-style:italic;color:var(--ink)}
+  .mc-intro-p{font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:var(--ink3);letter-spacing:.018em;max-width:460px;margin:0}
+  .mc-intro-suburbs{font-size:var(--t-label);font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:var(--taupe-d);margin-top:18px;line-height:2}
+  @media(max-width:900px){
+    .mc-intro-grid{grid-template-columns:1fr;gap:24px;align-items:start}
+    .mc-intro-suburbs{margin-top:14px}
+  }
+  .mc-how{padding:calc(clamp(56px,7vw,96px)*var(--sp-scale,1)*var(--sp-top,1)) var(--page-pad) calc(clamp(56px,7vw,96px)*var(--sp-scale,1)*var(--sp-bot,1));background:var(--bg);border-top:1px solid var(--border)}
+  .mc-how-l{justify-content:center;margin-bottom:8px}
+  .mc-how .proc-step{padding-top:40px}
+  .mc-how .proc-t{font-size:calc(var(--t-h3)*var(--s-h,1)*.92)}
+  .mc-how .proc-d{max-width:280px;margin:0 auto}
+  @media(max-width:900px){.mc-how .proc-step{padding-top:0}.mc-how .proc-d{max-width:none}}
+</style>
+
+<script>
+  (function () {
+    var grid = document.getElementById('propGrid');
+    if (!grid || grid.dataset.filterInit) return;
+    grid.dataset.filterInit = '1';
+    var byId = function (id) { return document.getElementById(id); };
+    var suburb = byId('fSuburb');
+    var beds = byId('fBeds');
+    var baths = byId('fBaths');
+    var cars = byId('fCars');
+    var land = byId('fLand');
+    var build = byId('fBuild');
+    var status = byId('fStatus');
+    var sort = byId('fSort');
+    var count = byId('fCount');
+    var empty = byId('fEmpty');
+    var clear = byId('fClear');
+    var featuredWrap = byId('featuredWrap');
+    var drop = document.querySelector('[data-feat-drop]');
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.ptool-opt input[data-feat]'));
+    var featSummary = document.querySelector('[data-feat-summary]');
+    var featAnyLabel = featSummary ? featSummary.textContent : '';
+    var selects = [suburb, beds, baths, cars, land, build, status].filter(Boolean);
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-prop-card]'));
+    if (!selects.length && !chips.length && !sort) return;
+
+    function val(el) { return el ? el.value : ''; }
+    function inRange(raw, spec, required) {
+      var n = Number(raw);
+      if (!n) return !required;
+      var r = spec.split('-');
+      var lo = Number(r[0] || 0);
+      var hi = r[1] ? Number(r[1]) : Infinity;
+      return n >= lo && n < hi;
+    }
+    function activeFeats() {
+      return chips.filter(function (c) { return c.checked; })
+        .map(function (c) { return c.dataset.feat; });
+    }
+
+    function apply() {
+      var feats = activeFeats();
+      var sortVal = sort ? sort.value : 'featured';
+      var anyFilter = feats.length > 0 || selects.some(function (el) { return !!el.value; });
+      var isDefault = !anyFilter && sortVal === 'featured';
+      if (featuredWrap) featuredWrap.style.display = isDefault ? '' : 'none';
+      if (clear) clear.hidden = isDefault;
+
+      var visible = 0;
+      cards.forEach(function (c) {
+        var ok = true;
+        if (isDefault && c.dataset.featured) ok = false; // featured shown in hero block instead
+        if (ok && val(suburb) && c.dataset.suburb !== suburb.value) ok = false;
+        if (ok && val(beds) && Number(c.dataset.beds) < Number(beds.value)) ok = false;
+        if (ok && val(baths) && Number(c.dataset.baths) < Number(baths.value)) ok = false;
+        if (ok && val(cars) && Number(c.dataset.cars) < Number(cars.value)) ok = false;
+        if (ok && val(land) && !inRange(c.dataset.land, land.value, false)) ok = false;
+        if (ok && val(build) && !inRange(c.dataset.build, build.value, true)) ok = false;
+        if (ok && val(status) && c.dataset.status !== status.value) ok = false;
+        if (ok && feats.length) {
+          var have = (c.dataset.feats || '').split(' ');
+          ok = feats.every(function (f) { return have.indexOf(f) > -1; });
+        }
+        c.style.display = ok ? '' : 'none';
+        if (ok) visible++;
+        var r = c.querySelector('.reveal');
+        if (r) r.classList.add('vis');
+      });
+
+      var sorted = cards.slice().sort(function (a, b) {
+        var d = 0;
+        if (sortVal === 'land') d = Number(b.dataset.land) - Number(a.dataset.land);
+        else if (sortVal === 'beds') d = Number(b.dataset.beds) - Number(a.dataset.beds);
+        else if (sortVal === 'cars') d = Number(b.dataset.cars) - Number(a.dataset.cars);
+        else if (sortVal === 'year') d = Number(b.dataset.year || 0) - Number(a.dataset.year || 0);
+        else if (sortVal === 'name') d = a.dataset.name.localeCompare(b.dataset.name);
+        return d || Number(a.dataset.order) - Number(b.dataset.order);
+      });
+      sorted.forEach(function (c) { grid.appendChild(c); });
+
+      if (empty) empty.style.display = visible === 0 ? '' : 'none';
+      if (count) count.textContent = isDefault
+        ? ''
+        : visible + (visible === 1 ? ' Residence' : ' Residences');
+    }
+
+    selects.concat(sort ? [sort] : []).forEach(function (el) {
+      el.addEventListener('change', apply);
+    });
+    function featLabel() {
+      if (!featSummary) return;
+      var on = chips.filter(function (c) { return c.checked; });
+      featSummary.textContent = on.length === 0 ? featAnyLabel
+        : (on.length === 1 ? on[0].parentNode.textContent.trim() : on.length + ' Features');
+    }
+    chips.forEach(function (chip) {
+      chip.addEventListener('change', function () { featLabel(); apply(); });
+    });
+    /* A dropdown left open over the grid gets in the way. */
+    if (drop) {
+      document.addEventListener('click', function (e) { if (drop.open && !drop.contains(e.target)) drop.open = false; });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && drop.open) { drop.open = false; drop.querySelector('summary').focus(); } });
+    }
+    if (clear) clear.addEventListener('click', function () {
+      selects.forEach(function (el) { el.value = ''; });
+      if (sort) sort.value = 'featured';
+      chips.forEach(function (chip) { chip.checked = false; });
+      featLabel();
+      apply();
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collection grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label",
+      "default": "For Sale"
+    },
+    {
+      "type": "html",
+      "id": "heading_html",
+      "label": "Heading (HTML)",
+      "default": "<em>Current</em><br>Properties."
+    },
+    {
+      "type": "textarea",
+      "id": "intro_template",
+      "label": "Intro line",
+      "info": "{count} becomes the number of residences",
+      "default": "{count} homes in inner Brisbane, each designed and built by Sabdia."
+    },
+    {
+      "type": "select",
+      "id": "hero_source",
+      "label": "Hero photo",
+      "options": [
+        { "value": "auto", "label": "Automatic - a different residence" },
+        { "value": "chosen", "label": "The photo chosen below" }
+      ],
+      "default": "chosen",
+      "info": "Automatic since 10 Sep 2026 (Tamsin): the page opened on the same house twice. Switch back to use your own photo."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "image_ext",
+      "label": "Current photo (URL)",
+      "info": "Leave the photo and this field empty and the hero shows a different residence from the featured banner below it, so the page never opens on the same house twice."
+    },
+    {
+      "type": "video",
+      "id": "hero_video",
+      "label": "Hero film (upload)",
+      "info": "A mash-up of the residences, playing silently on a loop behind the title. Beats the photo when set."
+    },
+    {
+      "type": "text",
+      "id": "hero_video_url",
+      "label": "Current hero film (URL)",
+      "info": "A direct .mp4 link, used when no film is uploaded above."
+    },
+    {
+      "type": "text",
+      "id": "refine_label",
+      "label": "Toolbar label",
+      "default": "Refine:"
+    },
+    {
+      "type": "text",
+      "id": "all_suburbs",
+      "label": "All-suburbs option",
+      "default": "All Suburbs"
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "No-matches text",
+      "default": "Nothing matches those filters. Try widening them."
+    },
+    {
+      "type": "paragraph",
+      "content": "Which residences appear here, and whether a card reads For Sale, Under Offer or Sold, is set on each residence: Products › the residence › Status. Drag the order at Products › Collections › For Sale (sort Manually)."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sold_band",
+      "label": "Show the sold band under the grid",
+      "default": false,
+      "info": "Off by default - with one sold home it looked odd (Tamsin, 10 Sep 2026). Sold residences still appear on the Collection page and at /collections/sold."
+    },
+    {
+      "type": "text",
+      "id": "sold_label",
+      "label": "Sold band label",
+      "default": "Sold Prior to Completion"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Private Enquiry"
+    },
+    {
+      "type": "html",
+      "id": "cta_heading_html",
+      "label": "CTA heading (HTML)",
+      "default": "Interested in a<br><em>private viewing</em>?"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "CTA text",
+      "default": "Inspections are by private appointment. Tell us when suits you."
+    },
+    {
+      "type": "text",
+      "id": "cta1_label",
+      "label": "Primary button",
+      "default": "Request a Viewing"
+    },
+    {
+      "type": "url",
+      "id": "cta1_link",
+      "label": "Primary link",
+      "info": "Empty = the contact form with Request a Viewing already chosen."
+    },
+    {
+      "type": "text",
+      "id": "cta2_label",
+      "label": "Secondary button",
+      "default": "Agent Enquiries"
+    },
+    {
+      "type": "url",
+      "id": "cta2_link",
+      "label": "Secondary link",
+      "info": "Empty = the contact form with Agent Access already chosen (/pages/contact?interest=Agent Access). The Agent Access page itself is parked for launch."
+    },
+    {
+      "type": "text",
+      "id": "cta3_label",
+      "label": "Gold button",
+      "default": "Guided Match"
+    },
+    {
+      "type": "url",
+      "id": "cta3_link",
+      "label": "Gold button link",
+      "info": "The Find Your Home page. Hidden site-wide when Theme settings › Guided Match is switched off; the row re-centres on the two buttons left."
+    },
+    {
+      "type": "header",
+      "content": "Wording"
+    },
+    {
+      "type": "text",
+      "id": "filter_land_label",
+      "label": "Land size filter label",
+      "default": "Land Size"
+    },
+    {
+      "type": "text",
+      "id": "filter_garage_label",
+      "label": "Garage filter label",
+      "default": "Garage Spaces"
+    },
+    {
+      "type": "text",
+      "id": "sort_featured_label",
+      "label": "Sort: featured",
+      "default": "Sort - Featured"
+    },
+    {
+      "type": "text",
+      "id": "sort_name_label",
+      "label": "Sort: name",
+      "default": "Name A–Z"
+    },
+    {
+      "type": "text",
+      "id": "sort_beds_label",
+      "label": "Sort: bedrooms",
+      "default": "Bedrooms"
+    },
+    {
+      "type": "text",
+      "id": "sort_newest_label",
+      "label": "Sort: newest",
+      "default": "Newest",
+      "info": "Offered once a residence carries a Year in its metafields."
+    },
+    {
+      "type": "text",
+      "id": "filter_any_garage",
+      "label": "Garage: any",
+      "default": "Any Garage"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_land",
+      "label": "Land: any",
+      "default": "Any Land Size"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_build",
+      "label": "Build size: any",
+      "default": "Any Build Size",
+      "info": "The Build size filter appears once at least one residence has a Build size (m²) in its Metafields."
+    },
+    {
+      "type": "text",
+      "id": "filter_any_beds",
+      "label": "Bedrooms: any",
+      "default": "Any Bedrooms"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_baths",
+      "label": "Bathrooms: any",
+      "default": "Any Bathrooms"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_status",
+      "label": "Status: any",
+      "default": "Any Status"
+    },
+    {
+      "type": "text",
+      "id": "clear_label",
+      "label": "Clear-filters link",
+      "default": "Clear filters"
+    },
+    {
+      "type": "header",
+      "content": "Filters"
+    },
+    {
+      "type": "paragraph",
+      "content": "Each filter only offers what the residences for sale actually have: bedroom and bathroom steps stop at the largest count, Status appears once more than one Status is in use, and a feature chip appears when at least one residence lists that feature (Products › the residence › Features; the keyword map is the residence-feats snippet)."
+    },
+    {"type": "checkbox", "id": "show_filter_suburb", "label": "Show the Suburb filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_beds", "label": "Show the Bedrooms filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_baths", "label": "Show the Bathrooms filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_garage", "label": "Show the Garage filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_land", "label": "Show the Land size filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_build", "label": "Show the Build size filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_status", "label": "Show the Status filter", "default": true},
+    {"type": "checkbox", "id": "show_filter_features", "label": "Show the Features filter", "default": true, "info": "A dropdown with a box beside each feature. Tick more than one and a residence must have them all. Only features a residence actually has are listed."},
+    {"type": "text", "id": "filter_any_features", "label": "Features filter: nothing chosen", "default": "Any Features"},
+    {"type": "checkbox", "id": "show_sort", "label": "Show the Sort menu", "default": true},
+    {"type": "text", "id": "features_label", "label": "Chips label", "default": "Features"},
+    {"type": "text", "id": "chip_pool", "label": "Chip: pool", "default": "Pool"},
+    {"type": "text", "id": "chip_views", "label": "Chip: city views", "default": "City Views"},
+    {"type": "text", "id": "chip_lift", "label": "Chip: lift", "default": "Lift"},
+    {"type": "text", "id": "chip_cinema", "label": "Chip: cinema or media room", "default": "Cinema"},
+    {"type": "text", "id": "chip_gym", "label": "Chip: gym", "default": "Gym"},
+    {"type": "text", "id": "chip_cellar", "label": "Chip: cellar", "default": "Cellar"},
+    {"type": "text", "id": "chip_study", "label": "Chip: study or home office", "default": "Study"},
+    {"type": "text", "id": "chip_solar", "label": "Chip: solar or battery", "default": "Solar and Battery"},
+    {"type": "text", "id": "chip_butler", "label": "Chip: butler's pantry", "default": "Butler's Pantry"},
+    {
+      "type": "header",
+      "content": "Now Selling band"
+    },
+    {
+      "type": "paragraph",
+      "content": "A short editorial band between the toolbar and the featured residence, so the page does not go straight from filters to cards."
+    },
+    {"type": "checkbox", "id": "show_intro_band", "label": "Show the band", "default": true},
+    {"type": "text", "id": "intro_band_label", "label": "Small label", "default": "Now Selling"},
+    {"type": "html", "id": "intro_band_heading", "label": "Heading (HTML)", "info": "Leave empty and the heading counts the residences for you: Five residences, inner Brisbane. Wrap a word in <em> for the italic accent; {count} becomes the number."},
+    {"type": "textarea", "id": "intro_band_text", "label": "Paragraph", "default": "Each residence is drawn, developed and built by the one team. Inspections are by private appointment."},
+    {"type": "checkbox", "id": "intro_band_suburbs", "label": "List the suburbs beneath the paragraph", "default": true, "info": "Read from each residence's Suburb, once each."},
+    {
+      "type": "header",
+      "content": "How It Works strip"
+    },
+    {
+      "type": "paragraph",
+      "content": "A quiet four-step track above the closing band, set like the Process track on the home page. Leave a title empty to drop that step."
+    },
+    {"type": "checkbox", "id": "show_how", "label": "Show the strip", "default": true},
+    {"type": "text", "id": "how_label", "label": "Small label", "default": "How It Works"},
+    {"type": "text", "id": "how1_title", "label": "Step 1 title", "default": "Private inspection"},
+    {"type": "textarea", "id": "how1_text", "label": "Step 1 text", "default": "By appointment, with a member of the Sabdia team who knows the residence."},
+    {"type": "text", "id": "how2_title", "label": "Step 2 title", "default": "A conversation about the residence"},
+    {"type": "textarea", "id": "how2_text", "label": "Step 2 text", "default": "Questions on the drawings, the materials and the way the house was built, answered by the people who made it."},
+    {"type": "text", "id": "how3_title", "label": "Step 3 title", "default": "Contract and settlement"},
+    {"type": "textarea", "id": "how3_text", "label": "Step 3 text", "default": "The contract goes to your solicitor for review. Settlement is arranged between the parties."},
+    {"type": "text", "id": "how4_title", "label": "Step 4 title", "default": "Handover"},
+    {"type": "textarea", "id": "how4_text", "label": "Step 4 text", "default": "The keys and the documents, handed over in person by the team that built the house."},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."},
+    {"type": "header", "content": "Hero"},
+    {"type": "range", "id": "hero_dim", "label": "Darken the hero photo or film", "min": 0, "max": 100, "step": 4, "default": 52, "unit": "%", "info": "Lower = brighter."},
+    {"type": "select", "id": "hero_height", "label": "Hero height", "options": [{"value": "short", "label": "Short"}, {"value": "standard", "label": "Standard (as designed)"}, {"value": "tall", "label": "Tall"}, {"value": "full", "label": "Full screen"}], "default": "standard"},
+    {"type": "select", "id": "hero_scrim", "label": "Veil", "options": [{"value": "corner", "label": "Weighted to the words (as designed)"}, {"value": "base", "label": "Fades up from the base"}, {"value": "even", "label": "Even veil"}, {"value": "none", "label": "None"}], "default": "corner"},
+    {"type": "select", "id": "hero_words", "label": "Where the words sit", "options": [{"value": "base-left", "label": "Base, left (as designed)"}, {"value": "base-centre", "label": "Base, centred"}, {"value": "centre", "label": "Centre of the photo"}], "default": "base-left"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_intro", "label": "Show the intro line", "default": true},
+    {"type": "header", "content": "Toolbar and featured residence"},
+    {"type": "checkbox", "id": "show_toolbar", "label": "Show the refine and sort toolbar", "default": true},
+    {"type": "checkbox", "id": "show_featured", "label": "Lead with the featured residence banner", "default": true, "info": "Off = the first residence sits in the grid with the others."},
+    {"type": "checkbox", "id": "featured_specs", "label": "Bed · bath · garage · land on the banner", "default": true},
+    {"type": "range", "id": "featured_height", "label": "Banner height, at most", "min": 360, "max": 800, "step": 20, "default": 680, "unit": "px"},
+    {"type": "header", "content": "The grid"},
+    {"type": "select", "id": "columns", "label": "Cards across", "options": [{"value": "2", "label": "Two"}, {"value": "3", "label": "Three (as designed)"}, {"value": "4", "label": "Four"}], "default": "3"},
+    {"type": "select", "id": "card_shape", "label": "Card shape", "options": [{"value": "16/10", "label": "Landscape 16:10"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "1/1", "label": "Square"}, {"value": "4/5", "label": "Portrait 4:5"}], "default": "16/10"},
+    {"type": "range", "id": "gap", "label": "Gap between cards", "min": 0, "max": 40, "step": 2, "default": 10, "unit": "px"},
+    {"type": "checkbox", "id": "show_cars", "label": "Garage count on the cards", "default": true},
+    {"type": "checkbox", "id": "show_land", "label": "Land size on the cards", "default": true},
+    {"type": "header", "content": "Closing band"},
+    {"type": "checkbox", "id": "show_cta", "label": "Show the closing band", "default": true},
+    {"type": "checkbox", "id": "show_cta1", "label": "Primary button", "default": true},
+    {"type": "checkbox", "id": "show_cta2", "label": "Secondary button", "default": true},
+    {"type": "checkbox", "id": "show_cta3", "label": "Gold button", "default": true, "info": "Also needs Theme settings › Guided Match to be on."}
+  ]
+}
+{% endschema %}

@@ -1,0 +1,96 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "page-hero",
+      "settings": {
+        "label": "Portfolio",
+        "title_html": "Our<br><em>Projects</em>",
+        "sub": "More than 100 homes delivered across inner Brisbane since 2013.",
+        "image_ext": "/images/qasr-hero.jpg",
+        "image_alt": "Projects"
+      }
+    },
+    "grid": {
+      "type": "projects-grid",
+      "settings": {
+        "current_label": "For Sale — Current",
+        "sold_label": "Sold Prior to Completion"
+      }
+    },
+    "stats": {
+      "type": "stats-band",
+      "settings": {},
+      "blocks": {
+        "stat-1": {
+          "type": "stat",
+          "settings": {
+            "target": "10",
+            "suffix": "+",
+            "label": "Years in Brisbane",
+            "count": true
+          }
+        },
+        "stat-2": {
+          "type": "stat",
+          "settings": {
+            "target": "100",
+            "suffix": "+",
+            "label": "Residences Delivered",
+            "count": true
+          }
+        },
+        "stat-3": {
+          "type": "stat",
+          "settings": {
+            "target": "5",
+            "suffix": "★",
+            "label": "Multi-Award Winning",
+            "count": true
+          }
+        },
+        "stat-4": {
+          "type": "stat",
+          "settings": {
+            "target": "100",
+            "suffix": "%",
+            "label": "In-House Delivery",
+            "count": false
+          }
+        }
+      },
+      "block_order": [
+        "stat-1",
+        "stat-2",
+        "stat-3",
+        "stat-4"
+      ]
+    },
+    "cta": {
+      "type": "cta-centered",
+      "settings": {
+        "label": "Interested?",
+        "heading_html": "Ready to find your<br><em>next home</em>?",
+        "cta1_label": "View For Sale",
+        "cta1_link": "/collections/for-sale",
+        "cta2_label": "Enquire Now",
+        "cta2_link": "/pages/contact",
+        "compact": true
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "grid",
+    "stats",
+    "cta"
+  ]
+}

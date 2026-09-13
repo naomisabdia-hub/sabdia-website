@@ -1,0 +1,287 @@
+{%- comment -%}
+  Image band - a drop-anywhere photography section with ready-made
+  structures, so image layouts are a dropdown rather than a rebuild:
+    · Full-bleed photograph
+    · Two-up
+    · Gallery row (three-up)
+    · Image beside text
+  Add images as blocks; the chosen layout uses as many as it needs.
+{%- endcomment -%}
+{%- liquid
+  assign layout = section.settings.layout | default: 'full'
+  assign blocks = section.blocks
+  # Size controls: a shape (aspect ratio) or a fixed height, a band width, a gap.
+  assign shape = section.settings.shape | default: 'auto'
+  assign ib_h = section.settings.height | default: 480
+  assign ib_hm = section.settings.height_mobile | default: 260
+  assign ib_gap = section.settings.gap | default: 10
+  case section.settings.width
+    when 'wide'
+      assign ib_max = '1100px'
+    when 'medium'
+      assign ib_max = '900px'
+    when 'narrow'
+      assign ib_max = '700px'
+    else
+      assign ib_max = '1400px'
+  endcase
+-%}
+
+{% render 'section-look', section: section %}
+<section class="imgband imgband-{{ layout }}{% if section.settings.tight %} imgband-tight{% endif %}{% if shape == 'custom' %} imgband-custom{% elsif shape != 'auto' %} imgband-shape{% endif %}{% if section.settings.hover_zoom == false %} imgband-nozoom{% endif %} imgband-cap-{{ section.settings.caption_style | default: 'chip' }}{% if section.settings.frame %} imgband-frame{% endif %}{% if section.settings.align == 'centre' %} imgband-centre{% endif %}"
+         style="--ib-gap:{{ ib_gap }}px;--ib-h:{{ ib_h }}px;--ib-hm:{{ ib_hm }}px;--ib-max:{{ ib_max }};--ib-radius:{{ section.settings.corner | default: 0 }}px{% if shape != 'auto' and shape != 'custom' %};--ib-ar:{{ shape }}{% endif %}">
+  <div class="inner" style="max-width:var(--ib-max)">
+    {%- if section.settings.label != blank or section.settings.heading_html != blank -%}
+      <div class="imgband-hdr">
+        {%- if section.settings.label != blank -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+        {%- if section.settings.heading_html != blank -%}<h2 class="about-h reveal d1" style="font-size:calc(clamp(30px,4vw,52px)*var(--s-h,1))">{{ section.settings.heading_html }}</h2>{%- endif -%}
+        {%- if section.settings.intro != blank -%}<p class="about-p reveal d2" style="margin-top:14px;max-width:560px">{{ section.settings.intro }}</p>{%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- capture imgs -%}
+      {%- assign delays = ',d1,d2' | split: ',' -%}
+      {%- for block in blocks -%}
+        {%- assign di = forloop.index0 | modulo: 3 -%}
+        {%- assign focus = block.settings.focus | default: 'center' -%}
+        {%- assign zoom = block.settings.zoom | default: 100 -%}
+        <figure class="imgband-item reveal-wipe {{ delays[di] }}" {{ block.shopify_attributes }}>
+          {%- if block.settings.image -%}
+            {%- assign ibh = 1400 | divided_by: block.settings.image.aspect_ratio | round -%}<img src="{{ block.settings.image | image_url: width: 1400 }}" alt="{{ block.settings.alt | escape }}" width="1400" height="{{ ibh }}" loading="lazy" decoding="async" style="object-position:{{ focus }};--ib-zoom:{{ zoom | divided_by: 100.0 }}">
+          {%- elsif block.settings.image_ext != blank -%}
+            <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 1400, h: 1000 %}" alt="{{ block.settings.alt | escape }}" width="1400" height="1000" loading="lazy" decoding="async" style="object-position:{{ focus }};--ib-zoom:{{ zoom | divided_by: 100.0 }}">
+          {%- endif -%}
+          {%- if block.settings.caption != blank -%}<figcaption class="imgband-cap">{{ block.settings.caption }}</figcaption>{%- endif -%}
+        </figure>
+      {%- endfor -%}
+    {%- endcapture -%}
+
+    {%- if layout == 'split' -%}
+      <div class="imgband-split">
+        <div class="imgband-grid">{{ imgs }}</div>
+        <div class="imgband-copy reveal d1">
+          {%- if section.settings.text != blank -%}<p class="about-p" style="margin-top:0">{{ section.settings.text }}</p>{%- endif -%}
+          {%- if section.settings.cta_label != blank -%}<a href="{{ section.settings.cta_link }}" class="btn-g" style="margin-top:20px">{{ section.settings.cta_label }} &rarr;</a>{%- endif -%}
+        </div>
+      </div>
+    {%- else -%}
+      <div class="imgband-grid">{{ imgs }}</div>
+    {%- endif -%}
+  </div>
+</section>
+
+<style>
+  .imgband{padding:clamp(52px,7vw,96px) var(--page-pad);background:var(--bg)}
+  .imgband-tight{padding-top:clamp(24px,3vw,40px);padding-bottom:clamp(24px,3vw,40px)}
+  .imgband-hdr{margin-bottom:32px}
+  .imgband-grid{display:grid;gap:var(--ib-gap,10px)}
+  .imgband-item{margin:0;overflow:hidden;position:relative;border-radius:var(--ib-radius,0)}
+  .imgband-nozoom .imgband-item:hover img{transform:scale(var(--ib-zoom,1))}
+  .imgband-frame .imgband-item{border:1px solid var(--border)}
+  .imgband-centre .imgband-hdr{text-align:center}.imgband-centre .imgband-hdr .slabel{justify-content:center}.imgband-centre .imgband-hdr .about-p{margin-left:auto;margin-right:auto}
+  .imgband-cap-below .imgband-cap{position:static;background:none;padding:10px 0 0;color:var(--taupe-d);backdrop-filter:none;letter-spacing:.14em}
+  .imgband-cap-none .imgband-cap{display:none}
+  .imgband-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.92);transform:scale(var(--ib-zoom,1));transition:transform .8s var(--ease)}
+  .imgband-item:hover img{transform:scale(calc(var(--ib-zoom,1) * 1.03))}
+  /* Shape / height overrides from the section's size controls */
+  .imgband.imgband-shape .imgband-item{aspect-ratio:var(--ib-ar)}
+  .imgband.imgband-custom .imgband-item{aspect-ratio:auto;height:var(--ib-h)}
+  @media(max-width:900px){.imgband.imgband-custom .imgband-item{aspect-ratio:auto;height:var(--ib-hm)}}
+  .imgband-cap{position:absolute;bottom:14px;left:14px;padding:7px 14px;background:rgba(var(--dark-rgb),.72);backdrop-filter:blur(8px);font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--white-rgb),.85)}
+  .imgband-full .imgband-item{aspect-ratio:21/9}
+  .imgband-two .imgband-grid{grid-template-columns:1fr 1fr}
+  .imgband-two .imgband-item{aspect-ratio:4/3}
+  .imgband-three .imgband-grid{grid-template-columns:repeat(3,1fr)}
+  .imgband-three .imgband-item{aspect-ratio:4/3}
+  .imgband-split .imgband-item{aspect-ratio:4/3}
+  .imgband-split{display:grid;grid-template-columns:7fr 5fr;gap:clamp(28px,5vw,72px);align-items:center}
+  @media(max-width:900px){
+    .imgband-two .imgband-grid,.imgband-three .imgband-grid{grid-template-columns:1fr}
+    .imgband-split{grid-template-columns:1fr;gap:28px}
+    .imgband-full .imgband-item{aspect-ratio:16/10}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Image band",
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Structure",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full-bleed photograph"
+        },
+        {
+          "value": "two",
+          "label": "Two-up"
+        },
+        {
+          "value": "three",
+          "label": "Gallery row (three-up)"
+        },
+        {
+          "value": "split",
+          "label": "Image beside text"
+        }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label (optional)"
+    },
+    {
+      "type": "html",
+      "id": "heading_html",
+      "label": "Heading (optional, HTML)"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text (Image-beside-text structure)"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label (optional)"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link"
+    },
+    {
+      "type": "checkbox",
+      "id": "tight",
+      "label": "Tighter spacing",
+      "default": false
+    },
+    { "type": "header", "content": "Size" },
+    {
+      "type": "select",
+      "id": "shape",
+      "label": "Image shape",
+      "options": [
+        { "value": "auto", "label": "Automatic (by structure)" },
+        { "value": "21/9", "label": "Cinematic 21:9" },
+        { "value": "16/9", "label": "Wide 16:9" },
+        { "value": "3/2", "label": "Landscape 3:2" },
+        { "value": "4/3", "label": "Landscape 4:3" },
+        { "value": "1/1", "label": "Square" },
+        { "value": "4/5", "label": "Portrait 4:5" },
+        { "value": "custom", "label": "Fixed height (set below)" }
+      ],
+      "default": "auto"
+    },
+    { "type": "range", "id": "height", "label": "Height", "min": 160, "max": 900, "step": 20, "unit": "px", "default": 480, "info": "Only used with \"Fixed height\"." },
+    { "type": "range", "id": "height_mobile", "label": "Height on phones", "min": 120, "max": 600, "step": 20, "unit": "px", "default": 260, "info": "Only used with \"Fixed height\"." },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Band width",
+      "options": [
+        { "value": "full", "label": "Full page width" },
+        { "value": "wide", "label": "Wide (1100px)" },
+        { "value": "medium", "label": "Medium (900px)" },
+        { "value": "narrow", "label": "Narrow (700px)" }
+      ],
+      "default": "full"
+    },
+    { "type": "range", "id": "gap", "label": "Gap between images", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 10 },
+    {"type": "header", "content": "Photos"},
+    {"type": "checkbox", "id": "hover_zoom", "label": "Photos zoom gently on hover", "default": true},
+    {"type": "select", "id": "caption_style", "label": "Captions", "options": [{"value": "chip", "label": "Chip on the photo (as designed)"}, {"value": "below", "label": "Under the photo"}, {"value": "none", "label": "Hidden"}], "default": "chip"},
+    {"type": "range", "id": "corner", "label": "Rounded corners", "min": 0, "max": 24, "step": 2, "default": 0, "unit": "px"},
+    {"type": "checkbox", "id": "frame", "label": "Hairline frame around each photo", "default": false},
+    {"type": "header", "content": "Words"},
+    {"type": "textarea", "id": "intro", "label": "Intro line (optional)"},
+    {"type": "select", "id": "align", "label": "Words sit", "options": [{"value": "left", "label": "Left"}, {"value": "centre", "label": "Centre"}], "default": "left"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "image_ext",
+          "label": "Current photo (URL)",
+          "info": "The photo showing now is loaded from this address. Choose an image above and it takes over - you never need to edit this field."
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption (optional)"
+        },
+        {
+          "type": "select",
+          "id": "focus",
+          "label": "Crop focus",
+          "options": [
+            { "value": "center", "label": "Centre" },
+            { "value": "top", "label": "Top" },
+            { "value": "bottom", "label": "Bottom" },
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "center",
+          "info": "Which part of the photo to keep when it is cropped to the frame."
+        },
+        { "type": "range", "id": "zoom", "label": "Zoom", "min": 100, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Enlarge the photo inside its frame." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image band",
+      "blocks": [
+        {
+          "type": "image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
