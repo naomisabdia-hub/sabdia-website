@@ -96,6 +96,7 @@
   assign lead_heading = lead_heading | replace: count_token, total
 -%}
 
+{% render 'residence-faces' %}
 {% render 'section-look', section: section %}
 {%- if show_lead -%}
 <section class="pf-lead" id="pfLead-{{ sid }}">
@@ -164,7 +165,7 @@
                 <span class="port-film-tag">{{ pstatus }}</span>
               </div>
               <div class="pf-info">
-                <div class="pf-name">{{ product.title }} <span aria-hidden="true">&rarr;</span></div>
+                <div class="pf-name">{% render 'residence-name', product: product %} <span aria-hidden="true">&rarr;</span></div>
                 <div class="pf-meta">{{ product.metafields.custom.suburb.value }}{% if product.metafields.custom.year.value != blank %} <i>&middot;</i> {{ product.metafields.custom.year.value }}{% endif %}</div>
               </div>
             </a>

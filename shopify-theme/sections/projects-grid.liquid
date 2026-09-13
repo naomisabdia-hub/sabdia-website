@@ -17,6 +17,7 @@
   assign sold_handles = sold_csv | split: ','
 -%}
 
+{% render 'residence-faces' %}
 {% render 'section-look', section: section %}
 {%- if section.settings.show_filter -%}
 <div class="s-surface" style="background:var(--bg2);border-bottom:1px solid var(--border);padding:20px var(--page-pad)">
@@ -47,7 +48,7 @@
             <div class="proj-card-ov"></div>
             <div class="proj-card-info">
               {%- if section.settings.show_year_status -%}<div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}{{ pstatus }}</div>{%- endif -%}
-              <div class="proj-card-name">{{ product.title }}</div>
+              <div class="proj-card-name">{% render 'residence-name', product: product %}</div>
               <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD{% if section.settings.show_specs %} - {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}{% endif %}</div>
             </div>
             {%- if section.settings.show_arrow -%}<div class="pc-arrow">&rarr;</div>{%- endif -%}
@@ -81,7 +82,7 @@
             {%- if section.settings.show_sold_badge -%}<div class="sc-badge">{{ badge }}</div>{%- endif -%}
             <div class="proj-card-info">
               {%- if section.settings.show_year_status -%}<div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}Sold</div>{%- endif -%}
-              <div class="proj-card-name">{{ product.title }}</div>
+              <div class="proj-card-name">{% render 'residence-name', product: product %}</div>
               <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD{% if section.settings.show_specs %} - {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}{% endif %}</div>
             </div>
           </a>

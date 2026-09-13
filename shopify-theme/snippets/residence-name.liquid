@@ -1,0 +1,33 @@
+{%- comment -%}
+  The residence's name, set in its own brochure face wherever it appears
+  in running text (Naomi, 14 Sep 2026: "anywhere that it has the house
+  name must be written in their font"). Prints a span carrying the face,
+  the brochure's case (Sierra, not SIERRA) and the optical scale, or the
+  plain title when the product has no face. The page must have rendered
+  'residence-faces' (or the residence page's own @font-face) once.
+
+    {% render 'residence-name', product: product %}
+{%- endcomment -%}
+{%- liquid
+  assign rn_m = product.metafields.custom
+  assign rn_f = rn_m.name_font.value | strip
+  assign rn_ff = rn_m.name_font_file.value | strip
+  if rn_f == blank and rn_ff == blank
+    echo product.title
+  else
+    assign rn_fam = rn_f
+    if rn_fam == blank
+      assign rn_fam = 'ResidenceFace-' | append: product.handle
+    endif
+    capture rn_scale
+      render 'residence-face-scale', product: product
+    endcapture
+    assign rn_name = product.title
+    assign rn_tt = 'uppercase'
+    unless rn_m.name_font_caps.value
+      assign rn_name = product.title | downcase | capitalize
+      assign rn_tt = 'none'
+    endunless
+    echo '<span class="res-face" style="font-family:' | append: "'" | append: rn_fam | append: "',var(--font-d);font-weight:" | append: rn_m.name_font_weight.value | default: 400 | append: ';font-size:calc(1em*' | append: rn_scale | strip | append: ');text-transform:' | append: rn_tt | append: ';letter-spacing:0;font-style:normal">' | append: rn_name | append: '</span>'
+  endif
+-%}

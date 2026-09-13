@@ -25,8 +25,12 @@
     endif
   endif
   assign wt_name = section.settings.name
+  assign wt_name_html = wt_name
   if wt_name == blank and template.name == 'product'
     assign wt_name = product.title
+    capture wt_name_html
+      render 'residence-name', product: product
+    endcapture
   endif
   assign base = folder
   unless folder contains '://'
@@ -46,7 +50,7 @@
   {%- if section.settings.show_intro -%}
   <div class="sw-intro inner">
     {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.walk_label | default: "The Walkthrough" }}</div>{%- endif -%}
-    <h2 class="sw-h reveal d1">{{ sw_heading | replace: name_token, wt_name }}</h2>
+    <h2 class="sw-h reveal d1">{{ sw_heading | replace: name_token, wt_name_html }}</h2>
   </div>
   {%- endif -%}
   <div class="sw-track" style="height:480vh">

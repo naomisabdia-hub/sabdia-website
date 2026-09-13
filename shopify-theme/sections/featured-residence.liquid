@@ -270,7 +270,7 @@
       <div class="slabel slabel-dark reveal">{{ fr_label }}{% if section.settings.show_status and fr_status != blank %} <span class="fr-status">&middot; {{ fr_status }}</span>{% endif %}</div>
     {%- endif -%}
     <h2 class="page-h reveal d1">{{ fr_heading }}</h2>
-    <div class="fr-name reveal d1">{{ res.title }}{% if m.suburb.value != blank %} <span>{{ m.suburb.value }}</span>{% endif %}</div>
+    <div class="fr-name reveal d1">{% render 'residence-name', product: res %}{% if m.suburb.value != blank %} <span>{{ m.suburb.value }}</span>{% endif %}</div>
     {%- if fr_text != blank and section.settings.show_text -%}<p class="page-hero-sub reveal d2">{{ fr_text }}</p>{%- endif -%}
     {%- if section.settings.show_facts -%}
     <ul class="fr-facts reveal d2">

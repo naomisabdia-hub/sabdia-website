@@ -66,6 +66,14 @@
   capture nf_scale
     render 'residence-face-scale', product: product
   endcapture
+  # Headings that carry the name in running text (Enquire About Sierra,
+  # Inside Sierra, Experience Sierra) set it in the face with this span;
+  # the words around it stay in the site type, as the brochures do.
+  capture name_span
+    echo '<span class="pg-house prop-house">'
+    echo prop_name
+    echo '</span>'
+  endcapture
 -%}
 {%- if nf != blank or nf_file != blank -%}
   {%- if nf_file != blank -%}
@@ -91,8 +99,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family={{ nf | replace: ' ', '+' }}:wght@{{ nf_weight }}&display=swap">
   {%- endif -%}
   <style>
-    .prop-name,.psb-name,.prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house{font-family:'{{ nf_family }}',var(--font-d);font-weight:{{ nf_weight }}{% if nf_caps %};text-transform:uppercase{% endif %}}
-    .prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house{font-size:calc(1em * {{ nf_scale | strip }})}
+    .prop-name,.psb-name,.prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house,.prop-house{font-family:'{{ nf_family }}',var(--font-d);font-weight:{{ nf_weight }}{% if nf_caps %};text-transform:uppercase{% endif %}}
+    .prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house,.prop-house{font-size:calc(1em * {{ nf_scale | strip }})}
+    .prop-house{text-transform:none}
+    em .prop-house,.prop-house em{font-size:1em}
     .psb-name{font-size:calc(var(--t-body) * var(--s-t,1) * {{ nf_scale | strip }})}
     .prop-name{font-size:calc(var(--t-display-xl) * {{ section.settings.name_font_scale | default: 100 | divided_by: 100.0 }} * {{ nf_scale | strip }});letter-spacing:{{ section.settings.name_font_tracking | default: -4 | divided_by: 100.0 }}em;line-height:.95}
   </style>
@@ -211,7 +221,7 @@
 <div class="prop-body pb-{{ section.settings.body_layout | default: 'beside' }}" style="--prop-split:{{ pr_split }}">
   <div class="prop-layout inner">
     <div class="{% if section.settings.sticky_desc %}prop-desc{% endif %}">
-      {%- if section.settings.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, prop_name }}</div>{%- endif -%}
+      {%- if section.settings.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, name_span }}</div>{%- endif -%}
       {%- if section.settings.show_headline and mf.headline.value != blank -%}<h1 class="prop-body-h reveal d1">{{ mf.headline.value }}</h1>{%- endif -%}
       {%- if section.settings.show_description -%}{{ product.description | replace: '<p>', '<p class="prop-body-p reveal d2">' }}{%- endif -%}
 
@@ -230,7 +240,7 @@
     {%- if section.settings.show_enquiry -%}
     <div class="reveal d2 prop-side">
       <div class="prop-enquire">
-        <div class="prop-enquire-h">{{ mf.enquiry_heading.value | default: 'Enquire Now' }}</div>
+        <div class="prop-enquire-h">{{ mf.enquiry_heading.value | default: 'Enquire Now' | replace: product.title, name_span }}</div>
         <p style="font-size:13px;font-weight:300;color:var(--ink3);line-height:1.75;margin-bottom:24px">{{ mf.enquiry_text.value }}</p>
         {%- if settings.form_backend == 'vercel' -%}
         <form class="cform" id="cform" name="property-enquiry" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
@@ -344,7 +354,7 @@
 {%- if gallery_count > 0 and section.settings.show_gallery -%}
   <div class="prop-gallery inner{% if section.settings.show_thumbs == false %} pg-nothumbs{% endif %}{% if section.settings.show_rooms == false %} pg-norooms{% endif %}{% if section.settings.show_expand == false %} pg-noexpand{% endif %}" style="--pgs-ar:{{ section.settings.stage_shape | default: '16/9' }}">
     {%- if section.settings.gallery_label != blank -%}<div class="slabel reveal">{{ section.settings.gallery_label }}</div>{%- endif -%}
-    <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, prop_name }}</h2>
+    <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, name_span }}</h2>
     {%- if glayout == 'grid' -%}
     <div class="prop-gallery-grid gn-{{ gallery_count }}" id="galleryGrid">
       {%- assign gdelays = ',d1,d2' | split: ',' -%}
@@ -681,14 +691,14 @@
             assign film_h = 'Experience <em>' | append: name_token | append: '</em>.'
           endif
         -%}
-        <h2 class="film-h reveal d1">{{ film_h | replace: name_token, prop_name }}</h2>
+        <h2 class="film-h reveal d1">{{ film_h | replace: name_token, name_span }}</h2>
         {%- liquid
           assign film_text = section.settings.film_text
           if film_text == blank
             assign film_text = 'A walk through ' | append: name_token | append: ', on film.'
           endif
         -%}
-        <p class="film-p reveal d2">{{ film_text | replace: name_token, prop_name }}</p>
+        <p class="film-p reveal d2">{{ film_text | replace: name_token, name_span }}</p>
       </div>
       <div class="reveal d2">
         <div class="film-frame" data-film>
@@ -700,7 +710,7 @@
         </div>
         {%- if section.settings.show_film_caption -%}
         <div class="film-caption">
-          <span><b>{{ prop_name }} - On Film</b></span>
+          <span><b>{{ name_span }} - On Film</b></span>
           <span>{{ mf.suburb.value }}, {{ state }}</span>
         </div>
         {%- endif -%}
@@ -713,8 +723,8 @@
   <section class="prop-cta">
     <div class="inner prop-cta-inner">
       <div class="slabel reveal" style="justify-content:center">{{ section.settings.cta_label }}</div>
-      <h2 class="prop-cta-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, prop_name }}</h2>
-      <p class="prop-cta-p reveal d2">{{ section.settings.cta_text | replace: name_token, prop_name }}</p>
+      <h2 class="prop-cta-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, name_span }}</h2>
+      <p class="prop-cta-p reveal d2">{{ section.settings.cta_text | replace: name_token, name_span }}</p>
       <a href="#cform" class="btn-p reveal d3">{{ section.settings.cta_button | replace: name_token, prop_name }} &rarr;</a>
     </div>
   </section>

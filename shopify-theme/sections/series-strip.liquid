@@ -26,9 +26,13 @@
   # the residence name come from whichever the template provides.
   assign posts = product.metafields.custom.series_posts.value
   assign series_name = product.title
+  capture series_name_html
+    render 'residence-name', product: product
+  endcapture
   if posts == blank and page
     assign posts = page.metafields.custom.series_posts.value
     assign series_name = page.title
+    assign series_name_html = page.title
   endif
   assign visible = 0
   for item in posts
@@ -57,7 +61,7 @@
   <div class="series-hdr">
     <div>
       {%- if section.settings.show_label -%}<div class="slabel {% if section.settings.dark %}slabel-dark {% endif %}reveal">{{ section.settings.label }}</div>{%- endif -%}
-      {%- if section.settings.show_heading -%}<h2 class="series-h reveal d1">{{ section.settings.heading_prefix }} <em>{{ series_name }}</em>.</h2>{%- endif -%}
+      {%- if section.settings.show_heading -%}<h2 class="series-h reveal d1">{{ section.settings.heading_prefix }} <em>{{ series_name_html }}</em>.</h2>{%- endif -%}
       {%- if section.settings.show_handle -%}
       <a href="{{ section.settings.instagram_url | default: settings.instagram_url }}" target="_blank" rel="noopener" class="series-handle reveal d2">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>

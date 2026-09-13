@@ -1679,3 +1679,6 @@ html.bk h1 em,html.bk h2 em,html.bk h3 em,html.bk [class*="-h"] em,html.bk [clas
 html.bk .mc-intro{padding-top:clamp(36px,4.5vw,60px)}
 html.bk .prop-toolbar{padding-top:14px;padding-bottom:14px}
 html.bk .film-band{padding-top:calc(clamp(52px,6.2vw,92px)*var(--sp-scale)*var(--sp-top,1));padding-bottom:calc(clamp(52px,6.2vw,92px)*var(--sp-scale)*var(--sp-bot,1))}
+/* A residence name set in its brochure face inside running text (snippets/residence-name). */
+.res-face{display:inline-block;line-height:1;vertical-align:baseline}
+.slabel .res-face,.slabel .prop-house{font-size:calc(1.3em*1);letter-spacing:0}
