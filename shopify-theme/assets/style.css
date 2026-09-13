@@ -1444,7 +1444,7 @@ h1 em, h2 em, h3 em,
 /* Header: nav links and Enquire a touch larger (logo unchanged) */
 .nav-center{gap:var(--nav-gap,40px)}
 .nav-center a{font-size:var(--nav-link,calc(var(--t-label) + 2px));letter-spacing:calc(var(--nav-track,22) * .01em)}
-.nav-cta{font-size:calc(var(--t-label) + 1.5px);padding:12px 28px;letter-spacing:.22em}
+.nav-cta{font-size:calc(var(--nav-link,13px) - .5px);padding:12px 28px;letter-spacing:.22em}
 
 /* Sabdia Concierge chat */
 .cc{position:fixed;right:clamp(14px,2.4vw,28px);bottom:clamp(14px,2.4vw,28px);z-index:7000;font-family:var(--font-u)}

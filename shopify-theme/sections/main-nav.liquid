@@ -33,7 +33,7 @@
 -%}
 {%- liquid
   assign nav_h = section.settings.bar_height | default: 80
-  assign nav_link = section.settings.link_size | default: 12.5
+  assign nav_link = section.settings.link_size | default: 14
   assign nav_gap = section.settings.link_gap | default: 40
   assign nav_track = section.settings.link_tracking | default: 22
   assign mob_link = section.settings.mobile_link_size | default: 52
@@ -201,7 +201,7 @@
     {"type": "select", "id": "scrolled_bar", "label": "Bar once scrolled", "options": [{"value": "cream", "label": "Cream (as designed)"}, {"value": "obsidian", "label": "Obsidian"}], "default": "cream"},
     {"type": "checkbox", "id": "show_progress", "label": "Thin gold reading-progress line under the bar", "default": true},
     {"type": "header", "content": "Links"},
-    {"type": "range", "id": "link_size", "label": "Link size", "min": 9, "max": 16, "step": 0.5, "default": 12.5, "unit": "px"},
+    {"type": "range", "id": "link_size", "label": "Link size", "min": 9, "max": 18, "step": 0.5, "default": 14, "unit": "px", "info": "14 since 14 Sep 2026 (Naomi: a little bigger). The Enquire button follows it."},
     {"type": "range", "id": "link_gap", "label": "Gap between links", "min": 20, "max": 64, "step": 2, "default": 40, "unit": "px"},
     {"type": "range", "id": "link_tracking", "label": "Letter spacing", "min": 0, "max": 40, "step": 2, "default": 22, "info": "Hundredths of an em."},
     {"type": "select", "id": "menu_case", "label": "Links set in", "options": [{"value": "caps", "label": "Tracked capitals (as designed)"}, {"value": "as-written", "label": "As written in the menu"}], "default": "caps"},
