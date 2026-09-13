@@ -1,0 +1,172 @@
+{%- comment -%}
+  Featured residence - the flagship band the 11 Sep 2026 review asked for
+  ("pop a feature project up front, let's do AETHER and really force that,
+  then go into current"). One residence, full width, its own photo or film
+  behind, name, suburb, the headline from its product, the four facts and
+  two buttons. Pick the residence in Customize; leave it empty and the band
+  takes the first residence in the For Sale order, so it follows the Status
+  field like every other list. Real photographs and real footage only.
+{%- endcomment -%}
+{%- liquid
+  assign res = section.settings.residence
+  if res == blank
+    capture live_csv
+      render 'residence-handles', col: collections['for-sale'], group: 'live'
+    endcapture
+    assign first_h = live_csv | split: ',' | first
+    for p in collections.all.products
+      if p.handle == first_h
+        assign res = p
+        break
+      endif
+    endfor
+  endif
+-%}
+{%- if res -%}
+{%- liquid
+  assign m = res.metafields.custom
+  assign fr_label = section.settings.label
+  assign fr_heading = section.settings.heading_html
+  if fr_heading == blank
+    assign fr_heading = m.headline.value
+  endif
+  if fr_heading == blank
+    assign fr_heading = res.title
+  endif
+  assign fr_text = section.settings.text
+  if fr_text == blank and section.settings.text_source == 'description'
+    assign fr_text = res.description | strip_html | split: '. ' | first | append: '.'
+  endif
+  assign fr_video = section.settings.video_url
+  if section.settings.video
+    assign vmp4 = section.settings.video.sources | where: 'format', 'mp4' | first
+    if vmp4
+      assign fr_video = vmp4.url
+    endif
+  endif
+  if fr_video == blank and section.settings.use_product_film and m.film_video.value != blank
+    assign fr_video = m.film_video.value
+  endif
+  assign fr_img = section.settings.image
+  if fr_img == blank
+    assign fr_img = res.featured_image
+  endif
+  assign fr_focus = section.settings.focus | default: 'center'
+  assign fr_dim = section.settings.dim | default: 45 | divided_by: 100.0
+  case section.settings.height
+    when 'short'
+      assign fr_h = '56vh'
+      assign fr_hm = '52vh'
+    when 'full'
+      assign fr_h = '100svh'
+      assign fr_hm = '100svh'
+    else
+      assign fr_h = 'max(520px,78vh)'
+      assign fr_hm = 'max(420px,64vh)'
+  endcase
+  assign fr_cta1 = section.settings.cta1_label | replace: '{name}', res.title
+  assign fr_cta2 = section.settings.cta2_label | replace: '{name}', res.title
+  assign fr_cta2_link = section.settings.cta2_link
+  if fr_cta2_link == blank
+    assign fr_cta2_link = '/pages/contact?interest=Request%20a%20Viewing&property=' | append: res.title | url_encode
+  endif
+  capture fr_status
+    render 'residence-status', product: res
+  endcapture
+-%}
+{% render 'section-look', section: section, mode: 'hero' %}
+<section class="page-hero ph-sized fr ph-pos-{{ section.settings.words | default: 'base-left' }} ph-scrim-{{ section.settings.scrim | default: 'corner' }}" style="--ph-h:{{ fr_h }};--ph-hm:{{ fr_hm }};--ph-dim:{{ fr_dim }}">
+  {%- if fr_video != blank -%}
+    <video class="page-hero-video" src="{{ fr_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if fr_img %} poster="{{ fr_img | image_url: width: 1920, height: 1080, crop: fr_focus }}"{% endif %}></video>
+  {%- elsif fr_img -%}
+    <img src="{{ fr_img | image_url: width: 1920, height: 1080, crop: fr_focus }}" srcset="{{ fr_img | image_url: width: 900, height: 1125, crop: fr_focus }} 900w, {{ fr_img | image_url: width: 1440, height: 810, crop: fr_focus }} 1440w, {{ fr_img | image_url: width: 1920, height: 1080, crop: fr_focus }} 1920w" sizes="100vw" alt="{{ res.title }}, {{ m.suburb.value }}" loading="lazy" decoding="async" width="1920" height="1080" style="object-position:{{ fr_focus }}">
+  {%- endif -%}
+  <div class="page-hero-ov"></div>
+  <div class="page-hero-content inner">
+    {%- if section.settings.show_label and fr_label != blank -%}
+      <div class="slabel slabel-dark reveal">{{ fr_label }}{% if section.settings.show_status and fr_status != blank %} <span class="fr-status">&middot; {{ fr_status }}</span>{% endif %}</div>
+    {%- endif -%}
+    <h2 class="page-h reveal d1">{{ fr_heading }}</h2>
+    <div class="fr-name reveal d1">{{ res.title }}{% if m.suburb.value != blank %} <span>{{ m.suburb.value }}</span>{% endif %}</div>
+    {%- if fr_text != blank and section.settings.show_text -%}<p class="page-hero-sub reveal d2">{{ fr_text }}</p>{%- endif -%}
+    {%- if section.settings.show_facts -%}
+    <ul class="fr-facts reveal d2">
+      {%- if m.beds.value != blank -%}<li><b>{{ m.beds.value }}</b> Bed</li>{%- endif -%}
+      {%- if m.baths.value != blank -%}<li><b>{{ m.baths.value }}</b> Bath</li>{%- endif -%}
+      {%- if m.cars.value != blank -%}<li><b>{{ m.cars.value }}</b> Garage</li>{%- endif -%}
+      {%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>m&sup2; land</li>{%- endif -%}
+    </ul>
+    {%- endif -%}
+    {%- if section.settings.show_buttons -%}
+    <div class="fr-btns reveal d3">
+      {%- if fr_cta1 != blank -%}<a href="{{ res.url }}" class="btn-p">{{ fr_cta1 }} &rarr;</a>{%- endif -%}
+      {%- if fr_cta2 != blank -%}<a href="{{ fr_cta2_link }}" class="btn-g btn-g-light">{{ fr_cta2 }}</a>{%- endif -%}
+    </div>
+    {%- endif -%}
+  </div>
+</section>
+<style>
+  .fr .page-hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(calc(1 - var(--ph-dim,.45) * .5)) saturate(.95)}
+  .fr .page-h{font-size:calc(var(--t-h1)*1.15*var(--s-h,1));line-height:1.05;max-width:12em}
+  .fr-name{margin-top:16px;font-size:var(--t-label);font-weight:500;letter-spacing:.3em;text-transform:uppercase;color:var(--white)}
+  .fr-name span{font-weight:300;letter-spacing:.2em;opacity:.7;margin-left:12px}
+  .fr-status{font-weight:300;opacity:.75}
+  .fr-facts{list-style:none;margin:22px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px 28px;font-size:var(--t-small);letter-spacing:.06em;color:rgba(var(--white-rgb),.8)}
+  .fr-facts b{font-weight:500;color:var(--white)}
+  .fr-btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+  .ph-pos-base-centre.fr .fr-facts,.ph-pos-centre.fr .fr-facts,.ph-pos-base-centre.fr .fr-btns,.ph-pos-centre.fr .fr-btns{justify-content:center}
+  @media(prefers-reduced-motion:reduce){.fr .page-hero-video{display:none}}
+  @media(max-width:900px){.fr.page-hero.ph-sized{height:auto;min-height:max(360px,var(--ph-hm,60vh))}}
+</style>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Featured residence",
+  "settings": [
+    {"type": "paragraph", "content": "The flagship band: one residence, full width, up front. Leave the residence empty and it takes the first home in the For Sale order."},
+    {"type": "product", "id": "residence", "label": "Residence"},
+    {"type": "header", "content": "Words"},
+    {"type": "text", "id": "label", "label": "Small label", "default": "Featured Residence"},
+    {"type": "checkbox", "id": "show_status", "label": "Add the residence's Status after the label", "default": true},
+    {"type": "html", "id": "heading_html", "label": "Heading", "info": "Empty = the residence's own headline (Products › the residence › Headline), else its name."},
+    {"type": "select", "id": "text_source", "label": "Line under the heading", "options": [{"value": "description", "label": "First sentence of the residence's description"}, {"value": "none", "label": "None"}], "default": "description"},
+    {"type": "textarea", "id": "text", "label": "Your own line instead", "info": "Overrides the choice above."},
+    {"type": "header", "content": "Show"},
+    {"type": "checkbox", "id": "show_label", "label": "Small label", "default": true},
+    {"type": "checkbox", "id": "show_text", "label": "The line", "default": true},
+    {"type": "checkbox", "id": "show_facts", "label": "Bed, bath, garage, land", "default": true},
+    {"type": "checkbox", "id": "show_buttons", "label": "The two buttons", "default": true},
+    {"type": "text", "id": "cta1_label", "label": "Button 1 (to the residence)", "default": "Explore {name}", "info": "{name} becomes the residence's name."},
+    {"type": "text", "id": "cta2_label", "label": "Button 2", "default": "Arrange an Inspection"},
+    {"type": "url", "id": "cta2_link", "label": "Button 2 goes to", "info": "Empty = the contact form with a viewing of this residence already chosen."},
+    {"type": "header", "content": "Photo or film behind"},
+    {"type": "paragraph", "content": "Real photographs and real footage only. Empty = the residence's main photo."},
+    {"type": "image_picker", "id": "image", "label": "Photo"},
+    {"type": "video", "id": "video", "label": "Film (upload)"},
+    {"type": "text", "id": "video_url", "label": "Current film (URL)"},
+    {"type": "checkbox", "id": "use_product_film", "label": "Use the residence's own film when no film is chosen", "default": false},
+    {"type": "select", "id": "focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "range", "id": "dim", "label": "Darken", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 45},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "height", "label": "Height", "options": [{"value": "standard", "label": "Standard (as designed)"}, {"value": "short", "label": "Short"}, {"value": "full", "label": "Full screen"}], "default": "standard"},
+    {"type": "select", "id": "words", "label": "Words sit", "options": [{"value": "base-left", "label": "Bottom left (as designed)"}, {"value": "base-centre", "label": "Bottom centre"}, {"value": "centre", "label": "Centre"}], "default": "base-left"},
+    {"type": "select", "id": "scrim", "label": "Darkening shape", "options": [{"value": "corner", "label": "Corner (as designed)"}, {"value": "base", "label": "Bottom only"}, {"value": "even", "label": "Even"}, {"value": "none", "label": "None"}], "default": "corner"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name"}
+  ],
+  "presets": [{"name": "Featured residence"}]
+}
+{% endschema %}

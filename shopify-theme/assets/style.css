@@ -1658,3 +1658,19 @@ html.bk .proj-h,html.bk .contact-h{line-height:1.1}
 html.bk .slabel{margin-bottom:14px}
 html.bk .film-h{margin-bottom:16px}
 html.bk .ps .about-p{margin-bottom:44px!important}
+/* Section rhythm in the brand kit system: the editorial serif needed air;
+   the sans does not, and two adjacent sections were stacking ~260px of
+   empty page (Naomi, 13 Sep 2026: "the spaces are really weird"). */
+html.bk .sp{padding-top:calc(clamp(52px,6.2vw,92px)*var(--sp-scale)*var(--sp-top,1));padding-bottom:calc(clamp(52px,6.2vw,92px)*var(--sp-scale)*var(--sp-bot,1))}
+html.bk .sp-sm{padding-top:calc(clamp(36px,4.4vw,60px)*var(--sp-scale)*var(--sp-top,1));padding-bottom:calc(clamp(36px,4.4vw,60px)*var(--sp-scale)*var(--sp-bot,1))}
+html.bk .sp-lg{padding-top:calc(clamp(64px,7.5vw,112px)*var(--sp-scale)*var(--sp-top,1));padding-bottom:calc(clamp(64px,7.5vw,112px)*var(--sp-scale)*var(--sp-bot,1))}
+html.bk .proj-hdr{margin-bottom:36px}
+html.bk .about-grid{gap:64px}
+html.bk .proc-track{margin-top:8px}
+/* For Sale toolbar in the kit: charcoal carets, no gold, one caret per control. */
+html.bk .ptool-sel{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%233d3d3d' stroke-width='1.2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center;background-size:10px 6px}
+html.bk .ptool-drop summary::after{display:none}
+html.bk .ptool-drop summary:focus-visible{outline-color:var(--ink)}
+/* Headings written with an <em> in section-local styles (contact page, CTA
+   bands) outrank the rules above; in the kit no heading word is italic. */
+html.bk h1 em,html.bk h2 em,html.bk h3 em,html.bk [class*="-h"] em,html.bk [class*="-name"] em{font-style:normal!important;font-weight:inherit!important;color:inherit!important}

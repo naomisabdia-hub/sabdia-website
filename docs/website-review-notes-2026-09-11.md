@@ -259,3 +259,58 @@ for `zsh shopify-app/push-live.sh`):
 Still Naomi's: AETHER first in the For Sale collection (drag order),
 Collection ordering best to weakest, 5–6 photos per residence, hero
 placeholder images, the Inbox tick, the menu item, then `push-live.sh`.
+
+---
+
+## Go-live audit, 13 Sep 2026 (staging #150783361126, Claude's own pass)
+
+Checked every template at 1440px and 390px through the password cookie:
+home, For Sale, Sold, About, Process, Collection, a Collection residence,
+AETHER, Contact, Agent Access, search, 404. All 200, no Liquid errors.
+
+### Fixed in this pass
+- **Flagship band** (the meeting, 05:12: "pop a feature project up front,
+  let's do AETHER and really force that, then go into current"): new
+  section *Featured residence* sits straight after the hero. Picks the
+  residence in Customize; empty = first in the For Sale order. Its own
+  photo/film, the residence's headline, four facts, two buttons. The For
+  Sale grid under it leaves that residence out (Customize › Leave out).
+- **Marquee band** hidden (eye icon brings it back). Stats band already off.
+- **Section gaps**: two adjacent sections were stacking about 260px of
+  empty page. Kit rhythm is now 52 to 92px per side; heading-to-content
+  gaps tightened.
+- **Headings**: one weight, no bold or light word, no italics anywhere in a
+  heading (forced, so section-local styles cannot bring them back).
+- **Filters**: a control only appears when it can change the list (two or
+  more values). Bedrooms drops out (every home has five). Features
+  dropdown had two carets: fixed. Carets are charcoal, not gold.
+- **Disciplines band** ("Every discipline, under one roof", the four
+  services) now lives on About after the studio intro, and the Process
+  page carries the full version. It is off on the home page.
+- **Agent Access**: one switch, off, hidden everywhere (see above).
+
+### Good, leave alone
+- Hero film with the wordmark, buttons and award line.
+- For Sale cards, status chips, the AETHER residence page (specs, enquiry
+  form, film, series, similar homes) on desktop and phone.
+- About: studio, values, journey, awards, now-selling band.
+- Process: intro, film, four disciplines with photos, four steps.
+- Contact: direct contact, form, "you may also be interested in".
+- Footer and Journal signup.
+
+### Still open before go-live (Naomi)
+1. Hero placeholder images (you said you will do these).
+2. AETHER photos: the product has one photo; the flagship band and card use
+   it. More photos before Monday's listing.
+3. Collection: order best to weakest; five or six photos per residence.
+4. Shopify Inbox: untick "featured products" (Customize › App embeds › Inbox)
+   so the chat never shows a $0.00 price.
+5. Content › Menus › Main menu still lists Agent Access. The switch hides it
+   on the site, but tidy the menu when convenient.
+6. Testimonials: nine Google quotes are in; the lead quote is generic. Swap
+   for a named one if you want.
+7. Journey milestones and awards are the earlier placeholder set (2015
+   first award, 2017 fifty residences, and so on): confirm they are true
+   before launch.
+8. Hero multi-house cut needs landscape footage; all reels are vertical.
+9. Then `zsh shopify-app/push-live.sh`.

@@ -88,6 +88,9 @@
   endcapture
   assign sold_handles = sold_csv | split: ','
 
+  # A filter is only offered when it can change the list: two or more
+  # distinct values (Naomi, 13 Sep 2026: "so many and conflicting"; every
+  # home has five bedrooms, so Bedrooms and Bathrooms drop out on their own).
   # One pass over the listed residences: the suburbs, the largest bed and
   # bath counts, the statuses and feature tokens present (so the toolbar
   # only offers choices that match something), whether any has a year, and
@@ -183,6 +186,16 @@
       assign land_big = true
     endif
   endfor
+  assign land_brackets = 0
+  if land_small
+    assign land_brackets = land_brackets | plus: 1
+  endif
+  if land_mid
+    assign land_brackets = land_brackets | plus: 1
+  endif
+  if land_big
+    assign land_brackets = land_brackets | plus: 1
+  endif
   assign gfont_list = gfonts | split: '||' | uniq
   assign ffile_list = ffiles | split: '||' | uniq
 
@@ -311,25 +324,25 @@
       {%- endfor -%}
     </select>
     {%- endif -%}
-    {%- if section.settings.show_filter_beds != false and bed_list.size > 0 -%}
+    {%- if section.settings.show_filter_beds != false and bed_list.size > 1 -%}
     <select class="ptool-sel" id="fBeds" aria-label="Minimum bedrooms">
       <option value="">{{ section.settings.filter_any_beds | default: "Any Bedrooms" }}</option>
       {%- for v in bed_list -%}<option value="{{ v }}">{{ v }}+ Bed</option>{%- endfor -%}
     </select>
     {%- endif -%}
-    {%- if section.settings.show_filter_baths != false and bath_list.size > 0 -%}
+    {%- if section.settings.show_filter_baths != false and bath_list.size > 1 -%}
     <select class="ptool-sel" id="fBaths" aria-label="Minimum bathrooms">
       <option value="">{{ section.settings.filter_any_baths | default: "Any Bathrooms" }}</option>
       {%- for v in bath_list -%}<option value="{{ v }}">{{ v }}+ Bath</option>{%- endfor -%}
     </select>
     {%- endif -%}
-    {%- if section.settings.show_filter_garage != false and car_list.size > 0 -%}
+    {%- if section.settings.show_filter_garage != false and car_list.size > 1 -%}
     <select class="ptool-sel" id="fCars" aria-label="Minimum garage spaces">
       <option value="">{{ section.settings.filter_any_garage | default: "Any Garage" }}</option>
       {%- for v in car_list -%}<option value="{{ v }}">{{ v }}+ Cars</option>{%- endfor -%}
     </select>
     {%- endif -%}
-    {%- if section.settings.show_filter_land != false -%}
+    {%- if section.settings.show_filter_land != false and land_brackets > 1 -%}
     <select class="ptool-sel" id="fLand" aria-label="Land size">
       <option value="">{{ section.settings.filter_any_land | default: "Any Land Size" }}</option>
       {%- if land_small -%}<option value="0-600">Land under 600m&sup2;</option>{%- endif -%}

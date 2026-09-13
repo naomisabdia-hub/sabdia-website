@@ -13,6 +13,13 @@
     render 'residence-handles', col: for_sale, group: 'live'
   endcapture
   assign live_handles = live_csv | split: ','
+  # A residence shown in the Featured residence band above is left out here
+  # so the page never opens on the same house twice (Customize › Leave out).
+  if section.settings.exclude != blank
+    assign ex_key = ',' | append: section.settings.exclude.handle | append: ','
+    assign ex_csv = ',' | append: live_csv | replace: ex_key, ','
+    assign live_handles = ex_csv | remove_first: ',' | split: ','
+  endif
   capture sold_csv
     render 'residence-handles', col: sold, group: 'sold'
   endcapture
@@ -107,6 +114,7 @@
     { "type": "range", "id": "max_cards", "label": "Most residences to show", "min": 3, "max": 30, "step": 1, "default": 12, "info": "Past this number the button above leads to the full list." },
     { "type": "header", "content": "Order" },
     { "type": "paragraph", "content": "These two pickers only set the drag order (Products › Collections › the collection › sort Manually). They never move a house between For Sale and Sold." },
+    { "type": "product", "id": "exclude", "label": "Leave out", "info": "The residence the Featured residence band already shows, so it is not the first card as well." },
     { "type": "collection", "id": "for_sale_collection", "label": "Order of For Sale cards" },
     { "type": "collection", "id": "sold_collection", "label": "Order of Sold cards" },
     {"type": "header", "content": "Show"},
