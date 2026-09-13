@@ -1183,8 +1183,8 @@ h1 em, h2 em, h3 em,
 @media(max-width:700px){.sw-stage{width:100vw;aspect-ratio:auto;height:min(80vh,80svh)}.sw-caption{left:14px;bottom:18px}.sw-rooms{right:8px;gap:0}.sw-room{padding:4px 9px;font-size:var(--t-micro);letter-spacing:.14em}}
 
 /* ── CINEMA / FILM SECTIONS ── */
-.film-band{background:var(--dark);border-top:1px solid rgba(var(--white-rgb),.06);overflow:hidden}
-.film-grid{display:grid;grid-template-columns:5fr 4fr;gap:clamp(40px,6vw,96px);align-items:center;max-width:var(--page-max);margin:0 auto;padding:calc(clamp(72px,10vw,140px)*var(--sp-scale)*var(--sp-top,1)) var(--page-pad) calc(clamp(72px,10vw,140px)*var(--sp-scale)*var(--sp-bot,1))}
+.film-band{background:var(--dark);border-top:1px solid rgba(var(--white-rgb),.06);overflow:hidden;padding:calc(clamp(72px,10vw,140px)*var(--sp-scale)*var(--sp-top,1)) var(--page-pad) calc(clamp(72px,10vw,140px)*var(--sp-scale)*var(--sp-bot,1))}
+.film-grid{display:grid;grid-template-columns:5fr 4fr;gap:clamp(40px,6vw,96px);align-items:center;max-width:var(--page-max);margin:0 auto}
 .film-copy .slabel{margin-bottom:20px}
 .film-h{font-family:var(--font-d);font-size:calc(var(--t-h1)*var(--s-h,1));font-weight:300;color:var(--white);letter-spacing:-.02em;margin-bottom:22px}
 .film-h em{font-style:italic;color:var(--gold2)}
@@ -1678,3 +1678,4 @@ html.bk h1 em,html.bk h2 em,html.bk h3 em,html.bk [class*="-h"] em,html.bk [clas
    breath (Naomi, 14 Sep 2026). The band sits closer to the toolbar. */
 html.bk .mc-intro{padding-top:clamp(36px,4.5vw,60px)}
 html.bk .prop-toolbar{padding-top:14px;padding-bottom:14px}
+html.bk .film-band{padding-top:calc(clamp(52px,6.2vw,92px)*var(--sp-scale)*var(--sp-top,1));padding-bottom:calc(clamp(52px,6.2vw,92px)*var(--sp-scale)*var(--sp-bot,1))}

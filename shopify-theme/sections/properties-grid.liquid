@@ -44,9 +44,10 @@
   endif
 -%}
 {% render 'section-look', section: section %}
-<section id="properties" class="pgrid pgrid-{{ pg_layout }}" style="padding:0 0 calc(clamp(80px,12vw,160px) * var(--sp-scale) * var(--sp-bot,1));--proj-gap:{{ section.settings.gap | default: 10 }}px;--pg-hero-min:{{ section.settings.hero_height | default: 680 }}px;--pg-row-ar:{{ section.settings.row_shape | default: '16/10' }}">
+<section id="properties" class="sp pgrid pgrid-{{ pg_layout }}" style="--proj-gap:{{ section.settings.gap | default: 10 }}px;--pg-hero-min:{{ section.settings.hero_height | default: 680 }}px;--pg-row-ar:{{ section.settings.row_shape | default: '16/10' }}">
   {%- if section.settings.show_label or section.settings.show_heading or section.settings.show_button -%}
-  <div class="inner" style="padding:calc(clamp(80px,12vw,160px) * var(--sp-scale) * var(--sp-top,1)) var(--page-pad) clamp(44px,5vw,60px)">
+  {%- comment -%} Side padding lives on the section (.sp) like every other band, so the heading and the cards line up with the sections above and below. {%- endcomment -%}
+  <div class="inner">
     <div class="proj-hdr">
       <div>
         {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
@@ -55,11 +56,9 @@
       {%- if section.settings.show_button and section.settings.cta_label != blank -%}<a href="{{ section.settings.cta_link }}" class="btn-g reveal d2">{{ section.settings.cta_label }} &rarr;</a>{%- endif -%}
     </div>
   </div>
-  {%- else -%}
-  <div style="padding-top:calc(clamp(80px,12vw,160px) * var(--sp-scale) * var(--sp-top,1))"></div>
   {%- endif -%}
 
-  <div class="inner" style="padding:0 var(--page-pad)">
+  <div class="inner">
     {%- if pg_layout == 'editorial' -%}
     <div class="proj-grid proj-grid-main">
       {%- for h in live_handles limit: 3 -%}
