@@ -1,0 +1,164 @@
+{%- comment -%}
+  Residence rail - the flagship presented the way Naomi sketched it on
+  14 Sep 2026 (a travel site's "hand picked offers" band): a small intro
+  cell on the left, then upright cards gliding sideways with arrows. The
+  first card is the featured residence (Customize › Featured residence;
+  empty = first in the For Sale order) and sits wider; the other homes for
+  sale follow in the For Sale order. Every photo is the residence's own.
+{%- endcomment -%}
+{%- liquid
+  capture live_csv
+    render 'residence-handles', col: collections['for-sale'], group: 'live'
+  endcapture
+  assign live_handles = live_csv | split: ','
+  assign feat = section.settings.featured
+  if feat == blank
+    assign first_h = live_handles | first
+    for p in collections.all.products
+      if p.handle == first_h
+        assign feat = p
+        break
+      endif
+    endfor
+  endif
+  assign rail_max = section.settings.max_cards | default: 8
+  assign card_w = section.settings.card_width | default: 300
+  assign feat_w = card_w | times: section.settings.featured_scale | default: 150 | divided_by: 100
+  assign rr_ar = section.settings.shape | default: '3/4'
+-%}
+{% render 'section-look', section: section %}
+<section class="sp-sm rr{% if section.settings.show_rule %} rr-rule{% endif %}" style="--rr-w:{{ card_w }}px;--rr-fw:{{ feat_w }}px;--rr-ar:{{ rr_ar }};--rr-gap:{{ section.settings.gap | default: 12 }}px">
+  <div class="inner rr-inner">
+    <div class="rr-intro">
+      {%- if section.settings.show_label and section.settings.label != blank -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+      {%- if section.settings.heading_html != blank -%}<h2 class="rr-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
+      {%- if section.settings.text != blank -%}<p class="about-p reveal d2">{{ section.settings.text }}</p>{%- endif -%}
+      {%- if section.settings.link_label != blank -%}<a href="{{ section.settings.link | default: '/collections/for-sale' }}" class="rr-link reveal d2">{{ section.settings.link_label }} &rarr;</a>{%- endif -%}
+    </div>
+    <div class="rr-stage">
+      <button type="button" class="rr-arrow rr-prev" aria-label="Previous residence" data-rr-prev><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M7.5 1.5 3 6l4.5 4.5"/></svg></button>
+      <ul class="rr-track" data-rr-track>
+        {%- assign shown = 0 -%}
+        {%- if feat -%}
+          {%- assign shown = shown | plus: 1 -%}
+          {% render 'rail-card', product: feat, featured: true, section: section %}
+        {%- endif -%}
+        {%- for h in live_handles -%}
+          {%- if shown >= rail_max -%}{%- break -%}{%- endif -%}
+          {%- if feat and h == feat.handle -%}{%- continue -%}{%- endif -%}
+          {%- for p in collections.all.products -%}
+            {%- if p.handle != h -%}{%- continue -%}{%- endif -%}
+            {%- assign shown = shown | plus: 1 -%}
+            {% render 'rail-card', product: p, featured: false, section: section %}
+            {%- break -%}
+          {%- endfor -%}
+        {%- endfor -%}
+      </ul>
+      <button type="button" class="rr-arrow rr-next" aria-label="Next residence" data-rr-next><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="m4.5 1.5 4.5 4.5-4.5 4.5"/></svg></button>
+    </div>
+  </div>
+</section>
+<style>
+  .rr-rule{border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+  .rr-inner{display:grid;grid-template-columns:minmax(200px,3fr) 9fr;gap:clamp(24px,4vw,56px);align-items:center}
+  .rr-intro{padding-right:8px}
+  .rr-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:500;line-height:1.12;letter-spacing:-.01em;color:var(--ink);margin:0 0 14px}
+  .rr-intro .about-p{margin-bottom:18px}
+  .rr-link{display:inline-block;font-size:var(--t-label);font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);border-bottom:1px solid var(--ink);padding-bottom:3px}
+  .rr-stage{position:relative;min-width:0}
+  .rr-track{list-style:none;margin:0;padding:6px 2px;display:flex;gap:var(--rr-gap,12px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth}
+  .rr-track::-webkit-scrollbar{display:none}
+  .rr-card{flex:0 0 var(--rr-w,300px);scroll-snap-align:start;position:relative;display:block;background:var(--bg2);overflow:hidden}
+  .rr-card.rr-featured{flex-basis:var(--rr-fw,450px)}
+  .rr-media{position:relative;aspect-ratio:var(--rr-ar,3/4);overflow:hidden;background:var(--bg3)}
+  .rr-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .9s var(--ease);filter:saturate(.95)}
+  .rr-card:hover .rr-media img{transform:scale(1.035)}
+  .rr-media .pc-status-chip{opacity:1;transform:none}
+  .rr-body{padding:16px 18px 20px}
+  .rr-name{font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:500;line-height:1.05;color:var(--ink);letter-spacing:.02em}
+  .rr-loc{margin-top:4px;font-size:var(--t-micro);font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--ink3)}
+  .rr-line{margin:12px 0 0;font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:1.6;color:var(--ink3);letter-spacing:.01em}
+  .rr-facts{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 16px;font-size:var(--t-small);color:var(--ink3);letter-spacing:.04em}
+  .rr-facts b{font-weight:500;color:var(--ink)}
+  .rr-cta{display:inline-block;margin-top:16px;font-size:var(--t-label);font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);border-bottom:1px solid rgba(var(--dark-rgb),.35);padding-bottom:3px}
+  .rr-arrow{position:absolute;top:calc(50% - 18px);z-index:2;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:rgba(var(--bg-rgb),.92);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s,border-color .25s,opacity .25s;backdrop-filter:blur(6px)}
+  .rr-arrow:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .rr-prev{left:-18px}.rr-next{right:-18px}
+  .rr-arrow[disabled]{opacity:.35;cursor:default}
+  .rr-arrow[disabled]:hover{background:rgba(var(--bg-rgb),.92);color:var(--ink);border-color:var(--border)}
+  @media(max-width:1100px){.rr-inner{grid-template-columns:minmax(180px,4fr) 8fr}}
+  @media(max-width:900px){.rr-inner{grid-template-columns:1fr;gap:24px}.rr-card{flex-basis:min(78vw,var(--rr-w,300px))}.rr-card.rr-featured{flex-basis:min(86vw,var(--rr-fw,450px))}.rr-prev{left:6px}.rr-next{right:6px}}
+</style>
+<script>
+  (function () {
+    document.querySelectorAll('[data-rr-track]').forEach(function (track) {
+      if (track.dataset.init) return;
+      track.dataset.init = '1';
+      var stage = track.parentNode;
+      var prev = stage.querySelector('[data-rr-prev]');
+      var next = stage.querySelector('[data-rr-next]');
+      function step() {
+        var card = track.querySelector('.rr-card:not(.rr-featured)') || track.querySelector('.rr-card');
+        return card ? card.getBoundingClientRect().width + 12 : 320;
+      }
+      function sync() {
+        var max = track.scrollWidth - track.clientWidth - 2;
+        if (prev) prev.disabled = track.scrollLeft <= 2;
+        if (next) next.disabled = track.scrollLeft >= max;
+      }
+      if (prev) prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+      if (next) next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
+      track.addEventListener('scroll', sync, { passive: true });
+      window.addEventListener('resize', sync);
+      sync();
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Residence rail",
+  "settings": [
+    {"type": "paragraph", "content": "A small intro on the left, then the residences for sale as cards that glide sideways. The featured residence comes first and wider."},
+    {"type": "product", "id": "featured", "label": "Featured residence", "info": "Empty = the first home in the For Sale order."},
+    {"type": "header", "content": "Intro cell"},
+    {"type": "text", "id": "label", "label": "Small label", "default": "Now Selling"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "html", "id": "heading_html", "label": "Heading", "default": "The residences for sale"},
+    {"type": "textarea", "id": "text", "label": "Line (optional)", "default": "Designed, developed and built by Sabdia, across inner Brisbane."},
+    {"type": "text", "id": "link_label", "label": "Link", "default": "View all residences"},
+    {"type": "url", "id": "link", "label": "Link goes to", "info": "Empty = the For Sale page."},
+    {"type": "header", "content": "Cards"},
+    {"type": "checkbox", "id": "show_status", "label": "Status chip on the photo", "default": true},
+    {"type": "checkbox", "id": "show_headline", "label": "Headline on the featured card", "default": true},
+    {"type": "checkbox", "id": "show_facts", "label": "Bed, bath, garage, land", "default": true},
+    {"type": "text", "id": "card_cta", "label": "Link under each card", "default": "View residence"},
+    {"type": "range", "id": "max_cards", "label": "Most cards", "min": 2, "max": 12, "step": 1, "default": 8},
+    {"type": "header", "content": "Layout"},
+    {"type": "range", "id": "card_width", "label": "Card width", "min": 220, "max": 420, "step": 10, "unit": "px", "default": 300},
+    {"type": "range", "id": "featured_scale", "label": "Featured card, share of a card", "min": 100, "max": 200, "step": 10, "unit": "%", "default": 150},
+    {"type": "select", "id": "shape", "label": "Photo shape", "options": [{"value": "3/4", "label": "Portrait 3:4 (as designed)"}, {"value": "4/5", "label": "Portrait 4:5"}, {"value": "1/1", "label": "Square"}, {"value": "4/3", "label": "Landscape 4:3"}], "default": "3/4"},
+    {"type": "range", "id": "gap", "label": "Gap between cards", "min": 0, "max": 32, "step": 2, "unit": "px", "default": 12},
+    {"type": "checkbox", "id": "show_rule", "label": "Hairlines above and below", "default": true},
+    {"type": "header", "content": "Look"},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}], "default": "design"},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#E5E2DF"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name"}
+  ],
+  "presets": [{"name": "Residence rail"}]
+}
+{% endschema %}
