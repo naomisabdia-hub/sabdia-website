@@ -332,17 +332,17 @@
     {%- if section.settings.show_filter_land != false -%}
     <select class="ptool-sel" id="fLand" aria-label="Land size">
       <option value="">{{ section.settings.filter_any_land | default: "Any Land Size" }}</option>
-      {%- if land_small -%}<option value="0-600">Up to 600m&sup2;</option>{%- endif -%}
-      {%- if land_mid -%}<option value="600-800">600&ndash;800m&sup2;</option>{%- endif -%}
-      {%- if land_big -%}<option value="800-">800m&sup2;+</option>{%- endif -%}
+      {%- if land_small -%}<option value="0-600">Land under 600m&sup2;</option>{%- endif -%}
+      {%- if land_mid -%}<option value="600-800">Land 600&ndash;800m&sup2;</option>{%- endif -%}
+      {%- if land_big -%}<option value="800-">Land 800m&sup2; and over</option>{%- endif -%}
     </select>
     {%- endif -%}
     {%- if section.settings.show_filter_build != false and has_build -%}
     <select class="ptool-sel" id="fBuild" aria-label="Build size">
       <option value="">{{ section.settings.filter_any_build | default: "Any Build Size" }}</option>
-      <option value="0-450">Up to 450m&sup2;</option>
-      <option value="450-600">450&ndash;600m&sup2;</option>
-      <option value="600-">600m&sup2;+</option>
+      <option value="0-450">Floor area under 450m&sup2;</option>
+      <option value="450-600">Floor area 450&ndash;600m&sup2;</option>
+      <option value="600-">Floor area 600m&sup2; and over</option>
     </select>
     {%- endif -%}
     {%- if section.settings.show_filter_status != false and status_list.size > 1 -%}
@@ -358,10 +358,10 @@
     {%- if section.settings.show_sort != false -%}
     <select class="ptool-sel" id="fSort" aria-label="Sort properties">
       <option value="featured">{{ section.settings.sort_featured_label | default: "Sort - Featured" }}</option>
-      <option value="land">{{ section.settings.filter_land_label | default: "Land Size" }}</option>
-      <option value="beds">{{ section.settings.sort_beds_label | default: "Bedrooms" }}</option>
-      <option value="cars">{{ section.settings.filter_garage_label | default: "Garage Spaces" }}</option>
-      {%- if has_year -%}<option value="year">{{ section.settings.sort_newest_label | default: "Newest" }}</option>{%- endif -%}
+      <option value="land">{{ section.settings.filter_land_label | default: "Land size, largest first" }}</option>
+      <option value="beds">{{ section.settings.sort_beds_label | default: "Bedrooms, most first" }}</option>
+      <option value="cars">{{ section.settings.filter_garage_label | default: "Garage, most first" }}</option>
+      {%- if has_year -%}<option value="year">{{ section.settings.sort_newest_label | default: "Newest first" }}</option>{%- endif -%}
       <option value="name">{{ section.settings.sort_name_label | default: "Name A–Z" }}</option>
     </select>
     {%- endif -%}
@@ -1019,7 +1019,7 @@
       "type": "paragraph",
       "content": "A quiet four-step track above the closing band, set like the Process track on the home page. Leave a title empty to drop that step."
     },
-    {"type": "checkbox", "id": "show_how", "label": "Show the strip", "default": true},
+    {"type": "checkbox", "id": "show_how", "label": "Show the strip", "default": false, "info": "Off since the 11 Sep 2026 review: read as the contract process. Back on once the buyer process is settled."},
     {"type": "text", "id": "how_label", "label": "Small label", "default": "How It Works"},
     {"type": "text", "id": "how1_title", "label": "Step 1 title", "default": "Private inspection"},
     {"type": "textarea", "id": "how1_text", "label": "Step 1 text", "default": "By appointment, with a member of the Sabdia team who knows the residence."},

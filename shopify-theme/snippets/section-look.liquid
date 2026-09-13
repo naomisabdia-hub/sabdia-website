@@ -30,9 +30,21 @@
   if mode == 'hero'
     assign surface = 'design'
   endif
+  # The three surfaces follow the site's type and colour system (Theme
+  # settings › Design): brand kit page white / warm grey / charcoal, or the
+  # editorial cream / stone / obsidian.
+  assign kit = true
+  if settings.brand_system == 'editorial'
+    assign kit = false
+  endif
   assign cream = '#F7F3EB'
   assign stone = '#F0EADE'
   assign obsidian = '#1F1B14'
+  if kit
+    assign cream = '#F4F4F4'
+    assign stone = '#E5E2DF'
+    assign obsidian = '#3D3D3D'
+  endif
   if settings.design_override
     assign cream = settings.c_bg
     assign stone = settings.c_bg2
@@ -89,7 +101,13 @@
   if bg != blank
     assign decl = decl | append: 'position:relative;background:' | append: bg | append: ';'
   endif
-  if invert
+  if invert and kit
+    if tone == 'dark'
+      assign decl = decl | append: '--bg:#3D3D3D;--bg2:#474747;--bg3:#525252;--dark:#F4F4F4;--dark2:#E5E2DF;--dark3:#D9D5D0;--ink:#F4F4F4;--ink2:#E5E2DF;--ink3:#C4C1BC;--taupe:#B3AFAA;--taupe-d:#CFCBC6;--gold:#C4C1BC;--gold2:#E5E2DF;--gold3:#F4F4F4;--white:#3D3D3D;--border:rgba(244,244,244,.16);--border-dk:rgba(61,61,61,.3);--white-rgb:61,61,61;--dark-rgb:244,244,244;--bg-rgb:61,61,61;'
+    else
+      assign decl = decl | append: '--bg:#F4F4F4;--bg2:#E5E2DF;--bg3:#D9D5D0;--dark:#3D3D3D;--dark2:#474747;--dark3:#525252;--ink:#3D3D3D;--ink2:#4B4B4B;--ink3:#6A6A6A;--taupe:#8A8580;--taupe-d:#6E6A66;--gold:#9A958F;--gold2:#9A958F;--gold3:#9A958F;--white:#3D3D3D;--border:rgba(61,61,61,.16);--border-dk:rgba(61,61,61,.16);--white-rgb:61,61,61;--dark-rgb:244,244,244;--bg-rgb:244,244,244;'
+    endif
+  elsif invert
     if tone == 'dark'
       assign decl = decl | append: '--bg:#1F1B14;--bg2:#2A251D;--bg3:#352F25;--dark:#F7F3EB;--dark2:#F0EADE;--dark3:#E7DFCE;--ink:#F7F3EB;--ink2:#F0EADE;--ink3:#BDB5A6;--taupe:#B4AB9C;--taupe-d:#C9C0AF;--gold:#C3A45E;--gold2:#C3A45E;--gold3:#D8C48E;--white:#1F1B14;--border:rgba(var(--gold3-rgb),.16);--border-dk:rgba(var(--gold-rgb),.3);--white-rgb:41,35,25;--dark-rgb:247,243,235;--bg-rgb:31,27,20;'
     else
@@ -171,9 +189,9 @@ html.js #shopify-section-{{ sid }} .proc-track .proc-n{transform:none;opacity:1;
   {%- liquid
     assign dim = s.look_dim | default: 55 | divided_by: 100.0
     assign focus = s.look_focus | default: 'center'
-    assign scrim = '#1F1B14'
+    assign scrim = obsidian
     if tone == 'light'
-      assign scrim = '#F7F3EB'
+      assign scrim = cream
     endif
   -%}
   <div class="s-backdrop" aria-hidden="true" style="--s-dim:{{ dim }};--s-focus:{{ focus }};--s-scrim:{{ scrim }}">

@@ -6,11 +6,11 @@
   in the theme customizer.
 {%- endcomment -%}
 <!DOCTYPE html>
-<html lang="en-AU">
+<html lang="en-AU"{% unless settings.brand_system == 'editorial' %} class="bk"{% endunless %}>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#F7F3EB">
+<meta name="theme-color" content="{% if settings.brand_system == 'editorial' %}#F7F3EB{% else %}#F4F4F4{% endif %}">
 {%- liquid
   # Routes the site does not use still exist on every store; give them a
   # neutral title instead of Shopify's "Your Shopping Cart".
@@ -91,8 +91,43 @@ try {
 </style>
 {%- endif -%}
 {%- comment -%}
-  Theme settings → Design. Must come AFTER the stylesheet: style.css sets
-  the same :root variables, and the later declaration wins.
+  Type and colour system (Theme settings › Design). "Brand kit" is the
+  default since the 11 Sep 2026 review: the brand guidelines' charcoal
+  #3d3d3d, warm grey #e5e2df and page white #f4f4f4, no gold, and the
+  headings in the brand sans (DIN Next by default) instead of the italic
+  serif. Every colour in style.css is a token, so the palette is one block
+  of variables here; the html.bk class carries the handful of rules a token
+  cannot express (weights, line-heights, the accent). "Editorial" writes
+  nothing and the original warm-stone-and-gold site renders exactly as
+  before. Must come AFTER the stylesheet: the later declaration wins.
+{%- endcomment -%}
+{%- liquid
+  assign brand_kit = true
+  if settings.brand_system == 'editorial'
+    assign brand_kit = false
+  endif
+  assign head_font = settings.font_heading
+-%}
+{%- if brand_kit -%}
+{%- if head_font -%}
+{%- liquid
+  assign head_font_light = head_font | font_modify: 'weight', '300'
+  assign head_font_medium = head_font | font_modify: 'weight', '500'
+  assign head_font_bold = head_font | font_modify: 'weight', 'bold'
+-%}
+<link rel="preload" as="font" type="font/woff2" href="{{ head_font | font_url }}" crossorigin>
+<style>
+  {{ head_font | font_face: font_display: 'swap' }}
+  {%- if head_font_light %}{{ head_font_light | font_face: font_display: 'swap' }}{% endif -%}
+  {%- if head_font_medium %}{{ head_font_medium | font_face: font_display: 'swap' }}{% endif -%}
+  {%- if head_font_bold %}{{ head_font_bold | font_face: font_display: 'swap' }}{% endif -%}
+</style>
+{%- endif -%}
+<style>:root{--bg:#F4F4F4;--bg2:#E5E2DF;--bg3:#D9D5D0;--dark:#3D3D3D;--dark2:#474747;--dark3:#525252;--ink:#3D3D3D;--ink2:#4B4B4B;--ink3:#6A6A6A;--taupe:#8A8580;--taupe-d:#6E6A66;--gold:#9A958F;--gold2:#E5E2DF;--gold3:#F4F4F4;--white:#F4F4F4;--border:rgba(61,61,61,.16);--border-dk:rgba(244,244,244,.16);--white-rgb:244,244,244;--dark-rgb:61,61,61;--bg-rgb:244,244,244;--gold-rgb:154,149,143;--gold2-rgb:229,226,223;--gold3-rgb:244,244,244{% if head_font %};--font-d:{{ head_font.family }},{{ head_font.fallback_families }}{% else %};--font-d:'DIN Next','Avenir Next','Jost',Helvetica,Arial,sans-serif{% endif %}}</style>
+{%- endif -%}
+{%- comment -%}
+  Theme settings → Design → your own colours. Comes after the system block
+  so a colour picked here still wins.
 {%- endcomment -%}
 {%- if settings.design_override -%}
 <style>:root{--bg:{{ settings.c_bg }};--bg2:{{ settings.c_bg2 }};--dark:{{ settings.c_dark }};--ink:{{ settings.c_ink }};--gold:{{ settings.c_gold }};--gold2:{{ settings.c_gold2 }};--bg-rgb:{{ settings.c_bg.red }},{{ settings.c_bg.green }},{{ settings.c_bg.blue }};--dark-rgb:{{ settings.c_dark.red }},{{ settings.c_dark.green }},{{ settings.c_dark.blue }};--gold-rgb:{{ settings.c_gold.red }},{{ settings.c_gold.green }},{{ settings.c_gold.blue }};--gold2-rgb:{{ settings.c_gold2.red }},{{ settings.c_gold2.green }},{{ settings.c_gold2.blue }}}</style>
@@ -142,6 +177,9 @@ try {
     assign page_top = page_html | slice: 0, 5000
   endif
   assign obsidian_hex = '#1F1B14'
+  unless settings.brand_system == 'editorial'
+    assign obsidian_hex = '#3D3D3D'
+  endunless
   if settings.design_override
     assign obsidian_hex = settings.c_dark
   endif
@@ -152,9 +190,9 @@ try {
   #    veil = light), the inverted token set when the surface flips the
   #    section's designed tone (--ink:#F7F3EB = now dark, --ink:#292319 = now
   #    light), and background:<obsidian> for the Obsidian surface.
-  if page_top contains '--s-scrim:#1F1B14' or page_top contains '--ink:#F7F3EB;' or page_top contains obsidian_bg
+  if page_top contains '--s-scrim:#1F1B14' or page_top contains '--s-scrim:#3D3D3D' or page_top contains '--ink:#F7F3EB;' or page_top contains '--ink:#F4F4F4;' or page_top contains obsidian_bg
     assign dark_top = true
-  elsif page_top contains '--s-scrim:#F7F3EB' or page_top contains '--ink:#292319;'
+  elsif page_top contains '--s-scrim:#F7F3EB' or page_top contains '--s-scrim:#F4F4F4' or page_top contains '--ink:#292319;' or page_top contains '--ink:#3D3D3D;'
     assign dark_top = false
   # 2. Otherwise the section as designed: the home hero, the inner-page and
   #    photographic heroes (page-hero, incl. page-header with a banner and

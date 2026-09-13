@@ -5,6 +5,7 @@ The full illustrated guide is *Sabdia Website Guide.pdf* on the Desktop.
 
 | I want to change… | Go to | Notes |
 |---|---|---|
+| **The whole site's look: brand kit greys and sans headings, or the original stone and gold serif** | Customize › **Theme settings › Design › Type and colour system** | Since 13 Sep 2026 the default is **Brand kit** (charcoal #3d3d3d, warm grey #e5e2df, page #f4f4f4, no gold, headings in Barlow - the closest face to the kit's DIN Next that Shopify has). Choose **Editorial** to put the original look back exactly. The heading font for Brand kit is the picker underneath |
 | Words, pictures, films on a page | **Online Store › Themes › Customize** | Pick the page in the top-centre dropdown first |
 | Home banner: slideshow or a film | Customize › Home › **Hero slideshow** › Header media | Set "Show" to **Video instead**, upload the mp4. Slides are kept — set it back to Slideshow any time |
 | Size, shape or crop of a photo | Customize › click the section › **Size** | Image band, Photo gallery and Page hero: shape (4:3, square, portrait…) or fixed height, band width, gap; each image block has **Crop focus** and Image band a **Zoom**. Shopify has no drag-to-resize — these settings are the resize |

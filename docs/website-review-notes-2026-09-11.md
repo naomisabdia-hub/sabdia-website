@@ -224,3 +224,38 @@ features (06:15–06:39)
 - Instagram tile redirect.
 - Style filter on Collection.
 - Closing comment: "very clean, very excited... nice work."
+
+---
+
+## Status after the 13 Sep 2026 work session (staging theme #150783361126)
+
+Backup of the live site before any of this: git tag `backup-2026-09-13`
+(commit 5e02f2e), full live theme in `backups/live-theme-2026-09-13/`.
+
+Done on staging (code in the repo; templates in ~/Desktop/sabdia-store-templates
+for `zsh shopify-app/push-live.sh`):
+- A1/A2/E: Theme settings › Design › **Type and colour system** = Brand kit
+  (charcoal / warm grey / page white, no gold, Barlow headings, light-weight
+  accent instead of the italic). Editorial = the original, one click back.
+- A4: stats band hidden (eye icon in Customize to bring it back). Marquee kept.
+- A6: About heading now "Considered homes, designed and built in-house."
+- A7/A9: home film band = completed residences reel (completed-reel-v1.mp4,
+  eight homes, 36 s, real footage); the process reel moved to the Process
+  page; the big "How we work" section hidden on home, the compact strip kept.
+- A10: order = hero, marquee, For Sale, About, How we work, film, reviews,
+  contact.
+- A12: not possible from the existing films (all vertical except SOLACE);
+  needs landscape footage of the completed homes.
+- B3: sort reads "Land size, largest first" etc.; land filter options say
+  "Land under 600m²"; build-size options say "Floor area". Every residence
+  already has beds/baths/cars/land filled (CASPIAN included). build_size is
+  empty on all six, so that filter stays hidden.
+- B4: How It Works strip off. B5: Guided Match off by default.
+- D3: Agent Access is not in the theme's own menus; the store's Main menu
+  still has it - Naomi removes it in Content › Menus (API write blocked).
+- F: the $0.00 came from Shopify Inbox's "featured products" - untick it at
+  Customize › App embeds › Inbox (store setting; not pushable from here).
+
+Still Naomi's: AETHER first in the For Sale collection (drag order),
+Collection ordering best to weakest, 5–6 photos per residence, hero
+placeholder images, the Inbox tick, the menu item, then `push-live.sh`.

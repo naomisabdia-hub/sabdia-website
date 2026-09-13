@@ -68,18 +68,46 @@
         "content": "Colours flow into every page of the site. Off = the built-in Sabdia palette. Side margins, content width and section spacing are in the Layout group below."
       },
       {
+        "type": "header",
+        "content": "Type and colour system"
+      },
+      {
+        "type": "select",
+        "id": "brand_system",
+        "label": "System",
+        "options": [
+          {
+            "value": "kit",
+            "label": "Brand kit - charcoal, warm grey, white; sans headings; no gold"
+          },
+          {
+            "value": "editorial",
+            "label": "Editorial - warm stone and gold, serif headings (the original)"
+          }
+        ],
+        "default": "kit",
+        "info": "One switch for the whole site. Brand kit follows the Sabdia brand guidelines (#3d3d3d, #e5e2df, #f4f4f4) after the 11 Sep 2026 review: the gold and the italic serif read as generated. Editorial puts the original look back exactly."
+      },
+      {
+        "type": "font_picker",
+        "id": "font_heading",
+        "label": "Heading font (Brand kit)",
+        "default": "barlow_n5",
+        "info": "Headings and titles when the system is Brand kit. The kit's DIN Next is not in Shopify's font library; Barlow is its closest match there and the default. The Editorial system keeps Cormorant Garamond."
+      },
+      {
         "type": "font_picker",
         "id": "font_body",
         "label": "Body and interface font",
         "default": "open_sans_n4",
-        "info": "Everything except the large serif headings: paragraphs, labels, buttons, forms, the nav. Open Sans by default. The headings stay in Cormorant Garamond."
+        "info": "Paragraphs, labels, buttons, forms, the nav. Open Sans by default (the brand kit body face)."
       },
       {
         "type": "checkbox",
         "id": "design_override",
         "label": "Use the colours below",
         "default": false,
-        "info": "Leave off to keep the built-in palette. Turn on to apply your own colours site-wide."
+        "info": "Leave off to keep the palette of the chosen system. Turn on to apply your own colours site-wide."
       },
       {
         "type": "color",
@@ -200,8 +228,8 @@
         "type": "checkbox",
         "id": "guided_match_enabled",
         "label": "Guided Match (Find Your Home)",
-        "default": true,
-        "info": "Off hides every link to the guided match across the site and the page itself shows a short note pointing to the contact page. On shows it everywhere it is designed to appear."
+        "default": false,
+        "info": "Off (11 Sep 2026 review: parked until the match is perfected) hides every link to the guided match across the site and the page itself shows a short note pointing to the contact page. On shows it everywhere it is designed to appear."
       }
     ]
   },
