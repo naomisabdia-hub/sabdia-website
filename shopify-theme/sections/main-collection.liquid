@@ -457,7 +457,26 @@
             <div style="width:5px;height:5px;border-radius:50%;background:var(--gold2);{% if fstatus == 'For Sale' or fstatus == settings.label_for_sale %}animation:pulse 2s ease-in-out infinite;{% endif %}flex-shrink:0"></div>
             <span style="font-size:10.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2)">{{ fstatus }}</span>
           </div>
-          <div style="font-family:var(--font-d);font-size:calc(var(--t-display)*var(--s-h,1));font-weight:300;line-height:.88;letter-spacing:-.04em;color:var(--white);margin-bottom:10px">{{ featured.title }}</div>
+          {%- liquid
+            assign fb_nf = fmf.name_font.value | strip
+            assign fb_nff = fmf.name_font_file.value | strip
+            assign fb_name = featured.title
+            assign fb_font = 'var(--font-d)'
+            assign fb_caps = ''
+            if fb_nf != blank or fb_nff != blank
+              assign fb_fam = fb_nf
+              if fb_fam == blank
+                assign fb_fam = 'ResidenceFace-' | append: featured.handle
+              endif
+              assign fb_font = "'" | append: fb_fam | append: "',var(--font-d)"
+              if fmf.name_font_caps.value
+                assign fb_caps = ';text-transform:uppercase'
+              else
+                assign fb_name = featured.title | downcase | capitalize
+              endif
+            endif
+          -%}
+          <div style="font-family:{{ fb_font }};font-size:calc(var(--t-display)*var(--s-h,1));font-weight:{{ fmf.name_font_weight.value | default: 300 }};line-height:.95;letter-spacing:0;color:var(--white);margin-bottom:10px{{ fb_caps }}">{{ fb_name }}</div>
           <div style="font-size:11.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--white-rgb),.78);margin-bottom:18px">{{ fmf.suburb.value }}, {{ fmf.state.value | default: 'QLD' }}</div>
           {%- if section.settings.featured_specs -%}
           <div style="display:flex;gap:18px;flex-wrap:wrap">
