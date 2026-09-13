@@ -1,0 +1,106 @@
+{%- comment -%}
+  Intro split - a brief introduction straight after the home hero: words on
+  one side, one big photograph (or film) on the other. Naomi, 14 Sep 2026:
+  "after the header we need some sort of brief intro to Sabdia before the
+  flagship section... text on one side and big image on the other". Real
+  photographs and real footage only.
+{%- endcomment -%}
+{%- liquid
+  assign is_side = section.settings.side | default: 'right'
+  assign is_shape = section.settings.shape | default: '4/5'
+  assign is_focus = section.settings.focus | default: 'center'
+  assign is_video = section.settings.video_url
+  if section.settings.video
+    assign vmp4 = section.settings.video.sources | where: 'format', 'mp4' | first
+    if vmp4
+      assign is_video = vmp4.url
+    endif
+  endif
+-%}
+{% render 'section-look', section: section %}
+<section class="sp is is-{{ is_side }}{% if section.settings.align == 'centre' %} is-vcentre{% endif %}" style="--is-ar:{{ is_shape }};--is-split:{{ section.settings.split | default: '6-6' | replace: '-', 'fr ' }}fr">
+  <div class="inner is-grid">
+    <div class="is-words">
+      {%- if section.settings.show_label and section.settings.label != blank -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+      {%- if section.settings.heading_html != blank -%}<h2 class="about-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
+      {%- if section.settings.text != blank -%}<p class="about-p reveal d2">{{ section.settings.text }}</p>{%- endif -%}
+      {%- if section.settings.text2 != blank -%}<p class="about-p reveal d2" style="margin-top:18px">{{ section.settings.text2 }}</p>{%- endif -%}
+      {%- if section.settings.cta_label != blank -%}
+        <div class="reveal d3" style="margin-top:34px"><a href="{{ section.settings.cta_link | default: '/pages/about' }}" class="{% if section.settings.button_style == 'solid' %}btn-p{% else %}btn-g{% endif %}">{{ section.settings.cta_label }} &rarr;</a></div>
+      {%- endif -%}
+    </div>
+    <div class="is-media reveal-wipe d1">
+      {%- if is_video != blank -%}
+        <video src="{{ is_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if section.settings.image %} poster="{{ section.settings.image | image_url: width: 1200 }}"{% endif %}></video>
+      {%- elsif section.settings.image -%}
+        <img src="{{ section.settings.image | image_url: width: 1200 }}" srcset="{{ section.settings.image | image_url: width: 700 }} 700w, {{ section.settings.image | image_url: width: 1200 }} 1200w, {{ section.settings.image | image_url: width: 1600 }} 1600w" sizes="(max-width: 900px) 100vw, 55vw" alt="{{ section.settings.image_alt | escape }}" loading="lazy" decoding="async" width="1200" height="1500" style="object-position:{{ is_focus }}">
+      {%- elsif section.settings.image_ext != blank -%}
+        <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1200, h: 1500 %}" alt="{{ section.settings.image_alt | escape }}" loading="lazy" decoding="async" width="1200" height="1500" style="object-position:{{ is_focus }}">
+      {%- endif -%}
+      {%- if section.settings.caption != blank -%}<div class="is-cap">{{ section.settings.caption }}</div>{%- endif -%}
+    </div>
+  </div>
+</section>
+<style>
+  .is-grid{display:grid;grid-template-columns:var(--is-split,6fr 6fr);gap:clamp(40px,6vw,96px);align-items:start}
+  .is-vcentre .is-grid{align-items:center}
+  .is-right .is-words{order:1}.is-right .is-media{order:2}
+  .is-left .is-words{order:2}.is-left .is-media{order:1}
+  .is-words{padding-top:clamp(0px,2vw,24px)}
+  .is-media{position:relative;aspect-ratio:var(--is-ar,4/5);overflow:hidden;background:var(--bg2)}
+  .is-media img,.is-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95)}
+  .is-cap{position:absolute;left:0;right:0;bottom:0;padding:14px 18px;font-size:var(--t-micro);letter-spacing:.28em;text-transform:uppercase;color:rgba(var(--white-rgb),.85);background:linear-gradient(to top,rgba(var(--dark-rgb),.55),transparent)}
+  @media(prefers-reduced-motion:reduce){.is-media video{display:none}}
+  @media(max-width:900px){.is-grid{grid-template-columns:1fr;gap:32px}.is-left .is-words,.is-right .is-words{order:2}.is-left .is-media,.is-right .is-media{order:1}.is-media{aspect-ratio:4/3}}
+</style>
+
+{% schema %}
+{
+  "name": "Intro split",
+  "settings": [
+    {"type": "paragraph", "content": "A brief introduction: words on one side, one big photo or film on the other."},
+    {"type": "header", "content": "Words"},
+    {"type": "text", "id": "label", "label": "Small label", "default": "Sabdia"},
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "html", "id": "heading_html", "label": "Heading", "default": "Homes designed, developed and built by one team, in inner Brisbane, since 2013."},
+    {"type": "textarea", "id": "text", "label": "Paragraph", "default": "Sabdia is a boutique developer. Every residence is drawn, approved, built and finished in-house, so the decisions made on paper are the decisions that get built."},
+    {"type": "textarea", "id": "text2", "label": "Second paragraph (optional)"},
+    {"type": "text", "id": "cta_label", "label": "Button", "default": "About Sabdia"},
+    {"type": "url", "id": "cta_link", "label": "Button goes to"},
+    {"type": "select", "id": "button_style", "label": "Button style", "options": [{"value": "ghost", "label": "Outline"}, {"value": "solid", "label": "Solid"}], "default": "ghost"},
+    {"type": "header", "content": "Photo or film"},
+    {"type": "paragraph", "content": "Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "image", "label": "Photo"},
+    {"type": "text", "id": "image_ext", "label": "Current photo (URL)", "info": "Choose a photo above and it takes over."},
+    {"type": "text", "id": "image_alt", "label": "Alt text"},
+    {"type": "video", "id": "video", "label": "Film (upload)", "info": "Plays silently on a loop instead of the photo."},
+    {"type": "text", "id": "video_url", "label": "Current film (URL)"},
+    {"type": "text", "id": "caption", "label": "Caption on the photo (optional)"},
+    {"type": "select", "id": "focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "header", "content": "Layout"},
+    {"type": "select", "id": "side", "label": "Photo sits", "options": [{"value": "right", "label": "Right (as designed)"}, {"value": "left", "label": "Left"}], "default": "right"},
+    {"type": "select", "id": "split", "label": "Split", "options": [{"value": "6-6", "label": "Even"}, {"value": "5-7", "label": "Words narrow, photo wide"}, {"value": "7-5", "label": "Words wide, photo narrow"}], "default": "5-7"},
+    {"type": "select", "id": "shape", "label": "Photo shape", "options": [{"value": "4/5", "label": "Portrait 4:5 (as designed)"}, {"value": "1/1", "label": "Square"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}], "default": "4/5"},
+    {"type": "select", "id": "align", "label": "Words sit", "options": [{"value": "top", "label": "Top (as designed)"}, {"value": "centre", "label": "Centred beside the photo"}], "default": "top"},
+    {"type": "header", "content": "Look"},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}], "default": "design"},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#E5E2DF"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name"}
+  ],
+  "presets": [{"name": "Intro split"}]
+}
+{% endschema %}

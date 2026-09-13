@@ -73,7 +73,67 @@
   capture fr_status
     render 'residence-status', product: res
   endcapture
+  assign fr_layout = section.settings.layout | default: 'split'
+  assign fr_side = section.settings.side | default: 'left'
 -%}
+{%- if fr_layout == 'split' -%}
+{%- comment -%}
+  Split card (as designed, Naomi 14 Sep 2026: "having another header just
+  looks weird"): the photo on one side, a stone panel with the words on the
+  other. Never full-bleed, never a hero.
+{%- endcomment -%}
+{% render 'section-look', section: section %}
+<section class="sp frs frs-{{ fr_side }}" style="--frs-ar:{{ section.settings.shape | default: '4/5' }}">
+  <div class="inner frs-grid">
+    <div class="frs-media reveal-wipe d1">
+      {%- if fr_video != blank -%}
+        <video src="{{ fr_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if fr_img %} poster="{{ fr_img | image_url: width: 1200 }}"{% endif %}></video>
+      {%- elsif fr_img -%}
+        <img src="{{ fr_img | image_url: width: 1200 }}" srcset="{{ fr_img | image_url: width: 700 }} 700w, {{ fr_img | image_url: width: 1200 }} 1200w, {{ fr_img | image_url: width: 1600 }} 1600w" sizes="(max-width: 900px) 100vw, 58vw" alt="{{ res.title }}, {{ m.suburb.value }}" loading="lazy" decoding="async" width="1200" height="1500" style="object-position:{{ fr_focus }}">
+      {%- endif -%}
+      {%- if section.settings.show_status and fr_status != blank -%}<span class="pc-status-chip"><span class="pc-dot"></span>{{ fr_status }}</span>{%- endif -%}
+    </div>
+    <div class="frs-panel">
+      {%- if section.settings.show_label and fr_label != blank -%}<div class="slabel reveal">{{ fr_label }}</div>{%- endif -%}
+      <div class="frs-name reveal d1">{{ res.title }}</div>
+      {%- if m.suburb.value != blank -%}<div class="frs-loc reveal d1">{{ m.suburb.value }}{% if m.state.value != blank %}, {{ m.state.value }}{% endif %}</div>{%- endif -%}
+      <h2 class="frs-h reveal d1">{{ fr_heading }}</h2>
+      {%- if fr_text != blank and section.settings.show_text -%}<p class="about-p reveal d2">{{ fr_text }}</p>{%- endif -%}
+      {%- if section.settings.show_facts -%}
+      <ul class="frs-facts reveal d2">
+        {%- if m.beds.value != blank -%}<li><b>{{ m.beds.value }}</b> Bed</li>{%- endif -%}
+        {%- if m.baths.value != blank -%}<li><b>{{ m.baths.value }}</b> Bath</li>{%- endif -%}
+        {%- if m.cars.value != blank -%}<li><b>{{ m.cars.value }}</b> Garage</li>{%- endif -%}
+        {%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>m&sup2; land</li>{%- endif -%}
+      </ul>
+      {%- endif -%}
+      {%- if section.settings.show_buttons -%}
+      <div class="frs-btns reveal d3">
+        {%- if fr_cta1 != blank -%}<a href="{{ res.url }}" class="btn-p">{{ fr_cta1 }} &rarr;</a>{%- endif -%}
+        {%- if fr_cta2 != blank -%}<a href="{{ fr_cta2_link }}" class="btn-g">{{ fr_cta2 }}</a>{%- endif -%}
+      </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+<style>
+  .frs-grid{display:grid;grid-template-columns:7fr 5fr;gap:0;align-items:stretch;background:var(--bg2)}
+  .frs-right .frs-media{order:2}.frs-right .frs-panel{order:1}
+  .frs-media{position:relative;aspect-ratio:var(--frs-ar,4/5);min-height:100%;overflow:hidden;background:var(--bg3)}
+  .frs-media img,.frs-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95)}
+  .frs-media .pc-status-chip{opacity:1;transform:none}
+  .frs-panel{padding:clamp(32px,4.5vw,64px);display:flex;flex-direction:column;justify-content:center}
+  .frs-name{font-family:var(--font-d);font-size:calc(clamp(30px,3.6vw,52px)*var(--s-h,1));font-weight:500;line-height:1;letter-spacing:.02em;text-transform:uppercase;color:var(--ink)}
+  .frs-loc{margin-top:8px;font-size:var(--t-label);font-weight:400;letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}
+  .frs-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:500;line-height:1.12;color:var(--ink);margin:26px 0 14px;letter-spacing:-.01em}
+  .frs-panel .about-p{max-width:none}
+  .frs-facts{list-style:none;margin:22px 0 0;padding:18px 0 0;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px 26px;font-size:var(--t-small);letter-spacing:.06em;color:var(--ink3)}
+  .frs-facts b{font-weight:500;color:var(--ink)}
+  .frs-btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+  @media(prefers-reduced-motion:reduce){.frs-media video{display:none}}
+  @media(max-width:900px){.frs-grid{grid-template-columns:1fr}.frs-right .frs-media{order:1}.frs-right .frs-panel{order:2}.frs-media{aspect-ratio:4/3;min-height:0}.frs-panel{padding:28px 22px 36px}}
+</style>
+{%- else -%}
 {% render 'section-look', section: section, mode: 'hero' %}
 <section class="page-hero ph-sized fr ph-pos-{{ section.settings.words | default: 'base-left' }} ph-scrim-{{ section.settings.scrim | default: 'corner' }}" style="--ph-h:{{ fr_h }};--ph-hm:{{ fr_hm }};--ph-dim:{{ fr_dim }}">
   {%- if fr_video != blank -%}
@@ -119,6 +179,7 @@
   @media(max-width:900px){.fr.page-hero.ph-sized{height:auto;min-height:max(360px,var(--ph-hm,60vh))}}
 </style>
 {%- endif -%}
+{%- endif -%}
 
 {% schema %}
 {
@@ -149,9 +210,16 @@
     {"type": "select", "id": "focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
     {"type": "range", "id": "dim", "label": "Darken", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 45},
     {"type": "header", "content": "Layout"},
-    {"type": "select", "id": "height", "label": "Height", "options": [{"value": "standard", "label": "Standard (as designed)"}, {"value": "short", "label": "Short"}, {"value": "full", "label": "Full screen"}], "default": "standard"},
+    {"type": "select", "id": "layout", "label": "Layout", "options": [{"value": "split", "label": "Split card, photo beside the words"}, {"value": "band", "label": "Full-width band"}], "default": "split"},
+    {"type": "select", "id": "side", "label": "Photo sits (split card)", "options": [{"value": "left", "label": "Left (as designed)"}, {"value": "right", "label": "Right"}], "default": "left"},
+    {"type": "select", "id": "shape", "label": "Photo shape (split card)", "options": [{"value": "4/5", "label": "Portrait 4:5 (as designed)"}, {"value": "1/1", "label": "Square"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}], "default": "4/5"},
+    {"type": "select", "id": "height", "label": "Height (full-width band)", "options": [{"value": "standard", "label": "Standard (as designed)"}, {"value": "short", "label": "Short"}, {"value": "full", "label": "Full screen"}], "default": "standard"},
     {"type": "select", "id": "words", "label": "Words sit", "options": [{"value": "base-left", "label": "Bottom left (as designed)"}, {"value": "base-centre", "label": "Bottom centre"}, {"value": "centre", "label": "Centre"}], "default": "base-left"},
     {"type": "select", "id": "scrim", "label": "Darkening shape", "options": [{"value": "corner", "label": "Corner (as designed)"}, {"value": "base", "label": "Bottom only"}, {"value": "even", "label": "Even"}, {"value": "none", "label": "None"}], "default": "corner"},
+    {"type": "header", "content": "Look"},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}], "default": "design"},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#E5E2DF"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
     {"type": "header", "content": "Space"},
     {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
     {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
