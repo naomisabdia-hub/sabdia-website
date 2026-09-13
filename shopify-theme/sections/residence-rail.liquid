@@ -26,6 +26,7 @@
   assign feat_w = card_w | times: section.settings.featured_scale | default: 150 | divided_by: 100
   assign rr_ar = section.settings.shape | default: '3/4'
 -%}
+{% render 'residence-faces' %}
 {% render 'section-look', section: section %}
 <section class="sp-sm rr{% if section.settings.show_rule %} rr-rule{% endif %}" style="--rr-w:{{ card_w }}px;--rr-fw:{{ feat_w }}px;--rr-ar:{{ rr_ar }};--rr-gap:{{ section.settings.gap | default: 12 }}px">
   <div class="inner rr-inner">

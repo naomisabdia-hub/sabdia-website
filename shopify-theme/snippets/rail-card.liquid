@@ -21,6 +21,22 @@
   assign ih = iw | times: ar_parts[1] | divided_by: ar_parts[0]
   assign iw2 = iw | times: 2
   assign ih2 = ih | times: 2
+  assign nf = m.name_font.value | strip
+  assign nff = m.name_font_file.value | strip
+  assign rc_name = product.title
+  assign rc_style = ''
+  if nf != blank or nff != blank
+    assign fam = nf
+    if fam == blank
+      assign fam = 'ResidenceFace-' | append: product.handle
+    endif
+    assign rc_style = "font-family:'" | append: fam | append: "',var(--font-d);font-weight:" | append: m.name_font_weight.value | default: 400
+    if m.name_font_caps.value
+      assign rc_style = rc_style | append: ';text-transform:uppercase'
+    else
+      assign rc_name = product.title | downcase | capitalize
+    endif
+  endif
   assign line = ''
   if featured and section.settings.show_headline
     assign line = m.headline.value
@@ -35,7 +51,7 @@
       {%- if section.settings.show_status and st != blank -%}<span class="pc-status-chip"><span class="pc-dot{% if st contains 'Sold' %} sold{% elsif st != 'For Sale' %} still{% endif %}"></span>{{ chip }}</span>{%- endif -%}
     </div>
     <div class="rr-body">
-      <div class="rr-name">{{ product.title }}</div>
+      <div class="rr-name"{% if rc_style != blank %} style="{{ rc_style }}"{% endif %}>{{ rc_name }}</div>
       {%- if m.suburb.value != blank -%}<div class="rr-loc">{{ m.suburb.value }}</div>{%- endif -%}
       {%- if line != blank -%}<p class="rr-line">{{ line }}</p>{%- endif -%}
       {%- if section.settings.show_facts -%}

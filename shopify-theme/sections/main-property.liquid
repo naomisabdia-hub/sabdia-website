@@ -120,7 +120,15 @@
       <span style="color:rgba(var(--white-rgb),.88)">{{ pstatus }}</span>
     </div>
     {%- endif -%}
-    <div class="prop-name">{{ product.title }}</div>
+    {%- liquid
+      assign prop_name = product.title
+      if nf != blank or nf_file != blank
+        unless nf_caps
+          assign prop_name = product.title | downcase | capitalize
+        endunless
+      endif
+    -%}
+    <div class="prop-name">{{ prop_name }}</div>
     {%- if section.settings.show_location -%}<div class="prop-loc">{{ mf.suburb.value }}, {{ state }}</div>{%- endif -%}
   </div>
 </section>

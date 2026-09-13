@@ -324,3 +324,14 @@ AETHER, Contact, Agent Access, search, 404. All 200, no Liquid errors.
 - For Sale: one **Size** dropdown (Land brackets; Floor area appears once a
   residence has a build size); suburb list under Now Selling off; band sits
   closer to the toolbar.
+
+### 14 Sep 2026, copy and faces
+- Every residence name now renders in its brochure face (docs/RESIDENCE-FONTS.md).
+- Copy rewritten from the brochures and the caption corpus: home About band
+  ("True luxury lies in the details", Muhammad Sabdia and Stephen Orazio
+  named), How we work, About page studio text, journey (2013 founded, 100+
+  residences, HIA awards, CAPRI 2024, QASR 2025, the 2026 release), Process
+  intro; the six residence descriptions and headlines from the brochure
+  facts (rooms, finishes, garages), no floor areas, no em dashes.
+- About › Awards grid hidden: the six awards listed were placeholders. Fill
+  in the real HIA awards and switch it back on.

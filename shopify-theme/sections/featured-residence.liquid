@@ -76,6 +76,25 @@
     render 'residence-status', product: res
   endcapture
   assign fr_layout = section.settings.layout | default: 'editorial'
+  # The residence's own brochure face (Products › the residence › Residence
+  # name font / font file / capitals), the same fields the cards read.
+  assign fr_nf = m.name_font.value | strip
+  assign fr_nff = m.name_font_file.value | strip
+  assign fr_name = res.title
+  assign fr_name_style = ''
+  if fr_nf != blank or fr_nff != blank
+    assign fr_fam = fr_nf
+    if fr_fam == blank
+      assign fr_fam = 'ResidenceFace-' | append: res.handle
+    endif
+    assign fr_name_style = "font-family:'" | append: fr_fam | append: "',var(--font-d);font-weight:" | append: m.name_font_weight.value | default: 400 | append: ';letter-spacing:.01em'
+    if m.name_font_caps.value
+      assign fr_name_style = fr_name_style | append: ';text-transform:uppercase'
+    else
+      assign fr_name = res.title | downcase | capitalize
+      assign fr_name_style = fr_name_style | append: ';text-transform:none'
+    endif
+  endif
   assign fr_reel = section.settings.reel_url
   if section.settings.reel
     assign rmp4 = section.settings.reel.sources | where: 'format', 'mp4' | first
@@ -89,6 +108,7 @@
   assign fr_reel_poster = section.settings.reel_poster_url | default: m.film_poster.value
   assign fr_side = section.settings.side | default: 'right'
 -%}
+{% render 'residence-faces' %}
 {%- if fr_layout == 'editorial' -%}
 {%- comment -%}
   Editorial band (as designed, 14 Sep 2026 - one flagship, presented with
@@ -102,7 +122,7 @@
   <div class="inner fre-grid">
     <div class="fre-words">
       {%- if section.settings.show_label and fr_label != blank -%}<div class="slabel reveal">{{ fr_label }}{% if section.settings.show_status and fr_status != blank %}<span class="fre-status">{{ fr_status }}</span>{% endif %}</div>{%- endif -%}
-      <h2 class="fre-name reveal d1">{{ res.title }}</h2>
+      <h2 class="fre-name reveal d1"{% if fr_name_style != blank %} style="{{ fr_name_style }}"{% endif %}>{{ fr_name }}</h2>
       {%- if m.suburb.value != blank -%}<div class="fre-loc reveal d1">{{ m.suburb.value }}{% if m.state.value != blank %}, {{ m.state.value }}{% endif %}</div>{%- endif -%}
       <div class="fre-rule reveal d2"></div>
       {%- if fr_heading != blank and fr_heading != res.title -%}<p class="fre-h reveal d2">{{ fr_heading }}</p>{%- endif -%}
@@ -195,7 +215,7 @@
     </div>
     <div class="frs-panel">
       {%- if section.settings.show_label and fr_label != blank -%}<div class="slabel reveal">{{ fr_label }}</div>{%- endif -%}
-      <div class="frs-name reveal d1">{{ res.title }}</div>
+      <div class="frs-name reveal d1"{% if fr_name_style != blank %} style="{{ fr_name_style }}"{% endif %}>{{ fr_name }}</div>
       {%- if m.suburb.value != blank -%}<div class="frs-loc reveal d1">{{ m.suburb.value }}{% if m.state.value != blank %}, {{ m.state.value }}{% endif %}</div>{%- endif -%}
       <h2 class="frs-h reveal d1">{{ fr_heading }}</h2>
       {%- if fr_text != blank and section.settings.show_text -%}<p class="about-p reveal d2">{{ fr_text }}</p>{%- endif -%}

@@ -53,6 +53,12 @@
       assign nf_style = nf_style | append: ';text-transform:uppercase'
     endif
   endif
+  # The face decides the case: a brochure that sets "Sierra" in a script
+  # keeps it that way on the card; capitals on = the name as written.
+  assign pc_name = product.title
+  if nf_style != blank and mf.name_font_caps.value != true
+    assign pc_name = product.title | downcase | capitalize
+  endif
 -%}
 <a href="{{ product.url }}" class="pc {{ class }}" {% if style != blank %}style="{{ style }}"{% endif %} data-beds="{{ mf.beds.value }}" data-baths="{{ mf.baths.value }}" data-status="{{ pstatus | escape }}" data-feats="{{ feats }}" data-year="{{ mf.year.value }}">
   {%- if product.featured_image -%}
@@ -64,7 +70,7 @@
   <div class="pc-ov"></div>
   <div class="pc-status-chip"><span class="pc-dot {{ dot_class }}"></span>{{ chip }}</div>
   <div class="pc-info">
-    <div class="pc-name"{% if nf_style != blank %} style="{{ nf_style | escape }}"{% endif %}>{{ product.title }}</div>
+    <div class="pc-name"{% if nf_style != blank %} style="{{ nf_style | escape }}"{% endif %}>{{ pc_name }}</div>
     {%- if mf.suburb.value != blank -%}
       <div class="pc-loc">{% render 'spec-icon', icon: 'pin' %}{{ mf.suburb.value }}, QLD</div>
     {%- endif -%}
