@@ -1,0 +1,29 @@
+{%- comment -%}
+  Optical size for a residence's brochure face. Each face draws its letters
+  at a different height for the same font-size (a script's capital sits
+  low, Papyrus runs tall), so the same nominal size gives names of very
+  different weight on the page. The figures come from the drawn height of
+  each name's letters in its font file (14 Sep 2026), normalised so every
+  name reads at the same height. 1 = no change.
+
+    {% capture s %}{% render 'residence-face-scale', product: product %}{% endcapture %}
+{%- endcomment -%}
+{%- liquid
+  assign fam = product.metafields.custom.name_font.value | strip | downcase
+  case fam
+    when 'sephir'
+      echo '1.09'
+    when 'century expanded'
+      echo '0.92'
+    when 'hello paris serif'
+      echo '1.04'
+    when 'adu script'
+      echo '1.55'
+    when 'papyrus'
+      echo '0.68'
+    when 'garamond'
+      echo '1.05'
+    else
+      echo '1'
+  endcase
+-%}

@@ -54,6 +54,19 @@
     assign nf_fallback = 'ResidenceFace'
   endif
 -%}
+{%- liquid
+  # The name as the brochure writes it (Sierra, not SIERRA) wherever a
+  # heading names the house: the face's letters exist only in that case.
+  assign prop_name = product.title
+  if nf != blank or nf_file != blank
+    unless nf_caps
+      assign prop_name = product.title | downcase | capitalize
+    endunless
+  endif
+  capture nf_scale
+    render 'residence-face-scale', product: product
+  endcapture
+-%}
 {%- if nf != blank or nf_file != blank -%}
   {%- if nf_file != blank -%}
     {%- assign nf_family = nf | default: nf_fallback -%}
@@ -79,7 +92,9 @@
   {%- endif -%}
   <style>
     .prop-name,.psb-name,.prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house{font-family:'{{ nf_family }}',var(--font-d);font-weight:{{ nf_weight }}{% if nf_caps %};text-transform:uppercase{% endif %}}
-    .prop-name{font-size:calc(var(--t-display-xl) * {{ section.settings.name_font_scale | default: 100 | divided_by: 100.0 }});letter-spacing:{{ section.settings.name_font_tracking | default: -4 | divided_by: 100.0 }}em;line-height:.95}
+    .prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house{font-size:calc(1em * {{ nf_scale | strip }})}
+    .psb-name{font-size:calc(var(--t-body) * var(--s-t,1) * {{ nf_scale | strip }})}
+    .prop-name{font-size:calc(var(--t-display-xl) * {{ section.settings.name_font_scale | default: 100 | divided_by: 100.0 }} * {{ nf_scale | strip }});letter-spacing:{{ section.settings.name_font_tracking | default: -4 | divided_by: 100.0 }}em;line-height:.95}
   </style>
 {%- endif -%}
 
@@ -196,7 +211,7 @@
 <div class="prop-body pb-{{ section.settings.body_layout | default: 'beside' }}" style="--prop-split:{{ pr_split }}">
   <div class="prop-layout inner">
     <div class="{% if section.settings.sticky_desc %}prop-desc{% endif %}">
-      {%- if section.settings.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, product.title }}</div>{%- endif -%}
+      {%- if section.settings.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, prop_name }}</div>{%- endif -%}
       {%- if section.settings.show_headline and mf.headline.value != blank -%}<h1 class="prop-body-h reveal d1">{{ mf.headline.value }}</h1>{%- endif -%}
       {%- if section.settings.show_description -%}{{ product.description | replace: '<p>', '<p class="prop-body-p reveal d2">' }}{%- endif -%}
 
@@ -329,7 +344,7 @@
 {%- if gallery_count > 0 and section.settings.show_gallery -%}
   <div class="prop-gallery inner{% if section.settings.show_thumbs == false %} pg-nothumbs{% endif %}{% if section.settings.show_rooms == false %} pg-norooms{% endif %}{% if section.settings.show_expand == false %} pg-noexpand{% endif %}" style="--pgs-ar:{{ section.settings.stage_shape | default: '16/9' }}">
     {%- if section.settings.gallery_label != blank -%}<div class="slabel reveal">{{ section.settings.gallery_label }}</div>{%- endif -%}
-    <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, product.title }}</h2>
+    <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, prop_name }}</h2>
     {%- if glayout == 'grid' -%}
     <div class="prop-gallery-grid gn-{{ gallery_count }}" id="galleryGrid">
       {%- assign gdelays = ',d1,d2' | split: ',' -%}
@@ -449,7 +464,7 @@
         <img class="pg-img" id="pgImgB" alt="" decoding="async">
         <video class="pg-vid" id="pgVid" muted playsinline loop preload="none" hidden></video>
         <div class="pg-veil" aria-hidden="true"></div>
-        <div class="pg-top"><span class="pg-house">{{ product.title }}{% if mf.suburb.value != blank %} &middot; {{ mf.suburb.value }}{% endif %}</span><span class="pg-count" id="pgCount"></span></div>
+        <div class="pg-top"><span class="pg-house">{{ prop_name }}{% if mf.suburb.value != blank %} &middot; {{ mf.suburb.value }}{% endif %}</span><span class="pg-count" id="pgCount"></span></div>
         <div class="pg-cap" id="pgCap" aria-live="polite"></div>
         <button type="button" class="pg-arrow pg-prev" id="pgPrev" aria-label="Previous photo">&larr;</button>
         <button type="button" class="pg-arrow pg-next" id="pgNext" aria-label="Next photo">&rarr;</button>
@@ -666,14 +681,14 @@
             assign film_h = 'Experience <em>' | append: name_token | append: '</em>.'
           endif
         -%}
-        <h2 class="film-h reveal d1">{{ film_h | replace: name_token, product.title }}</h2>
+        <h2 class="film-h reveal d1">{{ film_h | replace: name_token, prop_name }}</h2>
         {%- liquid
           assign film_text = section.settings.film_text
           if film_text == blank
             assign film_text = 'A walk through ' | append: name_token | append: ', on film.'
           endif
         -%}
-        <p class="film-p reveal d2">{{ film_text | replace: name_token, product.title }}</p>
+        <p class="film-p reveal d2">{{ film_text | replace: name_token, prop_name }}</p>
       </div>
       <div class="reveal d2">
         <div class="film-frame" data-film>
@@ -685,7 +700,7 @@
         </div>
         {%- if section.settings.show_film_caption -%}
         <div class="film-caption">
-          <span><b>{{ product.title }} - On Film</b></span>
+          <span><b>{{ prop_name }} - On Film</b></span>
           <span>{{ mf.suburb.value }}, {{ state }}</span>
         </div>
         {%- endif -%}
@@ -698,9 +713,9 @@
   <section class="prop-cta">
     <div class="inner prop-cta-inner">
       <div class="slabel reveal" style="justify-content:center">{{ section.settings.cta_label }}</div>
-      <h2 class="prop-cta-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, product.title }}</h2>
-      <p class="prop-cta-p reveal d2">{{ section.settings.cta_text | replace: name_token, product.title }}</p>
-      <a href="#cform" class="btn-p reveal d3">{{ section.settings.cta_button | replace: name_token, product.title }} &rarr;</a>
+      <h2 class="prop-cta-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, prop_name }}</h2>
+      <p class="prop-cta-p reveal d2">{{ section.settings.cta_text | replace: name_token, prop_name }}</p>
+      <a href="#cform" class="btn-p reveal d3">{{ section.settings.cta_button | replace: name_token, prop_name }} &rarr;</a>
     </div>
   </section>
 {%- endunless -%}
@@ -726,7 +741,7 @@
 
 {%- unless sold or section.settings.show_sticky == false -%}
   <div class="prop-sticky-bar" id="stickyEnquire">
-    <div class="psb-name">{{ product.title }} <span class="psb-loc">- {{ mf.suburb.value }}</span></div>
+    <div class="psb-name">{{ prop_name }} <span class="psb-loc">- {{ mf.suburb.value }}</span></div>
     <a href="#cform" class="psb-btn">{{ section.settings.sticky_label }} &rarr;</a>
   </div>
   <script>

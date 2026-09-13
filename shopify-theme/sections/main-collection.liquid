@@ -469,6 +469,9 @@
                 assign fb_fam = 'ResidenceFace-' | append: featured.handle
               endif
               assign fb_font = "'" | append: fb_fam | append: "',var(--font-d)"
+              capture fb_scale
+                render 'residence-face-scale', product: featured
+              endcapture
               if fmf.name_font_caps.value
                 assign fb_caps = ';text-transform:uppercase'
               else
@@ -476,7 +479,7 @@
               endif
             endif
           -%}
-          <div style="font-family:{{ fb_font }};font-size:calc(var(--t-display)*var(--s-h,1));font-weight:{{ fmf.name_font_weight.value | default: 300 }};line-height:.95;letter-spacing:0;color:var(--white);margin-bottom:10px{{ fb_caps }}">{{ fb_name }}</div>
+          <div style="font-family:{{ fb_font }};font-size:calc(var(--t-display)*var(--s-h,1)*{{ fb_scale | default: 1 | strip }});font-weight:{{ fmf.name_font_weight.value | default: 300 }};line-height:.95;letter-spacing:0;color:var(--white);margin-bottom:10px{{ fb_caps }}">{{ fb_name }}</div>
           <div style="font-size:11.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--white-rgb),.78);margin-bottom:18px">{{ fmf.suburb.value }}, {{ fmf.state.value | default: 'QLD' }}</div>
           {%- if section.settings.featured_specs -%}
           <div style="display:flex;gap:18px;flex-wrap:wrap">

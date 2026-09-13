@@ -30,7 +30,10 @@
     if fam == blank
       assign fam = 'ResidenceFace-' | append: product.handle
     endif
-    assign rc_style = "font-family:'" | append: fam | append: "',var(--font-d);font-weight:" | append: m.name_font_weight.value | default: 400
+    capture rc_scale
+      render 'residence-face-scale', product: product
+    endcapture
+    assign rc_style = "font-family:'" | append: fam | append: "',var(--font-d);font-weight:" | append: m.name_font_weight.value | default: 400 | append: ';font-size:calc(var(--t-h3)*1.25*var(--s-h,1)*' | append: rc_scale | strip | append: ')'
     if m.name_font_caps.value
       assign rc_style = rc_style | append: ';text-transform:uppercase'
     else

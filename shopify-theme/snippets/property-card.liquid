@@ -48,7 +48,10 @@
       assign nf_family = 'ResidenceFace-' | append: product.handle
     endif
     assign nf_weight = mf.name_font_weight.value | default: 400
-    assign nf_style = "font-family:'" | append: nf_family | append: "',var(--font-d);font-weight:" | append: nf_weight | append: ';font-size:calc(var(--t-h3)*1.3*var(--s-h,1));letter-spacing:0;text-transform:none' 
+    capture nf_scale
+      render 'residence-face-scale', product: product
+    endcapture
+    assign nf_style = "font-family:'" | append: nf_family | append: "',var(--font-d);font-weight:" | append: nf_weight | append: ';font-size:calc(var(--t-h3)*1.25*var(--s-h,1)*' | append: nf_scale | append: ');letter-spacing:0;text-transform:none;line-height:1' 
     if mf.name_font_caps.value
       assign nf_style = nf_style | append: ';text-transform:uppercase'
     endif

@@ -29,10 +29,17 @@
       assign nf_family = 'ResidenceFace-' | append: product.handle
     endif
     assign nf_weight = mf.name_font_weight.value | default: 400
-    assign nf_style = "font-family:'" | append: nf_family | append: "',var(--font-d);font-weight:" | append: nf_weight
+    capture nf_scale
+      render 'residence-face-scale', product: product
+    endcapture
+    assign nf_style = "font-family:'" | append: nf_family | append: "',var(--font-d);font-weight:" | append: nf_weight | append: ';font-size:calc(var(--t-h3)*1.25*var(--s-h,1)*' | append: nf_scale | append: ');letter-spacing:0;text-transform:none;line-height:1'
     if mf.name_font_caps.value
       assign nf_style = nf_style | append: ';text-transform:uppercase'
     endif
+  endif
+  assign sc_name = product.title
+  if nf_style != blank and mf.name_font_caps.value != true
+    assign sc_name = product.title | downcase | capitalize
   endif
 -%}
 <a href="{{ product.url }}" class="sc-card {{ class }}" data-beds="{{ mf.beds.value }}" data-baths="{{ mf.baths.value }}" data-status="{{ pstatus | escape }}" data-feats="{{ feats }}" data-year="{{ mf.year.value }}">
@@ -45,7 +52,7 @@
   <div class="sc-ov"></div>
   <div class="sc-badge">{{ badge }}</div>
   <div class="sc-info">
-    <div class="sc-name"{% if nf_style != blank %} style="{{ nf_style | escape }}"{% endif %}>{{ product.title }}</div>
+    <div class="sc-name"{% if nf_style != blank %} style="{{ nf_style | escape }}"{% endif %}>{{ sc_name }}</div>
     {%- if show_suburb and mf.suburb.value != blank -%}
       <div class="pc-loc">{% render 'spec-icon', icon: 'pin' %}{{ mf.suburb.value }}, QLD</div>
     {%- endif -%}
