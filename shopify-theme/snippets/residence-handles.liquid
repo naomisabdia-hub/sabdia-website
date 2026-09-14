@@ -4,6 +4,9 @@
 
     group: 'live' - For Sale, Under Offer, Coming Soon … (no "Sold")
     group: 'sold' - any status containing "Sold"
+    Status "Completed" (the Collection homes that live in Products since
+    14 Sep 2026: MILOS, PETRA, KIRRA, HERMOSA, ENCANTO, HAVEN, SPECTRE) is
+    in neither group: those residences belong to the Collection page only.
     col:   the collection whose manual drag-order leads the list
            (For Sale or Sold). Residences whose Status puts them in this
            group but who are not in that collection are swept in after,
@@ -21,6 +24,9 @@
       capture st
         render 'residence-status', product: p
       endcapture
+      if st contains 'Completed'
+        continue
+      endif
       assign in_sold = false
       if st contains 'Sold'
         assign in_sold = true
@@ -41,6 +47,9 @@
     capture st
       render 'residence-status', product: p
     endcapture
+    if st contains 'Completed'
+      continue
+    endif
     assign in_sold = false
     if st contains 'Sold'
       assign in_sold = true

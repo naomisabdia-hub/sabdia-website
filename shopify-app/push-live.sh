@@ -14,15 +14,20 @@ shopify theme push --store $STORE --path shopify-theme --theme $THEME --allow-li
 # Theme settings (Enquiry handling = Shopify) ship once too; afterwards the
 # customizer copy is the source of truth, so never overwrite it again.
 grep -q "^config/settings_data.json" shopify-theme/.shopifyignore || echo "config/settings_data.json" >> shopify-theme/.shopifyignore
-for h in qasr solace sierra caspian aether capri; do
+for h in qasr solace sierra caspian aether capri milos petra kirra hermosa encanto haven spectre; do
   grep -q "^templates/product.$h.json" shopify-theme/.shopifyignore || echo "templates/product.$h.json" >> shopify-theme/.shopifyignore
 done
-if [ -d "$HOME/Desktop/sabdia-store-templates/templates" ]; then
-  echo "== page templates (home, about, services, contact, collection, for-sale, agent - Tamsin review edits 10 Sep 2026)"
-  shopify theme push --store $STORE --path "$HOME/Desktop/sabdia-store-templates" --theme $THEME --allow-live --nodelete \
-    --only templates/index.json --only templates/page.about.json --only templates/page.services.json --only templates/page.contact.json \
-    --only templates/page.collection.json --only templates/page.collection-item.json --only templates/collection.json --only templates/page.agent-access.json --only templates/page.find-your-home.json
-fi
+# DISABLED 14 Sep 2026 (Naomi lost her home page edits - the dusk facade and
+# sneak-peek reel on the Featured residence - when this step pushed the
+# 10 Sep Desktop copy of templates/index.json over the live one). The
+# customizer is the source of truth for every page template; never push a
+# stored copy over it again.
+#if [ -d "$HOME/Desktop/sabdia-store-templates/templates" ]; then
+#  echo "== page templates (home, about, services, contact, collection, for-sale, agent - Tamsin review edits 10 Sep 2026)"
+#  shopify theme push --store $STORE --path "$HOME/Desktop/sabdia-store-templates" --theme $THEME --allow-live --nodelete \
+#    --only templates/index.json --only templates/page.about.json --only templates/page.services.json --only templates/page.contact.json \
+#    --only templates/page.collection.json --only templates/page.collection-item.json --only templates/collection.json --only templates/page.agent-access.json --only templates/page.find-your-home.json
+#fi
 # The film section (14 Sep 2026) sits on every residence page template; the
 # templates are store-side, so this adds it where it is missing and nothing else.
 echo "== The film section on the residence templates"
@@ -59,4 +64,20 @@ python3 shopify-app/add-residence-card-blocks.py $THEME
 # Adds blocks only where a gallery has none; hand edits survive.
 echo "== Photo blocks in the residence galleries"
 python3 shopify-app/add-gallery-photo-blocks.py $THEME
+# The home film band stays real photographs (14 Sep 2026): any render in its
+# photo blocks is swapped for an AETHER photograph. Idempotent.
+echo "== Real photographs only in the home film band"
+python3 shopify-app/real-only-film-band.py $THEME
+# The completed residences live in Products since 14 Sep 2026 (MILOS, PETRA,
+# KIRRA, HERMOSA, ENCANTO, HAVEN, SPECTRE): their own residence page, their
+# photographs in Products › Media, Status Completed (a group every For Sale,
+# Sold and home list skips). Now that the live theme knows that status they
+# go back on the storefront, the Collection page's cards point at them, and
+# the old /pages/collection-… pages step aside behind their redirects.
+echo "== Completed residences back on the storefront"
+python3 shopify-app/hide-completed-residences.py show
+echo "== Collection page cards pointed at the residences in Products"
+python3 shopify-app/convert-collection-blocks.py $THEME
+echo "== Old Collection pages unpublished (redirects take over)"
+python3 shopify-app/retire-collection-pages.py
 echo "Done."

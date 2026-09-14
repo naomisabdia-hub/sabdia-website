@@ -8,7 +8,9 @@
 
   Residences without a Status fall back to the old "sold" tag, so nothing
   changes until the field is filled in. Any status containing "Sold" sits
-  in the Sold group; everything else is live (listed under For Sale).
+  in the Sold group; "Completed" is the Collection (a finished home that
+  lives in Products since 14 Sep 2026, listed only on the Collection
+  page); everything else is live (listed under For Sale).
 
   Usage: {% capture st %}{% render 'residence-status', product: p %}{% endcapture %}
 {%- endcomment -%}

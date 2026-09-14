@@ -20,7 +20,7 @@ STORE = "b91p0j-f4.myshopify.com"
 LIVE = "150554902630"
 MAX_BLOCKS = 50
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-HANDLES = ("qasr", "solace", "sierra", "caspian", "aether", "capri")
+HANDLES = ("qasr", "solace", "sierra", "caspian", "aether", "capri", "milos", "petra", "kirra", "hermosa", "encanto", "haven", "spectre")
 
 def token():
     for line in open(os.path.join(ROOT, ".env")):

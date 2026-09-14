@@ -41,7 +41,7 @@ import importlib.util, json, os, re, shutil, subprocess, sys, tempfile, urllib.r
 STORE = "b91p0j-f4.myshopify.com"
 LIVE = "150554902630"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-HANDLES = ("qasr", "solace", "sierra", "caspian", "aether", "capri")
+HANDLES = ("qasr", "solace", "sierra", "caspian", "aether", "capri", "milos", "petra", "kirra", "hermosa", "encanto", "haven", "spectre")
 FILES = ["templates/product.json"] + [f"templates/product.{h}.json" for h in HANDLES]
 
 # Page order, top to bottom: (template key, section type).

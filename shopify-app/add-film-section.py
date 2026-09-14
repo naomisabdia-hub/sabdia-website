@@ -19,7 +19,7 @@ import json, os, re, shutil, subprocess, sys, tempfile
 STORE = "b91p0j-f4.myshopify.com"
 LIVE = "150554902630"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FILES = ["templates/product.json"] + [f"templates/product.{h}.json" for h in ("qasr", "solace", "sierra", "caspian", "aether", "capri")]
+FILES = ["templates/product.json"] + [f"templates/product.{h}.json" for h in ("qasr", "solace", "sierra", "caspian", "aether", "capri", "milos", "petra", "kirra", "hermosa", "encanto", "haven", "spectre")]
 
 def token():
     for line in open(os.path.join(ROOT, ".env")):

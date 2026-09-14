@@ -35,6 +35,23 @@
   if film_src == blank and on_product
     assign film_src = mf.film_video.value
   endif
+  # Nothing picked and no film address on the residence: the first film in
+  # Products › the residence › Media (a film uploaded with the photographs,
+  # 14 Sep 2026) plays here, its own still as the poster.
+  assign own_film = blank
+  if film_src == blank and on_product
+    for m in product.media
+      if m.media_type == 'video'
+        assign own_film = m
+        assign own_mp4s = m.sources | where: 'format', 'mp4' | sort: 'height'
+        assign own_mp4 = own_mp4s | last
+        if own_mp4
+          assign film_src = own_mp4.url
+        endif
+        break
+      endif
+    endfor
+  endif
 
   assign poster = ''
   if s.poster
@@ -43,6 +60,9 @@
     assign poster = s.poster_url
   elsif on_product
     assign poster = mf.film_poster.value
+  endif
+  if poster == blank and own_film != blank and own_film.preview_image
+    assign poster = own_film.preview_image | image_url: width: 1600
   endif
 
   # {name} in the words becomes the residence's name, set in its own face

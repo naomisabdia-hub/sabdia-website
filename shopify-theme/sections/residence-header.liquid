@@ -152,6 +152,20 @@
         assign hero_src = hmp4.url
       endif
     endif
+    # "A film" with nothing picked: the first film in Products › the
+    # residence › Media (uploaded with the photographs, 14 Sep 2026).
+    if hm == 'video' and hero_src == blank
+      for m in product.media
+        if m.media_type == 'video'
+          assign own_mp4s = m.sources | where: 'format', 'mp4' | sort: 'height'
+          assign own_mp4 = own_mp4s | last
+          if own_mp4
+            assign hero_src = own_mp4.url
+          endif
+          break
+        endif
+      endfor
+    endif
     assign hero_img = product.featured_image
     if hm == 'image' and section.settings.hero_image
       assign hero_img = section.settings.hero_image

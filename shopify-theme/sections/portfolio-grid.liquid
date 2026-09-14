@@ -33,7 +33,11 @@
         assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
         assign rp = pages[rp_handle]
       endif
-      assign r_style = block.settings.style | default: rp.metafields.custom.style.value | strip
+      if block.settings.product != blank
+        assign r_style = block.settings.style | default: block.settings.product.metafields.custom.style.value | strip
+      else
+        assign r_style = block.settings.style | default: rp.metafields.custom.style.value | strip
+      endif
       if r_style != blank
         echo r_style | append: '¦'
       endif
@@ -47,7 +51,11 @@
         assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
         assign rp = pages[rp_handle]
       endif
-      assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
+      if block.settings.product != blank
+        assign r_loc = block.settings.loc | default: block.settings.product.metafields.custom.suburb.value
+      else
+        assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
+      endif
       assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
       if r_suburb != blank
         echo r_suburb | append: '¦'
@@ -180,6 +188,57 @@
             assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
             assign rp = pages[rp_handle]
           endif
+          # A residence that lives in Products (its own residence page and
+          # Media folder, 14 Sep 2026) fills the card from the product; the
+          # block's own fields still override.
+          assign rprod = block.settings.product
+        -%}
+        {%- if rprod != blank -%}
+        {%- liquid
+          assign r_name = block.settings.name | default: rprod.title
+          assign r_loc = block.settings.loc | default: rprod.metafields.custom.suburb.value
+          assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+          assign r_style = block.settings.style | default: rprod.metafields.custom.style.value | strip
+          assign r_year = rprod.metafields.custom.year.value
+          assign r_image_ext = block.settings.image_ext
+          assign r_video = ''
+          if tile_media == 'film'
+            assign r_video = block.settings.video
+            if block.settings.video_file
+              assign pmp4 = block.settings.video_file.sources | where: 'format', 'mp4' | first
+              if pmp4
+                assign r_video = pmp4.url
+              endif
+            endif
+            if r_video == blank
+              for m in rprod.media
+                if m.media_type == 'video'
+                  assign own_mp4 = m.sources | where: 'format', 'mp4' | first
+                  if own_mp4
+                    assign r_video = own_mp4.url
+                  endif
+                  break
+                endif
+              endfor
+            endif
+          endif
+          assign r_link = block.settings.link | default: rprod.url
+          assign r_teaser = block.settings.teaser | default: rprod.metafields.custom.teaser.value
+          if r_teaser == blank and rprod.metafields.custom.headline.value != blank
+            assign r_teaser = rprod.metafields.custom.headline.value | strip_html
+          endif
+          assign r_beds = rprod.metafields.custom.beds.value
+          assign r_baths = rprod.metafields.custom.baths.value
+          assign r_land = rprod.metafields.custom.land.value
+          assign pcount = pcount | plus: 1
+          assign di = forloop.index0 | modulo: 3
+          assign card_more = false
+          if more_after > 0 and pcount > more_after
+            assign card_more = true
+          endif
+        -%}
+        {%- else -%}
+        {%- liquid
           assign r_name = block.settings.name | default: rp.title
           assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
           assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
@@ -231,10 +290,13 @@
             assign card_more = true
           endif
         -%}
+        {%- endif -%}
         {%- capture card_inner -%}
           <div class="pf-media">
             {%- if block.settings.image -%}
               <img src="{{ block.settings.image | image_url: width: 1200, height: 900, crop: 'center' }}" alt="{{ r_name | escape }}{% if r_suburb != blank %}, {{ r_suburb | escape }}{% endif %}" width="1200" height="900" loading="lazy" decoding="async">
+            {%- elsif rprod != blank and rprod.featured_image -%}
+              <img src="{{ rprod.featured_image | image_url: width: 1200, height: 900, crop: 'center' }}" alt="{{ r_name | escape }}{% if r_suburb != blank %}, {{ r_suburb | escape }}{% endif %}" width="1200" height="900" loading="lazy" decoding="async">
             {%- elsif r_image_ext != blank -%}
               <img src="{% render 'ext-variant', src: r_image_ext, w: 1200, h: 900 %}" alt="{{ r_name | escape }}{% if r_suburb != blank %}, {{ r_suburb | escape }}{% endif %}" width="1200" height="900" loading="lazy" decoding="async">
             {%- endif -%}
@@ -501,7 +563,8 @@
       "type": "residence",
       "name": "Residence",
       "settings": [
-        { "type": "page", "id": "page", "label": "Residence page", "info": "Pick the completed residence's page (Content › Pages, theme template \"collection-item\"). Its name, location line, style, year, photo, film and link then fill in by themselves - the fields below only override." },
+        { "type": "product", "id": "product", "label": "Residence", "info": "Pick the residence from Products (MILOS, PETRA, KIRRA, HERMOSA, ENCANTO, HAVEN, SPECTRE and the rest). Its name, suburb, style, year, main photo, film and link fill in by themselves; the fields below only override." },
+        { "type": "page", "id": "page", "label": "Residence page (older pages)", "info": "Only for a completed residence that still lives in Content › Pages (theme template \"collection-item\"). Leave empty when a residence is picked above." },
         { "type": "text", "id": "name", "label": "Name", "info": "Leave empty to use the page title." },
         { "type": "text", "id": "loc", "label": "Location line" },
         { "type": "text", "id": "style", "label": "Style (override)", "info": "Normally set on the page itself (Metafields › Style) so the residence page shows it too." },

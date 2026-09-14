@@ -1,0 +1,541 @@
+{
+  "sections": {
+    "walkthrough": {
+      "type": "scroll-walk",
+      "settings": {
+        "folder": "",
+        "name": "",
+        "walk_label": "The Walkthrough",
+        "hint_walk": "Scroll to walk",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": "",
+        "show_intro": true,
+        "show_label": true,
+        "show_rooms": true,
+        "show_caption": true,
+        "show_progress": true,
+        "show_hint": true,
+        "frame_border": true,
+        "vignette": true,
+        "heading_html": "",
+        "stage_size": "cinema",
+        "scroll_pace": 12
+      },
+      "disabled": true
+    },
+    "series": {
+      "type": "series-strip",
+      "settings": {
+        "label": "The Series",
+        "heading_prefix": "The story of",
+        "handle_line": "As documented on",
+        "handle": "",
+        "instagram_url": "",
+        "sub": "The build, as it was posted.",
+        "reel_mode": "instagram",
+        "view_on_instagram": "View on Instagram",
+        "brand_caps": true,
+        "dark": false,
+        "show_label": true,
+        "show_heading": true,
+        "show_handle": true,
+        "show_sub": true,
+        "show_dates": true,
+        "show_captions": true,
+        "show_kind": true,
+        "show_arrows": true,
+        "card_width": 0,
+        "card_shape": "9/14",
+        "gap": 14,
+        "caption_lines": 3,
+        "limit": 0,
+        "order": "posted",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      },
+      "blocks": {},
+      "block_order": []
+    },
+    "related": {
+      "type": "related-properties",
+      "settings": {
+        "show_share": true,
+        "share_label": "Share",
+        "copy_link_label": "Copy link",
+        "related_collection": "",
+        "heading_html": "More <em>Sabdia residences</em>",
+        "heading_sold_html": "Residences <em>for sale now</em>",
+        "show_heading": true,
+        "label": "",
+        "show_cars": true,
+        "show_land": false,
+        "count": 3,
+        "columns": "3",
+        "card_shape": "4/3",
+        "gap": 10,
+        "cta_label": "",
+        "cta_link": "",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "film": {
+      "type": "residence-film",
+      "settings": {
+        "film": "shopify://files/videos/spectre-film.mp4",
+        "film_url": "",
+        "poster": "shopify://shop_images/spectre-hero.jpg",
+        "poster_url": "",
+        "shape": "16/9"
+      }
+    },
+    "header": {
+      "type": "residence-header",
+      "settings": {
+        "hero_media": "video",
+        "hero_image": "shopify://shop_images/spectre-hero.jpg",
+        "hero_image_ext": "",
+        "hero_video": "shopify://files/videos/spectre-film.mp4",
+        "hero_video_url": "",
+        "hero_poster": "shopify://shop_images/spectre-hero.jpg",
+        "hero_dim": 44,
+        "hero_height": "tall",
+        "hero_focus": "center",
+        "hero_words": "base-left",
+        "show_status": true,
+        "show_location": true,
+        "name_font": "",
+        "name_font_file": "",
+        "name_font_weight": "400",
+        "name_font_scale": 100,
+        "name_font_tracking": -4,
+        "name_font_caps": false,
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "specs": {
+      "type": "residence-specs",
+      "settings": {
+        "hide_specs": false,
+        "spec_show_location": true,
+        "spec_show_beds": true,
+        "spec_show_baths": true,
+        "spec_show_cars": true,
+        "spec_show_land": true,
+        "spec_show_build": false,
+        "spec_show_status": true,
+        "specs_align": "left",
+        "spec_location": "Location",
+        "spec_beds": "Bedrooms",
+        "spec_baths": "Bathrooms",
+        "spec_cars": "Garages",
+        "spec_land": "Land Size",
+        "spec_build": "Build Size",
+        "spec_status": "Status",
+        "show_sold_banner": false,
+        "sold_notice": "This residence has been sold. View our current properties for sale below.",
+        "sold_banner_label": "View Available",
+        "sold_banner_link": "",
+        "show_sticky": false,
+        "sticky_label": "Enquire"
+      }
+    },
+    "story": {
+      "type": "residence-story",
+      "settings": {
+        "show_about_label": true,
+        "about_label": "About {name}",
+        "show_headline": true,
+        "show_description": true,
+        "show_features": true,
+        "features_heading": "Key Features",
+        "sticky_desc": true,
+        "body_layout": "beside",
+        "show_enquiry": false,
+        "enquiry_types": "General enquiry about {name} | Thank you for your enquiry about {name}. A member of the Sabdia team will be in touch shortly.\nArrange an inspection | Thank you. Inspections of {name} are by private appointment, and a member of the Sabdia team will be in touch shortly to arrange a time.\nRegister my interest | Thank you for registering your interest in {name}. A member of the Sabdia team will be in touch shortly.",
+        "f_first": "First Name*",
+        "f_last": "Last Name*",
+        "f_email": "Email*",
+        "f_phone": "Phone",
+        "f_interest": "Enquiry Type",
+        "f_message": "Message",
+        "optin_label": "Keep me updated on new Sabdia releases",
+        "privacy_note": "By submitting this form you agree to our privacy policy. Your details will not be shared with third parties.",
+        "success_text": "Thank you. A member of the Sabdia team will be in touch shortly.",
+        "show_brochure": true,
+        "brochure_label": "Download Brochure",
+        "show_general": true,
+        "general_label": "General Enquiry",
+        "general_link": "",
+        "sold_cta_label": "View Current Properties",
+        "prequal_budget_label": "Budget range",
+        "prequal_budget": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say",
+        "prequal_timeline_label": "Timeline",
+        "prequal_timeline": "Ready now\n1 - 3 months\n3 - 6 months\n6 - 12 months\nJust researching",
+        "prequal_flex_label": "Location and flexibility",
+        "prequal_flex": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases",
+        "prequal_loc_label": "Preferred locations",
+        "prequal_loc_label_other": "Also considering (optional)",
+        "prequal_locations": ""
+      }
+    },
+    "gallery": {
+      "type": "residence-gallery",
+      "settings": {
+        "show_gallery": true,
+        "gallery_label": "The Residence",
+        "gallery_heading_html": "Inside <em>{name}</em>.",
+        "gallery_layout": "stage",
+        "gallery_tiles": 9,
+        "stage_shape": "16/9",
+        "show_thumbs": true,
+        "show_rooms": true,
+        "show_expand": true,
+        "gallery_all_label": "View all photos"
+      },
+      "blocks": {
+        "photo_1": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-entry-01.jpg"
+          }
+        },
+        "photo_2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-kitchen-detail-01.jpg"
+          }
+        },
+        "photo_3": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-bedroom-01.jpg"
+          }
+        },
+        "photo_4": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-media-room-01.jpg"
+          }
+        },
+        "photo_5": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-study-01.jpg"
+          }
+        },
+        "photo_6": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-dining-living-01.jpg"
+          }
+        },
+        "photo_7": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-living-01.jpg"
+          }
+        },
+        "photo_8": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-kitchen-dining-01.jpg"
+          }
+        },
+        "photo_9": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-pool-01.jpg"
+          }
+        },
+        "photo_10": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-kitchen-01.jpg"
+          }
+        },
+        "photo_11": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-kitchen-detail-02.jpg"
+          }
+        },
+        "photo_12": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-kitchen-dining-02.jpg"
+          }
+        },
+        "photo_13": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-dining-01.jpg"
+          }
+        },
+        "photo_14": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-alfresco-dining-01.jpg"
+          }
+        },
+        "photo_15": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-kitchen-02.jpg"
+          }
+        },
+        "photo_16": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-living-02.jpg"
+          }
+        },
+        "photo_17": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-laundry-01.jpg"
+          }
+        },
+        "photo_18": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-staircase-01.jpg"
+          }
+        },
+        "photo_19": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-kitchen-dining-03.jpg"
+          }
+        },
+        "photo_20": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-kitchen-03.jpg"
+          }
+        },
+        "photo_21": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-master-bedroom-01.jpg"
+          }
+        },
+        "photo_22": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-kitchen-detail-03.jpg"
+          }
+        },
+        "photo_23": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-bedroom-02.jpg"
+          }
+        },
+        "photo_24": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-kitchen-04.jpg"
+          }
+        },
+        "photo_25": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-exterior-front-02.jpg"
+          }
+        },
+        "photo_26": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-facade-detail-01.jpg"
+          }
+        },
+        "photo_27": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-walk-in-robe-01.jpg"
+          }
+        },
+        "photo_28": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-ensuite-01.jpg"
+          }
+        },
+        "photo_29": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-bathroom-01.jpg"
+          }
+        },
+        "photo_30": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-ensuite-02.jpg"
+          }
+        },
+        "photo_31": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-kitchen-detail-04.jpg"
+          }
+        },
+        "photo_32": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-ensuite-03.jpg"
+          }
+        },
+        "photo_33": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-living-03.jpg"
+          }
+        },
+        "photo_34": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-living-04.jpg"
+          }
+        },
+        "photo_35": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-staircase-02.jpg"
+          }
+        },
+        "photo_36": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-bathroom-02.jpg"
+          }
+        },
+        "photo_37": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-ensuite-04.jpg"
+          }
+        },
+        "photo_38": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/spectre-ensuite-05.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "photo_1",
+        "photo_2",
+        "photo_3",
+        "photo_4",
+        "photo_5",
+        "photo_6",
+        "photo_7",
+        "photo_8",
+        "photo_9",
+        "photo_10",
+        "photo_11",
+        "photo_12",
+        "photo_13",
+        "photo_14",
+        "photo_15",
+        "photo_16",
+        "photo_17",
+        "photo_18",
+        "photo_19",
+        "photo_20",
+        "photo_21",
+        "photo_22",
+        "photo_23",
+        "photo_24",
+        "photo_25",
+        "photo_26",
+        "photo_27",
+        "photo_28",
+        "photo_29",
+        "photo_30",
+        "photo_31",
+        "photo_32",
+        "photo_33",
+        "photo_34",
+        "photo_35",
+        "photo_36",
+        "photo_37",
+        "photo_38"
+      ]
+    },
+    "closing": {
+      "type": "residence-closing",
+      "settings": {
+        "show_cta": true,
+        "cta_label": "Private Appointments",
+        "cta_heading_html": "Experience <em>{name}</em> in person.",
+        "cta_text": "Inspections are by private appointment. Leave your details and we will be in touch within a business day.",
+        "cta_button": "Enquire About {name}"
+      },
+      "disabled": true
+    }
+  },
+  "order": [
+    "header",
+    "specs",
+    "story",
+    "gallery",
+    "closing",
+    "film",
+    "series",
+    "related",
+    "walkthrough"
+  ]
+}

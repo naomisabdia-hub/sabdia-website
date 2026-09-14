@@ -87,6 +87,21 @@ architecture, layout, interiors, or finishes. No exceptions.**
   section's Look "backdrop" dials (photo/film behind the words) are named
   Backdrop … and only show when Background = a photo or film; The film
   section has no backdrop dials at all.
+- Completed residences (since 14 Sep 2026: MILOS, PETRA, KIRRA, HERMOSA,
+  ENCANTO, HAVEN, SPECTRE) are PRODUCTS like the ones for sale, so each has
+  the nine-section residence page and its own Media folder in the file
+  picker (`house-room-NN.jpg`, hero first; films as `house-film.mp4`).
+  Their Status is `Completed`: `residence-handles` skips that group, so
+  they never appear under For Sale, Sold or the home grid, only on the
+  Collection page (`portfolio-grid` Residence blocks pick a product). The
+  Admin token has no Files scope, so product Media is the only Shopify
+  home for photos Claude can upload. Adding the next one: name map in
+  `shopify-app/photo-names/<house>.json`, then
+  `create-residence-products.py`, `add-residence-media.py <house> <folder>
+  [--film …]`, `make-residence-templates.py <theme>`; push-live.sh puts
+  them on the storefront and retires the old /pages/collection-… page
+  (redirects exist). Old-page residences still on Supabase: ALHAMBRA,
+  AMMOS, CALLE, ELYSIUM, FRASER, NERO.
 - The public QASR cut is deliberately curated — mud room, sauna, guest
   suites, powder, dining, cellar etc. are held back pre-sale. Do not add
   rooms without Naomi's sign-off. The full private tour lives on Naomi's
