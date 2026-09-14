@@ -535,11 +535,35 @@ function nativeFormInit() {
         form.innerHTML = '<p class="nl-done">' + ((doneEl && doneEl.textContent.trim()) || 'Thank you — you\'re subscribed.') + '</p>';
       } else {
         mirrorEnquiry(form);
-        showThanks(form, thanksHeading(form), thanksText(form));
+        let tt = thanksText(form);
+        if (form.dataset.cvFailed === '1') tt = (tt || '') + ' Our upload did not go through this time, so please email your CV to sales@sabdia.com.au.';
+        showThanks(form, thanksHeading(form), tt);
       }
+    };
+    /* Careers: the CV goes to the private careers folder first; the form
+       then carries its file name. Only the public key is used, and it can
+       only add files to that folder. */
+    const uploadCv = async () => {
+      const cf = form.querySelector('[data-careers-file]'), cp = form.querySelector('[data-careers-path]');
+      if (!cf || cf.disabled || !cf.files || !cf.files[0]) return;
+      const f = cf.files[0];
+      if (f.size > 10 * 1024 * 1024) throw new Error('Please keep the CV under 10 MB.');
+      const host = form.closest('[data-careers-upload]') || form;
+      const base = host.getAttribute('data-careers-upload'), key = host.getAttribute('data-careers-key');
+      if (!base || !key) throw new Error('CV uploads are not set up yet. Please email your CV to sales@sabdia.com.au.');
+      const safe = f.name.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'cv';
+      const name = new Date().toISOString().slice(0, 10) + '-' + Math.random().toString(36).slice(2, 8) + '-' + safe;
+      const res = await fetch(base + '/' + name, { method: 'POST', headers: { 'apikey': key, 'Authorization': 'Bearer ' + key, 'Content-Type': f.type || 'application/octet-stream', 'x-upsert': 'false' }, body: f });
+      if (!res.ok) throw new Error('Your CV could not be uploaded. Please try again, or email it to sales@sabdia.com.au.');
+      if (cp) cp.value = name;
     };
     const send = async () => {
       try {
+        /* If the CV upload fails the enquiry still goes, flagged, and the
+           thank-you asks for the CV by email - a blocked form loses the
+           applicant altogether. */
+        try { await uploadCv(); form.dataset.cvFailed = ''; }
+        catch (err) { const cp = form.querySelector('[data-careers-path]'); if (cp) cp.value = 'UPLOAD FAILED - please ask the applicant to email their CV'; form.dataset.cvFailed = '1'; }
         const res = await fetch(form.getAttribute('action').split('#')[0], {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'text/html' },
@@ -613,10 +637,18 @@ function prequalInit() {
         if (!sel || /inspect|interest|buy|purchase|offer/i.test(t)) { mode = 'residence'; suburb = pageSuburb; }
       }
       else if (sel) {
+        /* Contact page (Naomi, 14 Sep 2026): the buyer questions only when a
+           specific residence is chosen or a viewing is requested. */
         const r = residenceFor(sel.value);
         if (r) { mode = 'residence'; suburb = r.suburb || ''; }
-        else if (/for sale|current propert|purchase|buy|residence|home for|off.?market|upcoming|release/i.test(sel.value)) mode = 'forsale';
+        else if (/viewing|inspect/i.test(sel.value)) mode = 'forsale';
       } else { mode = 'forsale'; }
+      /* Careers: a CV instead of the buyer questions. */
+      const cw = form.querySelector('[data-careers-wrap]'), cf = form.querySelector('[data-careers-file]');
+      const isCareers = !!sel && /career|job|employ|work with|position|vacanc/i.test(sel.value);
+      if (cw) cw.hidden = !isCareers;
+      if (cf) { cf.required = isCareers; cf.disabled = !isCareers; }
+      if (isCareers) mode = 'none';
       const show = mode !== 'none';
       wrap.hidden = !show;
       if (budget) budget.required = show;

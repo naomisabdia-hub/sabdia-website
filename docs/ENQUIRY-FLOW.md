@@ -136,3 +136,26 @@ The custom app's token can read and write products, content, pages, navigation a
 - How Shopify treats an address that already exists (it should update that Customer and add the tags rather than create a second record).
 - Whether an enquiry with the box unticked shows as Subscribed (the consent point above), and whether the phone and note from the mirror are kept.
 - The current count in Customers › Segments › Email subscribers, and whether any signups are already there.
+
+## Careers enquiries (14 Sep 2026)
+
+Contact page › enquiry type **Careers**: the buyer questions hide and a CV
+field appears (required, PDF or Word, 10 MB). On send the file uploads to
+the private Supabase bucket `careers` with the public key, and the enquiry
+arrives with the file name in the field "CV". Open the file at Supabase ›
+Storage › careers.
+
+**One-off setup (Naomi):** the bucket exists, but the public key needs
+permission to add files to it. In Supabase › SQL editor run:
+
+```sql
+create policy "careers anon insert" on storage.objects
+  for insert to anon with check (bucket_id = 'careers');
+```
+
+Until that runs, a Careers enquiry still sends, flagged
+"UPLOAD FAILED", and the thank-you asks the applicant to email the CV.
+
+Buyer questions (budget, timeline, locations) on the Contact page appear
+only for a specific residence or Request a Viewing; on a residence page
+only for Arrange an inspection or Register my interest.

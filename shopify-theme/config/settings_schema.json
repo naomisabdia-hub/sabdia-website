@@ -357,6 +357,27 @@
       },
       {
         "type": "text",
+        "id": "supabase_url",
+        "label": "Storage service URL",
+        "default": "https://fvczsjcrvwzqtcbforgo.supabase.co",
+        "info": "Where a Careers CV is uploaded to (the media library's service)."
+      },
+      {
+        "type": "text",
+        "id": "supabase_anon_key",
+        "label": "Storage public key",
+        "default": "sb_publishable_x9Vq8CUwZJLTXHRLrmo2TA_C3GTw796",
+        "info": "The public (anon) key. It can only add files to the careers folder; it cannot read or delete anything."
+      },
+      {
+        "type": "text",
+        "id": "careers_bucket",
+        "label": "Careers folder",
+        "default": "careers",
+        "info": "CVs land here (Supabase › Storage › careers). Private: only you can open them."
+      },
+      {
+        "type": "text",
         "id": "domain_display",
         "label": "Domain display text",
         "default": "sabdiaconstructions.com.au"

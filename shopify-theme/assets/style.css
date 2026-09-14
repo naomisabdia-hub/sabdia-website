@@ -1696,3 +1696,5 @@ html.bk .chip span{border-color:rgba(var(--dark-rgb),.35)}
 html.bk .chip input:checked+span{border-color:var(--ink);background:var(--bg)}
 html.bk .chip input:focus-visible+span{outline-color:var(--ink)}
 html.bk .prop-enquire{border-top-color:var(--ink)}
+.fi-file{padding:11px 14px;cursor:pointer}
+.fi-file::file-selector-button{font-family:var(--font-u);font-size:var(--t-label);letter-spacing:.18em;text-transform:uppercase;padding:8px 14px;margin-right:14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg2);color:var(--ink);cursor:pointer}

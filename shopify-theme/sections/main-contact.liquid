@@ -7,6 +7,10 @@
 {%- endcomment -%}
 {%- assign fs = section.settings.listings_collection | default: collections['for-sale'] -%}
 {% render 'section-look', section: section %}
+{%- liquid
+  assign careers_bucket = settings.careers_bucket | default: 'careers'
+  assign careers_upload = settings.supabase_url | default: 'https://fvczsjcrvwzqtcbforgo.supabase.co' | append: '/storage/v1/object/' | append: careers_bucket
+-%}
 <section class="sp cp cp-{{ section.settings.layout | default: 'beside' }} cp-agent-{{ section.settings.agent_style | default: 'obsidian' }}{% if section.settings.form_style == 'card' %} cp-card{% endif %}" style="--cm-map-ar:{{ section.settings.map_shape | default: '16/9' }}">
   <div class="inner contact-page-grid">
     <div>
@@ -53,7 +57,7 @@
         <p class="reveal d1" style="font-family:'EB Garamond',Georgia,serif;font-size:14px;font-style:italic;color:var(--ink3);margin:10px 0 6px">{{ section.settings.guided_line_html }}</p>
       {%- endif -%}
       {%- if settings.form_backend == 'vercel' -%}
-      <form class="cform reveal d1" id="cform" style="margin-top:12px" name="contact" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
+      <form class="cform reveal d1" id="cform" style="margin-top:12px" name="contact" method="POST" action="{{ settings.forms_endpoint }}/api/contact" data-careers-upload="{{ careers_upload }}" data-careers-key="{{ settings.supabase_anon_key }}">
         <input type="hidden" name="form-name" value="contact">
         <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
         <div class="frow">
@@ -80,6 +84,12 @@
           {%- endfor -%}
         </div>
         {% render 'prequal-fields', mode: 'vercel', s: section.settings %}
+        <div class="fg" data-careers-wrap hidden>
+          <label class="fl" for="cf-cv-v">{{ section.settings.careers_label | default: "CV or resume*" }}</label>
+          <input type="file" id="cf-cv-v" class="fi fi-file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" data-careers-file disabled>
+          <p class="form-note" style="margin:0">{{ section.settings.careers_note | default: "PDF or Word, up to 10 MB." }}</p>
+          <input type="hidden" name="cv" value="" data-careers-path>
+        </div>
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="message" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           <button type="submit" class="fsub" id="fsub">{{ section.settings.submit_label }} &rarr;</button>
@@ -90,6 +100,7 @@
       {%- else -%}
       {%- comment -%} Shopify-native: emails the store's sender address and
           files the enquirer under Customers. {%- endcomment -%}
+      <div data-careers-upload="{{ careers_upload }}" data-careers-key="{{ settings.supabase_anon_key }}">
       {% form 'contact', id: 'cform', class: 'cform reveal d1', style: 'margin-top:12px' %}
         <span hidden data-thanks>{{ section.settings.success_text }}</span>
         {%- if form.posted_successfully? -%}
@@ -122,6 +133,13 @@
           {%- endfor -%}
         </div>
         {% render 'prequal-fields', mode: 'shopify', s: section.settings %}
+        {%- comment -%} Careers: a CV is required and uploads to the careers folder before the form sends (main.js). {%- endcomment -%}
+        <div class="fg" data-careers-wrap hidden>
+          <label class="fl" for="cf-cv">{{ section.settings.careers_label | default: "CV or resume*" }}</label>
+          <input type="file" id="cf-cv" class="fi fi-file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" data-careers-file disabled>
+          <p class="form-note" style="margin:0">{{ section.settings.careers_note | default: "PDF or Word, up to 10 MB." }}</p>
+          <input type="hidden" name="contact[CV]" value="" data-careers-path>
+        </div>
         <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Your Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="Tell us about your interest, timeline, or any questions you have…" style="min-height:140px" required></textarea></div>
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
           {% render 'form-optin', label: section.settings.optin_label %}
@@ -130,6 +148,7 @@
         </div>
       {%- endif -%}
         {% endform %}
+      </div>
         {%- assign cm_uid = 'cm-' | append: section.id -%}{% render 'customer-mirror', uid: cm_uid, residence: '' %}
       {%- endif -%}
     </div>
@@ -206,6 +225,10 @@
 {
   "name": "Contact body",
   "settings": [
+    {"type": "header", "content": "Careers"},
+    {"type": "paragraph", "content": "Add an enquiry type block named Careers below. Choosing it asks for a CV (required) instead of the buyer questions; the file uploads to the careers folder and its name arrives with the enquiry."},
+    {"type": "text", "id": "careers_label", "label": "CV field label", "default": "CV or resume*"},
+    {"type": "text", "id": "careers_note", "label": "CV field note", "default": "PDF or Word, up to 10 MB."},
     {
       "type": "text",
       "id": "direct_label",
