@@ -24,7 +24,7 @@ import json, os, re, subprocess, sys, tempfile
 
 STORE = "b91p0j-f4.myshopify.com"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FILES = ["templates/product.json"] + [f"templates/product.{h}.json" for h in ("qasr", "solace", "sierra", "caspian", "aether", "capri", "milos", "petra", "kirra", "hermosa", "encanto", "haven", "spectre")]
+FILES = ["templates/product.json"] + [f"templates/product.{h}.json" for h in ("qasr", "solace", "sierra", "caspian", "aether", "capri")]
 
 # Which of the old section's settings each new section takes (its schema ids).
 HEADER_IDS = ["hero_media", "hero_image", "hero_use_links", "hero_image_ext", "hero_video", "hero_video_url", "hero_poster", "hero_dim", "hero_height", "hero_focus", "hero_words", "show_status", "show_location", "show_sold_banner", "sold_notice", "sold_banner_label", "sold_banner_link", "name_font", "name_font_file", "name_font_weight", "name_font_scale", "name_font_tracking", "name_font_caps", "look_space_top", "look_space_bottom", "look_width", "look_margins", "look_heading", "look_text", "look_label", "look_animate", "look_rule_top", "look_rule_bottom", "look_anchor"]

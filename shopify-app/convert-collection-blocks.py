@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Point the Collection page's Residence blocks at the residences that now
-live in Products (14 Sep 2026: MILOS, PETRA, KIRRA, HERMOSA, ENCANTO), so
-the card fills from the product (name, suburb, style, main photo, link to
-the residence page) instead of the old Collection page and its photos on
-Supabase. Adds Residence blocks for the residences that never had a page
-(HAVEN, SPECTRE). Idempotent; pushes only when something changed.
+"""Point the Collection page's Residence blocks at the completed residences'
+photographs in Shopify (14 Sep 2026): each of MILOS, PETRA, KIRRA, HERMOSA,
+ENCANTO keeps its page and its card photo becomes the main photo from that
+residence's Media folder in Products (no Supabase); HAVEN and SPECTRE,
+which never had a card, join the grid with their pages. Idempotent; pushes
+only when something changed.
 
     python3 shopify-app/convert-collection-blocks.py 150783361126   # staging
     python3 shopify-app/convert-collection-blocks.py 150554902630   # live (Naomi)
 """
-import json, os, re, shutil, subprocess, sys, tempfile
+import json, os, re, shutil, subprocess, sys, tempfile, urllib.request
 
 STORE = "b91p0j-f4.myshopify.com"
 LIVE = "150554902630"
@@ -26,9 +26,25 @@ def env_val(key):
     sys.exit(f"{key} missing from .env")
 
 
+def gql(q, v=None):
+    r = urllib.request.Request(f"https://{STORE}/admin/api/2025-07/graphql.json", data=json.dumps({"query": q, "variables": v or {}}).encode(),
+                               headers={"X-Shopify-Access-Token": env_val("SHOPIFY_ADMIN_TOKEN"), "Content-Type": "application/json"})
+    d = json.load(urllib.request.urlopen(r))
+    if d.get("errors"):
+        sys.exit(json.dumps(d["errors"], indent=2))
+    return d["data"]
+
+
 def sh(*args, **kw):
     print("$", " ".join(args))
     return subprocess.run(args, check=True, **kw)
+
+
+def hero(handle):
+    d = gql('query($h:String!){ productByHandle(handle:$h){ featuredImage{ url } } }', {"h": handle})["productByHandle"]
+    if not d or not d.get("featuredImage"):
+        return None
+    return d["featuredImage"]["url"].split("?")[0].rsplit("/", 1)[-1]
 
 
 def main():
@@ -36,6 +52,7 @@ def main():
         sys.exit(__doc__)
     theme = sys.argv[1]
     env = dict(os.environ, SHOPIFY_CLI_THEME_TOKEN=env_val("SHOPIFY_CLI_THEME_TOKEN"))
+    heroes = {h: hero(h) for h in CONVERTED + NEW}
     work = tempfile.mkdtemp(prefix="collection-blocks-")
     sh("shopify", "theme", "pull", "--store", STORE, "--theme", theme, "--path", work, "--only", REL, env=env)
     path = os.path.join(work, REL)
@@ -56,30 +73,27 @@ def main():
         st = b.setdefault("settings", {})
         page = (st.get("page") or "").strip()
         link = st.get("link") or ""
-        h = page[len("collection-"):] if page.startswith("collection-") else ""
+        h = page[len("collection-"):] if page.startswith("collection-") else (st.get("product") or "")
         if not h and "/pages/collection-" in link:
             h = link.split("/pages/collection-", 1)[1].split("?")[0].split("#")[0].strip("/")
-        if st.get("product"):
-            have.add(st["product"])
-        if h in CONVERTED and st.get("product") != h:
-            st["product"] = h
-            # The old page's photo and link no longer lead; the product's do.
-            if link.startswith("/pages/collection-"):
-                st["link"] = ""
-            changed = True
-            print(f"  {bid}: -> product {h}")
-        if st.get("product"):
-            have.add(st["product"])
+        if h in heroes and heroes[h]:
+            want = {"page": f"collection-{h}", "image": "shopify://shop_images/" + heroes[h]}
+            if any(st.get(k) != v for k, v in want.items()) or st.get("product"):
+                st.update(want); st.pop("product", None)
+                changed = True
+                print(f"  {bid}: page collection-{h}, photo {heroes[h]}")
+        if h:
+            have.add(h)
     for h in NEW:
-        if h in have:
+        if h in have or not heroes.get(h):
             continue
         bid = f"residence_{h}"
         while bid in blocks:
             bid += "_"
-        blocks[bid] = {"type": "residence", "settings": {"product": h}}
+        blocks[bid] = {"type": "residence", "settings": {"page": f"collection-{h}", "image": "shopify://shop_images/" + heroes[h]}}
         order.append(bid)
         changed = True
-        print(f"  added {bid} (product {h})")
+        print(f"  added {bid} (page collection-{h})")
     if not changed:
         print("Nothing to change."); shutil.rmtree(work); return
     open(path, "w").write(json.dumps(data, indent=2, ensure_ascii=False) + "\n")

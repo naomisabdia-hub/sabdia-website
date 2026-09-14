@@ -17,6 +17,9 @@ grep -q "^config/settings_data.json" shopify-theme/.shopifyignore || echo "confi
 for h in qasr solace sierra caspian aether capri milos petra kirra hermosa encanto haven spectre; do
   grep -q "^templates/product.$h.json" shopify-theme/.shopifyignore || echo "templates/product.$h.json" >> shopify-theme/.shopifyignore
 done
+for h in milos petra kirra hermosa encanto haven spectre; do
+  grep -q "^templates/page.collection-$h.json" shopify-theme/.shopifyignore || echo "templates/page.collection-$h.json" >> shopify-theme/.shopifyignore
+done
 # DISABLED 14 Sep 2026 (Naomi lost her home page edits - the dusk facade and
 # sneak-peek reel on the Featured residence - when this step pushed the
 # 10 Sep Desktop copy of templates/index.json over the live one). The
@@ -68,16 +71,17 @@ python3 shopify-app/add-gallery-photo-blocks.py $THEME
 # photo blocks is swapped for an AETHER photograph. Idempotent.
 echo "== Real photographs only in the home film band"
 python3 shopify-app/real-only-film-band.py $THEME
-# The completed residences live in Products since 14 Sep 2026 (MILOS, PETRA,
-# KIRRA, HERMOSA, ENCANTO, HAVEN, SPECTRE): their own residence page, their
-# photographs in Products › Media, Status Completed (a group every For Sale,
-# Sold and home list skips). Now that the live theme knows that status they
-# go back on the storefront, the Collection page's cards point at them, and
-# the old /pages/collection-… pages step aside behind their redirects.
-echo "== Completed residences back on the storefront"
-python3 shopify-app/hide-completed-residences.py show
-echo "== Collection page cards pointed at the residences in Products"
+# The completed residences' photographs and films live in Products › Media
+# since 14 Sep 2026 (MILOS, PETRA, KIRRA, HERMOSA, ENCANTO, HAVEN, SPECTRE:
+# Status Completed, a group every For Sale, Sold and home list skips; the
+# product address only redirects to the Collection page). Each residence's
+# Collection page gets its own copy of the collection-item template with the
+# Photo blocks and pickers, and the Collection grid's cards show the same
+# photographs from Shopify.
+echo "== Product addresses of the completed residences redirect to their pages"
+python3 shopify-app/push-product-redirects.py $THEME
+echo "== Each completed residence's page on its own Collection template"
+python3 shopify-app/assign-collection-templates.py
+echo "== Collection page cards showing the photographs from Shopify"
 python3 shopify-app/convert-collection-blocks.py $THEME
-echo "== Old Collection pages unpublished (redirects take over)"
-python3 shopify-app/retire-collection-pages.py
 echo "Done."

@@ -25,9 +25,22 @@
   if first_char == '/'
     assign is_media = true
   endif
+  # A Shopify CDN address (image_url gives //www.sabdia.com.au/cdn/shop/…)
+  # is served as it is: Shopify already sized it.
+  assign first_two = src | slice: 0, 2
+  if first_two == '//' or src contains '/cdn/shop/'
+    assign is_media = false
+  endif
+  # Supabase photos are served straight from Supabase (14 Sep 2026): the
+  # Vercel project behind /api/img sits behind Deployment Protection, so
+  # its crops redirect to a Vercel sign-in and the picture never loads.
+  assign is_supabase = false
+  if src contains '.supabase.co/storage/v1/object/public/'
+    assign is_supabase = true
+  endif
   if src == blank
     # nothing to output
-  elsif is_svg or is_media == false
+  elsif is_svg or is_media == false or is_supabase
     echo src
   else
     assign enc = src | url_encode

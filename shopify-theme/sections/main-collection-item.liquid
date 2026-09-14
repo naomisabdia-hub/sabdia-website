@@ -27,19 +27,84 @@
   keeps the metafield. The Gallery list stays URL-based.
 {%- endcomment -%}
 {%- liquid
-  assign mf = page.metafields.custom
+  # Since 14 Sep 2026 a completed residence can live in Products (MILOS,
+  # PETRA, KIRRA, HERMOSA, ENCANTO, HAVEN, SPECTRE): the same page, fed by
+  # the product - its title, suburb, style, year, story (the description),
+  # the photographs in Products › Media (or the Photo blocks below) and the
+  # film uploaded with them. Older completed residences stay on pages.
+  assign on_product = false
+  if template.name == 'product' and product != blank
+    assign on_product = true
+  endif
+  if on_product
+    assign mf = product.metafields.custom
+    assign res_title = product.title
+    assign res_url = product.url
+    assign loc = mf.suburb.value | append: ' QLD, Australia'
+  else
+    assign mf = page.metafields.custom
+    assign res_title = page.title
+    assign res_url = page.url
+    assign loc = mf.loc.value
+  endif
   assign posts = mf.series_posts.value
-  assign gallery = mf.gallery.value
-  # The film poster (a portrait reel frame) is not a hero: when the Hero
-  # image is one of those and the page has photos, the first photo leads.
-  assign hero = mf.image.value
-  if gallery.size > 0
-    if hero == blank or hero contains '/films/'
-      assign hero = gallery[0]
+  # The photographs: one Photo block per picture when Photo blocks are
+  # added (each residence's own template, since 14 Sep 2026), else the
+  # residence's Media folder in Products (this product, or the folder
+  # picked in Media folder below), else the page's Gallery links.
+  assign media_res = blank
+  if on_product
+    assign media_res = product
+  elsif section.settings.media_product != blank
+    assign media_res = section.settings.media_product
+  endif
+  assign use_photo_blocks = false
+  for block in section.blocks
+    if block.type == 'photo' and block.settings.image
+      assign use_photo_blocks = true
+      break
+    endif
+  endfor
+  capture gal_raw
+    assign sep = ''
+    if use_photo_blocks
+      for block in section.blocks
+        if block.type == 'photo' and block.settings.image
+          echo sep
+          echo block.settings.image | image_url: width: 2000
+          assign sep = '¦'
+        endif
+      endfor
+    elsif media_res != blank
+      for image in media_res.images offset: 1
+        echo sep
+        echo image | image_url: width: 2000
+        assign sep = '¦'
+      endfor
+    endif
+  endcapture
+  assign gal_raw = gal_raw | strip
+  if gal_raw != blank
+    assign gallery = gal_raw | split: '¦'
+  elsif on_product
+    assign gallery = '' | split: '¦'
+  else
+    assign gallery = mf.gallery.value
+  endif
+  assign hero = ''
+  if media_res != blank and media_res.featured_image
+    assign hero = media_res.featured_image | image_url: width: 1920
+  elsif on_product == false
+    # The film poster (a portrait reel frame) is not a hero: when the Hero
+    # image is one of those and the page has photos, the first photo leads.
+    assign hero = mf.image.value
+    if gallery.size > 0
+      if hero == blank or hero contains '/films/'
+        assign hero = gallery[0]
+      endif
     endif
   endif
   assign name_token = '{' | append: 'name' | append: '}'
-  assign loc = mf.loc.value
   assign suburb = loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
   assign style_name = mf.style.value | strip
   assign year = mf.year.value
@@ -81,7 +146,51 @@
       break
     endif
   endfor
+  if true
+    # This section's own pickers (each residence has its own template
+    # since 14 Sep 2026) win over the block above and the metafields.
+    if section.settings.hero_image
+      assign hero_pick = section.settings.hero_image
+    endif
+    if section.settings.film
+      assign film_pick = section.settings.film
+    endif
+    if section.settings.film_poster
+      assign poster_pick = section.settings.film_poster
+    endif
+    if section.settings.film_2
+      assign film2_pick = section.settings.film_2
+    endif
+    if section.settings.film_2_poster
+      assign poster2_pick = section.settings.film_2_poster
+    endif
+    if section.settings.side_photo_1
+      assign side_a_pick = section.settings.side_photo_1
+    endif
+    if section.settings.side_photo_2
+      assign side_b_pick = section.settings.side_photo_2
+    endif
+  endif
   assign film_src = mf.video.value
+  if on_product
+    assign film_src = mf.film_video.value
+  endif
+  if media_res != blank
+    # The film: a film address on the residence, else the first film in the
+    # Media folder in Products (uploaded with the photographs).
+    if film_src == blank
+      for m in media_res.media
+        if m.media_type == 'video'
+          assign own_mp4s = m.sources | where: 'format', 'mp4' | sort: 'height'
+          assign own_mp4 = own_mp4s | last
+          if own_mp4
+            assign film_src = own_mp4.url
+          endif
+          break
+        endif
+      endfor
+    endif
+  endif
   if film_pick
     assign fmp4 = film_pick.sources | where: 'format', 'mp4' | first
     if fmp4
@@ -124,7 +233,9 @@
   # Story: the Story field, one paragraph per line; else the strongest
   # Instagram captions (over 60 characters), deduplicated, first three.
   assign story = '' | split: '¦'
-  if mf.story.value != blank
+  if on_product and product.description != blank
+    assign story = product.description | replace: '</p>', '¦' | strip_html | split: '¦'
+  elsif mf.story.value != blank
     assign story = mf.story.value | strip | newline_to_br | split: '<br />'
   elsif posts.size > 0
     capture story_raw
@@ -207,7 +318,7 @@
 {%- assign hero_poster = hero_poster | strip -%}
 <section class="cd-hero{% if section.settings.hero_words == 'centre' %} cd-hero-centre{% endif %}{% if hero_film %} cd-hero-film cd-hero-fit-{{ section.settings.hero_film_fit | default: 'cover' }}{% endif %}" style="--cd-h:{{ cd_h }};--cd-dim:{{ cd_dim }};--cd-focus:{{ cd_focus }}">
   {%- if hero_poster != blank -%}
-    <img src="{{ hero_poster }}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="eager" fetchpriority="high" width="1920" height="1080">
+    <img src="{{ hero_poster }}" alt="{{ res_title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="eager" fetchpriority="high" width="1920" height="1080">
   {%- endif -%}
   {%- if hero_film -%}
   {%- comment -%} The residence's real film, silent, on a loop. The photo
@@ -220,7 +331,7 @@
   <div class="cd-hero-ov"></div>
   <div class="cd-hero-content">
     {%- if section.settings.show_badge and section.settings.badge != blank -%}<div class="cd-badge reveal">{{ section.settings.badge }}</div>{%- endif -%}
-    <h1 class="cd-name reveal d1">{{ page.title }}</h1>
+    <h1 class="cd-name reveal d1">{{ res_title }}</h1>
     {%- if section.settings.show_meta -%}
     <div class="cd-meta reveal d2">
       {%- if suburb != blank -%}<span>{{ suburb }}</span>{%- endif -%}
@@ -307,7 +418,7 @@
 <div class="prop-body cd-body{% if show_side %} cd-side-{{ section.settings.side_layout | default: 'offset' }}{% else %} cd-solo cd-solo-{{ section.settings.story_align | default: 'left' }}{% endif %}" style="--cd-split:{{ cd_split }}">
   <div class="cd-layout inner">
     <div class="{% if section.settings.sticky_story and show_side %}prop-desc {% endif %}cd-desc">
-      {%- if section.settings.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, page.title }}</div>{%- endif -%}
+      {%- if section.settings.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, res_title }}</div>{%- endif -%}
       {%- if section.settings.show_headline -%}<h2 class="prop-body-h reveal d1">{{ headline }}</h2>{%- endif -%}
       {%- if story.size > 0 -%}
         {%- for p in story limit: 4 -%}
@@ -317,7 +428,7 @@
           <p class="prop-body-p reveal d2">{{ pt }}{% unless last == '.' or last == '!' or last == '?' %}.{% endunless %}</p>
         {%- endfor -%}
       {%- elsif section.settings.fallback_text != blank -%}
-        <p class="prop-body-p reveal d2">{{ section.settings.fallback_text | replace: name_token, page.title }}</p>
+        <p class="prop-body-p reveal d2">{{ section.settings.fallback_text | replace: name_token, res_title }}</p>
       {%- endif -%}
       {%- if mf.features.value.size > 0 and section.settings.show_features -%}
         <div class="prop-features reveal d3">
@@ -338,24 +449,24 @@
     </div>
 
     {%- if show_side -%}
-    <aside class="cd-side" aria-label="{{ page.title | escape }} photos">
+    <aside class="cd-side" aria-label="{{ res_title | escape }} photos">
       <figure class="cd-side-a reveal-wipe d1">
         {%- if side_a_pick -%}
-        <img src="{{ side_a_pick | image_url: width: 900, height: 1125, crop: 'center' }}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="1125">
+        <img src="{{ side_a_pick | image_url: width: 900, height: 1125, crop: 'center' }}" alt="{{ res_title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="1125">
         {%- else -%}
-        <img src="{% render 'ext-variant', src: side_a, w: 900, h: 1125 %}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="1125">
+        <img src="{% render 'ext-variant', src: side_a, w: 900, h: 1125 %}" alt="{{ res_title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="1125">
         {%- endif -%}
       </figure>
       {%- if side_b_pick or side_b != blank -%}
       <figure class="cd-side-b reveal-wipe d3">
         {%- if side_b_pick -%}
-        <img src="{{ side_b_pick | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="675">
+        <img src="{{ side_b_pick | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ res_title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="675">
         {%- else -%}
-        <img src="{% render 'ext-variant', src: side_b, w: 900, h: 675 %}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="675">
+        <img src="{% render 'ext-variant', src: side_b, w: 900, h: 675 %}" alt="{{ res_title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="675">
         {%- endif -%}
       </figure>
       {%- endif -%}
-      {%- if section.settings.show_side_caption -%}<div class="cd-side-cap reveal d4"><b>{{ page.title }}</b>{% if loc != blank %}<span>{{ loc }}</span>{% endif %}</div>{%- endif -%}
+      {%- if section.settings.show_side_caption -%}<div class="cd-side-cap reveal d4"><b>{{ res_title }}</b>{% if loc != blank %}<span>{{ loc }}</span>{% endif %}</div>{%- endif -%}
     </aside>
     {%- endif -%}
   </div>
@@ -369,19 +480,19 @@
   <section class="cd-gallery{% if section.settings.show_thumbs == false %} pg-nothumbs{% endif %}{% if section.settings.show_expand == false %} pg-noexpand{% endif %}" id="gallery" style="--pgs-ar:{{ section.settings.stage_shape | default: '16/9' }}">
     <div class="prop-gallery inner">
       {%- if section.settings.gallery_label != blank -%}<div class="slabel reveal">{{ section.settings.gallery_label }}</div>{%- endif -%}
-      <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, page.title }}</h2>
+      <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, res_title }}</h2>
       <div hidden id="pgData">
         {%- for u in gallery -%}
-          {%- assign t = u | replace: '/media/collection/', '/media/collection-thumbs/' -%}
-          <span data-lb-item data-src="{{ u }}" data-stage="{{ u }}" data-thumb="{{ t }}" data-alt="{{ page.title | escape }}{% if suburb != blank %} &middot; {{ suburb | escape }}{% endif %}"></span>
+          {%- assign t = u | replace: '/media/collection/', '/media/collection-thumbs/' | replace: 'width=2000', 'width=320' -%}
+          <span data-lb-item data-src="{{ u }}" data-stage="{{ u }}" data-thumb="{{ t }}" data-alt="{{ res_title | escape }}{% if suburb != blank %} &middot; {{ suburb | escape }}{% endif %}"></span>
         {%- endfor -%}
       </div>
-      <div class="pg reveal d1" id="pg" data-house="{{ page.title | escape }}">
-        <div class="pg-stage" id="pgStage" tabindex="0" aria-roledescription="carousel" aria-label="{{ page.title | escape }} photos">
+      <div class="pg reveal d1" id="pg" data-house="{{ res_title | escape }}">
+        <div class="pg-stage" id="pgStage" tabindex="0" aria-roledescription="carousel" aria-label="{{ res_title | escape }} photos">
           <img class="pg-img" id="pgImgA" alt="" decoding="async" width="1800" height="1013">
           <img class="pg-img" id="pgImgB" alt="" decoding="async" width="1800" height="1013">
           <div class="pg-veil" aria-hidden="true"></div>
-          <div class="pg-top"><span class="pg-house">{{ page.title }}{% if suburb != blank %} &middot; {{ suburb }}{% endif %}</span><span class="pg-count" id="pgCount"></span></div>
+          <div class="pg-top"><span class="pg-house">{{ res_title }}{% if suburb != blank %} &middot; {{ suburb }}{% endif %}</span><span class="pg-count" id="pgCount"></span></div>
           <button type="button" class="pg-arrow pg-prev" id="pgPrev" aria-label="Previous photo">&larr;</button>
           <button type="button" class="pg-arrow pg-next" id="pgNext" aria-label="Next photo">&rarr;</button>
           <button type="button" class="pg-expand" id="pgExpand"><span aria-hidden="true">&#x2922;</span> {{ section.settings.gallery_all_label | default: "View all photos" }} ({{ gcount }})</button>
@@ -405,7 +516,7 @@
             {%- else -%}{%- assign mw = 800 -%}{%- assign mh = 450 -%}
           {%- endcase -%}
           <button type="button" class="cd-mosaic-item cd-m{{ i }} reveal-wipe{% if i > 0 %} d{{ i }}{% endif %}" data-cd-open="{{ gi }}" aria-label="View photo {{ gi | plus: 1 }} of {{ gcount }}">
-            <img src="{% render 'ext-variant', src: u, w: mw, h: mh %}" alt="{{ page.title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="{{ mw }}" height="{{ mh }}">
+            <img src="{% render 'ext-variant', src: u, w: mw, h: mh %}" alt="{{ res_title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="{{ mw }}" height="{{ mh }}">
           </button>
         {%- endfor -%}
       </div>
@@ -523,12 +634,12 @@
     <div class="film-grid">
       <div class="film-copy">
         {%- if section.settings.film_label != blank -%}<div class="slabel slabel-dark reveal">{{ section.settings.film_label }}</div>{%- endif -%}
-        <h2 class="film-h reveal d1">{{ section.settings.film_heading_html | replace: name_token, page.title }}</h2>
-        <p class="film-p reveal d2">{{ section.settings.film_text | replace: name_token, page.title }}</p>
+        <h2 class="film-h reveal d1">{{ section.settings.film_heading_html | replace: name_token, res_title }}</h2>
+        <p class="film-p reveal d2">{{ section.settings.film_text | replace: name_token, res_title }}</p>
       </div>
       <div class="reveal d2">
         <div class="film-frame" data-film>
-          <video src="{{ body_src }}" {% if body_poster_pick %}poster="{{ body_poster_pick | image_url: width: 1200, height: 675, crop: 'center' }}"{% elsif hero_pick %}poster="{{ hero_pick | image_url: width: 1200, height: 675, crop: 'center' }}"{% elsif mf.image.value != blank %}poster="{% render 'ext-variant', src: mf.image.value, w: 1200, h: 675 %}"{% endif %} muted loop playsinline preload="none"></video>
+          <video src="{{ body_src }}" {% if body_poster_pick %}poster="{{ body_poster_pick | image_url: width: 1200, height: 675, crop: 'center' }}"{% elsif hero_pick %}poster="{{ hero_pick | image_url: width: 1200, height: 675, crop: 'center' }}"{% elsif hero != blank %}poster="{% render 'ext-variant', src: hero, w: 1200, h: 675 %}"{% endif %} muted loop playsinline preload="none"></video>
           <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
             <span data-sound-label>{{ section.settings.sound_label | default: "Sound On" }}</span>
@@ -536,7 +647,7 @@
         </div>
         {%- if section.settings.show_film_caption -%}
         <div class="film-caption">
-          <span><b>{{ page.title }} - On Film</b></span>
+          <span><b>{{ res_title }} - On Film</b></span>
           <span>{{ loc }}</span>
         </div>
         {%- endif -%}
@@ -607,6 +718,17 @@
 {
   "name": "Collection residence",
   "settings": [
+    {"type": "header", "content": "Photos and film"},
+    {"type": "paragraph", "content": "Since 14 Sep 2026 each completed residence has its own copy of this template (collection-milos, collection-kirra …), so the pickers here and the Photo blocks (⊕ Add block › Photo, one per picture, drag to reorder) belong to that residence alone. Its photographs sit in Products › the residence › Media, the folder the file picker shows under Product."},
+    { "type": "product", "id": "media_product", "label": "Media folder", "info": "The residence's folder in Products (its photographs and film live in Products › the residence › Media). Empty pickers below then fall back to that folder: its first picture as the hero, its film in the hero and the film band, its pictures in the gallery when there are no Photo blocks." },
+    { "type": "image_picker", "id": "hero_image", "label": "Hero photo", "info": "Empty = the first picture of the Media folder, else the page's Hero image metafield. Also the film's poster unless one is picked below." },
+    { "type": "video", "id": "film", "label": "Film (upload)", "info": "Empty = the first film in Products › the residence › Media. Plays silently in the hero and with sound in the body band." },
+    { "type": "image_picker", "id": "film_poster", "label": "Film poster", "info": "The still shown before the body film plays. Empty = the hero photo." },
+    { "type": "video", "id": "film_2", "label": "Second film (upload)", "info": "Shown in the body band instead of the residence's film when Film in the body is set to a second film." },
+    { "type": "image_picker", "id": "film_2_poster", "label": "Second film poster", "info": "Empty = the hero photo." },
+    { "type": "image_picker", "id": "side_photo_1", "label": "Story column, tall photo", "info": "Only with Show the two photos beside the story on. Empty = the second gallery photo." },
+    { "type": "image_picker", "id": "side_photo_2", "label": "Story column, wide photo", "info": "Only with the side photos on. Empty = the third gallery photo." },
+    {"type": "header", "content": "Residences on pages"},
     { "type": "paragraph", "content": "Everything about the residence itself - photos, film, style, year, bedrooms, headline, story - is set on the page: Content › Pages › the residence › Metafields. This section sets the shared wording. Write {name} wherever the residence's name should appear." },
     { "type": "paragraph", "content": "To pick a residence's hero photo, film, poster or a second film from your Files instead of the page's metafields: ⊕ Add block › Residence photos and film, choose that residence's page, then pick. One block per residence; the picks apply only on that residence's page. The Gallery photos stay on the page (Metafields › Gallery)." },
     { "type": "paragraph", "content": "After this section the template runs The Series (the Instagram strip), then Similar residences and the closing band - each its own section, with its own settings." },
@@ -683,6 +805,15 @@
     {"type": "select", "id": "film_shape", "label": "Film shape", "options": [{"value": "9/16", "label": "Portrait 9:16 (as designed)"}, {"value": "4/5", "label": "Portrait 4:5"}, {"value": "1/1", "label": "Square"}, {"value": "16/9", "label": "Landscape 16:9"}], "default": "9/16"}
   ],
   "blocks": [
+    {
+      "type": "photo",
+      "name": "Photo",
+      "settings": [
+        { "type": "paragraph", "content": "One photograph of the gallery. Add one block per picture, in the order they should play; delete every Photo block and the gallery fills itself from the Media folder (or the page's Gallery links) again." },
+        { "type": "image_picker", "id": "image", "label": "Photo" },
+        { "type": "text", "id": "caption", "label": "Caption", "info": "Shown in the full-screen viewer. Empty = the residence's name and suburb." }
+      ]
+    },
     {
       "type": "media",
       "name": "Residence photos and film",

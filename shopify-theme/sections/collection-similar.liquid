@@ -12,9 +12,24 @@
   people to what is for sale now, with a share row.
 {%- endcomment -%}
 {%- liquid
-  assign mf = page.metafields.custom
+  # A completed residence in Products (since 14 Sep 2026) reads its name,
+  # suburb and style from the product; older ones from the page.
+  assign on_product = false
+  if template.name == 'product' and product != blank
+    assign on_product = true
+  endif
+  if on_product
+    assign mf = product.metafields.custom
+    assign res_title = product.title
+    assign res_url = product.url
+    assign loc = mf.suburb.value | append: ' QLD, Australia'
+  else
+    assign mf = page.metafields.custom
+    assign res_title = res_title
+    assign res_url = res_url
+    assign loc = mf.loc.value
+  endif
   assign name_token = '{' | append: 'name' | append: '}'
-  assign loc = mf.loc.value
   assign suburb = loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
   assign style_name = mf.style.value | strip
 -%}
@@ -33,12 +48,19 @@
           assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
           assign rp = pages[rp_handle]
         endif
-        assign r_name = block.settings.name | default: rp.title
-        if r_name == page.title or r_name == blank
+        assign rprod = block.settings.product
+        if rprod != blank
+          assign r_name = block.settings.name | default: rprod.title
+          assign r_style = rprod.metafields.custom.style.value | strip
+          assign r_loc = block.settings.loc | default: rprod.metafields.custom.suburb.value
+        else
+          assign r_name = block.settings.name | default: rp.title
+          assign r_style = rp.metafields.custom.style.value | strip
+          assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
+        endif
+        if r_name == res_title or r_name == blank
           continue
         endif
-        assign r_style = rp.metafields.custom.style.value | strip
-        assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
         assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
         assign hit = false
         if pass == 1 and r_style != blank and r_style == style_name
@@ -69,6 +91,37 @@
           assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
           assign rp = pages[rp_handle]
         endif
+        assign rprod = block.settings.product
+        if rprod != blank
+          assign r_name = block.settings.name | default: rprod.title
+          assign r_loc = block.settings.loc | default: rprod.metafields.custom.suburb.value
+          assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+          assign r_style = rprod.metafields.custom.style.value
+          assign r_year = rprod.metafields.custom.year.value
+          assign r_link = block.settings.link | default: rprod.url
+          assign r_video = block.settings.video
+          if block.settings.video_file
+            assign pmp4 = block.settings.video_file.sources | where: 'format', 'mp4' | first
+            if pmp4
+              assign r_video = pmp4.url
+            endif
+          endif
+          if r_video == blank
+            for m in rprod.media
+              if m.media_type == 'video'
+                assign own_mp4 = m.sources | where: 'format', 'mp4' | first
+                if own_mp4
+                  assign r_video = own_mp4.url
+                endif
+                break
+              endif
+            endfor
+          endif
+          assign r_img = ''
+          if rprod.featured_image
+            assign r_img = rprod.featured_image | image_url: width: 900, height: 675, crop: 'center'
+          endif
+        else
         assign r_name = block.settings.name | default: rp.title
         assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
         assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
@@ -87,6 +140,7 @@
           if r_img == blank or r_img contains '/films/'
             assign r_img = rp.metafields.custom.gallery.value | first
           endif
+        endif
         endif
         assign shown = shown | plus: 1
       -%}
@@ -121,14 +175,14 @@
 <section class="cd-close cd-close-{{ section.settings.close_style | default: 'obsidian' }}">
   <div class="inner-sm">
     {%- if section.settings.cta_label != blank -%}<div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">{{ section.settings.cta_label }}</div>{%- endif -%}
-    <h2 class="cd-close-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, page.title }}</h2>
-    {%- if section.settings.cta_text != blank -%}<p class="cd-close-p reveal d2">{{ section.settings.cta_text | replace: name_token, page.title }}</p>{%- endif -%}
+    <h2 class="cd-close-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, res_title }}</h2>
+    {%- if section.settings.cta_text != blank -%}<p class="cd-close-p reveal d2">{{ section.settings.cta_text | replace: name_token, res_title }}</p>{%- endif -%}
     <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <a href="{{ section.settings.cta1_link | default: '/collections/for-sale' }}" class="btn-p">{{ section.settings.cta1_label }}</a>
       {%- if section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link | default: '/pages/collection' }}" class="btn-g btn-g-light">{{ section.settings.cta2_label }}</a>{%- endif -%}
     </div>
-    {%- assign share_url = shop.url | append: page.url -%}
-    {%- assign share_title = page.title | append: ' - ' | append: suburb | append: ' | Sabdia Constructions' -%}
+    {%- assign share_url = shop.url | append: res_url -%}
+    {%- assign share_title = res_title | append: ' - ' | append: suburb | append: ' | Sabdia Constructions' -%}
     {%- assign eu = share_url | url_encode -%}
     {%- assign et = share_title | url_encode -%}
     {%- if section.settings.show_share -%}
@@ -179,14 +233,14 @@
 <section class="cd-close cd-close-{{ section.settings.close_style | default: 'obsidian' }}">
   <div class="inner-sm">
     {%- if section.settings.cta_label != blank -%}<div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">{{ section.settings.cta_label }}</div>{%- endif -%}
-    <h2 class="cd-close-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, page.title }}</h2>
-    {%- if section.settings.cta_text != blank -%}<p class="cd-close-p reveal d2">{{ section.settings.cta_text | replace: name_token, page.title }}</p>{%- endif -%}
+    <h2 class="cd-close-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, res_title }}</h2>
+    {%- if section.settings.cta_text != blank -%}<p class="cd-close-p reveal d2">{{ section.settings.cta_text | replace: name_token, res_title }}</p>{%- endif -%}
     <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
       <a href="{{ section.settings.cta1_link | default: '/collections/for-sale' }}" class="btn-p">{{ section.settings.cta1_label }}</a>
       {%- if section.settings.cta2_label != blank -%}<a href="{{ section.settings.cta2_link | default: '/pages/collection' }}" class="btn-g btn-g-light">{{ section.settings.cta2_label }}</a>{%- endif -%}
     </div>
-    {%- assign share_url = shop.url | append: page.url -%}
-    {%- assign share_title = page.title | append: ' - ' | append: suburb | append: ' | Sabdia Constructions' -%}
+    {%- assign share_url = shop.url | append: res_url -%}
+    {%- assign share_title = res_title | append: ' - ' | append: suburb | append: ' | Sabdia Constructions' -%}
     {%- assign eu = share_url | url_encode -%}
     {%- assign et = share_title | url_encode -%}
     {%- if section.settings.show_share -%}
@@ -301,7 +355,8 @@
       "type": "residence",
       "name": "Portfolio residence",
       "settings": [
-        { "type": "page", "id": "page", "label": "Residence page", "info": "Pick the completed residence's page (Content › Pages, template \"collection-item\"). Name, location, style, year, photo and film then come from that page - the fields below only override." },
+        { "type": "product", "id": "product", "label": "Residence", "info": "Pick the residence from Products (MILOS, PETRA, KIRRA, HERMOSA, ENCANTO, HAVEN, SPECTRE and the rest). Name, suburb, style, year, main photo and film come from the product; the fields below only override." },
+        { "type": "page", "id": "page", "label": "Residence page (older pages)", "info": "Only for a completed residence that still lives in Content › Pages (template \"collection-item\"). Leave empty when a residence is picked above." },
         { "type": "text", "id": "name", "label": "Name" },
         { "type": "text", "id": "loc", "label": "Location line" },
         { "type": "image_picker", "id": "image", "label": "Image" },

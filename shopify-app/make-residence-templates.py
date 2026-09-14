@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
-"""Write the page template for each completed residence that moved into
-Products (14 Sep 2026), in AETHER's shape: the same nine sections with
-AETHER's dials, this residence's own media in the pickers, one Photo block
-per photograph in The residence, the film in the Header (landscape films
-only) and in The film section. As a completed home (Status Completed) it
-carries no enquiry form, no sticky Enquire bar and no Private appointments
-band; the Collection page is where it is listed.
+"""Write each completed residence's own copy of the Collection residence
+template (14 Sep 2026): page.collection-<handle>.json, assigned to that
+one page, so the Photo blocks and the photo/film pickers in its Collection
+residence section belong to that residence alone.
 
-    python3 shopify-app/make-residence-templates.py <theme id> [handles...]
+    python3 shopify-app/make-residence-templates.py <theme id> [--force] [handles...]
 
-Reads AETHER's template from the theme (Naomi's tuned copy), the media
-from Products › the residence › Media, and writes
-shopify-theme/templates/product.<handle>.json. A template that already
-exists locally is overwritten only with --force. First push ships them;
-push-live.sh then lists them in .shopifyignore so the store copy leads.
+Starts from the store's page.collection-item.json (Naomi's dials), then:
+Collection residence - Media folder = the residence's product (its
+photographs and film in Products › Media), hero photo and film poster =
+the main photo, film = the film in that folder, one Photo block per
+photograph; Similar residences - the cards of residences with a folder
+show its main photo (from Shopify, not Supabase) and link to their pages,
+HAVEN and SPECTRE join the list. A template already on disk is rewritten
+only with --force. First push ships them; push-live.sh then lists them in
+.shopifyignore so the store copy leads.
 """
 import json, os, re, shutil, subprocess, sys, tempfile, urllib.request
 
@@ -40,11 +41,11 @@ def gql(q, v=None):
 
 
 def media(handle):
-    d = gql("""query($h:String!){ productByHandle(handle:$h){ title media(first:250){ nodes{ mediaContentType alt
-        ... on MediaImage{ image{ url } } ... on Video{ filename sources{ url width height format } } } } } }""", {"h": handle})
+    d = gql("""query($h:String!){ productByHandle(handle:$h){ title media(first:250){ nodes{ mediaContentType
+        ... on MediaImage{ image{ url } } ... on Video{ filename sources{ width height } } } } } }""", {"h": handle})
     p = d["productByHandle"]
     if not p:
-        sys.exit(f"no product {handle}")
+        return None, [], []
     photos, films = [], []
     for n in p["media"]["nodes"]:
         if n["mediaContentType"] == "IMAGE" and n.get("image"):
@@ -56,6 +57,31 @@ def media(handle):
     return p["title"], photos, films
 
 
+def similar_blocks(sec, heroes):
+    """Similar residences: residences with a Media folder show their main
+    photo from Shopify and link to their page; HAVEN and SPECTRE join."""
+    blocks, order = sec.setdefault("blocks", {}), sec.setdefault("block_order", list(sec.get("blocks", {})))
+    have = set()
+    for bid in order:
+        st = blocks[bid].setdefault("settings", {})
+        page = (st.get("page") or "").strip()
+        link = st.get("link") or ""
+        h = page[len("collection-"):] if page.startswith("collection-") else ""
+        if not h and "/pages/collection-" in link:
+            h = link.split("/pages/collection-", 1)[1].split("?")[0].split("#")[0].strip("/")
+        if h in heroes:
+            st["page"] = f"collection-{h}"
+            st["image"] = f"shopify://shop_images/{heroes[h]}"
+            st.pop("product", None)
+            have.add(h)
+    for h in HANDLES:
+        if h in have or h not in heroes:
+            continue
+        bid = f"residence_{h}"
+        blocks[bid] = {"type": "residence", "settings": {"page": f"collection-{h}", "image": f"shopify://shop_images/{heroes[h]}"}}
+        order.append(bid)
+
+
 def main():
     args = [a for a in sys.argv[1:] if a != "--force"]
     force = "--force" in sys.argv
@@ -64,15 +90,17 @@ def main():
     theme, want = args[0], (args[1:] or list(HANDLES))
     env = dict(os.environ, SHOPIFY_CLI_THEME_TOKEN=env_val("SHOPIFY_CLI_THEME_TOKEN"))
     work = tempfile.mkdtemp(prefix="residence-templates-")
-    subprocess.run(["shopify", "theme", "pull", "--store", STORE, "--theme", theme, "--path", work, "--only", "templates/product.aether.json"], check=True, env=env)
-    raw = open(os.path.join(work, "templates/product.aether.json")).read()
+    subprocess.run(["shopify", "theme", "pull", "--store", STORE, "--theme", theme, "--path", work, "--only", "templates/page.collection-item.json"], check=True, env=env)
+    raw = open(os.path.join(work, "templates/page.collection-item.json")).read()
     base = json.loads(re.sub(r"^\s*/\*.*?\*/\s*", "", raw, count=1, flags=re.S))
     shutil.rmtree(work)
+    info = {h: media(h) for h in HANDLES}
+    heroes = {h: v[1][0] for h, v in info.items() if v[1]}
     for h in want:
-        out = os.path.join(ROOT, "shopify-theme", "templates", f"product.{h}.json")
+        out = os.path.join(ROOT, "shopify-theme", "templates", f"page.collection-{h}.json")
         if os.path.exists(out) and not force:
             print(f"  {h}: template exists, left alone (--force to rewrite)"); continue
-        title, photos, films = media(h)
+        title, photos, films = info[h]
         if not photos:
             print(f"  {h}: no photos on the product yet, skipped"); continue
         hero, rest = photos[0], photos[1:]
@@ -82,40 +110,22 @@ def main():
         for key, sec in t["sections"].items():
             st = sec.setdefault("settings", {})
             typ = sec.get("type")
-            if typ == "residence-header":
-                st.update({"hero_media": "video" if (film and film["landscape"]) else "residence",
-                           "hero_image": f"shopify://shop_images/{hero}", "hero_image_ext": "",
-                           "hero_video": film_ref if (film and film["landscape"]) else "", "hero_video_url": "",
-                           "hero_poster": f"shopify://shop_images/{hero}"})
-            elif typ == "residence-specs":
-                # A completed home: the status reads Completed, no sold banner, no sticky Enquire bar.
-                st.update({"show_sold_banner": False, "show_sticky": False})
-            elif typ == "residence-story":
-                st.update({"show_enquiry": False})
-            elif typ == "residence-closing":
-                sec["disabled"] = True
-            elif typ == "residence-gallery":
+            if typ == "main-collection-item":
+                st.update({"media_product": h, "hero_image": f"shopify://shop_images/{hero}", "film": film_ref,
+                           "film_poster": f"shopify://shop_images/{hero}", "film_2": "", "film_2_poster": "", "side_photo_1": "", "side_photo_2": ""})
+                if film:
+                    st["film_shape"] = "16/9" if film["landscape"] else "9/16"
                 blocks, order = {}, []
                 for i, f in enumerate(rest[:MAX_BLOCKS], 1):
                     blocks[f"photo_{i}"] = {"type": "photo", "settings": {"image": f"shopify://shop_images/{f}"}}
                     order.append(f"photo_{i}")
-                # A second, portrait film (a reel) joins the gallery as a Video block.
-                for j, extra in enumerate(films[1:], 2):
-                    if extra["name"] and len(order) < MAX_BLOCKS:
-                        blocks[f"video_{j}"] = {"type": "video", "settings": {"video": f"shopify://files/videos/{extra['name']}", "poster": f"shopify://shop_images/{hero}"}}
-                        order.append(f"video_{j}")
                 sec["blocks"], sec["block_order"] = blocks, order
                 if len(rest) > MAX_BLOCKS:
-                    print(f"  {h}: {len(rest)} photos, only the first {MAX_BLOCKS} get blocks (Shopify's limit); the rest stay in the viewer")
-            elif typ == "residence-film":
-                st.update({"film": film_ref, "film_url": "", "poster": f"shopify://shop_images/{hero}", "poster_url": "",
-                           "shape": "16/9" if (film and film["landscape"]) else "9/16"})
-            elif typ == "series-strip":
-                sec["blocks"], sec["block_order"] = {}, []
-            elif typ == "scroll-walk":
-                sec["disabled"] = True
+                    print(f"  {h}: {len(rest)} photos, only the first {MAX_BLOCKS} get blocks (Shopify's limit); delete the blocks and the gallery shows them all from the Media folder")
+            elif typ == "collection-similar":
+                similar_blocks(sec, heroes)
         open(out, "w").write(json.dumps(t, indent=2, ensure_ascii=False) + "\n")
-        print(f"  {h}: {len(rest)} Photo block(s), hero {hero}, film {film_ref or 'none'} -> templates/product.{h}.json")
+        print(f"  {h}: {len(rest)} Photo block(s), hero {hero}, film {film_ref or 'none'} -> templates/page.collection-{h}.json")
 
 
 if __name__ == "__main__":

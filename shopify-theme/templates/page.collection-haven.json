@@ -1,0 +1,457 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-collection-item",
+      "settings": {
+        "hero_media": "film",
+        "show_side_photos": true,
+        "body_film": "same",
+        "show_mosaic": false,
+        "media_product": "haven",
+        "hero_image": "shopify://shop_images/haven-hero.jpg",
+        "film": "",
+        "film_poster": "shopify://shop_images/haven-hero.jpg",
+        "film_2": "",
+        "film_2_poster": "",
+        "side_photo_1": "",
+        "side_photo_2": ""
+      },
+      "blocks": {
+        "photo_1": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-living-01.jpg"
+          }
+        },
+        "photo_2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-living-02.jpg"
+          }
+        },
+        "photo_3": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-living-dining-01.jpg"
+          }
+        },
+        "photo_4": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-kitchen-dining-01.jpg"
+          }
+        },
+        "photo_5": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-kitchen-living-01.jpg"
+          }
+        },
+        "photo_6": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-staircase-01.jpg"
+          }
+        },
+        "photo_7": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-living-dining-02.jpg"
+          }
+        },
+        "photo_8": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-exterior-rear-pool-01.jpg"
+          }
+        },
+        "photo_9": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-dining-01.jpg"
+          }
+        },
+        "photo_10": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-kitchen-dining-02.jpg"
+          }
+        },
+        "photo_11": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-dining-alfresco-01.jpg"
+          }
+        },
+        "photo_12": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-kitchen-01.jpg"
+          }
+        },
+        "photo_13": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-kitchen-02.jpg"
+          }
+        },
+        "photo_14": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-kitchen-detail-01.jpg"
+          }
+        },
+        "photo_15": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-kitchen-detail-02.jpg"
+          }
+        },
+        "photo_16": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-living-03.jpg"
+          }
+        },
+        "photo_17": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-bathroom-01.jpg"
+          }
+        },
+        "photo_18": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-bedroom-01.jpg"
+          }
+        },
+        "photo_19": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-bathroom-02.jpg"
+          }
+        },
+        "photo_20": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-hallway-01.jpg"
+          }
+        },
+        "photo_21": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-living-04.jpg"
+          }
+        },
+        "photo_22": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-walk-in-robe-01.jpg"
+          }
+        },
+        "photo_23": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-ensuite-01.jpg"
+          }
+        },
+        "photo_24": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-ensuite-02.jpg"
+          }
+        },
+        "photo_25": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-ensuite-03.jpg"
+          }
+        },
+        "photo_26": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-master-bedroom-01.jpg"
+          }
+        },
+        "photo_27": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-living-05.jpg"
+          }
+        },
+        "photo_28": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-bathroom-03.jpg"
+          }
+        },
+        "photo_29": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-bedroom-02.jpg"
+          }
+        },
+        "photo_30": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-bedroom-03.jpg"
+          }
+        },
+        "photo_31": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-bedroom-04.jpg"
+          }
+        },
+        "photo_32": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-study-01.jpg"
+          }
+        },
+        "photo_33": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-kitchen-detail-03.jpg"
+          }
+        },
+        "photo_34": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-facade-detail-01.jpg"
+          }
+        },
+        "photo_35": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-facade-detail-02.jpg"
+          }
+        },
+        "photo_36": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-exterior-front-02.jpg"
+          }
+        },
+        "photo_37": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-exterior-front-03.jpg"
+          }
+        },
+        "photo_38": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-exterior-front-04.jpg"
+          }
+        },
+        "photo_39": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/haven-entry-sign-01.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "photo_1",
+        "photo_2",
+        "photo_3",
+        "photo_4",
+        "photo_5",
+        "photo_6",
+        "photo_7",
+        "photo_8",
+        "photo_9",
+        "photo_10",
+        "photo_11",
+        "photo_12",
+        "photo_13",
+        "photo_14",
+        "photo_15",
+        "photo_16",
+        "photo_17",
+        "photo_18",
+        "photo_19",
+        "photo_20",
+        "photo_21",
+        "photo_22",
+        "photo_23",
+        "photo_24",
+        "photo_25",
+        "photo_26",
+        "photo_27",
+        "photo_28",
+        "photo_29",
+        "photo_30",
+        "photo_31",
+        "photo_32",
+        "photo_33",
+        "photo_34",
+        "photo_35",
+        "photo_36",
+        "photo_37",
+        "photo_38",
+        "photo_39"
+      ]
+    },
+    "series": {
+      "type": "series-strip",
+      "settings": {}
+    },
+    "similar": {
+      "type": "collection-similar",
+      "settings": {},
+      "blocks": {
+        "residence-1": {
+          "type": "residence",
+          "settings": {
+            "name": "MILOS",
+            "loc": "Camp Hill QLD, Australia",
+            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos-poster.jpg",
+            "link": "/pages/collection-milos",
+            "page": "collection-milos",
+            "image": "shopify://shop_images/milos-hero.jpg"
+          }
+        },
+        "residence-2": {
+          "type": "residence",
+          "settings": {
+            "name": "AMMOS",
+            "loc": "Taringa QLD, Australia",
+            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos-poster.jpg",
+            "link": "/pages/collection-ammos",
+            "page": "collection-ammos"
+          }
+        },
+        "residence-3": {
+          "type": "residence",
+          "settings": {
+            "name": "CALLE",
+            "loc": "Camp Hill QLD, Australia",
+            "image_ext": "/images/collection-calle.jpg",
+            "link": "/pages/collection-calle",
+            "page": "collection-calle"
+          }
+        },
+        "residence-4": {
+          "type": "residence",
+          "settings": {
+            "name": "ELYSIUM",
+            "loc": "Holland Park QLD, Australia",
+            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium-poster.jpg",
+            "link": "/pages/collection-elysium",
+            "page": "collection-elysium"
+          }
+        },
+        "residence-5": {
+          "type": "residence",
+          "settings": {
+            "name": "ALHAMBRA",
+            "loc": "Brisbane QLD, Australia",
+            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra-poster.jpg",
+            "link": "/pages/collection-alhambra",
+            "page": "collection-alhambra"
+          }
+        },
+        "residence-6": {
+          "type": "residence",
+          "settings": {
+            "name": "ENCANTO",
+            "loc": "Camp Hill QLD, Australia",
+            "image_ext": "/images/collection-encanto.jpg",
+            "link": "/pages/collection-encanto",
+            "page": "collection-encanto",
+            "image": "shopify://shop_images/encanto-hero.jpg"
+          }
+        },
+        "residence-7": {
+          "type": "residence",
+          "settings": {
+            "name": "NERO",
+            "loc": "Rochedale QLD, Australia",
+            "image_ext": "/images/collection-nero.jpg",
+            "link": "/pages/collection-nero",
+            "page": "collection-nero"
+          }
+        },
+        "residence-8": {
+          "type": "residence",
+          "settings": {
+            "name": "HERMOSA",
+            "loc": "Camp Hill QLD, Australia",
+            "image_ext": "/images/collection-hermosa.jpg",
+            "link": "/pages/collection-hermosa",
+            "page": "collection-hermosa",
+            "image": "shopify://shop_images/hermosa-hero.jpg"
+          }
+        },
+        "residence-9": {
+          "type": "residence",
+          "settings": {
+            "name": "FRASER",
+            "loc": "Graceville QLD, Australia",
+            "image_ext": "/images/collection-fraser.jpg",
+            "link": "/pages/collection-fraser",
+            "page": "collection-fraser"
+          }
+        },
+        "residence-10": {
+          "type": "residence",
+          "settings": {
+            "name": "PETRA",
+            "loc": "Taringa QLD, Australia",
+            "image_ext": "/images/collection-petra.jpg",
+            "link": "/pages/collection-petra",
+            "page": "collection-petra",
+            "image": "shopify://shop_images/petra-hero.jpg"
+          }
+        },
+        "residence-11": {
+          "type": "residence",
+          "settings": {
+            "name": "KIRRA",
+            "loc": "Brisbane QLD, Australia",
+            "image_ext": "/images/caspian-hero.jpg",
+            "link": "/pages/collection-kirra",
+            "page": "collection-kirra",
+            "image": "shopify://shop_images/kirra-hero.jpg"
+          }
+        },
+        "residence_haven": {
+          "type": "residence",
+          "settings": {
+            "page": "collection-haven",
+            "image": "shopify://shop_images/haven-hero.jpg"
+          }
+        },
+        "residence_spectre": {
+          "type": "residence",
+          "settings": {
+            "page": "collection-spectre",
+            "image": "shopify://shop_images/spectre-hero.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "residence-1",
+        "residence-2",
+        "residence-3",
+        "residence-4",
+        "residence-5",
+        "residence-6",
+        "residence-7",
+        "residence-8",
+        "residence-9",
+        "residence-10",
+        "residence-11",
+        "residence_haven",
+        "residence_spectre"
+      ]
+    }
+  },
+  "order": [
+    "main",
+    "series",
+    "similar"
+  ]
+}

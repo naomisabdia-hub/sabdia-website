@@ -1,0 +1,31 @@
+{%- comment -%}
+  Residence redirect - the only section on the product template of a
+  completed residence (MILOS, PETRA, KIRRA, HERMOSA, ENCANTO, HAVEN,
+  SPECTRE, since 14 Sep 2026). Those products exist to hold the
+  photographs and film (Products › the residence › Media, the per-house
+  folder in the file picker); the residence's page is the Collection page
+  at /pages/collection-<handle>. Anyone landing on the product address is
+  sent there. Search engines are told not to index this address.
+{%- endcomment -%}
+{%- assign target = section.settings.target -%}
+{%- if target == blank -%}
+  {%- assign target = '/pages/collection-' | append: product.handle -%}
+{%- endif -%}
+<meta name="robots" content="noindex, follow">
+<meta http-equiv="refresh" content="0; url={{ target }}">
+<link rel="canonical" href="{{ shop.url }}{{ target }}">
+<script>window.location.replace({{ target | json }});</script>
+<div class="inner" style="padding:120px var(--page-pad);text-align:center">
+  <p style="font-size:var(--t-body);color:var(--ink3)">{{ section.settings.text | default: 'Taking you to the residence' }} <a href="{{ target }}">{{ product.title }}</a>.</p>
+</div>
+{% schema %}
+{
+  "name": "Residence redirect",
+  "settings": [
+    { "type": "paragraph", "content": "This product only holds the residence's photographs and film (Products › the residence › Media). Its page is the Collection page; visitors to this address are sent there." },
+    { "type": "url", "id": "target", "label": "Send visitors to", "info": "Empty = /pages/collection-(the residence's handle)." },
+    { "type": "text", "id": "text", "label": "Line shown while redirecting", "default": "Taking you to the residence" }
+  ],
+  "presets": [{ "name": "Residence redirect" }]
+}
+{% endschema %}
