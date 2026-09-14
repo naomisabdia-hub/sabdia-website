@@ -1685,7 +1685,7 @@ html.bk .film-band{padding-top:calc(clamp(52px,6.2vw,92px)*var(--sp-scale)*var(-
 /* Enquiry forms: even rhythm between fields, the two-up row bottom-aligned
    so a wrapped label never pushes one select below the other, chips with
    room under them (Naomi, 14 Sep 2026: "the spacing needs to be okay"). */
-.prequal{display:flex;flex-direction:column;gap:16px}
+.prequal{display:flex;flex-direction:column;gap:16px}.prequal[hidden]{display:none}
 .prequal-row{gap:12px 16px;align-items:end}
 .prequal-row .fg{justify-content:flex-end}
 .chips{margin:8px 0 4px}
