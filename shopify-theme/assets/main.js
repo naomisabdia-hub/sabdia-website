@@ -637,11 +637,11 @@ function prequalInit() {
         if (!sel || /inspect|interest|buy|purchase|offer/i.test(t)) { mode = 'residence'; suburb = pageSuburb; }
       }
       else if (sel) {
-        /* Contact page (Naomi, 14 Sep 2026): the buyer questions only when a
-           specific residence is chosen or a viewing is requested. */
+        /* Contact page (Naomi, 14 Sep 2026): the buyer questions only for a
+           specific residence, a viewing, or For Sale - Current Residences. */
         const r = residenceFor(sel.value);
         if (r) { mode = 'residence'; suburb = r.suburb || ''; }
-        else if (/viewing|inspect/i.test(sel.value)) mode = 'forsale';
+        else if (/viewing|inspect|for sale|current residence/i.test(sel.value)) mode = 'forsale';
       } else { mode = 'forsale'; }
       /* Careers: a CV instead of the buyer questions. */
       const cw = form.querySelector('[data-careers-wrap]'), cf = form.querySelector('[data-careers-file]');
