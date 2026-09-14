@@ -23,4 +23,8 @@ if [ -d "$HOME/Desktop/sabdia-store-templates/templates" ]; then
     --only templates/index.json --only templates/page.about.json --only templates/page.services.json --only templates/page.contact.json \
     --only templates/page.collection.json --only templates/page.collection-item.json --only templates/collection.json --only templates/page.agent-access.json --only templates/page.find-your-home.json
 fi
+# The film section (14 Sep 2026) sits on every residence page template; the
+# templates are store-side, so this adds it where it is missing and nothing else.
+echo "== The film section on the residence templates"
+python3 shopify-app/add-film-section.py $THEME
 echo "Done."

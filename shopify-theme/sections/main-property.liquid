@@ -707,7 +707,7 @@
   endif
 -%}
 {%- if film_src != blank and section.settings.show_film -%}
-  <section class="film-band{% if section.settings.film_side == 'left' %} film-flip{% endif %}" id="film" style="--film-ar:{{ section.settings.film_shape | default: '9/16' }}">
+  <section class="film-band film-inline{% if section.settings.film_side == 'left' %} film-flip{% endif %}" id="film-inline" style="--film-ar:{{ section.settings.film_shape | default: '9/16' }}">
     <div class="film-grid">
       <div class="film-copy">
         {%- if section.settings.film_label != blank -%}<div class="slabel slabel-dark reveal">{{ section.settings.film_label }}</div>{%- endif -%}
@@ -809,6 +809,8 @@
   .pg-noexpand .pg-expand{display:none}
   .prop-gallery .pg-stage{aspect-ratio:var(--pgs-ar,16/9)}
   .film-band .film-frame{aspect-ratio:var(--film-ar,9/16)}
+  /* The film has its own section since 14 Sep 2026 (sections/residence-film.liquid). When it is on the page, this built-in one steps aside. */
+  body:has(.residence-film) .film-band.film-inline{display:none}
   @media(min-width:901px){.film-flip .film-grid>.film-copy{order:2}}
   .share-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:36px}
   .share-l{font-size:10px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}
@@ -1509,7 +1511,7 @@
     },
     {
       "type": "paragraph",
-      "content": "The film playing now comes from Products › the residence › Metafields › Film video and Film poster. Each residence has its own template, so a film or poster picked here belongs to this residence only."
+      "content": "Easier since 14 Sep 2026: the film is its own section, The film, in the left sidebar (⊕ Add section › The film), with the film upload as its first setting. When that section is on the page this built-in film steps aside and the settings below do nothing. Without it, the film playing here comes from Products › the residence › Metafields › Film video and Film poster, or the pickers below."
     },
     {
       "type": "checkbox",

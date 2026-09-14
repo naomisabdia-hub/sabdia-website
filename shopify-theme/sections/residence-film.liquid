@@ -1,0 +1,269 @@
+{%- comment -%}
+  The film - the residence film as its own section, so it sits in the
+  customizer's left sidebar like the Scroll walkthrough and The Series, and
+  clicking the film in the preview opens a panel whose first setting is the
+  film itself (14 Sep 2026: Naomi could not find the film pickers, which were
+  buried at the foot of the Property page's long panel).
+
+  Where the film comes from, in order: a film uploaded here, a film URL
+  typed here, then - on a residence page - the residence's Film video
+  metafield (Products › the residence › Metafields). The poster follows the
+  same order with Film poster. Same markup and classes as the Property
+  page's built-in film (style.css .film-band, main.js [data-film]); when
+  this section is on a residence page the built-in one steps aside.
+
+  ⛔ Real footage only. No AI-generated imagery of any Sabdia property.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign on_product = false
+  if template.name == 'product' and product != blank
+    assign on_product = true
+    assign mf = product.metafields.custom
+  endif
+
+  assign film_src = ''
+  if s.film
+    assign fmp4 = s.film.sources | where: 'format', 'mp4' | first
+    if fmp4
+      assign film_src = fmp4.url
+    endif
+  endif
+  if film_src == blank
+    assign film_src = s.film_url
+  endif
+  if film_src == blank and on_product
+    assign film_src = mf.film_video.value
+  endif
+
+  assign poster = ''
+  if s.poster
+    assign poster = s.poster | image_url: width: 1600
+  elsif s.poster_url != blank
+    assign poster = s.poster_url
+  elsif on_product
+    assign poster = mf.film_poster.value
+  endif
+
+  # {name} in the words becomes the residence's name, set in its own face
+  # on a residence page (the residence-name snippet), or the name typed here.
+  assign name_token = '{' | append: 'name' | append: '}'
+  assign name_html = s.name
+  if name_html == blank and on_product
+    capture name_html
+      render 'residence-name', product: product
+    endcapture
+  endif
+  if name_html == blank
+    assign name_html = 'Sabdia'
+  endif
+
+  assign heading = s.heading_html
+  if heading == blank
+    assign heading = 'Experience <em>' | append: name_token | append: '</em>.'
+  endif
+  assign text = s.text
+  if text == blank
+    assign text = 'A walk through ' | append: name_token | append: ', on film.'
+  endif
+  assign cap_left = s.caption_left
+  if cap_left == blank
+    assign cap_left = name_token | append: ' - On Film'
+  endif
+  assign cap_right = s.caption_right
+  if cap_right == blank and on_product
+    assign cap_state = mf.state.value | default: 'QLD'
+    if mf.suburb.value != blank
+      assign cap_right = mf.suburb.value | append: ', ' | append: cap_state
+    endif
+  endif
+-%}
+{%- if film_src != blank -%}
+{% render 'section-look', section: section, designed: 'dark' %}
+<section class="film-band residence-film{% if s.side == 'left' %} film-flip{% endif %}" id="{{ s.look_anchor | default: 'film' }}" style="--film-ar:{{ s.shape | default: '9/16' }};--film-maxh:{{ s.reel_height | default: 680 }}px">
+  <div class="film-grid">
+    <div class="film-copy">
+      {%- if s.show_label and s.label != blank -%}<div class="slabel slabel-dark reveal">{{ s.label }}</div>{%- endif -%}
+      {%- if s.show_heading -%}<h2 class="film-h reveal d1">{{ heading | replace: name_token, name_html }}</h2>{%- endif -%}
+      {%- if s.show_text -%}<p class="film-p reveal d2">{{ text | replace: name_token, name_html }}</p>{%- endif -%}
+    </div>
+    <div class="reveal d2">
+      <div class="film-frame" data-film{% unless s.autoplay %} data-noauto{% endunless %}>
+        <video src="{{ film_src }}"{% if poster != blank %} poster="{{ poster }}"{% endif %} muted loop playsinline preload="none"></video>
+        {%- if s.show_sound -%}
+        <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+          <span data-sound-label>{{ s.sound_label | default: "Sound On" }}</span>
+        </button>
+        {%- endif -%}
+      </div>
+      {%- if s.show_caption -%}
+      <div class="film-caption">
+        <span><b>{{ cap_left | replace: name_token, name_html }}</b></span>
+        {%- if cap_right != blank -%}<span>{{ cap_right | replace: name_token, name_html }}</span>{%- endif -%}
+      </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+<style>
+  .residence-film .film-frame{aspect-ratio:var(--film-ar,9/16);max-height:min(76vh,var(--film-maxh,680px))}
+  @media(min-width:901px){.residence-film.film-flip .film-grid>.film-copy{order:2}}
+  @media(prefers-reduced-motion:reduce){.residence-film video{display:none}}
+</style>
+{%- elsif request.design_mode -%}
+<section class="film-band residence-film" style="padding:48px var(--page-pad)">
+  <p class="editor-note" style="max-width:640px;margin:0 auto;text-align:center">The film - no film yet. Upload one in this section's panel (Film), or set Film video on the residence at Products › the residence › Metafields. Shoppers do not see this note.</p>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "The film",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The residence film beside its words. Upload the film here and it plays. Left empty on a residence page, the film and poster come from Products › the residence › Metafields › Film video and Film poster. Real footage only, never generated."
+    },
+    {
+      "type": "video",
+      "id": "film",
+      "label": "Film (upload)",
+      "info": "An mp4. Portrait 9:16 as designed; landscape works with the shape set below."
+    },
+    {
+      "type": "text",
+      "id": "film_url",
+      "label": "Film (URL)",
+      "info": "A direct .mp4 link, used when nothing is uploaded above."
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "Poster",
+      "info": "The still shown before the film plays."
+    },
+    {
+      "type": "text",
+      "id": "poster_url",
+      "label": "Poster (URL)",
+      "info": "Used when no poster is chosen above."
+    },
+    {
+      "type": "header",
+      "content": "Words"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label",
+      "default": "The Film"
+    },
+    {
+      "type": "html",
+      "id": "heading_html",
+      "label": "Heading",
+      "info": "Write {name} where the residence's name goes. Default: Experience <em>{name}</em>."
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Line under the heading",
+      "info": "Default: A walk through {name}, on film."
+    },
+    {
+      "type": "text",
+      "id": "name",
+      "label": "Residence name",
+      "info": "Leave blank on a residence page: the residence's own name, in its own face, is used."
+    },
+    {
+      "type": "text",
+      "id": "caption_left",
+      "label": "Caption - left",
+      "info": "Default: {name} - On Film"
+    },
+    {
+      "type": "text",
+      "id": "caption_right",
+      "label": "Caption - right",
+      "info": "Default on a residence page: its suburb and state."
+    },
+    {
+      "type": "text",
+      "id": "sound_label",
+      "label": "Sound button",
+      "default": "Sound On"
+    },
+    {
+      "type": "header",
+      "content": "Show"
+    },
+    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
+    {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
+    {"type": "checkbox", "id": "show_text", "label": "Show the line under the heading", "default": true},
+    {"type": "checkbox", "id": "show_caption", "label": "Show the caption under the film", "default": true},
+    {"type": "checkbox", "id": "show_sound", "label": "Show the sound button", "default": true},
+    {"type": "checkbox", "id": "autoplay", "label": "Film plays by itself when in view", "default": true, "info": "Off = the film waits for a click."},
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "side",
+      "label": "Film sits",
+      "options": [
+        {"value": "right", "label": "Right (as designed)"},
+        {"value": "left", "label": "Left"}
+      ],
+      "default": "right"
+    },
+    {
+      "type": "select",
+      "id": "shape",
+      "label": "Film shape",
+      "options": [
+        {"value": "9/16", "label": "Portrait 9:16 (as designed)"},
+        {"value": "4/5", "label": "Portrait 4:5"},
+        {"value": "1/1", "label": "Square"},
+        {"value": "16/9", "label": "Landscape 16:9"}
+      ],
+      "default": "9/16"
+    },
+    {"type": "range", "id": "reel_height", "label": "Film height, at most", "min": 360, "max": 900, "step": 20, "default": 680, "unit": "px"},
+    {"type": "header", "content": "Look"},
+    {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
+    {"type": "header", "content": "Photo or film behind the section"},
+    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
+    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
+    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
+    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
+    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
+    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "header", "content": "Space"},
+    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
+    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
+    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
+    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
+    {"type": "header", "content": "Type"},
+    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
+    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
+    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
+    {"type": "header", "content": "Finishing"},
+    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
+    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
+    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
+    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word film, a link to /products/qasr#film lands on this section."}
+  ],
+  "presets": [
+    {
+      "name": "The film"
+    }
+  ]
+}
+{% endschema %}
