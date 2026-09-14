@@ -268,9 +268,7 @@ function thanksText(form) {
   for (let k = 0; k < replies.length; k++) {
     try { if (new RegExp(replies[k].match, 'i').test(asked)) return replies[k].text; } catch (e) { /* bad pattern */ }
   }
-  /* Buyer enquiry with the pre-qualification left blank: ask for budget and timeline (Naomi's wording). */
-  const ask = form.querySelector('[data-prequal-ask]');
-  if (ask && (!v('contact[Budget range]') || !v('contact[Timeline]'))) return ask.textContent.trim();
+  /* Budget and timeline are required whenever they are shown, so the thank-you never has to ask for them (Naomi, 14 Sep 2026). */
   const el = form.querySelector('[data-thanks]');
   return (el && el.textContent.trim()) || form.getAttribute('data-thanks') || null;
 }

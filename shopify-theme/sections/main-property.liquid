@@ -292,7 +292,7 @@
               </select>
               {%- for t in etypes -%}
                 {%- assign parts = t | split: '|' -%}
-                {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | escape }}">{{ parts[1] | strip }}</span>{%- endif -%}
+                {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | replace: name_token, prop_name | escape }}">{{ parts[1] | strip | replace: name_token, prop_name }}</span>{%- endif -%}
               {%- endfor -%}
             </div>
           {%- endunless -%}
@@ -331,7 +331,7 @@
               </select>
               {%- for t in etypes -%}
                 {%- assign parts = t | split: '|' -%}
-                {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | escape }}">{{ parts[1] | strip }}</span>{%- endif -%}
+                {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | replace: name_token, prop_name | escape }}">{{ parts[1] | strip | replace: name_token, prop_name }}</span>{%- endif -%}
               {%- endfor -%}
             </div>
           {%- endunless -%}
@@ -1247,7 +1247,7 @@
       "id": "enquiry_types",
       "label": "Enquiry types (one per line)",
       "info": "{name} becomes the residence's name. The budget, timeline and location questions appear only for an inspection or an interest enquiry (Naomi, 14 Sep 2026). Add a tailored thank-you after a | on the same line, e.g. Custom home design | Thank you. Sabdia designs and builds every residence in-house, so we do not take on custom commissions - but we will be in touch about our current and upcoming releases.",
-      "default": "General enquiry about {name}\nArrange an inspection\nRegister my interest"
+      "default": "General enquiry about {name} | Thank you for your enquiry about {name}. A member of the Sabdia team will be in touch shortly.\nArrange an inspection | Thank you. Inspections of {name} are by private appointment, and a member of the Sabdia team will be in touch shortly to arrange a time.\nRegister my interest | Thank you for registering your interest in {name}. A member of the Sabdia team will be in touch shortly."
     },
     {
       "type": "text",
@@ -1302,7 +1302,7 @@
       "type": "textarea",
       "id": "success_text",
       "label": "Success message (Shopify mode)",
-      "default": "Thank you. We have received your enquiry and will be in touch within one business day."
+      "default": "Thank you. A member of the Sabdia team will be in touch shortly."
     },
     {
       "type": "checkbox",
@@ -1400,12 +1400,6 @@
       "id": "prequal_locations",
       "label": "Location options (one per line)",
       "info": "Leave empty to list the suburbs of the residences for sale plus Other inner Brisbane."
-    },
-    {
-      "type": "textarea",
-      "id": "prequal_ask",
-      "label": "Thank-you when budget or timeline is left blank",
-      "default": "Thank you for your interest. So we can send the most relevant information, could you share your approximate budget range and your timeline for purchase? We will follow up with further details on the residence."
     },
     {
       "type": "header",
