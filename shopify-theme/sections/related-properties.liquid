@@ -51,11 +51,37 @@
   {%- endif -%}
 </div>
 {%- endif -%}
+{%- comment -%} The share row lives under "More Sabdia residences" (Naomi, 14 Sep 2026). {%- endcomment -%}
+{%- if section.settings.show_share -%}
+{%- liquid
+  assign mf = product.metafields.custom
+  assign share_url = shop.url | append: product.url
+  assign share_title = product.title | append: ' - ' | append: mf.suburb.value | append: ' | Sabdia Constructions'
+  assign eu = share_url | url_encode
+  assign et = share_title | url_encode
+-%}
+<section style="padding:0 var(--page-pad) clamp(48px,6vw,72px)">
+  <div class="inner" style="display:flex;justify-content:center">
+    <div class="share-row" aria-label="Share this page">
+      <span class="share-l">{{ section.settings.share_label | default: "Share" }}</span>
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{ eu }}" target="_blank" rel="noopener" class="share-a">Facebook</a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ eu }}" target="_blank" rel="noopener" class="share-a">LinkedIn</a>
+      <a href="https://twitter.com/intent/tweet?url={{ eu }}&text={{ et }}" target="_blank" rel="noopener" class="share-a">X</a>
+      <a href="mailto:?subject={{ et }}&body={{ et }}%0A{{ eu }}" class="share-a">Email</a>
+      <button type="button" class="share-a share-copy" data-share-url="{{ share_url }}">{{ section.settings.copy_link_label | default: "Copy link" }}</button>
+    </div>
+  </div>
+</section>
+{%- endif -%}
 
 {% schema %}
 {
   "name": "Related residences",
   "settings": [
+    {"type": "header", "content": "Share row (under the residences)"},
+    {"type": "checkbox", "id": "show_share", "label": "Show the share row", "default": true},
+    {"type": "text", "id": "share_label", "label": "Share label", "default": "Share"},
+    {"type": "text", "id": "copy_link_label", "label": "Copy link button", "default": "Copy link"},
     { "type": "collection", "id": "related_collection", "label": "Collection", "info": "Defaults to for-sale; sets the order. Any residence whose Status is live is included; the one being viewed is never shown" },
     { "type": "html", "id": "heading_html", "label": "Heading (HTML)", "default": "More <em>Sabdia residences<\/em>" },
     { "type": "html", "id": "heading_sold_html", "label": "Heading when sold (HTML)", "default": "Residences <em>for sale now<\/em>" },

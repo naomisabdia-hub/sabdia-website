@@ -133,9 +133,35 @@
     assign pr_split = '1fr'
   endif
 -%}
+<style>@media(prefers-reduced-motion:reduce){.prop-hero video{display:none}}</style>
 <section class="prop-hero{% if section.settings.hero_words == 'centre' %} prop-hero-centre{% endif %}" style="--prop-h:{{ pr_h }};--prop-dim:{{ pr_dim }}">
-  {%- if product.featured_image -%}
-    <img src="{{ product.featured_image | image_url: width: 1920, height: 1080, crop: section.settings.hero_focus | default: 'center' }}" alt="{{ product.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ section.settings.hero_focus | default: 'center' }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)">
+  {%- liquid
+    # Header media (Customize › Header): the residence's main photo as
+    # designed, a photo chosen here, or a film. Real photographs and real
+    # footage only, never generated.
+    assign hm = section.settings.hero_media | default: 'residence'
+    assign hero_src = section.settings.hero_video_url
+    if section.settings.hero_video
+      assign hmp4 = section.settings.hero_video.sources | where: 'format', 'mp4' | first
+      if hmp4
+        assign hero_src = hmp4.url
+      endif
+    endif
+    assign hero_img = product.featured_image
+    if hm == 'image' and section.settings.hero_image
+      assign hero_img = section.settings.hero_image
+    endif
+    if hm == 'video' and section.settings.hero_poster
+      assign hero_img = section.settings.hero_poster
+    endif
+    assign hfocus = section.settings.hero_focus | default: 'center'
+  -%}
+  {%- if hm == 'video' and hero_src != blank -%}
+    <video src="{{ hero_src }}"{% if hero_img %} poster="{{ hero_img | image_url: width: 1920, height: 1080, crop: hfocus }}"{% endif %} autoplay muted loop playsinline preload="metadata" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ hfocus }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)"></video>
+  {%- elsif hm == 'image' and section.settings.hero_image_ext != blank and section.settings.hero_image == blank -%}
+    <img src="{% render 'ext-variant', src: section.settings.hero_image_ext, w: 1920, h: 1080 %}" alt="{{ product.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ hfocus }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)">
+  {%- elsif hero_img -%}
+    <img src="{{ hero_img | image_url: width: 1920, height: 1080, crop: hfocus }}" alt="{{ product.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ hfocus }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)">
   {%- endif -%}
   <div class="prop-hero-ov" style="opacity:calc(var(--prop-dim,.44) / .44)"></div>
   <div class="prop-hero-content inner">
@@ -799,71 +825,209 @@
       "type": "photo",
       "name": "Photo",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Photo" },
-        { "type": "text", "id": "caption", "label": "Caption", "info": "Shown in the viewer, e.g. Kitchen. Leave empty to use the photo's alt text." }
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Photo"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption",
+          "info": "Shown in the viewer, e.g. Kitchen. Leave empty to use the photo's alt text."
+        }
       ]
     },
     {
       "type": "video",
       "name": "Video",
       "settings": [
-        { "type": "video", "id": "video", "label": "Video (uploaded to Shopify)" },
-        { "type": "text", "id": "video_url", "label": "or video file URL", "info": "A direct .mp4 link, used when no Shopify video is picked." },
-        { "type": "image_picker", "id": "poster", "label": "Poster (optional)" },
-        { "type": "text", "id": "caption", "label": "Caption" }
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video (uploaded to Shopify)"
+        },
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "or video file URL",
+          "info": "A direct .mp4 link, used when no Shopify video is picked."
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Poster (optional)"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption"
+        }
       ]
     }
   ],
   "settings": [
     {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "select",
+      "id": "hero_media",
+      "label": "Header media",
+      "options": [
+        {
+          "value": "residence",
+          "label": "The residence's main photo (as designed)"
+        },
+        {
+          "value": "image",
+          "label": "A photo chosen below"
+        },
+        {
+          "value": "video",
+          "label": "A film"
+        }
+      ],
+      "default": "residence",
+      "info": "Real photographs and real footage only, never generated."
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Header photo",
+      "info": "Used when Header media is a chosen photo."
+    },
+    {
+      "type": "text",
+      "id": "hero_image_ext",
+      "label": "Header photo (URL)",
+      "info": "A link to a photo, used when none is chosen above."
+    },
+    {
+      "type": "video",
+      "id": "hero_video",
+      "label": "Header film (upload)",
+      "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."
+    },
+    {
+      "type": "text",
+      "id": "hero_video_url",
+      "label": "Header film (URL)",
+      "info": "A direct .mp4 link, used when no film is uploaded."
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_poster",
+      "label": "Film poster",
+      "info": "Shown while the film loads. Empty = the residence's main photo."
+    },
+    {
+      "type": "range",
+      "id": "hero_dim",
+      "label": "Darken the hero photo",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 44,
+      "unit": "%",
+      "info": "Lower = brighter. A sold residence sits a touch darker."
+    },
+    {
+      "type": "select",
+      "id": "hero_height",
+      "label": "Hero height",
+      "options": [
+        {
+          "value": "tall",
+          "label": "Tall (as designed)"
+        },
+        {
+          "value": "full",
+          "label": "Full screen"
+        },
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "short",
+          "label": "Short"
+        }
+      ],
+      "default": "tall"
+    },
+    {
+      "type": "select",
+      "id": "hero_focus",
+      "label": "Crop focus",
+      "options": [
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "hero_words",
+      "label": "Where the words sit",
+      "options": [
+        {
+          "value": "base-left",
+          "label": "Base, left (as designed)"
+        },
+        {
+          "value": "centre",
+          "label": "Centre"
+        }
+      ],
+      "default": "base-left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_status",
+      "label": "Status line above the name",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_location",
+      "label": "Suburb under the name",
+      "default": true
+    },
+    {
       "type": "paragraph",
-      "content": "Gallery: add Photo and Video blocks (⊕ Add block) to hand-pick this residence's gallery. With no blocks it shows the photos from Products › this residence › Media, in order. Each residence has its own template, so blocks picked here belong to this residence only."
+      "content": "Shown only when the residence's Status is in the Sold group (Products › the residence › Status). The badge prints that Status word."
     },
     {
-      "type": "paragraph",
-      "content": "Shared framing text for every property page. Write {name} wherever the residence's name should appear."
-    },
-    {
-      "type": "text",
-      "id": "about_label",
-      "label": "Description label",
-      "default": "About {name}"
+      "type": "checkbox",
+      "id": "show_sold_banner",
+      "label": "Sold banner under the hero (sold residences)",
+      "default": true
     },
     {
       "type": "text",
-      "id": "features_heading",
-      "label": "Features heading",
-      "default": "Key Features"
-    },
-    {
-      "type": "textarea",
-      "id": "enquiry_types",
-      "label": "Enquiry types (one per line)",
-      "info": "{name} becomes the residence's name. The budget, timeline and location questions appear only for an inspection or an interest enquiry (Naomi, 14 Sep 2026). Add a tailored thank-you after a | on the same line, e.g. Custom home design | Thank you. Sabdia designs and builds every residence in-house, so we do not take on custom commissions - but we will be in touch about our current and upcoming releases.",
-      "default": "General enquiry about {name}\nArrange an inspection\nRegister my interest"
-    },
-    {
-      "type": "textarea",
-      "id": "privacy_note",
-      "label": "Privacy note",
-      "default": "By submitting this form you agree to our privacy policy. Your details will not be shared with third parties."
-    },
-    {
-      "type": "text",
-      "id": "brochure_label",
-      "label": "Brochure button",
-      "default": "Download Brochure"
-    },
-    {
-      "type": "text",
-      "id": "general_label",
-      "label": "General enquiry button",
-      "default": "General Enquiry"
-    },
-    {
-      "type": "url",
-      "id": "general_link",
-      "label": "General enquiry link"
+      "id": "sold_notice",
+      "label": "Sold notice",
+      "default": "This residence has found its owner. Register your interest to hear about upcoming releases before they reach the market."
     },
     {
       "type": "text",
@@ -875,134 +1039,6 @@
       "type": "url",
       "id": "sold_banner_link",
       "label": "Sold banner link"
-    },
-    {
-      "type": "text",
-      "id": "sold_cta_label",
-      "label": "Sold sidebar button",
-      "default": "View Current Properties"
-    },
-    {
-      "type": "textarea",
-      "id": "success_text",
-      "label": "Success message (Shopify mode)",
-      "default": "Thank you. We have received your enquiry and will be in touch within one business day."
-    },
-    { "type": "header", "content": "Pre-qualification (budget, timeline, flexibility)" },
-    { "type": "paragraph", "content": "Three optional dropdowns on the form. Answers arrive in the enquiry email, and budget and timeline become tags on the person in Customers (budget-5m-6m, timeline-ready-now) for segments. If they skip them, the thank-you asks for budget and timeline in your words." },
-    { "type": "text", "id": "prequal_budget_label", "label": "Budget label", "default": "Budget range" },
-    { "type": "textarea", "id": "prequal_budget", "label": "Budget options (one per line)", "default": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say" },
-    { "type": "text", "id": "prequal_timeline_label", "label": "Timeline label", "default": "Timeline" },
-    { "type": "textarea", "id": "prequal_timeline", "label": "Timeline options (one per line)", "default": "Ready now\n1 - 3 months\n3 - 6 months\n6 - 12 months\nJust researching" },
-    { "type": "text", "id": "prequal_flex_label", "label": "Flexibility label", "default": "Location and flexibility" },
-    { "type": "textarea", "id": "prequal_flex", "label": "Flexibility options (one per line)", "default": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases" },
-    { "type": "textarea", "id": "prequal_ask", "label": "Thank-you when budget or timeline is left blank", "default": "Thank you for your interest. So we can send the most relevant information, could you share your approximate budget range and your timeline for purchase? We will follow up with further details on the residence." },
-    { "type": "text", "id": "prequal_loc_label", "label": "Locations label (For Sale enquiry)", "default": "Preferred locations" },
-    { "type": "text", "id": "prequal_loc_label_other", "label": "Locations label (residence enquiry)", "default": "Also considering (optional)" },
-    { "type": "textarea", "id": "prequal_locations", "label": "Location options (one per line)", "info": "Leave empty to list the suburbs of the residences for sale plus Other inner Brisbane." },
-    { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
-    { "type": "header", "content": "Residence name font" },
-    { "type": "paragraph", "content": "Each residence has its own template, so the face set here belongs to this residence only - use the face from its brochure (Tamsin, 10 Sep 2026). Either type a Google Fonts family (fonts.google.com, e.g. Cinzel, Cormorant, Inter, Marcellus) or upload the brochure's font file to Content › Files and paste its link below." },
-    { "type": "text", "id": "name_font", "label": "Google Fonts family", "info": "Exactly as written on fonts.google.com. Leave empty to keep the site serif." },
-    { "type": "text", "id": "name_font_file", "label": "Font file link (.woff2 / .woff / .ttf / .otf)", "info": "From Content › Files. When set, the family above is only the name the file is given." },
-    { "type": "text", "id": "name_font_weight", "label": "Weight", "default": "400", "info": "A number the face has: 300, 400, 500, 600, 700." },
-    { "type": "range", "id": "name_font_scale", "label": "Name size", "min": 50, "max": 130, "step": 5, "unit": "%", "default": 100 },
-    { "type": "range", "id": "name_font_tracking", "label": "Letter spacing", "min": -8, "max": 30, "step": 1, "unit": "%", "default": -4, "info": "Hundredths of an em: -4 is the site's tight serif; 10 to 20 suits a spaced capitals face." },
-    { "type": "checkbox", "id": "name_font_caps", "label": "Set the name in capitals", "default": false },
-    {
-      "type": "text",
-      "id": "share_label",
-      "label": "Share row label",
-      "default": "Share"
-    },
-    {
-      "type": "text",
-      "id": "sticky_label",
-      "label": "Sticky bar button",
-      "default": "Enquire"
-    },
-    {
-      "type": "text",
-      "id": "gallery_label",
-      "label": "Gallery label",
-      "default": "The Residence"
-    },
-    {
-      "type": "select",
-      "id": "gallery_layout",
-      "label": "Gallery layout",
-      "default": "stage",
-      "options": [
-        { "value": "stage", "label": "Stage + filmstrip" },
-        { "value": "grid", "label": "Grid of tiles" }
-      ],
-      "info": "Stage: arrows, swipe and keyboard move through every photo; the room names under the strip jump straight to a room; the photo opens full screen on click."
-    },
-    {
-      "type": "range",
-      "id": "gallery_tiles",
-      "label": "Photos in the grid (Grid layout only)",
-      "min": 3,
-      "max": 12,
-      "step": 3,
-      "default": 9,
-      "info": "Small even tiles; the rest open in the viewer."
-    },
-    {
-      "type": "text",
-      "id": "gallery_all_label",
-      "label": "View all photos button",
-      "default": "View all photos",
-      "info": "The photo count is added automatically. Every photo on the residence (Products › the residence › Media) opens in the viewer; the grid shows the first six after the hero."
-    },
-    {
-      "type": "html",
-      "id": "gallery_heading_html",
-      "label": "Gallery heading",
-      "default": "Inside <em>{name}</em>."
-    },
-    {
-      "type": "header",
-      "content": "The film"
-    },
-    {
-      "type": "paragraph",
-      "content": "The film playing now comes from Products › the residence › Metafields › Film video and Film poster. Each residence has its own template, so a film or poster picked here belongs to this residence only."
-    },
-    {
-      "type": "video",
-      "id": "film",
-      "label": "Film (upload)",
-      "info": "Upload the residence film (mp4) and it takes over from the Film video metafield. Leave empty to keep the metafield."
-    },
-    {
-      "type": "image_picker",
-      "id": "film_poster",
-      "label": "Film poster",
-      "info": "The still shown before the film plays. Choose one and it takes over from the Film poster metafield."
-    },
-    {
-      "type": "text",
-      "id": "film_label",
-      "label": "Film label",
-      "default": "The Film"
-    },
-    {
-      "type": "text",
-      "id": "film_text",
-      "label": "Film line",
-      "default": "A walk through {name}, on film.",
-      "info": "{name} becomes the residence's name."
-    },
-    {
-      "type": "paragraph",
-      "content": "Shown only when the residence's Status is in the Sold group (Products › the residence › Status). The badge prints that Status word."
-    },
-    {
-      "type": "text",
-      "id": "sold_notice",
-      "label": "Sold notice",
-      "default": "This residence has found its owner. Register your interest to hear about upcoming releases before they reach the market."
     },
     {
       "type": "header",
@@ -1017,6 +1053,64 @@
       "id": "hide_specs",
       "label": "Hide the specs bar",
       "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "spec_show_location",
+      "label": "Location",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "spec_show_beds",
+      "label": "Bedrooms",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "spec_show_baths",
+      "label": "Bathrooms",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "spec_show_cars",
+      "label": "Garages",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "spec_show_land",
+      "label": "Land size",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "spec_show_build",
+      "label": "Build size (when the residence has one)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "spec_show_status",
+      "label": "Status",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "specs_align",
+      "label": "Numbers sit",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left (as designed)"
+        },
+        {
+          "value": "centre",
+          "label": "Centre"
+        }
+      ],
+      "default": "left"
     },
     {
       "type": "text",
@@ -1050,37 +1144,110 @@
     },
     {
       "type": "text",
+      "id": "spec_build",
+      "label": "Build size label",
+      "default": "Build Size"
+    },
+    {
+      "type": "text",
       "id": "spec_status",
       "label": "Status label",
       "default": "Status"
     },
     {
-      "type": "text",
-      "id": "cta_label",
-      "label": "Closing CTA label",
-      "default": "Private Appointments"
+      "type": "header",
+      "content": "Description"
     },
     {
-      "type": "html",
-      "id": "cta_heading_html",
-      "label": "Closing CTA heading",
-      "default": "Experience <em>{name}</em> in person."
+      "type": "paragraph",
+      "content": "Shared framing text for every property page. Write {name} wherever the residence's name should appear."
     },
     {
-      "type": "textarea",
-      "id": "cta_text",
-      "label": "Closing CTA text",
-      "default": "Private inspections are available by appointment."
+      "type": "checkbox",
+      "id": "show_about_label",
+      "label": "Show the description label",
+      "default": true
     },
     {
       "type": "text",
-      "id": "cta_button",
-      "label": "Closing CTA button",
-      "default": "Enquire About {name}"
+      "id": "about_label",
+      "label": "Description label",
+      "default": "About {name}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_headline",
+      "label": "Show the headline",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show the description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_features",
+      "label": "Show the key features",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "features_heading",
+      "label": "Features heading",
+      "default": "Key Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_desc",
+      "label": "Description holds while the form scrolls",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "body_layout",
+      "label": "Description and form",
+      "options": [
+        {
+          "value": "beside",
+          "label": "Description 7 : form 5 (as designed)"
+        },
+        {
+          "value": "equal",
+          "label": "Equal halves"
+        },
+        {
+          "value": "form-first",
+          "label": "Form first"
+        },
+        {
+          "value": "stack",
+          "label": "Form under the description"
+        },
+        {
+          "value": "form-first-stack",
+          "label": "Form above the description"
+        }
+      ],
+      "default": "beside"
     },
     {
       "type": "header",
-      "content": "Wording"
+      "content": "Enquiry form"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_enquiry",
+      "label": "Show the enquiry panel",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "enquiry_types",
+      "label": "Enquiry types (one per line)",
+      "info": "{name} becomes the residence's name. The budget, timeline and location questions appear only for an inspection or an interest enquiry (Naomi, 14 Sep 2026). Add a tailored thank-you after a | on the same line, e.g. Custom home design | Thank you. Sabdia designs and builds every residence in-house, so we do not take on custom commissions - but we will be in touch about our current and upcoming releases.",
+      "default": "General enquiry about {name}\nArrange an inspection\nRegister my interest"
     },
     {
       "type": "text",
@@ -1120,9 +1287,319 @@
     },
     {
       "type": "text",
-      "id": "copy_link_label",
-      "label": "Copy link button",
-      "default": "Copy link"
+      "id": "optin_label",
+      "label": "Keep-me-updated box",
+      "default": "Keep me updated on new Sabdia releases",
+      "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence."
+    },
+    {
+      "type": "textarea",
+      "id": "privacy_note",
+      "label": "Privacy note",
+      "default": "By submitting this form you agree to our privacy policy. Your details will not be shared with third parties."
+    },
+    {
+      "type": "textarea",
+      "id": "success_text",
+      "label": "Success message (Shopify mode)",
+      "default": "Thank you. We have received your enquiry and will be in touch within one business day."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_brochure",
+      "label": "Brochure button (when the residence has one)",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "brochure_label",
+      "label": "Brochure button",
+      "default": "Download Brochure"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_general",
+      "label": "General enquiry button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "general_label",
+      "label": "General enquiry button",
+      "default": "General Enquiry"
+    },
+    {
+      "type": "url",
+      "id": "general_link",
+      "label": "General enquiry link"
+    },
+    {
+      "type": "text",
+      "id": "sold_cta_label",
+      "label": "Sold sidebar button",
+      "default": "View Current Properties"
+    },
+    {
+      "type": "header",
+      "content": "Buyer questions (inspection or interest)"
+    },
+    {
+      "type": "paragraph",
+      "content": "Three optional dropdowns on the form. Answers arrive in the enquiry email, and budget and timeline become tags on the person in Customers (budget-5m-6m, timeline-ready-now) for segments. If they skip them, the thank-you asks for budget and timeline in your words."
+    },
+    {
+      "type": "text",
+      "id": "prequal_budget_label",
+      "label": "Budget label",
+      "default": "Budget range"
+    },
+    {
+      "type": "textarea",
+      "id": "prequal_budget",
+      "label": "Budget options (one per line)",
+      "default": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say"
+    },
+    {
+      "type": "text",
+      "id": "prequal_timeline_label",
+      "label": "Timeline label",
+      "default": "Timeline"
+    },
+    {
+      "type": "textarea",
+      "id": "prequal_timeline",
+      "label": "Timeline options (one per line)",
+      "default": "Ready now\n1 - 3 months\n3 - 6 months\n6 - 12 months\nJust researching"
+    },
+    {
+      "type": "text",
+      "id": "prequal_flex_label",
+      "label": "Flexibility label",
+      "default": "Location and flexibility"
+    },
+    {
+      "type": "textarea",
+      "id": "prequal_flex",
+      "label": "Flexibility options (one per line)",
+      "default": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases"
+    },
+    {
+      "type": "text",
+      "id": "prequal_loc_label",
+      "label": "Locations label (For Sale enquiry)",
+      "default": "Preferred locations"
+    },
+    {
+      "type": "text",
+      "id": "prequal_loc_label_other",
+      "label": "Locations label (residence enquiry)",
+      "default": "Also considering (optional)"
+    },
+    {
+      "type": "textarea",
+      "id": "prequal_locations",
+      "label": "Location options (one per line)",
+      "info": "Leave empty to list the suburbs of the residences for sale plus Other inner Brisbane."
+    },
+    {
+      "type": "textarea",
+      "id": "prequal_ask",
+      "label": "Thank-you when budget or timeline is left blank",
+      "default": "Thank you for your interest. So we can send the most relevant information, could you share your approximate budget range and your timeline for purchase? We will follow up with further details on the residence."
+    },
+    {
+      "type": "header",
+      "content": "Gallery"
+    },
+    {
+      "type": "paragraph",
+      "content": "Gallery: add Photo and Video blocks (⊕ Add block) to hand-pick this residence's gallery. With no blocks it shows the photos from Products › this residence › Media, in order. Each residence has its own template, so blocks picked here belong to this residence only."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gallery",
+      "label": "Show the gallery",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "gallery_label",
+      "label": "Gallery label",
+      "default": "The Residence"
+    },
+    {
+      "type": "html",
+      "id": "gallery_heading_html",
+      "label": "Gallery heading",
+      "default": "Inside <em>{name}</em>."
+    },
+    {
+      "type": "select",
+      "id": "gallery_layout",
+      "label": "Gallery layout",
+      "default": "stage",
+      "options": [
+        {
+          "value": "stage",
+          "label": "Stage + filmstrip"
+        },
+        {
+          "value": "grid",
+          "label": "Grid of tiles"
+        }
+      ],
+      "info": "Stage: arrows, swipe and keyboard move through every photo; the room names under the strip jump straight to a room; the photo opens full screen on click."
+    },
+    {
+      "type": "range",
+      "id": "gallery_tiles",
+      "label": "Photos in the grid (Grid layout only)",
+      "min": 3,
+      "max": 12,
+      "step": 3,
+      "default": 9,
+      "info": "Small even tiles; the rest open in the viewer."
+    },
+    {
+      "type": "select",
+      "id": "stage_shape",
+      "label": "Stage shape",
+      "options": [
+        {
+          "value": "16/9",
+          "label": "Wide 16:9 (as designed)"
+        },
+        {
+          "value": "3/2",
+          "label": "Landscape 3:2"
+        },
+        {
+          "value": "4/3",
+          "label": "Landscape 4:3"
+        },
+        {
+          "value": "21/9",
+          "label": "Cinematic 21:9"
+        }
+      ],
+      "default": "16/9"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbs",
+      "label": "Filmstrip of thumbnails (Stage layout)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rooms",
+      "label": "Room names under the strip (Stage layout)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_expand",
+      "label": "\"View all photos\" button on the stage",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "gallery_all_label",
+      "label": "View all photos button",
+      "default": "View all photos",
+      "info": "The photo count is added automatically. Every photo on the residence (Products › the residence › Media) opens in the viewer; the grid shows the first six after the hero."
+    },
+    {
+      "type": "header",
+      "content": "Film"
+    },
+    {
+      "type": "paragraph",
+      "content": "The film playing now comes from Products › the residence › Metafields › Film video and Film poster. Each residence has its own template, so a film or poster picked here belongs to this residence only."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_film",
+      "label": "Show the film",
+      "default": true
+    },
+    {
+      "type": "video",
+      "id": "film",
+      "label": "Film (upload)",
+      "info": "Upload the residence film (mp4) and it takes over from the Film video metafield. Leave empty to keep the metafield."
+    },
+    {
+      "type": "image_picker",
+      "id": "film_poster",
+      "label": "Film poster",
+      "info": "The still shown before the film plays. Choose one and it takes over from the Film poster metafield."
+    },
+    {
+      "type": "text",
+      "id": "film_label",
+      "label": "Film label",
+      "default": "The Film"
+    },
+    {
+      "type": "html",
+      "id": "film_heading_html",
+      "label": "Film heading",
+      "default": "Experience <em>{name}</em>.",
+      "info": "{name} becomes the residence's name."
+    },
+    {
+      "type": "text",
+      "id": "film_text",
+      "label": "Film line",
+      "default": "A walk through {name}, on film.",
+      "info": "{name} becomes the residence's name."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_film_caption",
+      "label": "Caption under the film",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "film_side",
+      "label": "Film sits",
+      "options": [
+        {
+          "value": "right",
+          "label": "Right (as designed)"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "select",
+      "id": "film_shape",
+      "label": "Film shape",
+      "options": [
+        {
+          "value": "9/16",
+          "label": "Portrait 9:16 (as designed)"
+        },
+        {
+          "value": "4/5",
+          "label": "Portrait 4:5"
+        },
+        {
+          "value": "1/1",
+          "label": "Square"
+        },
+        {
+          "value": "16/9",
+          "label": "Landscape 16:9"
+        }
+      ],
+      "default": "9/16"
     },
     {
       "type": "text",
@@ -1130,64 +1607,263 @@
       "label": "Film sound button",
       "default": "Sound On"
     },
-    {"type": "header", "content": "Space"},
-    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
-    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
-    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
-    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
-    {"type": "header", "content": "Type"},
-    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
-    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
-    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
-    {"type": "header", "content": "Finishing"},
-    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
-    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
-    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
-    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."},
-    {"type": "header", "content": "Hero photo"},
-    {"type": "range", "id": "hero_dim", "label": "Darken the hero photo", "min": 0, "max": 100, "step": 4, "default": 44, "unit": "%", "info": "Lower = brighter. A sold residence sits a touch darker."},
-    {"type": "select", "id": "hero_height", "label": "Hero height", "options": [{"value": "tall", "label": "Tall (as designed)"}, {"value": "full", "label": "Full screen"}, {"value": "standard", "label": "Standard"}, {"value": "short", "label": "Short"}], "default": "tall"},
-    {"type": "select", "id": "hero_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
-    {"type": "select", "id": "hero_words", "label": "Where the words sit", "options": [{"value": "base-left", "label": "Base, left (as designed)"}, {"value": "centre", "label": "Centre"}], "default": "base-left"},
-    {"type": "checkbox", "id": "show_status", "label": "Status line above the name", "default": true},
-    {"type": "checkbox", "id": "show_location", "label": "Suburb under the name", "default": true},
-    {"type": "checkbox", "id": "show_sold_banner", "label": "Sold banner under the hero (sold residences)", "default": true},
-    {"type": "header", "content": "Specs bar - which numbers"},
-    {"type": "checkbox", "id": "spec_show_location", "label": "Location", "default": true},
-    {"type": "checkbox", "id": "spec_show_beds", "label": "Bedrooms", "default": true},
-    {"type": "checkbox", "id": "spec_show_baths", "label": "Bathrooms", "default": true},
-    {"type": "checkbox", "id": "spec_show_cars", "label": "Garages", "default": true},
-    {"type": "checkbox", "id": "spec_show_land", "label": "Land size", "default": true},
-    {"type": "checkbox", "id": "spec_show_build", "label": "Build size (when the residence has one)", "default": false},
-    {"type": "checkbox", "id": "spec_show_status", "label": "Status", "default": true},
-    {"type": "text", "id": "spec_build", "label": "Build size label", "default": "Build Size"},
-    {"type": "select", "id": "specs_align", "label": "Numbers sit", "options": [{"value": "left", "label": "Left (as designed)"}, {"value": "centre", "label": "Centre"}], "default": "left"},
-    {"type": "header", "content": "Description and enquiry"},
-    {"type": "checkbox", "id": "show_about_label", "label": "Show the description label", "default": true},
-    {"type": "checkbox", "id": "show_headline", "label": "Show the headline", "default": true},
-    {"type": "checkbox", "id": "show_description", "label": "Show the description", "default": true},
-    {"type": "checkbox", "id": "show_features", "label": "Show the key features", "default": true},
-    {"type": "checkbox", "id": "show_enquiry", "label": "Show the enquiry panel", "default": true},
-    {"type": "checkbox", "id": "show_brochure", "label": "Brochure button (when the residence has one)", "default": true},
-    {"type": "checkbox", "id": "show_general", "label": "General enquiry button", "default": true},
-    {"type": "checkbox", "id": "sticky_desc", "label": "Description holds while the form scrolls", "default": true},
-    {"type": "select", "id": "body_layout", "label": "Description and form", "options": [{"value": "beside", "label": "Description 7 : form 5 (as designed)"}, {"value": "equal", "label": "Equal halves"}, {"value": "form-first", "label": "Form first"}, {"value": "stack", "label": "Form under the description"}, {"value": "form-first-stack", "label": "Form above the description"}], "default": "beside"},
-    {"type": "header", "content": "Gallery"},
-    {"type": "checkbox", "id": "show_gallery", "label": "Show the gallery", "default": true},
-    {"type": "checkbox", "id": "show_thumbs", "label": "Filmstrip of thumbnails (Stage layout)", "default": true},
-    {"type": "checkbox", "id": "show_rooms", "label": "Room names under the strip (Stage layout)", "default": true},
-    {"type": "checkbox", "id": "show_expand", "label": "\"View all photos\" button on the stage", "default": true},
-    {"type": "select", "id": "stage_shape", "label": "Stage shape", "options": [{"value": "16/9", "label": "Wide 16:9 (as designed)"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "21/9", "label": "Cinematic 21:9"}], "default": "16/9"},
-    {"type": "header", "content": "Film"},
-    {"type": "checkbox", "id": "show_film", "label": "Show the film", "default": true},
-    {"type": "checkbox", "id": "show_film_caption", "label": "Caption under the film", "default": true},
-    {"type": "html", "id": "film_heading_html", "label": "Film heading", "default": "Experience <em>{name}</em>.", "info": "{name} becomes the residence's name."},
-    {"type": "select", "id": "film_side", "label": "Film sits", "options": [{"value": "right", "label": "Right (as designed)"}, {"value": "left", "label": "Left"}], "default": "right"},
-    {"type": "select", "id": "film_shape", "label": "Film shape", "options": [{"value": "9/16", "label": "Portrait 9:16 (as designed)"}, {"value": "4/5", "label": "Portrait 4:5"}, {"value": "1/1", "label": "Square"}, {"value": "16/9", "label": "Landscape 16:9"}], "default": "9/16"},
-    {"type": "header", "content": "Closing"},
-    {"type": "checkbox", "id": "show_cta", "label": "Closing \"Experience in person\" band", "default": true},
-    {"type": "checkbox", "id": "show_share", "label": "Share row", "default": true},
-    {"type": "checkbox", "id": "show_sticky", "label": "Sticky Enquire bar on phones", "default": true}
+    {
+      "type": "header",
+      "content": "Closing"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Closing \"Experience in person\" band",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Closing CTA label",
+      "default": "Private Appointments"
+    },
+    {
+      "type": "html",
+      "id": "cta_heading_html",
+      "label": "Closing CTA heading",
+      "default": "Experience <em>{name}</em> in person."
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "Closing CTA text",
+      "default": "Private inspections are available by appointment."
+    },
+    {
+      "type": "text",
+      "id": "cta_button",
+      "label": "Closing CTA button",
+      "default": "Enquire About {name}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sticky",
+      "label": "Sticky Enquire bar on phones",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sticky_label",
+      "label": "Sticky bar button",
+      "default": "Enquire"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share",
+      "label": "Share row",
+      "default": false,
+      "info": "The share row now sits under More Sabdia residences (that section's own switch). Leave this off unless you want it twice."
+    },
+    {
+      "type": "text",
+      "id": "share_label",
+      "label": "Share row label",
+      "default": "Share"
+    },
+    {
+      "type": "text",
+      "id": "copy_link_label",
+      "label": "Copy link button",
+      "default": "Copy link"
+    },
+    {
+      "type": "header",
+      "content": "Residence name font (fallback)"
+    },
+    {
+      "type": "paragraph",
+      "content": "Each residence has its own template, so the face set here belongs to this residence only - use the face from its brochure (Tamsin, 10 Sep 2026). Either type a Google Fonts family (fonts.google.com, e.g. Cinzel, Cormorant, Inter, Marcellus) or upload the brochure's font file to Content › Files and paste its link below."
+    },
+    {
+      "type": "text",
+      "id": "name_font",
+      "label": "Google Fonts family",
+      "info": "Exactly as written on fonts.google.com. Leave empty to keep the site serif."
+    },
+    {
+      "type": "text",
+      "id": "name_font_file",
+      "label": "Font file link (.woff2 / .woff / .ttf / .otf)",
+      "info": "From Content › Files. When set, the family above is only the name the file is given."
+    },
+    {
+      "type": "text",
+      "id": "name_font_weight",
+      "label": "Weight",
+      "default": "400",
+      "info": "A number the face has: 300, 400, 500, 600, 700."
+    },
+    {
+      "type": "range",
+      "id": "name_font_scale",
+      "label": "Name size",
+      "min": 50,
+      "max": 130,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "name_font_tracking",
+      "label": "Letter spacing",
+      "min": -8,
+      "max": 30,
+      "step": 1,
+      "unit": "%",
+      "default": -4,
+      "info": "Hundredths of an em: -4 is the site's tight serif; 10 to 20 suits a spaced capitals face."
+    },
+    {
+      "type": "checkbox",
+      "id": "name_font_caps",
+      "label": "Set the name in capitals",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Space"
+    },
+    {
+      "type": "range",
+      "id": "look_space_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."
+    },
+    {
+      "type": "range",
+      "id": "look_space_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "look_width",
+      "label": "Content width",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme setting (Layout › Content width)"
+        },
+        {
+          "value": "720",
+          "label": "Narrow (720px)"
+        },
+        {
+          "value": "900",
+          "label": "Reading (900px)"
+        },
+        {
+          "value": "1100",
+          "label": "Medium (1100px)"
+        },
+        {
+          "value": "1300",
+          "label": "Wide (1300px)"
+        },
+        {
+          "value": "1600",
+          "label": "Very wide (1600px)"
+        },
+        {
+          "value": "edge",
+          "label": "Edge to edge"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "look_margins",
+      "label": "Side margins",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "look_heading",
+      "label": "Heading size",
+      "min": 50,
+      "max": 160,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Scales the serif headings and titles in this section."
+    },
+    {
+      "type": "range",
+      "id": "look_text",
+      "label": "Text size",
+      "min": 70,
+      "max": 140,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Paragraphs, captions and standfirsts."
+    },
+    {
+      "type": "range",
+      "id": "look_label",
+      "label": "Small label size",
+      "min": 0,
+      "max": 20,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."
+    },
+    {
+      "type": "header",
+      "content": "Finishing"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_animate",
+      "label": "Fade in as it scrolls into view",
+      "default": true,
+      "info": "Off = the section is simply there, no entrance."
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_top",
+      "label": "Hairline above",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_bottom",
+      "label": "Hairline below",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "look_anchor",
+      "label": "Anchor name",
+      "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
+    }
   ]
 }
 {% endschema %}
