@@ -14,7 +14,7 @@ import os, shutil, subprocess, sys, tempfile
 STORE = "b91p0j-f4.myshopify.com"
 LIVE = "150554902630"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-HANDLES = ("milos", "petra", "kirra", "hermosa", "encanto", "haven", "spectre")
+HANDLES = ("milos", "petra", "kirra", "hermosa", "encanto", "haven", "spectre", "ammos", "alhambra", "eden")
 
 
 def env_val(key):

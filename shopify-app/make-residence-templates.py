@@ -20,7 +20,7 @@ import json, os, re, shutil, subprocess, sys, tempfile, urllib.request
 
 STORE = "b91p0j-f4.myshopify.com"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-HANDLES = ("milos", "petra", "kirra", "hermosa", "encanto", "haven", "spectre")
+HANDLES = ("milos", "petra", "kirra", "hermosa", "encanto", "haven", "spectre", "ammos", "alhambra", "eden")
 MAX_BLOCKS = 50
 
 

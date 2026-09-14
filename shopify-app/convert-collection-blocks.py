@@ -14,8 +14,8 @@ import json, os, re, shutil, subprocess, sys, tempfile, urllib.request
 STORE = "b91p0j-f4.myshopify.com"
 LIVE = "150554902630"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CONVERTED = ("milos", "petra", "kirra", "hermosa", "encanto")
-NEW = ("haven", "spectre")
+CONVERTED = ("milos", "petra", "kirra", "hermosa", "encanto", "ammos", "alhambra")
+NEW = ("haven", "spectre", "eden")
 REL = "templates/page.collection.json"
 
 

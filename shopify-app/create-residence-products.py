@@ -83,6 +83,26 @@ RESIDENCES = {
                     story=["SPECTRE is a contemporary residence in Camp Hill: a translucent screened upper level floating over a natural stone base, with the kitchen, dining and living rooms wrapped around a private pool courtyard.",
                            "Designed, developed and built in-house by Sabdia."],
                     seo="SPECTRE, Camp Hill. A completed Sabdia residence: a screened upper level over a natural stone base, designed, developed and built in-house."),
+    "ammos": dict(title="AMMOS", suburb="Taringa", style="Mediterranean", year=2025,
+                  headline="Set high in the hills <em>of Taringa</em>.",
+                  teaser="Soft curves, tonal render and a refined material palette.",
+                  story=["Set high in the hills of Taringa, AMMOS is a modern Mediterranean residence defined by natural stone, soft textures and a palette that is both timeless and contemporary.",
+                         "Soft curves and tonal render give the home its presence. Inside, the material palette is refined and grounded, designed to feel sunlit and effortless.",
+                         "Every surface refined and resolved through craft."],
+                  seo="AMMOS, Taringa. A completed Sabdia residence: natural stone, soft textures and a palette both timeless and contemporary, designed, developed and built in-house."),
+    "alhambra": dict(title="ALHAMBRA", suburb="Tarragindi", style="Mediterranean", year=None,
+                     headline="Form, texture <em>and restraint</em>.",
+                     teaser="Mediterranean influence, expressed through form, texture and restraint.",
+                     story=["ALHAMBRA carries a Mediterranean influence, expressed through form, texture and restraint.",
+                            "Arched openings and a warm, tonal palette give the residence its character, held in balance by the discipline to leave space quiet.",
+                            "Designed, developed and built in-house by Sabdia."],
+                     seo="ALHAMBRA, Tarragindi. A completed Sabdia residence: Mediterranean influence expressed through form, texture and restraint, designed, developed and built in-house."),
+    "eden": dict(title="EDEN", suburb="Brisbane", style="Hamptons", year=None,
+                 headline="Weatherboard and light, <em>in Brisbane</em>.",
+                 teaser="White weatherboard, a gabled front and pale timber joinery.",
+                 story=["EDEN is a Hamptons-inspired residence: white weatherboard under a gabled front, with pale timber joinery, fluted tiles and a farmhouse sink in a light-filled kitchen.",
+                        "Designed, developed and built in-house by Sabdia."],
+                 seo="EDEN. A completed Sabdia residence: white weatherboard, a gabled front and pale timber joinery, designed, developed and built in-house."),
 }
 
 
@@ -120,7 +140,7 @@ def main():
         r = RESIDENCES[h]
         body = "".join(f"<p>{p}</p>" for p in r['story'])
         existing = gql('query($h:String!){ productByHandle(handle:$h){ id } }', {"h": h})['productByHandle']
-        p_in = {"title": r['title'], "handle": h, "templateSuffix": h, "descriptionHtml": body,
+        p_in = {"title": r['title'], "handle": h, "status": "ACTIVE", "templateSuffix": h, "descriptionHtml": body,
                 "tags": ["sold", "completed"], "productType": "Residence", "vendor": "Sabdia",
                 "seo": {"title": f"{r['title']} | Sabdia", "description": r['seo']}, "metafields": metafields(h, r)}
         if existing:

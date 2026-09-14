@@ -14,10 +14,10 @@ shopify theme push --store $STORE --path shopify-theme --theme $THEME --allow-li
 # Theme settings (Enquiry handling = Shopify) ship once too; afterwards the
 # customizer copy is the source of truth, so never overwrite it again.
 grep -q "^config/settings_data.json" shopify-theme/.shopifyignore || echo "config/settings_data.json" >> shopify-theme/.shopifyignore
-for h in qasr solace sierra caspian aether capri milos petra kirra hermosa encanto haven spectre; do
+for h in qasr solace sierra caspian aether capri milos petra kirra hermosa encanto haven spectre ammos alhambra eden; do
   grep -q "^templates/product.$h.json" shopify-theme/.shopifyignore || echo "templates/product.$h.json" >> shopify-theme/.shopifyignore
 done
-for h in milos petra kirra hermosa encanto haven spectre; do
+for h in milos petra kirra hermosa encanto haven spectre ammos alhambra eden; do
   grep -q "^templates/page.collection-$h.json" shopify-theme/.shopifyignore || echo "templates/page.collection-$h.json" >> shopify-theme/.shopifyignore
 done
 # DISABLED 14 Sep 2026 (Naomi lost her home page edits - the dusk facade and

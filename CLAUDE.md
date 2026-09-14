@@ -89,7 +89,7 @@ architecture, layout, interiors, or finishes. No exceptions.**
   section has no backdrop dials at all.
 - Completed residences stay Collection PAGES (Content › Pages, template
   collection-item). Since 14 Sep 2026 MILOS, PETRA, KIRRA, HERMOSA,
-  ENCANTO, HAVEN, SPECTRE each have their own copy of that template
+  ENCANTO, HAVEN, SPECTRE, AMMOS, ALHAMBRA, EDEN each have their own copy of that template
   (`page.collection-<house>.json`) whose Collection residence section
   carries the photo/film pickers and one Photo block per photograph. The
   photographs and films live in Products › <HOUSE> › Media (the per-house
@@ -103,8 +103,7 @@ architecture, layout, interiors, or finishes. No exceptions.**
   then `create-residence-products.py`, `add-residence-media.py <house>
   <folder> [--film …]`, `make-residence-templates.py <theme> --force`;
   push-live.sh assigns the templates and refreshes the Collection cards.
-  Old-page residences still on Supabase: ALHAMBRA, AMMOS, CALLE, ELYSIUM,
-  FRASER, NERO.
+  Old-page residences still on Supabase: CALLE, ELYSIUM, FRASER, NERO.
 - The public QASR cut is deliberately curated — mud room, sauna, guest
   suites, powder, dining, cellar etc. are held back pre-sale. Do not add
   rooms without Naomi's sign-off. The full private tour lives on Naomi's

@@ -11,7 +11,7 @@ page.collection-<handle>.json is live (push-live.sh does).
 import json, os, sys, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-EXISTING = ("milos", "petra", "kirra", "hermosa", "encanto")
+EXISTING = ("milos", "petra", "kirra", "hermosa", "encanto", "ammos", "alhambra")
 NEW = {
     "haven": dict(title="HAVEN", loc="Camp Hill QLD, Australia", style="Hamptons", year=None,
                   headline="Weatherboard and arches, <em>in Camp Hill</em>.",
@@ -21,6 +21,10 @@ NEW = {
                     headline="Screens and stone, <em>in Camp Hill</em>.",
                     teaser="A translucent screened upper level over a natural stone base.",
                     story="SPECTRE is a contemporary residence in Camp Hill: a translucent screened upper level floating over a natural stone base, with the kitchen, dining and living rooms wrapped around a private pool courtyard.\nDesigned, developed and built in-house by Sabdia."),
+    "eden": dict(title="EDEN", loc="Brisbane QLD, Australia", style="Hamptons", year=None,
+                 headline="Weatherboard and light, <em>in Brisbane</em>.",
+                 teaser="White weatherboard, a gabled front and pale timber joinery.",
+                 story="EDEN is a Hamptons-inspired residence: white weatherboard under a gabled front, with pale timber joinery, fluted tiles and a farmhouse sink in a light-filled kitchen.\nDesigned, developed and built in-house by Sabdia."),
 }
 
 

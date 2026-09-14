@@ -272,7 +272,8 @@
             "loc": "Taringa QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos-poster.jpg",
             "link": "/pages/collection-ammos",
-            "page": "collection-ammos"
+            "page": "collection-ammos",
+            "image": "shopify://shop_images/ammos-hero.jpg"
           }
         },
         "residence-3": {
@@ -302,7 +303,8 @@
             "loc": "Brisbane QLD, Australia",
             "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra-poster.jpg",
             "link": "/pages/collection-alhambra",
-            "page": "collection-alhambra"
+            "page": "collection-alhambra",
+            "image": "shopify://shop_images/alhambra-hero.jpg"
           }
         },
         "residence-6": {
@@ -382,6 +384,13 @@
             "page": "collection-spectre",
             "image": "shopify://shop_images/spectre-hero.jpg"
           }
+        },
+        "residence_eden": {
+          "type": "residence",
+          "settings": {
+            "page": "collection-eden",
+            "image": "shopify://shop_images/eden-hero.jpg"
+          }
         }
       },
       "block_order": [
@@ -397,7 +406,8 @@
         "residence-10",
         "residence-11",
         "residence_haven",
-        "residence_spectre"
+        "residence_spectre",
+        "residence_eden"
       ]
     }
   },
