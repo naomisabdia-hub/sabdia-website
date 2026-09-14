@@ -1,0 +1,27 @@
+{%- comment -%}
+  The ordered, comma-separated handles of the residences a collection page
+  lists. On /collections/for-sale and /collections/sold the list is driven
+  by each residence's Status (see residence-handles): the collection's
+  manual order leads, then any other residence whose Status belongs here
+  is swept in. Other collections list their own products.
+
+  Usage:
+    {% capture h %}{% render 'collection-handles', collection: collection %}{% endcapture %}
+    {% assign handles = h | split: ',' %}
+{%- endcomment -%}
+{%- liquid
+  if collection.handle == 'for-sale' or collection.handle == 'sold'
+    assign group = 'live'
+    if collection.handle == 'sold'
+      assign group = 'sold'
+    endif
+    render 'residence-handles', col: collection, group: group
+  else
+    for p in collection.products
+      unless forloop.first
+        echo ','
+      endunless
+      echo p.handle
+    endfor
+  endif
+-%}

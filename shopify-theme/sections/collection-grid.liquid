@@ -1,0 +1,762 @@
+{%- comment -%}
+  The residences - the featured banner and the grid of residence cards on
+  the For Sale page, automatic or hand-picked with Residence blocks. The
+  refine toolbar (its own section) filters and sorts this grid; the filter
+  script lives here.
+
+  Split out of the all-in-one Collection grid section on 14 Sep 2026 so each
+  part of the For Sale page has its own panel in the customizer (Naomi:
+  "have the header its settings, then the Now Selling, then each individual
+  grid has their setting"). Real photographs and real footage only, never
+  generated.
+{%- endcomment -%}
+{%- liquid
+  capture list_csv
+    render 'collection-handles', collection: collection
+  endcapture
+  assign handles = list_csv | split: ','
+  assign count = handles.size
+  assign show_rich = true
+  if collection.handle == 'sold'
+    assign show_rich = false
+  endif
+-%}
+{%- liquid
+  # Hand-picked residences (Residence blocks) replace the automatic list, in
+  # block order. Each residence's own Status still decides how its card reads.
+  assign picked = false
+  if section.blocks.size > 0
+    assign picked = true
+    assign list_csv = ''
+    for block in section.blocks
+      if block.settings.product == blank
+        continue
+      endif
+      assign list_csv = list_csv | append: block.settings.product.handle | append: ','
+    endfor
+    assign handles = list_csv | split: ','
+    assign count = handles.size
+  endif
+  assign featured = false
+  assign first_handle = handles.first
+  for p in collections.all.products
+    if p.handle == first_handle
+      assign featured = p
+      break
+    endif
+  endfor
+  # Every distinct brochure face to load, so a card can set its name in it.
+  assign gfonts = ''
+  assign ffiles = ''
+  for h in handles
+    for p in collections.all.products
+      if p.handle != h
+        continue
+      endif
+      assign pm = p.metafields.custom
+      assign pf = pm.name_font.value | strip
+      assign pff = pm.name_font_file.value | strip
+      assign pfw = pm.name_font_weight.value | default: 400
+      if pff != blank
+        assign pfam = pf
+        if pfam == blank
+          assign pfam = 'ResidenceFace-' | append: p.handle
+        endif
+        assign ffiles = ffiles | append: pfam | append: '¦' | append: pff | append: '¦' | append: pfw | append: '||'
+      elsif pf != blank
+        assign gfonts = gfonts | append: pf | append: ':wght@' | append: pfw | append: '||'
+      endif
+      break
+    endfor
+  endfor
+  assign gfont_list = gfonts | split: '||' | uniq
+  assign ffile_list = ffiles | split: '||' | uniq
+  assign mc_featured = section.settings.show_featured
+  assign mc_style = 'aspect-ratio:' | append: section.settings.card_shape | default: '16/10'
+-%}
+
+{%- if gfont_list.size > 0 -%}
+  {%- capture gf_query -%}{%- for f in gfont_list -%}{%- unless forloop.first -%}&{%- endunless -%}family={{ f | replace: ' ', '+' }}{%- endfor -%}{%- endcapture -%}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?{{ gf_query }}&display=swap">
+{%- endif -%}
+{%- if ffile_list.size > 0 -%}
+  <style>
+  {%- for f in ffile_list -%}
+    {%- assign fp = f | split: '¦' -%}
+    {%- liquid
+      assign ff_fmt = 'woff2'
+      if fp[1] contains '.ttf'
+        assign ff_fmt = 'truetype'
+      elsif fp[1] contains '.otf'
+        assign ff_fmt = 'opentype'
+      elsif fp[1] contains '.woff2'
+        assign ff_fmt = 'woff2'
+      elsif fp[1] contains '.woff'
+        assign ff_fmt = 'woff'
+      endif
+    -%}
+    @font-face{font-family:'{{ fp[0] }}';src:url('{{ fp[1] }}') format('{{ ff_fmt }}');font-weight:{{ fp[2] | default: 400 }};font-display:swap}
+  {%- endfor -%}
+  </style>
+{%- endif -%}
+
+{%- if show_rich -%}
+{%- if featured and mc_featured -%}
+  {%- assign fmf = featured.metafields.custom -%}
+  {%- capture fstatus -%}{% render 'residence-status', product: featured %}{%- endcapture -%}
+  {%- if fstatus == 'For Sale' and settings.label_for_sale != blank -%}{%- assign fstatus = settings.label_for_sale -%}{%- endif -%}
+  <section style="padding:clamp(40px,5vw,64px) var(--page-pad) 0;background:var(--bg)" id="featuredWrap">
+    <div class="inner">
+      <a href="{{ featured.url }}" class="reveal" style="display:block;position:relative;overflow:hidden;height:min({{ section.settings.featured_height | default: 680 }}px,clamp(400px,52vw,680px));cursor:pointer;text-decoration:none">
+        {%- if featured.featured_image -%}
+          <img src="{{ featured.featured_image | image_url: width: 1600, height: 900, crop: 'center' }}" alt="{{ featured.title | escape }}" width="1600" height="900" loading="eager" fetchpriority="high"
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.98) saturate(.96);transition:filter .7s,transform .7s">
+        {%- endif -%}
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(var(--dark-rgb),.88) 0%,rgba(var(--dark-rgb),.1) 50%,transparent 100%);transition:opacity .4s"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:clamp(28px,4vw,52px)">
+          <div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
+            <div style="width:5px;height:5px;border-radius:50%;background:var(--gold2);{% if fstatus == 'For Sale' or fstatus == settings.label_for_sale %}animation:pulse 2s ease-in-out infinite;{% endif %}flex-shrink:0"></div>
+            <span style="font-size:10.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2)">{{ fstatus }}</span>
+          </div>
+          {%- liquid
+            assign fb_nf = fmf.name_font.value | strip
+            assign fb_nff = fmf.name_font_file.value | strip
+            assign fb_name = featured.title
+            assign fb_font = 'var(--font-d)'
+            assign fb_caps = ''
+            if fb_nf != blank or fb_nff != blank
+              assign fb_fam = fb_nf
+              if fb_fam == blank
+                assign fb_fam = 'ResidenceFace-' | append: featured.handle
+              endif
+              assign fb_font = "'" | append: fb_fam | append: "',var(--font-d)"
+              capture fb_scale
+                render 'residence-face-scale', product: featured
+              endcapture
+              if fmf.name_font_caps.value
+                assign fb_caps = ';text-transform:uppercase'
+              else
+                assign fb_name = featured.title | downcase | capitalize
+              endif
+            endif
+          -%}
+          <div style="font-family:{{ fb_font }};font-size:calc(var(--t-display)*var(--s-h,1)*{{ fb_scale | default: 1 | strip }});font-weight:{{ fmf.name_font_weight.value | default: 300 }};line-height:.95;letter-spacing:0;color:var(--white);margin-bottom:10px{{ fb_caps }}">{{ fb_name }}</div>
+          <div style="font-size:11.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--white-rgb),.78);margin-bottom:18px">{{ fmf.suburb.value }}, {{ fmf.state.value | default: 'QLD' }}</div>
+          {%- if section.settings.featured_specs -%}
+          <div style="display:flex;gap:18px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.beds.value }} Bed</span>
+            <span style="font-size:11px;color:rgba(var(--white-rgb),.45)">&middot;</span>
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.baths.value }} Bath</span>
+            <span style="font-size:11px;color:rgba(var(--white-rgb),.45)">&middot;</span>
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.cars.value }} Garage</span>
+            <span style="font-size:11px;color:rgba(var(--white-rgb),.45)">&middot;</span>
+            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.land.value }}m&sup2;{% if fmf.land_over.value %}+{% endif %}</span>
+          </div>
+          {%- endif -%}
+        </div>
+        <div style="position:absolute;top:clamp(18px,3vw,32px);right:clamp(18px,3vw,32px);width:44px;height:44px;border:1px solid rgba(var(--gold2-rgb),.45);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);font-size:16px">&rarr;</div>
+      </a>
+    </div>
+  </section>
+{%- endif -%}
+{%- endif -%}
+
+<section style="padding:clamp(8px,1vw,10px) var(--page-pad) 0;background:var(--bg);--pgc-cols:{{ section.settings.columns | default: '3' }};--pgc-gap:{{ section.settings.gap | default: 10 }}px">
+  <div class="inner">
+    <div class="proj-grid-3 mc-grid" id="propGrid" {% unless show_rich and mc_featured %}style="padding-top:clamp(32px,4vw,56px)"{% endunless %}>
+      {%- if picked -%}
+        {%- assign gi = 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.settings.product == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign gi = gi | plus: 1 -%}
+          {%- assign lead = false -%}{%- if show_rich and mc_featured -%}{%- assign lead = true -%}{%- endif -%}
+          {% render 'collection-card', product: block.settings.product, index: gi, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, image: block.settings.image, attrs: block.shopify_attributes %}
+        {%- endfor -%}
+      {%- else -%}
+      {%- for h in handles -%}
+        {%- for product in collections.all.products -%}
+        {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+          {%- assign lead = false -%}{%- if show_rich and mc_featured -%}{%- assign lead = true -%}{%- endif -%}
+          {% render 'collection-card', product: product, index: forloop.parentloop.index, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}
+        {%- break -%}
+        {%- endfor -%}
+      {%- endfor -%}
+      {%- endif -%}
+    </div>
+    <p id="fEmpty" style="display:none;padding:56px 0;text-align:center;font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:300;font-style:italic;color:var(--taupe-d)">{{ section.settings.empty_text }}</p>
+  </div>
+</section>
+<style>
+  .proj-grid-3.mc-grid{grid-template-columns:repeat(var(--pgc-cols,3),1fr);gap:var(--pgc-gap,10px)}
+  @media(max-width:1100px){.proj-grid-3.mc-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:768px){.proj-grid-3.mc-grid{grid-template-columns:1fr}}
+</style>
+
+<script>
+  (function () {
+  function initGrid() {
+    var grid = document.getElementById('propGrid');
+    if (!grid || grid.dataset.filterInit) return;
+    grid.dataset.filterInit = '1';
+    var byId = function (id) { return document.getElementById(id); };
+    var suburb = byId('fSuburb');
+    var beds = byId('fBeds');
+    var baths = byId('fBaths');
+    var cars = byId('fCars');
+    var size = byId('fSize');
+    var status = byId('fStatus');
+    var sort = byId('fSort');
+    var count = byId('fCount');
+    var empty = byId('fEmpty');
+    var clear = byId('fClear');
+    var featuredWrap = byId('featuredWrap');
+    var drop = document.querySelector('[data-feat-drop]');
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.ptool-opt input[data-feat]'));
+    var featSummary = document.querySelector('[data-feat-summary]');
+    var featAnyLabel = featSummary ? featSummary.textContent : '';
+    var selects = [suburb, beds, baths, cars, size, status].filter(Boolean);
+    var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-prop-card]'));
+    if (!selects.length && !chips.length && !sort) return;
+
+    function val(el) { return el ? el.value : ''; }
+    function inRange(raw, spec, required) {
+      var n = Number(raw);
+      if (!n) return !required;
+      var r = spec.split('-');
+      var lo = Number(r[0] || 0);
+      var hi = r[1] ? Number(r[1]) : Infinity;
+      return n >= lo && n < hi;
+    }
+    function activeFeats() {
+      return chips.filter(function (c) { return c.checked; })
+        .map(function (c) { return c.dataset.feat; });
+    }
+
+    function apply() {
+      var feats = activeFeats();
+      var sortVal = sort ? sort.value : 'featured';
+      var anyFilter = feats.length > 0 || selects.some(function (el) { return !!el.value; });
+      var isDefault = !anyFilter && sortVal === 'featured';
+      if (featuredWrap) featuredWrap.style.display = isDefault ? '' : 'none';
+      if (clear) clear.hidden = isDefault;
+
+      var visible = 0;
+      cards.forEach(function (c) {
+        var ok = true;
+        if (isDefault && c.dataset.featured) ok = false; // featured shown in hero block instead
+        if (ok && val(suburb) && c.dataset.suburb !== suburb.value) ok = false;
+        if (ok && val(beds) && Number(c.dataset.beds) < Number(beds.value)) ok = false;
+        if (ok && val(baths) && Number(c.dataset.baths) < Number(baths.value)) ok = false;
+        if (ok && val(cars) && Number(c.dataset.cars) < Number(cars.value)) ok = false;
+        if (ok && val(size)) {
+          var sz = size.value.split(':');
+          if (sz[0] === 'land' && !inRange(c.dataset.land, sz[1], false)) ok = false;
+          if (sz[0] === 'build' && !inRange(c.dataset.build, sz[1], true)) ok = false;
+        }
+        if (ok && val(status) && c.dataset.status !== status.value) ok = false;
+        if (ok && feats.length) {
+          var have = (c.dataset.feats || '').split(' ');
+          ok = feats.every(function (f) { return have.indexOf(f) > -1; });
+        }
+        c.style.display = ok ? '' : 'none';
+        if (ok) visible++;
+        var r = c.querySelector('.reveal');
+        if (r) r.classList.add('vis');
+      });
+
+      var sorted = cards.slice().sort(function (a, b) {
+        var d = 0;
+        if (sortVal === 'land') d = Number(b.dataset.land) - Number(a.dataset.land);
+        else if (sortVal === 'beds') d = Number(b.dataset.beds) - Number(a.dataset.beds);
+        else if (sortVal === 'cars') d = Number(b.dataset.cars) - Number(a.dataset.cars);
+        else if (sortVal === 'year') d = Number(b.dataset.year || 0) - Number(a.dataset.year || 0);
+        else if (sortVal === 'name') d = a.dataset.name.localeCompare(b.dataset.name);
+        return d || Number(a.dataset.order) - Number(b.dataset.order);
+      });
+      sorted.forEach(function (c) { grid.appendChild(c); });
+
+      if (empty) empty.style.display = visible === 0 ? '' : 'none';
+      if (count) count.textContent = isDefault
+        ? ''
+        : visible + (visible === 1 ? ' Residence' : ' Residences');
+    }
+
+    selects.concat(sort ? [sort] : []).forEach(function (el) {
+      el.addEventListener('change', apply);
+    });
+    function featLabel() {
+      if (!featSummary) return;
+      var on = chips.filter(function (c) { return c.checked; });
+      featSummary.textContent = on.length === 0 ? featAnyLabel
+        : (on.length === 1 ? on[0].parentNode.textContent.trim() : on.length + ' Features');
+    }
+    chips.forEach(function (chip) {
+      chip.addEventListener('change', function () { featLabel(); apply(); });
+    });
+    /* A dropdown left open over the grid gets in the way. */
+    if (drop) {
+      document.addEventListener('click', function (e) { if (drop.open && !drop.contains(e.target)) drop.open = false; });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && drop.open) { drop.open = false; drop.querySelector('summary').focus(); } });
+    }
+    if (clear) clear.addEventListener('click', function () {
+      selects.forEach(function (el) { el.value = ''; });
+      if (sort) sort.value = 'featured';
+      chips.forEach(function (chip) { chip.checked = false; });
+      featLabel();
+      apply();
+    });
+  }
+  // The toolbar is its own section and may sit anywhere on the page: wire up once everything is in the DOM.
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initGrid); } else { initGrid(); }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "The residences",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The residences on the For Sale page: the featured banner and the grid of cards. Add Residence blocks (⊕ Add block) to hand-pick which residences show and in what order - the first leads as the featured banner; each block can carry its own card photo. With no blocks the grid is automatic: every residence whose Status is live, in the For Sale collection's order. Whether a card reads For Sale, Under Offer or Sold, and its numbers, come from Products › the residence."
+    },
+    {
+      "type": "header",
+      "content": "Featured residence"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_featured",
+      "label": "Lead with the featured residence banner",
+      "default": true,
+      "info": "Off = the first residence sits in the grid with the others."
+    },
+    {
+      "type": "checkbox",
+      "id": "featured_specs",
+      "label": "Bed · bath · garage · land on the banner",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "featured_height",
+      "label": "Banner height, at most",
+      "min": 360,
+      "max": 800,
+      "step": 20,
+      "default": 680,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "The grid"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Cards across",
+      "options": [
+        {
+          "value": "2",
+          "label": "Two"
+        },
+        {
+          "value": "3",
+          "label": "Three (as designed)"
+        },
+        {
+          "value": "4",
+          "label": "Four"
+        }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "select",
+      "id": "card_shape",
+      "label": "Card shape",
+      "options": [
+        {
+          "value": "16/10",
+          "label": "Landscape 16:10"
+        },
+        {
+          "value": "4/3",
+          "label": "Landscape 4:3"
+        },
+        {
+          "value": "3/2",
+          "label": "Landscape 3:2"
+        },
+        {
+          "value": "16/9",
+          "label": "Wide 16:9"
+        },
+        {
+          "value": "1/1",
+          "label": "Square"
+        },
+        {
+          "value": "4/5",
+          "label": "Portrait 4:5"
+        }
+      ],
+      "default": "16/10"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap between cards",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cars",
+      "label": "Garage count on the cards",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_land",
+      "label": "Land size on the cards",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "No-matches text",
+      "default": "Nothing matches those filters. Try widening them."
+    },
+    {
+      "type": "header",
+      "content": "Look"
+    },
+    {
+      "type": "paragraph",
+      "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."
+    },
+    {
+      "type": "select",
+      "id": "look_surface",
+      "label": "Background",
+      "options": [
+        {
+          "value": "design",
+          "label": "As designed"
+        },
+        {
+          "value": "cream",
+          "label": "Cream (the page colour)"
+        },
+        {
+          "value": "stone",
+          "label": "Stone (soft panel)"
+        },
+        {
+          "value": "obsidian",
+          "label": "Obsidian (dark)"
+        },
+        {
+          "value": "custom",
+          "label": "A colour of your own (below)"
+        },
+        {
+          "value": "media",
+          "label": "A photo or film behind it (below)"
+        }
+      ],
+      "default": "design",
+      "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."
+    },
+    {
+      "type": "color",
+      "id": "look_color",
+      "label": "Your colour",
+      "default": "#F0EADE",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_tone",
+      "label": "Words on your colour",
+      "options": [
+        {
+          "value": "light",
+          "label": "Dark words (for a light colour)"
+        },
+        {
+          "value": "dark",
+          "label": "Light words (for a dark colour)"
+        }
+      ],
+      "default": "light",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "Backdrop photo or film",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "A backdrop behind this section's words, used only while Background is a photo or film. It is not the residence film. Real photographs and real footage only, never generated.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "look_image",
+      "label": "Backdrop photo",
+      "info": "Also the poster while a backdrop film loads.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "video",
+      "id": "look_video",
+      "label": "Backdrop film (upload)",
+      "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_media_link",
+      "label": "Use a film link instead of an upload",
+      "default": false,
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "text",
+      "id": "look_video_url",
+      "label": "Backdrop film (URL)",
+      "info": "A direct .mp4 link, used when no backdrop film is uploaded above.",
+      "visible_if": "{{ section.settings.look_surface == 'media' and section.settings.look_media_link }}"
+    },
+    {
+      "type": "range",
+      "id": "look_dim",
+      "label": "Darken the backdrop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 55,
+      "info": "Lower = brighter. The words stay readable down to about 40%.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_focus",
+      "label": "Backdrop crop focus",
+      "options": [
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_media_tone",
+      "label": "Words over the backdrop",
+      "options": [
+        {
+          "value": "dark",
+          "label": "Light words on a darkened backdrop"
+        },
+        {
+          "value": "light",
+          "label": "Dark words on a pale backdrop"
+        }
+      ],
+      "default": "dark",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "header",
+      "content": "Space"
+    },
+    {
+      "type": "range",
+      "id": "look_space_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."
+    },
+    {
+      "type": "range",
+      "id": "look_space_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "look_width",
+      "label": "Content width",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme setting (Layout › Content width)"
+        },
+        {
+          "value": "720",
+          "label": "Narrow (720px)"
+        },
+        {
+          "value": "900",
+          "label": "Reading (900px)"
+        },
+        {
+          "value": "1100",
+          "label": "Medium (1100px)"
+        },
+        {
+          "value": "1300",
+          "label": "Wide (1300px)"
+        },
+        {
+          "value": "1600",
+          "label": "Very wide (1600px)"
+        },
+        {
+          "value": "edge",
+          "label": "Edge to edge"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "look_margins",
+      "label": "Side margins",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "look_heading",
+      "label": "Heading size",
+      "min": 50,
+      "max": 160,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Scales the serif headings and titles in this section."
+    },
+    {
+      "type": "range",
+      "id": "look_text",
+      "label": "Text size",
+      "min": 70,
+      "max": 140,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Paragraphs, captions and standfirsts."
+    },
+    {
+      "type": "range",
+      "id": "look_label",
+      "label": "Small label size",
+      "min": 0,
+      "max": 20,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."
+    },
+    {
+      "type": "header",
+      "content": "Finishing"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_animate",
+      "label": "Fade in as it scrolls into view",
+      "default": true,
+      "info": "Off = the section is simply there, no entrance."
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_top",
+      "label": "Hairline above",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_bottom",
+      "label": "Hairline below",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "look_anchor",
+      "label": "Anchor name",
+      "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "residence",
+      "name": "Residence",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Residence",
+          "info": "A residence from Products. Its numbers, suburb and Status come from the product; the first block leads as the featured banner."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Card photo",
+          "info": "Empty = the residence's main photo. Real photographs only, never generated."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "The residences"
+    }
+  ]
+}
+{% endschema %}

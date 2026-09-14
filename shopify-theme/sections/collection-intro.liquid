@@ -1,0 +1,451 @@
+{%- comment -%}
+  Now selling - the editorial band between the toolbar and the residences.
+
+  Split out of the all-in-one Collection grid section on 14 Sep 2026 so each
+  part of the For Sale page has its own panel in the customizer (Naomi:
+  "have the header its settings, then the Now Selling, then each individual
+  grid has their setting"). Real photographs and real footage only, never
+  generated.
+{%- endcomment -%}
+{%- liquid
+  capture list_csv
+    render 'collection-handles', collection: collection
+  endcapture
+  assign handles = list_csv | split: ','
+  assign count = handles.size
+  assign show_rich = true
+  if collection.handle == 'sold'
+    assign show_rich = false
+  endif
+-%}
+{%- liquid
+  case count
+    when 1
+      assign count_word = 'One'
+    when 2
+      assign count_word = 'Two'
+    when 3
+      assign count_word = 'Three'
+    when 4
+      assign count_word = 'Four'
+    when 5
+      assign count_word = 'Five'
+    when 6
+      assign count_word = 'Six'
+    when 7
+      assign count_word = 'Seven'
+    when 8
+      assign count_word = 'Eight'
+    when 9
+      assign count_word = 'Nine'
+    else
+      assign count_word = count
+  endcase
+  assign live_suburbs = ''
+  for h in handles
+    for p in collections.all.products
+      if p.handle != h
+        continue
+      endif
+      if p.metafields.custom.suburb.value != blank
+        assign live_suburbs = live_suburbs | append: p.metafields.custom.suburb.value | append: '¦'
+      endif
+      break
+    endfor
+  endfor
+  assign suburb_list = live_suburbs | split: '¦' | uniq | sort
+  assign count_token = '{' | append: 'count' | append: '}'
+-%}
+{% render 'section-look', section: section %}
+{%- if show_rich and section.settings.show_intro_band != false -%}
+{%- liquid
+  assign ib_heading = section.settings.intro_band_heading | replace: count_token, count_word
+  if ib_heading == blank
+    if count == 1
+      assign ib_heading = count_word | append: ' residence, <em>inner Brisbane</em>.'
+    else
+      assign ib_heading = count_word | append: ' residences, <em>inner Brisbane</em>.'
+    endif
+  endif
+  assign ib_suburbs = suburb_list | join: ' · '
+-%}
+<section class="mc-intro s-surface">
+  <div class="inner mc-intro-grid">
+    <div>
+      {%- if section.settings.intro_band_label != blank -%}<div class="slabel reveal">{{ section.settings.intro_band_label }}</div>{%- endif -%}
+      <h2 class="mc-intro-h reveal d1">{{ ib_heading }}</h2>
+    </div>
+    <div class="mc-intro-side">
+      {%- if section.settings.intro_band_text != blank -%}<p class="mc-intro-p reveal d2">{{ section.settings.intro_band_text }}</p>{%- endif -%}
+      {%- if section.settings.intro_band_suburbs != false and ib_suburbs != blank -%}<div class="mc-intro-suburbs reveal d3">{{ ib_suburbs }}</div>{%- endif -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+<style>
+  .mc-intro{padding:clamp(56px,7vw,88px) var(--page-pad) clamp(8px,1vw,12px);background:var(--bg)}
+  .mc-intro-grid{display:grid;grid-template-columns:7fr 5fr;gap:32px clamp(32px,6vw,96px);align-items:end}
+  .mc-intro-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:300;line-height:1.05;letter-spacing:-.02em;color:var(--ink);margin:0}
+  .mc-intro-h em{font-style:italic;color:var(--ink)}
+  .mc-intro-p{font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;line-height:var(--lh-body);color:var(--ink3);letter-spacing:.018em;max-width:460px;margin:0}
+  .mc-intro-suburbs{font-size:var(--t-label);font-weight:300;letter-spacing:.22em;text-transform:uppercase;color:var(--taupe-d);margin-top:18px;line-height:2}
+  @media(max-width:900px){
+    .mc-intro-grid{grid-template-columns:1fr;gap:24px;align-items:start}
+    .mc-intro-suburbs{margin-top:14px}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Now selling",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The Now Selling band between the toolbar and the residences: a short editorial line so the page does not open straight onto the grid. {count} in the heading becomes the number of residences listed (Five). Not shown on the Sold page."
+    },
+    {
+      "type": "header",
+      "content": "Show"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_intro_band",
+      "label": "Show the band",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "intro_band_suburbs",
+      "label": "List the suburbs beneath the paragraph",
+      "default": true,
+      "info": "Read from each residence's Suburb, once each."
+    },
+    {
+      "type": "header",
+      "content": "Words"
+    },
+    {
+      "type": "text",
+      "id": "intro_band_label",
+      "label": "Small label",
+      "default": "Now Selling"
+    },
+    {
+      "type": "html",
+      "id": "intro_band_heading",
+      "label": "Heading (HTML)",
+      "info": "Leave empty and the heading counts the residences for you: Five residences, inner Brisbane. Wrap a word in <em> for the italic accent; {count} becomes the number."
+    },
+    {
+      "type": "textarea",
+      "id": "intro_band_text",
+      "label": "Paragraph",
+      "default": "Each residence is drawn, developed and built by the one team. Inspections are by private appointment."
+    },
+    {
+      "type": "header",
+      "content": "Look"
+    },
+    {
+      "type": "paragraph",
+      "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."
+    },
+    {
+      "type": "select",
+      "id": "look_surface",
+      "label": "Background",
+      "options": [
+        {
+          "value": "design",
+          "label": "As designed"
+        },
+        {
+          "value": "cream",
+          "label": "Cream (the page colour)"
+        },
+        {
+          "value": "stone",
+          "label": "Stone (soft panel)"
+        },
+        {
+          "value": "obsidian",
+          "label": "Obsidian (dark)"
+        },
+        {
+          "value": "custom",
+          "label": "A colour of your own (below)"
+        },
+        {
+          "value": "media",
+          "label": "A photo or film behind it (below)"
+        }
+      ],
+      "default": "design",
+      "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."
+    },
+    {
+      "type": "color",
+      "id": "look_color",
+      "label": "Your colour",
+      "default": "#F0EADE",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_tone",
+      "label": "Words on your colour",
+      "options": [
+        {
+          "value": "light",
+          "label": "Dark words (for a light colour)"
+        },
+        {
+          "value": "dark",
+          "label": "Light words (for a dark colour)"
+        }
+      ],
+      "default": "light",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "Backdrop photo or film",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "A backdrop behind this section's words, used only while Background is a photo or film. It is not the residence film. Real photographs and real footage only, never generated.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "look_image",
+      "label": "Backdrop photo",
+      "info": "Also the poster while a backdrop film loads.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "video",
+      "id": "look_video",
+      "label": "Backdrop film (upload)",
+      "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_media_link",
+      "label": "Use a film link instead of an upload",
+      "default": false,
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "text",
+      "id": "look_video_url",
+      "label": "Backdrop film (URL)",
+      "info": "A direct .mp4 link, used when no backdrop film is uploaded above.",
+      "visible_if": "{{ section.settings.look_surface == 'media' and section.settings.look_media_link }}"
+    },
+    {
+      "type": "range",
+      "id": "look_dim",
+      "label": "Darken the backdrop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 55,
+      "info": "Lower = brighter. The words stay readable down to about 40%.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_focus",
+      "label": "Backdrop crop focus",
+      "options": [
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_media_tone",
+      "label": "Words over the backdrop",
+      "options": [
+        {
+          "value": "dark",
+          "label": "Light words on a darkened backdrop"
+        },
+        {
+          "value": "light",
+          "label": "Dark words on a pale backdrop"
+        }
+      ],
+      "default": "dark",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "header",
+      "content": "Space"
+    },
+    {
+      "type": "range",
+      "id": "look_space_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."
+    },
+    {
+      "type": "range",
+      "id": "look_space_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "look_width",
+      "label": "Content width",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme setting (Layout › Content width)"
+        },
+        {
+          "value": "720",
+          "label": "Narrow (720px)"
+        },
+        {
+          "value": "900",
+          "label": "Reading (900px)"
+        },
+        {
+          "value": "1100",
+          "label": "Medium (1100px)"
+        },
+        {
+          "value": "1300",
+          "label": "Wide (1300px)"
+        },
+        {
+          "value": "1600",
+          "label": "Very wide (1600px)"
+        },
+        {
+          "value": "edge",
+          "label": "Edge to edge"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "look_margins",
+      "label": "Side margins",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "look_heading",
+      "label": "Heading size",
+      "min": 50,
+      "max": 160,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Scales the serif headings and titles in this section."
+    },
+    {
+      "type": "range",
+      "id": "look_text",
+      "label": "Text size",
+      "min": 70,
+      "max": 140,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Paragraphs, captions and standfirsts."
+    },
+    {
+      "type": "range",
+      "id": "look_label",
+      "label": "Small label size",
+      "min": 0,
+      "max": 20,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."
+    },
+    {
+      "type": "header",
+      "content": "Finishing"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_animate",
+      "label": "Fade in as it scrolls into view",
+      "default": true,
+      "info": "Off = the section is simply there, no entrance."
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_top",
+      "label": "Hairline above",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_bottom",
+      "label": "Hairline below",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "look_anchor",
+      "label": "Anchor name",
+      "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Now selling"
+    }
+  ]
+}
+{% endschema %}

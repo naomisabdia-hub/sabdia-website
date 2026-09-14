@@ -70,7 +70,20 @@ architecture, layout, interiors, or finishes. No exceptions.**
   has one). `main-property.liquid` is the older all-in-one, hidden from
   ⊕ Add section; `shopify-app/split-property-page.py` then
   `shopify-app/arrange-residence-page.py <theme>` bring any store-side
-  template into this shape (push-live.sh runs both). Every
+  template into this shape (push-live.sh runs both).
+- For Sale page (Shopify, since 14 Sep 2026): its own sections, in page
+  order - Header (`collection-header`), Refine toolbar
+  (`collection-toolbar`), Now selling (`collection-intro`), The residences
+  (`collection-grid`: Residence blocks with a card photo hand-pick the grid,
+  first block = featured banner; no blocks = automatic status-driven list;
+  the filter script lives here), Sold band (`collection-sold`), How it
+  works (`collection-how`), Private inspections (`collection-closing`).
+  Shared snippets `collection-handles` (the list) and `collection-card`
+  (one grid cell). `main-collection.liquid` is the older all-in-one,
+  hidden from ⊕ Add section; `shopify-app/arrange-collection-page.py
+  <theme>` moves the store-side collection template over (push-live.sh
+  runs it). The same template serves /collections/sold: toolbar, Now
+  selling, featured banner, sold band, how strip skip themselves there. Every
   section's Look "backdrop" dials (photo/film behind the words) are named
   Backdrop … and only show when Background = a photo or film; The film
   section has no backdrop dials at all.

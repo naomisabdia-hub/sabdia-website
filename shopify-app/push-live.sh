@@ -39,9 +39,24 @@ python3 shopify-app/split-property-page.py $THEME
 # Settings move with their section; nothing Naomi set is lost.
 echo "== The residence page arranged into its sections"
 python3 shopify-app/arrange-residence-page.py $THEME
+# The For Sale page as its own sections (14 Sep 2026): Header, Refine
+# toolbar, Now selling, The residences (Residence blocks), Sold band, How it
+# works, Private inspections. Moves templates/collection.json off the
+# all-in-one Collection grid section, every setting intact.
+echo "== The For Sale page split into its own sections"
+python3 shopify-app/arrange-collection-page.py $THEME
 # One editable Post block per synced post in The Series (14 Sep 2026), so a
 # tile can be clicked in the editor and its link changed. Adds only what is
 # missing; hand edits survive.
 echo "== Post blocks in The Series"
 python3 shopify-app/add-series-blocks.py $THEME
+# Every card of the home page's Current Residences its own block (14 Sep
+# 2026), so a card can be clicked and its photo or link changed. Adds blocks
+# only where the grid has none; hand edits survive.
+echo "== Residence card blocks in Current Residences"
+python3 shopify-app/add-residence-card-blocks.py $THEME
+# Every photo of each residence Gallery its own Photo block (14 Sep 2026).
+# Adds blocks only where a gallery has none; hand edits survive.
+echo "== Photo blocks in the residence galleries"
+python3 shopify-app/add-gallery-photo-blocks.py $THEME
 echo "Done."

@@ -1,0 +1,45 @@
+{%- comment -%}
+  One cell of the For Sale grid: the card with the data attributes the
+  refine toolbar filters and sorts on. Sold residences get the sold card.
+
+  Params: product, index (1-based position), featured (true hides the
+  first card behind the featured banner), style (aspect-ratio), show_cars,
+  show_land, image (optional photo instead of the residence's main photo),
+  attrs (a block's shopify_attributes, optional)
+{%- endcomment -%}
+{%- liquid
+  assign mfp = product.metafields.custom
+  assign delay = index | minus: 1 | modulo: 3
+  capture pstatus
+    render 'residence-status', product: product
+  endcapture
+  capture pfeats
+    render 'residence-feats', product: product
+  endcapture
+-%}
+<div
+  data-prop-card
+  {% if featured and index == 1 %}data-featured="1" style="display:none"{% endif %}
+  data-suburb="{{ mfp.suburb.value | escape }}"
+  data-cars="{{ mfp.cars.value }}"
+  data-land="{{ mfp.land.value }}"
+  data-build="{{ mfp.build_size.value }}"
+  data-beds="{{ mfp.beds.value }}"
+  data-baths="{{ mfp.baths.value }}"
+  data-status="{{ pstatus | escape }}"
+  data-feats="{{ pfeats }}"
+  data-year="{{ mfp.year.value }}"
+  data-name="{{ product.title | escape }}"
+  data-order="{{ index }}"
+  {{ attrs }}
+>
+  {%- if pstatus contains 'Sold' -%}
+    {% render 'sold-card', product: product, class: 'reveal-wipe', img_w: 800, img_h: 500, show_suburb: true %}
+  {%- elsif delay == 1 -%}
+    {% render 'property-card', product: product, class: 'reveal d1', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image %}
+  {%- elsif delay == 2 -%}
+    {% render 'property-card', product: product, class: 'reveal d2', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image %}
+  {%- else -%}
+    {% render 'property-card', product: product, class: 'reveal', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image %}
+  {%- endif -%}
+</div>

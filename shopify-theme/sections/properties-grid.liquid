@@ -3,6 +3,12 @@
   cards, then a row of remaining live plus sold residences. Which group
   a residence is in comes from its Status (see residence-status); the two
   collections chosen in the customizer set the order.
+
+  Since 14 Sep 2026 every card can be its own block (Residence card: the
+  residence, its photo, where a click goes, the crop), like the photos of
+  the residence Gallery. With blocks, the grid is the blocks in sidebar
+  order; with none it fills itself from Status as before.
+  shopify-app/add-residence-card-blocks.py seeds one block per card.
 {%- endcomment -%}
 {%- comment -%} The residences' own brochure faces, so a card name prints in its house's face. {%- endcomment -%}
 {% render 'residence-faces' %}
@@ -59,36 +65,56 @@
   {%- endif -%}
 
   <div class="inner">
+    {%- if section.blocks.size > 0 -%}
+      {%- comment -%} Every card its own block (Customize › Properties grid › ⊕ Add block › Residence card), in the sidebar's order. A block with no residence chosen is skipped. {%- endcomment -%}
+      {%- liquid
+        assign cards = 0
+        for block in section.blocks
+          if block.settings.residence != blank
+            assign cards = cards | plus: 1
+          endif
+        endfor
+      -%}
+      {%- if pg_layout == 'editorial' -%}
+      <div class="proj-grid proj-grid-main">
+        {%- assign n = 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.settings.residence == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign n = n | plus: 1 -%}
+          {%- if n > 3 -%}{%- break -%}{%- endif -%}
+          {%- assign slots = 'hero,a,b' | split: ',' -%}
+          {%- assign si = n | minus: 1 -%}
+          {% render 'residence-card', product: block.settings.residence, slot: slots[si], s: section.settings, block: block %}
+        {%- endfor -%}
+      </div>
+      {%- endif -%}
+      {%- assign skip = 0 -%}
+      {%- if pg_layout == 'editorial' -%}{%- assign skip = 3 -%}{%- endif -%}
+      {%- if cards > skip -%}
+        <div class="{% if pg_layout == 'two' %}proj-grid-2{% else %}proj-grid-3 proj-grid-flow{% endif %}" style="{% if pg_layout == 'editorial' %}margin-top:var(--proj-gap,10px){% endif %}">
+          {%- assign n = 0 -%}
+          {%- for block in section.blocks -%}
+            {%- if block.settings.residence == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign n = n | plus: 1 -%}
+            {%- if n <= skip -%}{%- continue -%}{%- endif -%}
+            {%- assign di = n | minus: skip | minus: 1 | modulo: 3 -%}
+            {% render 'residence-card', product: block.settings.residence, slot: 'row', di: di, s: section.settings, block: block %}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    {%- else -%}
     {%- if pg_layout == 'editorial' -%}
     <div class="proj-grid proj-grid-main">
       {%- for h in live_handles limit: 3 -%}
         {%- assign i = forloop.index -%}
         {%- for product in collections.all.products -%}
           {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
-          {%- liquid
-            # This residence's own card block, if one was added (Customize › ⊕ Add block › Residence card): its photo, link and crop replace the automatic ones.
-            assign cb = blank
-            assign cb_img = blank
-            for block in section.blocks
-              if block.settings.residence.handle == product.handle
-                assign cb = block
-                break
-              endif
-            endfor
-            if cb != blank
-              assign cb_img = cb.settings.image
-              if cb_img == blank and cb.settings.photo_n > 0
-                assign cb_i = cb.settings.photo_n | minus: 1
-                assign cb_img = product.images[cb_i]
-              endif
-            endif
-          -%}
           {%- if i == 1 -%}
-            {% render 'property-card', product: product, class: 'pc-hero reveal-wipe', img_w: 1400, img_h: 900, show_cars: section.settings.show_cars, show_land: section.settings.show_land, image: cb_img, image_ext: cb.settings.image_ext, url: cb.settings.link, focus: cb.settings.focus, attrs: cb.shopify_attributes %}
+            {% render 'residence-card', product: product, slot: 'hero', s: section.settings %}
           {%- elsif i == 2 -%}
-            {% render 'property-card', product: product, class: 'pc-sm-a reveal-wipe d1', img_w: 900, img_h: 680, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land, image: cb_img, image_ext: cb.settings.image_ext, url: cb.settings.link, focus: cb.settings.focus, attrs: cb.shopify_attributes %}
+            {% render 'residence-card', product: product, slot: 'a', s: section.settings %}
           {%- else -%}
-            {% render 'property-card', product: product, class: 'pc-sm-b reveal-wipe d2', img_w: 900, img_h: 680, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land, image: cb_img, image_ext: cb.settings.image_ext, url: cb.settings.link, focus: cb.settings.focus, attrs: cb.shopify_attributes %}
+            {% render 'residence-card', product: product, slot: 'b', s: section.settings %}
           {%- endif -%}
           {%- break -%}
         {%- endfor -%}
@@ -98,40 +124,16 @@
 
     {%- if rest_handles.size > 0 and rest_limit > 0 -%}
       <div class="{% if pg_layout == 'two' %}proj-grid-2{% else %}proj-grid-3 proj-grid-flow{% endif %}" style="{% if pg_layout == 'editorial' %}margin-top:var(--proj-gap,10px){% endif %}">
-        {%- assign delays = ',d1,d2' | split: ',' -%}
         {%- for h in rest_handles limit: rest_limit -%}
           {%- assign di = forloop.index0 | modulo: 3 -%}
-          {%- assign card_class = 'pc-row reveal-wipe ' | append: delays[di] -%}
           {%- for product in collections.all.products -%}
             {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
-            {%- liquid
-              # This residence's own card block, if one was added (Customize › ⊕ Add block › Residence card): its photo, link and crop replace the automatic ones.
-              assign cb = blank
-              assign cb_img = blank
-              for block in section.blocks
-                if block.settings.residence.handle == product.handle
-                  assign cb = block
-                  break
-                endif
-              endfor
-              if cb != blank
-                assign cb_img = cb.settings.image
-                if cb_img == blank and cb.settings.photo_n > 0
-                  assign cb_i = cb.settings.photo_n | minus: 1
-                  assign cb_img = product.images[cb_i]
-                endif
-              endif
-            -%}
-            {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
-            {%- if pstatus contains 'Sold' -%}
-              {% render 'sold-card', product: product, class: card_class, img_w: 900, img_h: 560, show_suburb: section.settings.sold_suburb, image: cb_img, image_ext: cb.settings.image_ext, url: cb.settings.link, focus: cb.settings.focus, attrs: cb.shopify_attributes %}
-            {%- else -%}
-              {% render 'property-card', product: product, class: card_class, img_w: 900, img_h: 560, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land, image: cb_img, image_ext: cb.settings.image_ext, url: cb.settings.link, focus: cb.settings.focus, attrs: cb.shopify_attributes %}
-            {%- endif -%}
+            {% render 'residence-card', product: product, slot: 'row', di: di, s: section.settings %}
             {%- break -%}
           {%- endfor -%}
         {%- endfor -%}
       </div>
+    {%- endif -%}
     {%- endif -%}
   </div>
 </section>
@@ -145,15 +147,15 @@
     { "type": "text", "id": "cta_label", "label": "Button label", "default": "View All" },
     { "type": "text", "id": "cta_link", "label": "Button link", "default": "/collections/for-sale" },
     { "type": "header", "content": "Which residences" },
-    { "type": "paragraph", "content": "For Sale or Sold is NOT chosen here. It is each residence's Status field: Products › the residence › Status (near the bottom) › Save. Every page follows it. The first three live residences fill the large layout; the rest flow in rows of three, live first, then sold." },
+    { "type": "paragraph", "content": "For Sale or Sold is NOT chosen here. It is each residence's Status field: Products › the residence › Status (near the bottom) › Save. Every page follows it, and a card in the rows turns into a sold card by itself. The first three cards fill the large layout; the rest flow in rows of three. The settings below only matter while the grid has no card blocks." },
     { "type": "range", "id": "max_cards", "label": "Most residences to show", "min": 3, "max": 30, "step": 1, "default": 12, "info": "Past this number the button above leads to the full list." },
     { "type": "header", "content": "Order" },
     { "type": "paragraph", "content": "These two pickers only set the drag order (Products › Collections › the collection › sort Manually). They never move a house between For Sale and Sold." },
     { "type": "product", "id": "exclude", "label": "Leave out", "info": "The residence the Featured residence band already shows, so it is not the first card as well." },
     { "type": "collection", "id": "for_sale_collection", "label": "Order of For Sale cards" },
     { "type": "collection", "id": "sold_collection", "label": "Order of Sold cards" },
-    { "type": "header", "content": "A card's own photo and link" },
-    { "type": "paragraph", "content": "Every card is automatic: the residence's main photo (Products › the residence › Media, first photo) and a click opens its page. To change one card, ⊕ Add block › Residence card, pick the residence, then set its photo, where it sends clicks, or the crop. A block never adds a residence to the grid - Status does that - so a block for a house not shown here does nothing." },
+    { "type": "header", "content": "The cards" },
+    { "type": "paragraph", "content": "Each card is a block: click a card, or ⊕ Add block › Residence card, to choose the residence, its photo, where a click goes and the crop. Drag the blocks to reorder. With no blocks at all, the grid fills itself: the residences for sale (Status), then the sold ones, main photo and own page each." },
     {"type": "header", "content": "Show"},
     {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
     {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
@@ -202,15 +204,12 @@
       "type": "card",
       "name": "Residence card",
       "settings": [
-        { "type": "product", "id": "residence", "label": "Residence", "info": "The card this block edits. The residence still has to be in the grid (its Status decides that)." },
-        { "type": "range", "id": "photo_n", "label": "Photo from the residence", "min": 0, "max": 40, "step": 1, "default": 0, "info": "Counts the residence's photos in order (Products › the residence › Media): 1 is the main photo, 2 the next, and so on. 0 = the main photo. A number past the last photo falls back to the main photo." },
-        { "type": "image_picker", "id": "image", "label": "Or a photo of your own", "info": "Wins over the number above. Real photographs and renders only, never generated." },
-        { "type": "text", "id": "image_ext", "label": "Photo (URL)", "info": "An image address, used only when nothing is set above." },
+        { "type": "product", "id": "residence", "label": "Residence" },
+        { "type": "image_picker", "id": "image", "label": "Photo", "info": "Empty = the residence's main photo (Products › the residence › Media, first photo). Its other photos are in the picker's library. Real photographs and renders only, never generated." },
         { "type": "url", "id": "link", "label": "Send clicks to", "info": "Empty = the residence's own page." },
         { "type": "select", "id": "focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center" }
       ]
     }
-  ],
-  "presets": [{ "name": "Properties grid" }]
+  ]
 }
 {% endschema %}

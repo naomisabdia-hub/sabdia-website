@@ -1,0 +1,468 @@
+{%- comment -%}
+  Header - the top of the For Sale page: the photographic (or filmed) hero
+  with the label, heading and intro line.
+
+  Split out of the all-in-one Collection grid section on 14 Sep 2026 so each
+  part of the For Sale page has its own panel in the customizer (Naomi:
+  "have the header its settings, then the Now Selling, then each individual
+  grid has their setting"). Real photographs and real footage only, never
+  generated.
+{%- endcomment -%}
+{%- liquid
+  capture list_csv
+    render 'collection-handles', collection: collection
+  endcapture
+  assign handles = list_csv | split: ','
+  assign count = handles.size
+  assign show_rich = true
+  if collection.handle == 'sold'
+    assign show_rich = false
+  endif
+-%}
+{%- liquid
+  case count
+    when 1
+      assign count_word = 'One'
+    when 2
+      assign count_word = 'Two'
+    when 3
+      assign count_word = 'Three'
+    when 4
+      assign count_word = 'Four'
+    when 5
+      assign count_word = 'Five'
+    when 6
+      assign count_word = 'Six'
+    when 7
+      assign count_word = 'Seven'
+    when 8
+      assign count_word = 'Eight'
+    when 9
+      assign count_word = 'Nine'
+    else
+      assign count_word = count
+  endcase
+  assign count_token = '{' | append: 'count' | append: '}'
+  assign intro = section.settings.intro_template | replace: count_token, count_word
+  if count == 1
+    assign intro = intro | replace: ' residences ', ' residence ' | replace: ' homes ', ' home ' | replace: ', each ', ', '
+  endif
+  assign featured = false
+  assign first_handle = handles.first
+  for p in collections.all.products
+    if p.handle == first_handle
+      assign featured = p
+      break
+    endif
+  endfor
+
+  # Hero film (uploaded or URL) beats the hero photo. With neither chosen the
+  # hero shows a different residence from the featured banner underneath
+  # (the second in the order; else the featured home's second photo), so the
+  # page never opens on the same house twice.
+  assign hero_video = section.settings.hero_video_url
+  if section.settings.hero_video
+    assign hmp4 = section.settings.hero_video.sources | where: 'format', 'mp4' | first
+    if hmp4
+      assign hero_video = hmp4.url
+    endif
+  endif
+  assign hero_auto = false
+  assign use_chosen = true
+  if section.settings.hero_source == 'auto'
+    assign use_chosen = false
+  endif
+  if section.settings.image == blank and section.settings.image_ext == blank
+    assign use_chosen = false
+  endif
+  if use_chosen == false and featured
+    assign second_handle = handles[1]
+    for p in collections.all.products
+      if p.handle == second_handle and p.featured_image
+        assign hero_auto = p.featured_image
+        break
+      endif
+    endfor
+    if hero_auto == false
+      if featured.images.size > 1
+        assign hero_auto = featured.images[1]
+      else
+        assign hero_auto = featured.featured_image
+      endif
+    endif
+  endif
+-%}
+
+{% render 'section-look', section: section, mode: 'hero' %}
+{%- liquid
+  case section.settings.hero_height
+    when 'short'
+      assign mc_h = '44vh'
+      assign mc_hm = '40vh'
+    when 'tall'
+      assign mc_h = '78vh'
+      assign mc_hm = '60vh'
+    when 'full'
+      assign mc_h = '100vh'
+      assign mc_hm = '100svh'
+    else
+      assign mc_h = 'max(460px,60vh)'
+      assign mc_hm = 'max(340px,50vh)'
+  endcase
+  assign mc_dim = section.settings.hero_dim | default: 52 | divided_by: 100.0
+  assign mc_featured = section.settings.show_featured
+  assign mc_style = 'aspect-ratio:' | append: section.settings.card_shape | default: '16/10'
+-%}
+<section class="page-hero ph-sized ph-pos-{{ section.settings.hero_words | default: 'base-left' }} ph-scrim-{{ section.settings.hero_scrim | default: 'corner' }}" style="--ph-h:{{ mc_h }};--ph-hm:{{ mc_hm }};--ph-dim:{{ mc_dim }}">
+  {%- if hero_video != blank -%}
+    <video class="page-hero-video" src="{{ hero_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if section.settings.image %} poster="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}"{% endif %}></video>
+  {%- elsif use_chosen and section.settings.image -%}
+    <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
+  {%- elsif use_chosen and section.settings.image_ext != blank -%}
+    <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}" alt="" loading="eager" width="1920" height="1080">
+  {%- elsif hero_auto -%}
+    <img src="{{ hero_auto | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
+  {%- endif -%}
+  <div class="page-hero-ov"></div>
+  <div class="page-hero-content inner">
+    {%- liquid
+      # The Sold collection is served by these same settings, so its hero takes the
+      # collection's own words rather than the For Sale label and heading.
+      assign hero_label = section.settings.label | default: collection.title
+      assign hero_heading = section.settings.heading_html | default: collection.title
+      unless show_rich
+        assign hero_label = collection.title
+        assign hero_heading = collection.title
+      endunless
+    -%}
+    {%- if section.settings.show_label -%}<div class="slabel slabel-dark">{{ hero_label }}</div>{%- endif -%}
+    <h1 class="page-h">{{ hero_heading }}</h1>
+    {%- if section.settings.show_intro -%}<p class="page-hero-sub">{{ intro }}</p>{%- endif -%}
+  </div>
+</section>
+<style>
+  .page-hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(calc(1 - var(--ph-dim,.52) * .5)) saturate(.95)}
+  .page-hero.ph-sized{min-height:max(380px,var(--ph-h,60vh))}
+  @media(prefers-reduced-motion:reduce){.page-hero-video{display:none}}
+</style>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The top of the For Sale page: the big photo or film and the words on it. {count} in the intro line becomes the number of residences listed (Five). On the Sold page the label and heading read the collection's own name."
+    },
+    {
+      "type": "header",
+      "content": "Header media"
+    },
+    {
+      "type": "select",
+      "id": "hero_source",
+      "label": "Hero photo",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Automatic - a different residence"
+        },
+        {
+          "value": "chosen",
+          "label": "The photo chosen below"
+        }
+      ],
+      "default": "chosen",
+      "info": "Automatic since 10 Sep 2026 (Tamsin): the page opened on the same house twice. Switch back to use your own photo."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "image_ext",
+      "label": "Current photo (URL)",
+      "info": "Leave the photo and this field empty and the hero shows a different residence from the featured banner below it, so the page never opens on the same house twice."
+    },
+    {
+      "type": "video",
+      "id": "hero_video",
+      "label": "Hero film (upload)",
+      "info": "A mash-up of the residences, playing silently on a loop behind the title. Beats the photo when set."
+    },
+    {
+      "type": "text",
+      "id": "hero_video_url",
+      "label": "Current hero film (URL)",
+      "info": "A direct .mp4 link, used when no film is uploaded above."
+    },
+    {
+      "type": "range",
+      "id": "hero_dim",
+      "label": "Darken the hero photo or film",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 52,
+      "unit": "%",
+      "info": "Lower = brighter."
+    },
+    {
+      "type": "select",
+      "id": "hero_height",
+      "label": "Hero height",
+      "options": [
+        {
+          "value": "short",
+          "label": "Short"
+        },
+        {
+          "value": "standard",
+          "label": "Standard (as designed)"
+        },
+        {
+          "value": "tall",
+          "label": "Tall"
+        },
+        {
+          "value": "full",
+          "label": "Full screen"
+        }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "select",
+      "id": "hero_scrim",
+      "label": "Veil",
+      "options": [
+        {
+          "value": "corner",
+          "label": "Weighted to the words (as designed)"
+        },
+        {
+          "value": "base",
+          "label": "Fades up from the base"
+        },
+        {
+          "value": "even",
+          "label": "Even veil"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "corner"
+    },
+    {
+      "type": "select",
+      "id": "hero_words",
+      "label": "Where the words sit",
+      "options": [
+        {
+          "value": "base-left",
+          "label": "Base, left (as designed)"
+        },
+        {
+          "value": "base-centre",
+          "label": "Base, centred"
+        },
+        {
+          "value": "centre",
+          "label": "Centre of the photo"
+        }
+      ],
+      "default": "base-left"
+    },
+    {
+      "type": "header",
+      "content": "Words on the header"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_label",
+      "label": "Show the small label",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Small label",
+      "default": "For Sale"
+    },
+    {
+      "type": "html",
+      "id": "heading_html",
+      "label": "Heading (HTML)",
+      "default": "<em>Current</em><br>Properties."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_intro",
+      "label": "Show the intro line",
+      "default": true
+    },
+    {
+      "type": "textarea",
+      "id": "intro_template",
+      "label": "Intro line",
+      "info": "{count} becomes the number of residences",
+      "default": "{count} homes in inner Brisbane, each designed and built by Sabdia."
+    },
+    {
+      "type": "header",
+      "content": "Look"
+    },
+    {
+      "type": "paragraph",
+      "content": "Space, type and finishing for this section. Leave everything as designed and nothing changes; every dial is undoable."
+    },
+    {
+      "type": "header",
+      "content": "Space"
+    },
+    {
+      "type": "range",
+      "id": "look_space_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."
+    },
+    {
+      "type": "range",
+      "id": "look_space_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "look_width",
+      "label": "Content width",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme setting (Layout › Content width)"
+        },
+        {
+          "value": "720",
+          "label": "Narrow (720px)"
+        },
+        {
+          "value": "900",
+          "label": "Reading (900px)"
+        },
+        {
+          "value": "1100",
+          "label": "Medium (1100px)"
+        },
+        {
+          "value": "1300",
+          "label": "Wide (1300px)"
+        },
+        {
+          "value": "1600",
+          "label": "Very wide (1600px)"
+        },
+        {
+          "value": "edge",
+          "label": "Edge to edge"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "look_margins",
+      "label": "Side margins",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "look_heading",
+      "label": "Heading size",
+      "min": 50,
+      "max": 160,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Scales the serif headings and titles in this section."
+    },
+    {
+      "type": "range",
+      "id": "look_text",
+      "label": "Text size",
+      "min": 70,
+      "max": 140,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Paragraphs, captions and standfirsts."
+    },
+    {
+      "type": "range",
+      "id": "look_label",
+      "label": "Small label size",
+      "min": 0,
+      "max": 20,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."
+    },
+    {
+      "type": "header",
+      "content": "Finishing"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_animate",
+      "label": "Fade in as it scrolls into view",
+      "default": true,
+      "info": "Off = the section is simply there, no entrance."
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_top",
+      "label": "Hairline above",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_bottom",
+      "label": "Hairline below",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "look_anchor",
+      "label": "Anchor name",
+      "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header"
+    }
+  ]
+}
+{% endschema %}

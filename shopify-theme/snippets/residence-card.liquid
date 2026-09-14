@@ -1,0 +1,43 @@
+{%- comment -%}
+  One card of the Properties grid (home page Current Residences). Picks the
+  live card (property-card) or the sold card (sold-card) from the
+  residence's Status, and passes through a Residence card block's own
+  photo, link, crop and editor attributes when the grid is built from
+  blocks (every card its own block, like the residence Gallery).
+
+  Params: product, slot ('hero' | 'a' | 'b' | 'row'), di (0-2, row delay),
+          s (section.settings), block (optional)
+{%- endcomment -%}
+{%- liquid
+  assign delays = ',d1,d2' | split: ','
+  case slot
+    when 'hero'
+      assign cls = 'pc-hero reveal-wipe'
+      assign w = 1400
+      assign h = 900
+      assign cars = s.show_cars
+    when 'a'
+      assign cls = 'pc-sm-a reveal-wipe d1'
+      assign w = 900
+      assign h = 680
+      assign cars = s.show_cars_small
+    when 'b'
+      assign cls = 'pc-sm-b reveal-wipe d2'
+      assign w = 900
+      assign h = 680
+      assign cars = s.show_cars_small
+    else
+      assign cls = 'pc-row reveal-wipe ' | append: delays[di]
+      assign w = 900
+      assign h = 560
+      assign cars = s.show_cars_small
+  endcase
+  capture pstatus
+    render 'residence-status', product: product
+  endcapture
+-%}
+{%- if pstatus contains 'Sold' and slot == 'row' -%}
+  {% render 'sold-card', product: product, class: cls, img_w: w, img_h: h, show_suburb: s.sold_suburb, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, attrs: block.shopify_attributes %}
+{%- else -%}
+  {% render 'property-card', product: product, class: cls, img_w: w, img_h: h, show_cars: cars, show_land: s.show_land, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, attrs: block.shopify_attributes %}
+{%- endif -%}

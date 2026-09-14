@@ -1,0 +1,819 @@
+{%- comment -%}
+  Refine toolbar - the filter and sort menus under the For Sale header.
+  Filters read each residence's metafields (suburb, cars, land, build_size,
+  beds, baths, status, year and the normalised feature tokens from
+  residence-feats); the grid they act on is The residences section.
+
+  Split out of the all-in-one Collection grid section on 14 Sep 2026 so each
+  part of the For Sale page has its own panel in the customizer (Naomi:
+  "have the header its settings, then the Now Selling, then each individual
+  grid has their setting"). Real photographs and real footage only, never
+  generated.
+{%- endcomment -%}
+{%- liquid
+  capture list_csv
+    render 'collection-handles', collection: collection
+  endcapture
+  assign handles = list_csv | split: ','
+  assign count = handles.size
+  assign show_rich = true
+  if collection.handle == 'sold'
+    assign show_rich = false
+  endif
+-%}
+{%- liquid
+  assign has_build = false
+  for p in collections.all.products
+    if p.metafields.custom.build_size.value != blank
+      assign has_build = true
+      break
+    endif
+  endfor
+  # A filter is only offered when it can change the list: two or more
+  # distinct values (Naomi, 13 Sep 2026: "so many and conflicting"; every
+  # home has five bedrooms, so Bedrooms and Bathrooms drop out on their own).
+  # One pass over the listed residences: the suburbs, the largest bed and
+  # bath counts, the statuses and feature tokens present (so the toolbar
+  # only offers choices that match something), whether any has a year, and
+  # every distinct brochure face to load.
+  assign live_suburbs = ''
+  assign max_beds = 0
+  assign max_baths = 0
+  # Every distinct count in use, so a step is only offered when a residence
+  # has it (Naomi, 11 Sep 2026: every home has five bedrooms, so "4+" was
+  # offering a choice nothing could answer).
+  assign bed_vals = ''
+  assign bath_vals = ''
+  assign car_vals = ''
+  assign land_vals = ''
+  assign statuses = ''
+  assign feats_all = ''
+  assign has_year = false
+  assign gfonts = ''
+  assign ffiles = ''
+  for h in handles
+    for p in collections.all.products
+      if p.handle != h
+        continue
+      endif
+      assign pm = p.metafields.custom
+      if pm.suburb.value != blank
+        assign live_suburbs = live_suburbs | append: pm.suburb.value | append: '¦'
+      endif
+      assign pb = pm.beds.value | plus: 0
+      if pb > max_beds
+        assign max_beds = pb
+      endif
+      if pb > 0
+        assign bed_vals = bed_vals | append: pb | append: '¦'
+      endif
+      assign pba = pm.baths.value | plus: 0
+      if pba > max_baths
+        assign max_baths = pba
+      endif
+      if pba > 0
+        assign bath_vals = bath_vals | append: pba | append: '¦'
+      endif
+      assign pc = pm.cars.value | plus: 0
+      if pc > 0
+        assign car_vals = car_vals | append: pc | append: '¦'
+      endif
+      assign pl = pm.land.value | plus: 0
+      if pl > 0
+        assign land_vals = land_vals | append: pl | append: '¦'
+      endif
+      capture pst
+        render 'residence-status', product: p
+      endcapture
+      assign statuses = statuses | append: pst | append: '¦'
+      capture pft
+        render 'residence-feats', product: p
+      endcapture
+      assign feats_all = feats_all | append: ' ' | append: pft
+      if pm.year.value != blank
+        assign has_year = true
+      endif
+      assign pf = pm.name_font.value | strip
+      assign pff = pm.name_font_file.value | strip
+      assign pfw = pm.name_font_weight.value | default: 400
+      if pff != blank
+        assign pfam = pf
+        if pfam == blank
+          assign pfam = 'ResidenceFace-' | append: p.handle
+        endif
+        assign ffiles = ffiles | append: pfam | append: '¦' | append: pff | append: '¦' | append: pfw | append: '||'
+      elsif pf != blank
+        assign gfonts = gfonts | append: pf | append: ':wght@' | append: pfw | append: '||'
+      endif
+      break
+    endfor
+  endfor
+  assign suburb_list = live_suburbs | split: '¦' | uniq | sort
+  assign status_list = statuses | split: '¦' | uniq
+  assign bed_list = bed_vals | split: '¦' | uniq | sort_natural
+  assign bath_list = bath_vals | split: '¦' | uniq | sort_natural
+  assign car_list = car_vals | split: '¦' | uniq | sort_natural
+  assign land_nums = land_vals | split: '¦'
+  assign land_small = false
+  assign land_mid = false
+  assign land_big = false
+  for lv in land_nums
+    assign lvn = lv | plus: 0
+    if lvn < 600
+      assign land_small = true
+    elsif lvn < 800
+      assign land_mid = true
+    else
+      assign land_big = true
+    endif
+  endfor
+  assign land_brackets = 0
+  if land_small
+    assign land_brackets = land_brackets | plus: 1
+  endif
+  if land_mid
+    assign land_brackets = land_brackets | plus: 1
+  endif
+  if land_big
+    assign land_brackets = land_brackets | plus: 1
+  endif
+  assign gfont_list = gfonts | split: '||' | uniq
+  assign ffile_list = ffiles | split: '||' | uniq
+-%}
+
+{%- if show_rich and section.settings.show_toolbar -%}
+<div class="prop-toolbar">
+  <div class="prop-toolbar-inner">
+    <span class="ptool-l">{{ section.settings.refine_label }}</span>
+    {%- if section.settings.show_filter_suburb != false -%}
+    <select class="ptool-sel" id="fSuburb" aria-label="Filter by suburb">
+      <option value="">{{ section.settings.all_suburbs }}</option>
+      {%- for s in suburb_list -%}
+        {%- assign st = s | strip -%}
+        {%- if st != blank -%}<option value="{{ st | escape }}">{{ st }}</option>{%- endif -%}
+      {%- endfor -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_beds != false and bed_list.size > 1 -%}
+    <select class="ptool-sel" id="fBeds" aria-label="Minimum bedrooms">
+      <option value="">{{ section.settings.filter_any_beds | default: "Any Bedrooms" }}</option>
+      {%- for v in bed_list -%}<option value="{{ v }}">{{ v }}+ Bed</option>{%- endfor -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_baths != false and bath_list.size > 1 -%}
+    <select class="ptool-sel" id="fBaths" aria-label="Minimum bathrooms">
+      <option value="">{{ section.settings.filter_any_baths | default: "Any Bathrooms" }}</option>
+      {%- for v in bath_list -%}<option value="{{ v }}">{{ v }}+ Bath</option>{%- endfor -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_garage != false and car_list.size > 1 -%}
+    <select class="ptool-sel" id="fCars" aria-label="Minimum garage spaces">
+      <option value="">{{ section.settings.filter_any_garage | default: "Any Garage" }}</option>
+      {%- for v in car_list -%}<option value="{{ v }}">{{ v }}+ Cars</option>{%- endfor -%}
+    </select>
+    {%- endif -%}
+    {%- comment -%} One Size control (Naomi, 14 Sep 2026): land brackets, and floor-area
+        brackets when any residence carries a build size. {%- endcomment -%}
+    {%- assign size_land = false -%}{%- if section.settings.show_filter_land != false and land_brackets > 1 -%}{%- assign size_land = true -%}{%- endif -%}
+    {%- assign size_build = false -%}{%- if section.settings.show_filter_build != false and has_build -%}{%- assign size_build = true -%}{%- endif -%}
+    {%- if size_land or size_build -%}
+    <select class="ptool-sel" id="fSize" aria-label="Size">
+      <option value="">{{ section.settings.filter_any_land | default: "Any Size" }}</option>
+      {%- if size_land -%}
+      <optgroup label="Land">
+        {%- if land_small -%}<option value="land:0-600">Land under 600m&sup2;</option>{%- endif -%}
+        {%- if land_mid -%}<option value="land:600-800">Land 600&ndash;800m&sup2;</option>{%- endif -%}
+        {%- if land_big -%}<option value="land:800-">Land 800m&sup2; and over</option>{%- endif -%}
+      </optgroup>
+      {%- endif -%}
+      {%- if size_build -%}
+      <optgroup label="Floor area">
+        <option value="build:0-450">Floor area under 450m&sup2;</option>
+        <option value="build:450-600">Floor area 450&ndash;600m&sup2;</option>
+        <option value="build:600-">Floor area 600m&sup2; and over</option>
+      </optgroup>
+      {%- endif -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_filter_status != false and status_list.size > 1 -%}
+    <select class="ptool-sel" id="fStatus" aria-label="Status">
+      <option value="">{{ section.settings.filter_any_status | default: "Any Status" }}</option>
+      {%- for s in status_list -%}
+        {%- assign st = s | strip -%}
+        {%- if st == blank -%}{%- continue -%}{%- endif -%}
+        <option value="{{ st | escape }}">{% if st == 'For Sale' and settings.label_for_sale != blank %}{{ settings.label_for_sale }}{% else %}{{ st }}{% endif %}</option>
+      {%- endfor -%}
+    </select>
+    {%- endif -%}
+    {%- if section.settings.show_sort != false -%}
+    <select class="ptool-sel" id="fSort" aria-label="Sort properties">
+      <option value="featured">{{ section.settings.sort_featured_label | default: "Sort - Featured" }}</option>
+      <option value="land">{{ section.settings.filter_land_label | default: "Land size, largest first" }}</option>
+      <option value="beds">{{ section.settings.sort_beds_label | default: "Bedrooms, most first" }}</option>
+      <option value="cars">{{ section.settings.filter_garage_label | default: "Garage, most first" }}</option>
+      {%- if has_year -%}<option value="year">{{ section.settings.sort_newest_label | default: "Newest first" }}</option>{%- endif -%}
+      <option value="name">{{ section.settings.sort_name_label | default: "Name A–Z" }}</option>
+    </select>
+    {%- endif -%}
+    <div class="ptool-end">
+      <button type="button" class="ptool-clear" id="fClear" hidden>{{ section.settings.clear_label | default: "Clear filters" }}</button>
+      <span class="ptool-count" id="fCount"></span>
+    </div>
+    {%- comment -%} Features read as a dropdown like the rest of the toolbar, with a
+        box beside each one so several can be chosen (Naomi, 11 Sep 2026). {%- endcomment -%}
+    {%- if section.settings.show_filter_features != false and feats_all != blank -%}
+    <details class="ptool-drop" data-feat-drop>
+      <summary class="ptool-sel ptool-sel-drop" aria-label="{{ section.settings.features_label | default: 'Features' | escape }}">
+        <span data-feat-summary>{{ section.settings.filter_any_features | default: "Any Features" }}</span>
+      </summary>
+      <div class="ptool-menu" role="group" aria-label="{{ section.settings.features_label | default: 'Features' | escape }}">
+        {%- if feats_all contains 'pool' -%}<label class="ptool-opt"><input type="checkbox" data-feat="pool"><span>{{ section.settings.chip_pool | default: "Pool" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'views' -%}<label class="ptool-opt"><input type="checkbox" data-feat="views"><span>{{ section.settings.chip_views | default: "City Views" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'lift' -%}<label class="ptool-opt"><input type="checkbox" data-feat="lift"><span>{{ section.settings.chip_lift | default: "Lift" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'cinema' -%}<label class="ptool-opt"><input type="checkbox" data-feat="cinema"><span>{{ section.settings.chip_cinema | default: "Cinema" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'gym' -%}<label class="ptool-opt"><input type="checkbox" data-feat="gym"><span>{{ section.settings.chip_gym | default: "Gym" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'cellar' -%}<label class="ptool-opt"><input type="checkbox" data-feat="cellar"><span>{{ section.settings.chip_cellar | default: "Cellar" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'study' -%}<label class="ptool-opt"><input type="checkbox" data-feat="study"><span>{{ section.settings.chip_study | default: "Study" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'solar' -%}<label class="ptool-opt"><input type="checkbox" data-feat="solar"><span>{{ section.settings.chip_solar | default: "Solar and Battery" }}</span></label>{%- endif -%}
+        {%- if feats_all contains 'butler' -%}<label class="ptool-opt"><input type="checkbox" data-feat="butler"><span>{{ section.settings.chip_butler | default: "Butler's Pantry" }}</span></label>{%- endif -%}
+      </div>
+    </details>
+    {%- endif -%}
+  </div>
+</div>
+{%- endif -%}
+<style>
+  .prop-toolbar{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:18px var(--page-pad);background:var(--bg2);border-bottom:1px solid var(--border)}
+  .prop-toolbar-inner{display:flex;gap:14px 28px;align-items:center;flex-wrap:wrap;max-width:var(--page-max);margin:0 auto;width:100%}
+  .ptool-l{font-size:10px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)}
+  .ptool-sel{font-family:var(--font-u);font-size:10.5px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;border:none;border-bottom:1px solid var(--border);padding:4px 22px 4px 0;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23A8874A'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center}
+  .ptool-sel:focus{outline:none;border-bottom-color:var(--gold)}
+  .ptool-end{margin-left:auto;display:flex;align-items:center;gap:20px}
+  .ptool-count{font-size:10px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--taupe-d)}
+  .ptool-clear{font-family:var(--font-u);font-size:10px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:none;border:0;border-bottom:1px solid var(--gold);padding:0 0 2px;cursor:pointer;transition:color .3s,border-color .3s}
+  .ptool-clear:hover{color:var(--ink);border-bottom-color:var(--ink)}
+  .ptool-clear[hidden]{display:none}
+  .ptool-drop{position:relative}
+  .ptool-drop summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .ptool-drop summary::-webkit-details-marker{display:none}
+  .ptool-drop summary::after{content:'';width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--gold);flex-shrink:0}
+  .ptool-drop[open] summary::after{transform:rotate(180deg)}
+  .ptool-drop summary:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
+  .ptool-menu{position:absolute;top:calc(100% + 10px);left:0;z-index:30;min-width:232px;max-height:62vh;overflow-y:auto;background:var(--bg);border:1px solid var(--border);box-shadow:0 20px 44px -20px rgba(var(--dark-rgb),.35);padding:6px 0}
+  .ptool-opt{display:flex;align-items:center;gap:11px;padding:9px 16px;cursor:pointer;font-family:var(--font-u);font-size:11px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+  .ptool-opt:hover{background:var(--bg2);color:var(--ink)}
+  .ptool-opt input{width:13px;height:13px;accent-color:var(--gold);flex-shrink:0;margin:0}
+  @media(max-width:900px){
+    .prop-toolbar{padding:16px var(--page-pad)}
+    .prop-toolbar-inner{gap:14px 20px}
+    .ptool-end{margin-left:auto}
+    .ptool-menu{left:auto;right:0}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Refine toolbar",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The refine and sort toolbar under the header. Each filter only offers what the residences for sale actually have: bedroom and bathroom steps stop at the largest count listed, a filter with one answer stays hidden, and Features lists only the features some residence has. Filtering happens on The residences grid below. Not shown on the Sold page."
+    },
+    {
+      "type": "header",
+      "content": "Show"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_toolbar",
+      "label": "Show the refine and sort toolbar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_suburb",
+      "label": "Show the Suburb filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_beds",
+      "label": "Show the Bedrooms filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_baths",
+      "label": "Show the Bathrooms filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_garage",
+      "label": "Show the Garage filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_land",
+      "label": "Show the Land size filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_build",
+      "label": "Show the Build size filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_status",
+      "label": "Show the Status filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_features",
+      "label": "Show the Features filter",
+      "default": true,
+      "info": "A dropdown with a box beside each feature. Tick more than one and a residence must have them all. Only features a residence actually has are listed."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show the Sort menu",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Wording"
+    },
+    {
+      "type": "text",
+      "id": "refine_label",
+      "label": "Toolbar label",
+      "default": "Refine:"
+    },
+    {
+      "type": "text",
+      "id": "all_suburbs",
+      "label": "All-suburbs option",
+      "default": "All Suburbs"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_beds",
+      "label": "Bedrooms: any",
+      "default": "Any Bedrooms"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_baths",
+      "label": "Bathrooms: any",
+      "default": "Any Bathrooms"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_garage",
+      "label": "Garage: any",
+      "default": "Any Garage"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_land",
+      "label": "Land: any",
+      "default": "Any Land Size"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_build",
+      "label": "Build size: any",
+      "default": "Any Build Size",
+      "info": "The Build size filter appears once at least one residence has a Build size (m²) in its Metafields."
+    },
+    {
+      "type": "text",
+      "id": "filter_any_status",
+      "label": "Status: any",
+      "default": "Any Status"
+    },
+    {
+      "type": "text",
+      "id": "filter_any_features",
+      "label": "Features filter: nothing chosen",
+      "default": "Any Features"
+    },
+    {
+      "type": "text",
+      "id": "features_label",
+      "label": "Chips label",
+      "default": "Features"
+    },
+    {
+      "type": "text",
+      "id": "clear_label",
+      "label": "Clear-filters link",
+      "default": "Clear filters"
+    },
+    {
+      "type": "text",
+      "id": "sort_featured_label",
+      "label": "Sort: featured",
+      "default": "Sort - Featured"
+    },
+    {
+      "type": "text",
+      "id": "filter_land_label",
+      "label": "Land size filter label",
+      "default": "Land Size"
+    },
+    {
+      "type": "text",
+      "id": "sort_beds_label",
+      "label": "Sort: bedrooms",
+      "default": "Bedrooms"
+    },
+    {
+      "type": "text",
+      "id": "filter_garage_label",
+      "label": "Garage filter label",
+      "default": "Garage Spaces"
+    },
+    {
+      "type": "text",
+      "id": "sort_newest_label",
+      "label": "Sort: newest",
+      "default": "Newest",
+      "info": "Offered once a residence carries a Year in its metafields."
+    },
+    {
+      "type": "text",
+      "id": "sort_name_label",
+      "label": "Sort: name",
+      "default": "Name A–Z"
+    },
+    {
+      "type": "header",
+      "content": "Feature names"
+    },
+    {
+      "type": "text",
+      "id": "chip_pool",
+      "label": "Chip: pool",
+      "default": "Pool"
+    },
+    {
+      "type": "text",
+      "id": "chip_views",
+      "label": "Chip: city views",
+      "default": "City Views"
+    },
+    {
+      "type": "text",
+      "id": "chip_lift",
+      "label": "Chip: lift",
+      "default": "Lift"
+    },
+    {
+      "type": "text",
+      "id": "chip_cinema",
+      "label": "Chip: cinema or media room",
+      "default": "Cinema"
+    },
+    {
+      "type": "text",
+      "id": "chip_gym",
+      "label": "Chip: gym",
+      "default": "Gym"
+    },
+    {
+      "type": "text",
+      "id": "chip_cellar",
+      "label": "Chip: cellar",
+      "default": "Cellar"
+    },
+    {
+      "type": "text",
+      "id": "chip_study",
+      "label": "Chip: study or home office",
+      "default": "Study"
+    },
+    {
+      "type": "text",
+      "id": "chip_solar",
+      "label": "Chip: solar or battery",
+      "default": "Solar and Battery"
+    },
+    {
+      "type": "text",
+      "id": "chip_butler",
+      "label": "Chip: butler's pantry",
+      "default": "Butler's Pantry"
+    },
+    {
+      "type": "header",
+      "content": "Look"
+    },
+    {
+      "type": "paragraph",
+      "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."
+    },
+    {
+      "type": "select",
+      "id": "look_surface",
+      "label": "Background",
+      "options": [
+        {
+          "value": "design",
+          "label": "As designed"
+        },
+        {
+          "value": "cream",
+          "label": "Cream (the page colour)"
+        },
+        {
+          "value": "stone",
+          "label": "Stone (soft panel)"
+        },
+        {
+          "value": "obsidian",
+          "label": "Obsidian (dark)"
+        },
+        {
+          "value": "custom",
+          "label": "A colour of your own (below)"
+        },
+        {
+          "value": "media",
+          "label": "A photo or film behind it (below)"
+        }
+      ],
+      "default": "design",
+      "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."
+    },
+    {
+      "type": "color",
+      "id": "look_color",
+      "label": "Your colour",
+      "default": "#F0EADE",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_tone",
+      "label": "Words on your colour",
+      "options": [
+        {
+          "value": "light",
+          "label": "Dark words (for a light colour)"
+        },
+        {
+          "value": "dark",
+          "label": "Light words (for a dark colour)"
+        }
+      ],
+      "default": "light",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "Backdrop photo or film",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "A backdrop behind this section's words, used only while Background is a photo or film. It is not the residence film. Real photographs and real footage only, never generated.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "look_image",
+      "label": "Backdrop photo",
+      "info": "Also the poster while a backdrop film loads.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "video",
+      "id": "look_video",
+      "label": "Backdrop film (upload)",
+      "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_media_link",
+      "label": "Use a film link instead of an upload",
+      "default": false,
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "text",
+      "id": "look_video_url",
+      "label": "Backdrop film (URL)",
+      "info": "A direct .mp4 link, used when no backdrop film is uploaded above.",
+      "visible_if": "{{ section.settings.look_surface == 'media' and section.settings.look_media_link }}"
+    },
+    {
+      "type": "range",
+      "id": "look_dim",
+      "label": "Darken the backdrop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 55,
+      "info": "Lower = brighter. The words stay readable down to about 40%.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_focus",
+      "label": "Backdrop crop focus",
+      "options": [
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_media_tone",
+      "label": "Words over the backdrop",
+      "options": [
+        {
+          "value": "dark",
+          "label": "Light words on a darkened backdrop"
+        },
+        {
+          "value": "light",
+          "label": "Dark words on a pale backdrop"
+        }
+      ],
+      "default": "dark",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "header",
+      "content": "Space"
+    },
+    {
+      "type": "range",
+      "id": "look_space_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."
+    },
+    {
+      "type": "range",
+      "id": "look_space_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "look_width",
+      "label": "Content width",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme setting (Layout › Content width)"
+        },
+        {
+          "value": "720",
+          "label": "Narrow (720px)"
+        },
+        {
+          "value": "900",
+          "label": "Reading (900px)"
+        },
+        {
+          "value": "1100",
+          "label": "Medium (1100px)"
+        },
+        {
+          "value": "1300",
+          "label": "Wide (1300px)"
+        },
+        {
+          "value": "1600",
+          "label": "Very wide (1600px)"
+        },
+        {
+          "value": "edge",
+          "label": "Edge to edge"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "look_margins",
+      "label": "Side margins",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "look_heading",
+      "label": "Heading size",
+      "min": 50,
+      "max": 160,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Scales the serif headings and titles in this section."
+    },
+    {
+      "type": "range",
+      "id": "look_text",
+      "label": "Text size",
+      "min": 70,
+      "max": 140,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Paragraphs, captions and standfirsts."
+    },
+    {
+      "type": "range",
+      "id": "look_label",
+      "label": "Small label size",
+      "min": 0,
+      "max": 20,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."
+    },
+    {
+      "type": "header",
+      "content": "Finishing"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_animate",
+      "label": "Fade in as it scrolls into view",
+      "default": true,
+      "info": "Off = the section is simply there, no entrance."
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_top",
+      "label": "Hairline above",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_bottom",
+      "label": "Hairline below",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "look_anchor",
+      "label": "Anchor name",
+      "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Refine toolbar"
+    }
+  ]
+}
+{% endschema %}

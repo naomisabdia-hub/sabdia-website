@@ -5,7 +5,7 @@
   one (see property-card for the metafields), and the card carries the same
   data attributes as property-card so a mixed grid filters the same way.
   Params: product, class, img_w, img_h, show_suburb (default false here)
-  Overrides (see property-card): image, image_ext, url, focus, attrs.
+  Overrides (see property-card): image, url, focus, attrs.
 {%- endcomment -%}
 {%- liquid
   assign mf = product.metafields.custom
@@ -48,9 +48,7 @@
   assign sc_img = image | default: product.featured_image
 -%}
 <a href="{{ url | default: product.url }}" class="sc-card {{ class }}" data-beds="{{ mf.beds.value }}" data-baths="{{ mf.baths.value }}" data-status="{{ pstatus | escape }}" data-feats="{{ feats }}" data-year="{{ mf.year.value }}" {{ attrs }}>
-  {%- if image == blank and image_ext != blank -%}
-    <img src="{% render 'ext-variant', src: image_ext, w: img_w, h: img_h %}" alt="{{ product.title | escape }}" loading="lazy" decoding="async" width="{{ img_w }}" height="{{ img_h }}" style="object-position:{{ sc_focus }}">
-  {%- elsif sc_img -%}
+  {%- if sc_img -%}
     <img
       src="{{ sc_img | image_url: width: img_w, height: img_h, crop: sc_focus }}"
       srcset="{{ sc_img | image_url: width: img_w, height: img_h, crop: sc_focus }} 1x, {{ sc_img | image_url: width: img_w2, height: img_h2, crop: sc_focus }} 2x"

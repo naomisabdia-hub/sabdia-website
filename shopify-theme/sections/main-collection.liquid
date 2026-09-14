@@ -786,8 +786,12 @@
 
 {% schema %}
 {
-  "name": "Collection grid",
+  "name": "Collection grid (older)",
   "settings": [
+    {
+      "type": "paragraph",
+      "content": "Older, all-in-one For Sale page. Since 14 Sep 2026 the page is built from its own sections - Header, Refine toolbar, Now selling, The residences, Sold band, How it works, Private inspections - each with only its own settings. This panel stays only until the page template is moved over."
+    },
     {
       "type": "text",
       "id": "label",
@@ -812,8 +816,14 @@
       "id": "hero_source",
       "label": "Hero photo",
       "options": [
-        { "value": "auto", "label": "Automatic - a different residence" },
-        { "value": "chosen", "label": "The photo chosen below" }
+        {
+          "value": "auto",
+          "label": "Automatic - a different residence"
+        },
+        {
+          "value": "chosen",
+          "label": "The photo chosen below"
+        }
       ],
       "default": "chosen",
       "info": "Automatic since 10 Sep 2026 (Tamsin): the page opened on the same house twice. Switch back to use your own photo."
@@ -1022,26 +1032,127 @@
       "type": "paragraph",
       "content": "Each filter only offers what the residences for sale actually have: bedroom and bathroom steps stop at the largest count, Status appears once more than one Status is in use, and a feature chip appears when at least one residence lists that feature (Products › the residence › Features; the keyword map is the residence-feats snippet)."
     },
-    {"type": "checkbox", "id": "show_filter_suburb", "label": "Show the Suburb filter", "default": true},
-    {"type": "checkbox", "id": "show_filter_beds", "label": "Show the Bedrooms filter", "default": true},
-    {"type": "checkbox", "id": "show_filter_baths", "label": "Show the Bathrooms filter", "default": true},
-    {"type": "checkbox", "id": "show_filter_garage", "label": "Show the Garage filter", "default": true},
-    {"type": "checkbox", "id": "show_filter_land", "label": "Show the Land size filter", "default": true},
-    {"type": "checkbox", "id": "show_filter_build", "label": "Show the Build size filter", "default": true},
-    {"type": "checkbox", "id": "show_filter_status", "label": "Show the Status filter", "default": true},
-    {"type": "checkbox", "id": "show_filter_features", "label": "Show the Features filter", "default": true, "info": "A dropdown with a box beside each feature. Tick more than one and a residence must have them all. Only features a residence actually has are listed."},
-    {"type": "text", "id": "filter_any_features", "label": "Features filter: nothing chosen", "default": "Any Features"},
-    {"type": "checkbox", "id": "show_sort", "label": "Show the Sort menu", "default": true},
-    {"type": "text", "id": "features_label", "label": "Chips label", "default": "Features"},
-    {"type": "text", "id": "chip_pool", "label": "Chip: pool", "default": "Pool"},
-    {"type": "text", "id": "chip_views", "label": "Chip: city views", "default": "City Views"},
-    {"type": "text", "id": "chip_lift", "label": "Chip: lift", "default": "Lift"},
-    {"type": "text", "id": "chip_cinema", "label": "Chip: cinema or media room", "default": "Cinema"},
-    {"type": "text", "id": "chip_gym", "label": "Chip: gym", "default": "Gym"},
-    {"type": "text", "id": "chip_cellar", "label": "Chip: cellar", "default": "Cellar"},
-    {"type": "text", "id": "chip_study", "label": "Chip: study or home office", "default": "Study"},
-    {"type": "text", "id": "chip_solar", "label": "Chip: solar or battery", "default": "Solar and Battery"},
-    {"type": "text", "id": "chip_butler", "label": "Chip: butler's pantry", "default": "Butler's Pantry"},
+    {
+      "type": "checkbox",
+      "id": "show_filter_suburb",
+      "label": "Show the Suburb filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_beds",
+      "label": "Show the Bedrooms filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_baths",
+      "label": "Show the Bathrooms filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_garage",
+      "label": "Show the Garage filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_land",
+      "label": "Show the Land size filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_build",
+      "label": "Show the Build size filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_status",
+      "label": "Show the Status filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filter_features",
+      "label": "Show the Features filter",
+      "default": true,
+      "info": "A dropdown with a box beside each feature. Tick more than one and a residence must have them all. Only features a residence actually has are listed."
+    },
+    {
+      "type": "text",
+      "id": "filter_any_features",
+      "label": "Features filter: nothing chosen",
+      "default": "Any Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Show the Sort menu",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "features_label",
+      "label": "Chips label",
+      "default": "Features"
+    },
+    {
+      "type": "text",
+      "id": "chip_pool",
+      "label": "Chip: pool",
+      "default": "Pool"
+    },
+    {
+      "type": "text",
+      "id": "chip_views",
+      "label": "Chip: city views",
+      "default": "City Views"
+    },
+    {
+      "type": "text",
+      "id": "chip_lift",
+      "label": "Chip: lift",
+      "default": "Lift"
+    },
+    {
+      "type": "text",
+      "id": "chip_cinema",
+      "label": "Chip: cinema or media room",
+      "default": "Cinema"
+    },
+    {
+      "type": "text",
+      "id": "chip_gym",
+      "label": "Chip: gym",
+      "default": "Gym"
+    },
+    {
+      "type": "text",
+      "id": "chip_cellar",
+      "label": "Chip: cellar",
+      "default": "Cellar"
+    },
+    {
+      "type": "text",
+      "id": "chip_study",
+      "label": "Chip: study or home office",
+      "default": "Study"
+    },
+    {
+      "type": "text",
+      "id": "chip_solar",
+      "label": "Chip: solar or battery",
+      "default": "Solar and Battery"
+    },
+    {
+      "type": "text",
+      "id": "chip_butler",
+      "label": "Chip: butler's pantry",
+      "default": "Butler's Pantry"
+    },
     {
       "type": "header",
       "content": "Now Selling band"
@@ -1050,11 +1161,37 @@
       "type": "paragraph",
       "content": "A short editorial band between the toolbar and the featured residence, so the page does not go straight from filters to cards."
     },
-    {"type": "checkbox", "id": "show_intro_band", "label": "Show the band", "default": true},
-    {"type": "text", "id": "intro_band_label", "label": "Small label", "default": "Now Selling"},
-    {"type": "html", "id": "intro_band_heading", "label": "Heading (HTML)", "info": "Leave empty and the heading counts the residences for you: Five residences, inner Brisbane. Wrap a word in <em> for the italic accent; {count} becomes the number."},
-    {"type": "textarea", "id": "intro_band_text", "label": "Paragraph", "default": "Each residence is drawn, developed and built by the one team. Inspections are by private appointment."},
-    {"type": "checkbox", "id": "intro_band_suburbs", "label": "List the suburbs beneath the paragraph", "default": true, "info": "Read from each residence's Suburb, once each."},
+    {
+      "type": "checkbox",
+      "id": "show_intro_band",
+      "label": "Show the band",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "intro_band_label",
+      "label": "Small label",
+      "default": "Now Selling"
+    },
+    {
+      "type": "html",
+      "id": "intro_band_heading",
+      "label": "Heading (HTML)",
+      "info": "Leave empty and the heading counts the residences for you: Five residences, inner Brisbane. Wrap a word in <em> for the italic accent; {count} becomes the number."
+    },
+    {
+      "type": "textarea",
+      "id": "intro_band_text",
+      "label": "Paragraph",
+      "default": "Each residence is drawn, developed and built by the one team. Inspections are by private appointment."
+    },
+    {
+      "type": "checkbox",
+      "id": "intro_band_suburbs",
+      "label": "List the suburbs beneath the paragraph",
+      "default": true,
+      "info": "Read from each residence's Suburb, once each."
+    },
     {
       "type": "header",
       "content": "How It Works strip"
@@ -1063,53 +1200,445 @@
       "type": "paragraph",
       "content": "A quiet four-step track above the closing band, set like the Process track on the home page. Leave a title empty to drop that step."
     },
-    {"type": "checkbox", "id": "show_how", "label": "Show the strip", "default": false, "info": "Off since the 11 Sep 2026 review: read as the contract process. Back on once the buyer process is settled."},
-    {"type": "text", "id": "how_label", "label": "Small label", "default": "How It Works"},
-    {"type": "text", "id": "how1_title", "label": "Step 1 title", "default": "Private inspection"},
-    {"type": "textarea", "id": "how1_text", "label": "Step 1 text", "default": "By appointment, with a member of the Sabdia team who knows the residence."},
-    {"type": "text", "id": "how2_title", "label": "Step 2 title", "default": "A conversation about the residence"},
-    {"type": "textarea", "id": "how2_text", "label": "Step 2 text", "default": "Questions on the drawings, the materials and the way the house was built, answered by the people who made it."},
-    {"type": "text", "id": "how3_title", "label": "Step 3 title", "default": "Contract and settlement"},
-    {"type": "textarea", "id": "how3_text", "label": "Step 3 text", "default": "The contract goes to your solicitor for review. Settlement is arranged between the parties."},
-    {"type": "text", "id": "how4_title", "label": "Step 4 title", "default": "Handover"},
-    {"type": "textarea", "id": "how4_text", "label": "Step 4 text", "default": "The keys and the documents, handed over in person by the team that built the house."},
-    {"type": "header", "content": "Space"},
-    {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
-    {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
-    {"type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme"},
-    {"type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."},
-    {"type": "header", "content": "Type"},
-    {"type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section."},
-    {"type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts."},
-    {"type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."},
-    {"type": "header", "content": "Finishing"},
-    {"type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance."},
-    {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
-    {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
-    {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."},
-    {"type": "header", "content": "Hero"},
-    {"type": "range", "id": "hero_dim", "label": "Darken the hero photo or film", "min": 0, "max": 100, "step": 4, "default": 52, "unit": "%", "info": "Lower = brighter."},
-    {"type": "select", "id": "hero_height", "label": "Hero height", "options": [{"value": "short", "label": "Short"}, {"value": "standard", "label": "Standard (as designed)"}, {"value": "tall", "label": "Tall"}, {"value": "full", "label": "Full screen"}], "default": "standard"},
-    {"type": "select", "id": "hero_scrim", "label": "Veil", "options": [{"value": "corner", "label": "Weighted to the words (as designed)"}, {"value": "base", "label": "Fades up from the base"}, {"value": "even", "label": "Even veil"}, {"value": "none", "label": "None"}], "default": "corner"},
-    {"type": "select", "id": "hero_words", "label": "Where the words sit", "options": [{"value": "base-left", "label": "Base, left (as designed)"}, {"value": "base-centre", "label": "Base, centred"}, {"value": "centre", "label": "Centre of the photo"}], "default": "base-left"},
-    {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
-    {"type": "checkbox", "id": "show_intro", "label": "Show the intro line", "default": true},
-    {"type": "header", "content": "Toolbar and featured residence"},
-    {"type": "checkbox", "id": "show_toolbar", "label": "Show the refine and sort toolbar", "default": true},
-    {"type": "checkbox", "id": "show_featured", "label": "Lead with the featured residence banner", "default": true, "info": "Off = the first residence sits in the grid with the others."},
-    {"type": "checkbox", "id": "featured_specs", "label": "Bed · bath · garage · land on the banner", "default": true},
-    {"type": "range", "id": "featured_height", "label": "Banner height, at most", "min": 360, "max": 800, "step": 20, "default": 680, "unit": "px"},
-    {"type": "header", "content": "The grid"},
-    {"type": "select", "id": "columns", "label": "Cards across", "options": [{"value": "2", "label": "Two"}, {"value": "3", "label": "Three (as designed)"}, {"value": "4", "label": "Four"}], "default": "3"},
-    {"type": "select", "id": "card_shape", "label": "Card shape", "options": [{"value": "16/10", "label": "Landscape 16:10"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "1/1", "label": "Square"}, {"value": "4/5", "label": "Portrait 4:5"}], "default": "16/10"},
-    {"type": "range", "id": "gap", "label": "Gap between cards", "min": 0, "max": 40, "step": 2, "default": 10, "unit": "px"},
-    {"type": "checkbox", "id": "show_cars", "label": "Garage count on the cards", "default": true},
-    {"type": "checkbox", "id": "show_land", "label": "Land size on the cards", "default": true},
-    {"type": "header", "content": "Closing band"},
-    {"type": "checkbox", "id": "show_cta", "label": "Show the closing band", "default": true},
-    {"type": "checkbox", "id": "show_cta1", "label": "Primary button", "default": true},
-    {"type": "checkbox", "id": "show_cta2", "label": "Secondary button", "default": true},
-    {"type": "checkbox", "id": "show_cta3", "label": "Gold button", "default": true, "info": "Also needs Theme settings › Guided Match to be on."}
-  ]
+    {
+      "type": "checkbox",
+      "id": "show_how",
+      "label": "Show the strip",
+      "default": false,
+      "info": "Off since the 11 Sep 2026 review: read as the contract process. Back on once the buyer process is settled."
+    },
+    {
+      "type": "text",
+      "id": "how_label",
+      "label": "Small label",
+      "default": "How It Works"
+    },
+    {
+      "type": "text",
+      "id": "how1_title",
+      "label": "Step 1 title",
+      "default": "Private inspection"
+    },
+    {
+      "type": "textarea",
+      "id": "how1_text",
+      "label": "Step 1 text",
+      "default": "By appointment, with a member of the Sabdia team who knows the residence."
+    },
+    {
+      "type": "text",
+      "id": "how2_title",
+      "label": "Step 2 title",
+      "default": "A conversation about the residence"
+    },
+    {
+      "type": "textarea",
+      "id": "how2_text",
+      "label": "Step 2 text",
+      "default": "Questions on the drawings, the materials and the way the house was built, answered by the people who made it."
+    },
+    {
+      "type": "text",
+      "id": "how3_title",
+      "label": "Step 3 title",
+      "default": "Contract and settlement"
+    },
+    {
+      "type": "textarea",
+      "id": "how3_text",
+      "label": "Step 3 text",
+      "default": "The contract goes to your solicitor for review. Settlement is arranged between the parties."
+    },
+    {
+      "type": "text",
+      "id": "how4_title",
+      "label": "Step 4 title",
+      "default": "Handover"
+    },
+    {
+      "type": "textarea",
+      "id": "how4_text",
+      "label": "Step 4 text",
+      "default": "The keys and the documents, handed over in person by the team that built the house."
+    },
+    {
+      "type": "header",
+      "content": "Space"
+    },
+    {
+      "type": "range",
+      "id": "look_space_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."
+    },
+    {
+      "type": "range",
+      "id": "look_space_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "look_width",
+      "label": "Content width",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme setting (Layout › Content width)"
+        },
+        {
+          "value": "720",
+          "label": "Narrow (720px)"
+        },
+        {
+          "value": "900",
+          "label": "Reading (900px)"
+        },
+        {
+          "value": "1100",
+          "label": "Medium (1100px)"
+        },
+        {
+          "value": "1300",
+          "label": "Wide (1300px)"
+        },
+        {
+          "value": "1600",
+          "label": "Very wide (1600px)"
+        },
+        {
+          "value": "edge",
+          "label": "Edge to edge"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "look_margins",
+      "label": "Side margins",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "look_heading",
+      "label": "Heading size",
+      "min": 50,
+      "max": 160,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Scales the serif headings and titles in this section."
+    },
+    {
+      "type": "range",
+      "id": "look_text",
+      "label": "Text size",
+      "min": 70,
+      "max": 140,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Paragraphs, captions and standfirsts."
+    },
+    {
+      "type": "range",
+      "id": "look_label",
+      "label": "Small label size",
+      "min": 0,
+      "max": 20,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."
+    },
+    {
+      "type": "header",
+      "content": "Finishing"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_animate",
+      "label": "Fade in as it scrolls into view",
+      "default": true,
+      "info": "Off = the section is simply there, no entrance."
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_top",
+      "label": "Hairline above",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_bottom",
+      "label": "Hairline below",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "look_anchor",
+      "label": "Anchor name",
+      "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
+    },
+    {
+      "type": "header",
+      "content": "Hero"
+    },
+    {
+      "type": "range",
+      "id": "hero_dim",
+      "label": "Darken the hero photo or film",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 52,
+      "unit": "%",
+      "info": "Lower = brighter."
+    },
+    {
+      "type": "select",
+      "id": "hero_height",
+      "label": "Hero height",
+      "options": [
+        {
+          "value": "short",
+          "label": "Short"
+        },
+        {
+          "value": "standard",
+          "label": "Standard (as designed)"
+        },
+        {
+          "value": "tall",
+          "label": "Tall"
+        },
+        {
+          "value": "full",
+          "label": "Full screen"
+        }
+      ],
+      "default": "standard"
+    },
+    {
+      "type": "select",
+      "id": "hero_scrim",
+      "label": "Veil",
+      "options": [
+        {
+          "value": "corner",
+          "label": "Weighted to the words (as designed)"
+        },
+        {
+          "value": "base",
+          "label": "Fades up from the base"
+        },
+        {
+          "value": "even",
+          "label": "Even veil"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "corner"
+    },
+    {
+      "type": "select",
+      "id": "hero_words",
+      "label": "Where the words sit",
+      "options": [
+        {
+          "value": "base-left",
+          "label": "Base, left (as designed)"
+        },
+        {
+          "value": "base-centre",
+          "label": "Base, centred"
+        },
+        {
+          "value": "centre",
+          "label": "Centre of the photo"
+        }
+      ],
+      "default": "base-left"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_label",
+      "label": "Show the small label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_intro",
+      "label": "Show the intro line",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Toolbar and featured residence"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_toolbar",
+      "label": "Show the refine and sort toolbar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_featured",
+      "label": "Lead with the featured residence banner",
+      "default": true,
+      "info": "Off = the first residence sits in the grid with the others."
+    },
+    {
+      "type": "checkbox",
+      "id": "featured_specs",
+      "label": "Bed · bath · garage · land on the banner",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "featured_height",
+      "label": "Banner height, at most",
+      "min": 360,
+      "max": 800,
+      "step": 20,
+      "default": 680,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "The grid"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Cards across",
+      "options": [
+        {
+          "value": "2",
+          "label": "Two"
+        },
+        {
+          "value": "3",
+          "label": "Three (as designed)"
+        },
+        {
+          "value": "4",
+          "label": "Four"
+        }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "select",
+      "id": "card_shape",
+      "label": "Card shape",
+      "options": [
+        {
+          "value": "16/10",
+          "label": "Landscape 16:10"
+        },
+        {
+          "value": "4/3",
+          "label": "Landscape 4:3"
+        },
+        {
+          "value": "3/2",
+          "label": "Landscape 3:2"
+        },
+        {
+          "value": "16/9",
+          "label": "Wide 16:9"
+        },
+        {
+          "value": "1/1",
+          "label": "Square"
+        },
+        {
+          "value": "4/5",
+          "label": "Portrait 4:5"
+        }
+      ],
+      "default": "16/10"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap between cards",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "default": 10,
+      "unit": "px"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cars",
+      "label": "Garage count on the cards",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_land",
+      "label": "Land size on the cards",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Closing band"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show the closing band",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta1",
+      "label": "Primary button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta2",
+      "label": "Secondary button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta3",
+      "label": "Gold button",
+      "default": true,
+      "info": "Also needs Theme settings › Guided Match to be on."
+    }
+  ],
+  "disabled_on": {
+    "templates": [
+      "*"
+    ]
+  }
 }
 {% endschema %}

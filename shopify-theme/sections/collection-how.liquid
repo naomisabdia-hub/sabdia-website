@@ -1,0 +1,449 @@
+{%- comment -%}
+  How it works - the four-step strip above the closing band.
+
+  Split out of the all-in-one Collection grid section on 14 Sep 2026 so each
+  part of the For Sale page has its own panel in the customizer (Naomi:
+  "have the header its settings, then the Now Selling, then each individual
+  grid has their setting"). Real photographs and real footage only, never
+  generated.
+{%- endcomment -%}
+{%- liquid
+  capture list_csv
+    render 'collection-handles', collection: collection
+  endcapture
+  assign handles = list_csv | split: ','
+  assign count = handles.size
+  assign show_rich = true
+  if collection.handle == 'sold'
+    assign show_rich = false
+  endif
+-%}
+{% render 'section-look', section: section %}
+{%- if show_rich and section.settings.show_how != false -%}
+{%- liquid
+  # The four steps are numbered settings (how1_title … how4_text); a step
+  # with an empty title is left out and the track closes up.
+  assign how_delays = ',d1,d2,d3' | split: ','
+  assign how_n = 0
+  for i in (1..4)
+    assign tkey = 'how' | append: i | append: '_title'
+    if section.settings[tkey] != blank
+      assign how_n = how_n | plus: 1
+    endif
+  endfor
+-%}
+{%- if how_n > 0 -%}
+<section class="mc-how s-surface">
+  <div class="inner">
+    {%- if section.settings.how_label != blank -%}<div class="slabel reveal mc-how-l">{{ section.settings.how_label }}</div>{%- endif -%}
+    <div class="proc-track" style="--proc-cols:{{ how_n }};--proc-n:44px">
+      {%- assign how_i = 0 -%}
+      {%- for i in (1..4) -%}
+        {%- assign tkey = 'how' | append: i | append: '_title' -%}
+        {%- assign dkey = 'how' | append: i | append: '_text' -%}
+        {%- if section.settings[tkey] == blank -%}{%- continue -%}{%- endif -%}
+        <div class="proc-step reveal {{ how_delays[how_i] }}">
+          <div class="proc-n">{{ how_i | plus: 1 }}</div>
+          <div class="proc-t">{{ section.settings[tkey] }}</div>
+          {%- if section.settings[dkey] != blank -%}<div class="proc-d">{{ section.settings[dkey] }}</div>{%- endif -%}
+        </div>
+        {%- assign how_i = how_i | plus: 1 -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+{%- endif -%}
+<style>
+  .mc-how{padding:calc(clamp(56px,7vw,96px)*var(--sp-scale,1)*var(--sp-top,1)) var(--page-pad) calc(clamp(56px,7vw,96px)*var(--sp-scale,1)*var(--sp-bot,1));background:var(--bg);border-top:1px solid var(--border)}
+  .mc-how-l{justify-content:center;margin-bottom:8px}
+  .mc-how .proc-step{padding-top:40px}
+  .mc-how .proc-t{font-size:calc(var(--t-h3)*var(--s-h,1)*.92)}
+  .mc-how .proc-d{max-width:280px;margin:0 auto}
+  @media(max-width:900px){.mc-how .proc-step{padding-top:0}.mc-how .proc-d{max-width:none}}
+</style>
+
+{% schema %}
+{
+  "name": "How it works",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "A quiet four-step track above the closing band, set like the Process track on the home page. A step with an empty title is left out and the track closes up. Not shown on the Sold page."
+    },
+    {
+      "type": "header",
+      "content": "Show"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_how",
+      "label": "Show the strip",
+      "default": false,
+      "info": "Off since the 11 Sep 2026 review: read as the contract process. Back on once the buyer process is settled."
+    },
+    {
+      "type": "header",
+      "content": "Words"
+    },
+    {
+      "type": "text",
+      "id": "how_label",
+      "label": "Small label",
+      "default": "How It Works"
+    },
+    {
+      "type": "text",
+      "id": "how1_title",
+      "label": "Step 1 title",
+      "default": "Private inspection"
+    },
+    {
+      "type": "textarea",
+      "id": "how1_text",
+      "label": "Step 1 text",
+      "default": "By appointment, with a member of the Sabdia team who knows the residence."
+    },
+    {
+      "type": "text",
+      "id": "how2_title",
+      "label": "Step 2 title",
+      "default": "A conversation about the residence"
+    },
+    {
+      "type": "textarea",
+      "id": "how2_text",
+      "label": "Step 2 text",
+      "default": "Questions on the drawings, the materials and the way the house was built, answered by the people who made it."
+    },
+    {
+      "type": "text",
+      "id": "how3_title",
+      "label": "Step 3 title",
+      "default": "Contract and settlement"
+    },
+    {
+      "type": "textarea",
+      "id": "how3_text",
+      "label": "Step 3 text",
+      "default": "The contract goes to your solicitor for review. Settlement is arranged between the parties."
+    },
+    {
+      "type": "text",
+      "id": "how4_title",
+      "label": "Step 4 title",
+      "default": "Handover"
+    },
+    {
+      "type": "textarea",
+      "id": "how4_text",
+      "label": "Step 4 text",
+      "default": "The keys and the documents, handed over in person by the team that built the house."
+    },
+    {
+      "type": "header",
+      "content": "Look"
+    },
+    {
+      "type": "paragraph",
+      "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."
+    },
+    {
+      "type": "select",
+      "id": "look_surface",
+      "label": "Background",
+      "options": [
+        {
+          "value": "design",
+          "label": "As designed"
+        },
+        {
+          "value": "cream",
+          "label": "Cream (the page colour)"
+        },
+        {
+          "value": "stone",
+          "label": "Stone (soft panel)"
+        },
+        {
+          "value": "obsidian",
+          "label": "Obsidian (dark)"
+        },
+        {
+          "value": "custom",
+          "label": "A colour of your own (below)"
+        },
+        {
+          "value": "media",
+          "label": "A photo or film behind it (below)"
+        }
+      ],
+      "default": "design",
+      "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."
+    },
+    {
+      "type": "color",
+      "id": "look_color",
+      "label": "Your colour",
+      "default": "#F0EADE",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_tone",
+      "label": "Words on your colour",
+      "options": [
+        {
+          "value": "light",
+          "label": "Dark words (for a light colour)"
+        },
+        {
+          "value": "dark",
+          "label": "Light words (for a dark colour)"
+        }
+      ],
+      "default": "light",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "Backdrop photo or film",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "A backdrop behind this section's words, used only while Background is a photo or film. It is not the residence film. Real photographs and real footage only, never generated.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "look_image",
+      "label": "Backdrop photo",
+      "info": "Also the poster while a backdrop film loads.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "video",
+      "id": "look_video",
+      "label": "Backdrop film (upload)",
+      "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_media_link",
+      "label": "Use a film link instead of an upload",
+      "default": false,
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "text",
+      "id": "look_video_url",
+      "label": "Backdrop film (URL)",
+      "info": "A direct .mp4 link, used when no backdrop film is uploaded above.",
+      "visible_if": "{{ section.settings.look_surface == 'media' and section.settings.look_media_link }}"
+    },
+    {
+      "type": "range",
+      "id": "look_dim",
+      "label": "Darken the backdrop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 55,
+      "info": "Lower = brighter. The words stay readable down to about 40%.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_focus",
+      "label": "Backdrop crop focus",
+      "options": [
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_media_tone",
+      "label": "Words over the backdrop",
+      "options": [
+        {
+          "value": "dark",
+          "label": "Light words on a darkened backdrop"
+        },
+        {
+          "value": "light",
+          "label": "Dark words on a pale backdrop"
+        }
+      ],
+      "default": "dark",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "header",
+      "content": "Space"
+    },
+    {
+      "type": "range",
+      "id": "look_space_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."
+    },
+    {
+      "type": "range",
+      "id": "look_space_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "look_width",
+      "label": "Content width",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme setting (Layout › Content width)"
+        },
+        {
+          "value": "720",
+          "label": "Narrow (720px)"
+        },
+        {
+          "value": "900",
+          "label": "Reading (900px)"
+        },
+        {
+          "value": "1100",
+          "label": "Medium (1100px)"
+        },
+        {
+          "value": "1300",
+          "label": "Wide (1300px)"
+        },
+        {
+          "value": "1600",
+          "label": "Very wide (1600px)"
+        },
+        {
+          "value": "edge",
+          "label": "Edge to edge"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "look_margins",
+      "label": "Side margins",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "look_heading",
+      "label": "Heading size",
+      "min": 50,
+      "max": 160,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Scales the serif headings and titles in this section."
+    },
+    {
+      "type": "range",
+      "id": "look_text",
+      "label": "Text size",
+      "min": 70,
+      "max": 140,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Paragraphs, captions and standfirsts."
+    },
+    {
+      "type": "range",
+      "id": "look_label",
+      "label": "Small label size",
+      "min": 0,
+      "max": 20,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."
+    },
+    {
+      "type": "header",
+      "content": "Finishing"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_animate",
+      "label": "Fade in as it scrolls into view",
+      "default": true,
+      "info": "Off = the section is simply there, no entrance."
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_top",
+      "label": "Hairline above",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_bottom",
+      "label": "Hairline below",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "look_anchor",
+      "label": "Anchor name",
+      "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
+    }
+  ],
+  "presets": [
+    {
+      "name": "How it works"
+    }
+  ]
+}
+{% endschema %}
