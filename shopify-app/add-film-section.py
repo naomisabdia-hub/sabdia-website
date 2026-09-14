@@ -60,7 +60,8 @@ def main():
     if not changed:
         print("Nothing to do."); shutil.rmtree(work); return
     only = sum((["--only", f] for f in changed), [])
-    args = ["shopify", "theme", "push", "--store", STORE, "--theme", theme, "--path", work, "--nodelete", *only]
+    # --force: the work folder holds only templates, and the CLI otherwise stops to ask "not a theme directory, proceed?"
+    args = ["shopify", "theme", "push", "--store", STORE, "--theme", theme, "--path", work, "--nodelete", "--force", *only]
     if theme == LIVE:
         args.append("--allow-live")
     sh(*args, env=env)
