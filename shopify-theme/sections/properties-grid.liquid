@@ -65,12 +65,30 @@
         {%- assign i = forloop.index -%}
         {%- for product in collections.all.products -%}
           {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+          {%- liquid
+            # This residence's own card block, if one was added (Customize › ⊕ Add block › Residence card): its photo, link and crop replace the automatic ones.
+            assign cb = blank
+            assign cb_img = blank
+            for block in section.blocks
+              if block.settings.residence.handle == product.handle
+                assign cb = block
+                break
+              endif
+            endfor
+            if cb != blank
+              assign cb_img = cb.settings.image
+              if cb_img == blank and cb.settings.photo_n > 0
+                assign cb_i = cb.settings.photo_n | minus: 1
+                assign cb_img = product.images[cb_i]
+              endif
+            endif
+          -%}
           {%- if i == 1 -%}
-            {% render 'property-card', product: product, class: 'pc-hero reveal-wipe', img_w: 1400, img_h: 900, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}
+            {% render 'property-card', product: product, class: 'pc-hero reveal-wipe', img_w: 1400, img_h: 900, show_cars: section.settings.show_cars, show_land: section.settings.show_land, image: cb_img, image_ext: cb.settings.image_ext, url: cb.settings.link, focus: cb.settings.focus, attrs: cb.shopify_attributes %}
           {%- elsif i == 2 -%}
-            {% render 'property-card', product: product, class: 'pc-sm-a reveal-wipe d1', img_w: 900, img_h: 680, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land %}
+            {% render 'property-card', product: product, class: 'pc-sm-a reveal-wipe d1', img_w: 900, img_h: 680, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land, image: cb_img, image_ext: cb.settings.image_ext, url: cb.settings.link, focus: cb.settings.focus, attrs: cb.shopify_attributes %}
           {%- else -%}
-            {% render 'property-card', product: product, class: 'pc-sm-b reveal-wipe d2', img_w: 900, img_h: 680, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land %}
+            {% render 'property-card', product: product, class: 'pc-sm-b reveal-wipe d2', img_w: 900, img_h: 680, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land, image: cb_img, image_ext: cb.settings.image_ext, url: cb.settings.link, focus: cb.settings.focus, attrs: cb.shopify_attributes %}
           {%- endif -%}
           {%- break -%}
         {%- endfor -%}
@@ -86,11 +104,29 @@
           {%- assign card_class = 'pc-row reveal-wipe ' | append: delays[di] -%}
           {%- for product in collections.all.products -%}
             {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+            {%- liquid
+              # This residence's own card block, if one was added (Customize › ⊕ Add block › Residence card): its photo, link and crop replace the automatic ones.
+              assign cb = blank
+              assign cb_img = blank
+              for block in section.blocks
+                if block.settings.residence.handle == product.handle
+                  assign cb = block
+                  break
+                endif
+              endfor
+              if cb != blank
+                assign cb_img = cb.settings.image
+                if cb_img == blank and cb.settings.photo_n > 0
+                  assign cb_i = cb.settings.photo_n | minus: 1
+                  assign cb_img = product.images[cb_i]
+                endif
+              endif
+            -%}
             {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
             {%- if pstatus contains 'Sold' -%}
-              {% render 'sold-card', product: product, class: card_class, img_w: 900, img_h: 560, show_suburb: section.settings.sold_suburb %}
+              {% render 'sold-card', product: product, class: card_class, img_w: 900, img_h: 560, show_suburb: section.settings.sold_suburb, image: cb_img, image_ext: cb.settings.image_ext, url: cb.settings.link, focus: cb.settings.focus, attrs: cb.shopify_attributes %}
             {%- else -%}
-              {% render 'property-card', product: product, class: card_class, img_w: 900, img_h: 560, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land %}
+              {% render 'property-card', product: product, class: card_class, img_w: 900, img_h: 560, show_cars: section.settings.show_cars_small, show_land: section.settings.show_land, image: cb_img, image_ext: cb.settings.image_ext, url: cb.settings.link, focus: cb.settings.focus, attrs: cb.shopify_attributes %}
             {%- endif -%}
             {%- break -%}
           {%- endfor -%}
@@ -116,6 +152,8 @@
     { "type": "product", "id": "exclude", "label": "Leave out", "info": "The residence the Featured residence band already shows, so it is not the first card as well." },
     { "type": "collection", "id": "for_sale_collection", "label": "Order of For Sale cards" },
     { "type": "collection", "id": "sold_collection", "label": "Order of Sold cards" },
+    { "type": "header", "content": "A card's own photo and link" },
+    { "type": "paragraph", "content": "Every card is automatic: the residence's main photo (Products › the residence › Media, first photo) and a click opens its page. To change one card, ⊕ Add block › Residence card, pick the residence, then set its photo, where it sends clicks, or the crop. A block never adds a residence to the grid - Status does that - so a block for a house not shown here does nothing." },
     {"type": "header", "content": "Show"},
     {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
     {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
@@ -133,16 +171,17 @@
     {"type": "header", "content": "Look"},
     {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
     {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
-    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
-    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
-    {"type": "header", "content": "Photo or film behind the section"},
-    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
-    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
-    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
-    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
-    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
-    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
-    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE", "visible_if": "{{ section.settings.look_surface == 'custom' }}"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light", "visible_if": "{{ section.settings.look_surface == 'custom' }}"},
+    {"type": "header", "content": "Backdrop photo or film", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "paragraph", "content": "A backdrop behind this section's words, used only while Background is a photo or film. It is not the residence film. Real photographs and real footage only, never generated.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "image_picker", "id": "look_image", "label": "Backdrop photo", "info": "Also the poster while a backdrop film loads.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "video", "id": "look_video", "label": "Backdrop film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "checkbox", "id": "look_media_link", "label": "Use a film link instead of an upload", "default": false, "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "text", "id": "look_video_url", "label": "Backdrop film (URL)", "info": "A direct .mp4 link, used when no backdrop film is uploaded above.", "visible_if": "{{ section.settings.look_surface == 'media' and section.settings.look_media_link }}"},
+    {"type": "range", "id": "look_dim", "label": "Darken the backdrop", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "select", "id": "look_focus", "label": "Backdrop crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the backdrop", "options": [{"value": "dark", "label": "Light words on a darkened backdrop"}, {"value": "light", "label": "Dark words on a pale backdrop"}], "default": "dark", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
     {"type": "header", "content": "Space"},
     {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
     {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
@@ -157,6 +196,20 @@
     {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
     {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
     {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Residence card",
+      "settings": [
+        { "type": "product", "id": "residence", "label": "Residence", "info": "The card this block edits. The residence still has to be in the grid (its Status decides that)." },
+        { "type": "range", "id": "photo_n", "label": "Photo from the residence", "min": 0, "max": 40, "step": 1, "default": 0, "info": "Counts the residence's photos in order (Products › the residence › Media): 1 is the main photo, 2 the next, and so on. 0 = the main photo. A number past the last photo falls back to the main photo." },
+        { "type": "image_picker", "id": "image", "label": "Or a photo of your own", "info": "Wins over the number above. Real photographs and renders only, never generated." },
+        { "type": "text", "id": "image_ext", "label": "Photo (URL)", "info": "An image address, used only when nothing is set above." },
+        { "type": "url", "id": "link", "label": "Send clicks to", "info": "Empty = the residence's own page." },
+        { "type": "select", "id": "focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center" }
+      ]
+    }
   ],
   "presets": [{ "name": "Properties grid" }]
 }

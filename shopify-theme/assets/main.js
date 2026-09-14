@@ -236,7 +236,15 @@ function showThanks(form, heading, text) {
   const panel = wrap.firstChild;
   form.replaceWith(panel);
   panel.classList.add('vis');
-  setTimeout(() => { panel.scrollIntoView({ behavior: 'smooth', block: 'center' }); panel.focus({ preventScroll: true }); }, 60);
+  /* Naomi, 14 Sep 2026: no jumping about after a send. The panel takes the
+     form's place; the page only moves if the panel is not fully in view,
+     and then just far enough. */
+  setTimeout(() => { keepInView(panel); panel.focus({ preventScroll: true }); }, 60);
+}
+function keepInView(el, behavior) {
+  const r = el.getBoundingClientRect(), navH = 90;
+  if (r.top >= navH && r.bottom <= window.innerHeight) return;
+  el.scrollIntoView({ behavior: behavior || 'smooth', block: r.height > window.innerHeight - navH ? 'start' : 'nearest' });
 }
 function thanksText(form) {
   /* A tailored thank-you for the chosen enquiry type wins (Customize: "Option | text"). */
@@ -915,6 +923,10 @@ function conciergeInit() {
   if (/[?&]contact_posted=true/.test(location.search) && contact && sessionStorage.getItem('cc-pending')) { try { sessionStorage.removeItem('cc-pending'); } catch (e) {} openPanel(); say(esc(cc.getAttribute('data-thanks') || 'Thank you. We will be in touch.')); }
 }
 
+/* The reload after Shopify's spam check (…?contact_posted=true) lands on the
+   thank-you in one go; the browser's own scroll restore would pull it away. */
+if (/[?&]contact_posted=true/.test(location.search)) { try { history.scrollRestoration = 'manual'; } catch (e) { /* not supported */ } }
+
 function initPage() {
   nativeFormInit();
   prequalInit();
@@ -939,7 +951,12 @@ function initPage() {
     } catch (e) { /* no storage */ }
     if (thanks) {
       thanks.classList.add('vis');
-      setTimeout(function () { thanks.scrollIntoView({ behavior: 'smooth', block: 'center' }); thanks.focus({ preventScroll: true }); }, 250);
+      /* Land on it at once - the page must not open at the top and then
+         glide down (Naomi, 14 Sep 2026). scrollRestoration is set to manual
+         at the top of this file for this reload, so the browser does not
+         fight it either. */
+      thanks.scrollIntoView({ behavior: 'instant', block: 'center' });
+      thanks.focus({ preventScroll: true });
       try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
     }
   }

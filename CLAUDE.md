@@ -59,6 +59,21 @@ architecture, layout, interiors, or finishes. No exceptions.**
   Enquiry email alerts activate with RESEND_API_KEY + CONTACT_EMAIL in
   Vercel env; inbox replies additionally need CONTACT_FROM on a
   Resend-verified domain.
+- Residence page (Shopify, since 14 Sep 2026): its own sections, each with
+  only its own settings, in page order - Header (`residence-header`),
+  Property page (`residence-specs`: specs bar + sold banner + sticky
+  Enquire bar), About and enquiry (`residence-story`), The residence
+  (`residence-gallery`, photo/video blocks), Private appointments
+  (`residence-closing`), The film, The Series, More Sabdia residences
+  (`related-properties`: Residence blocks or the automatic row + share
+  row), Scroll walkthrough (`disabled` in the template unless the residence
+  has one). `main-property.liquid` is the older all-in-one, hidden from
+  ⊕ Add section; `shopify-app/split-property-page.py` then
+  `shopify-app/arrange-residence-page.py <theme>` bring any store-side
+  template into this shape (push-live.sh runs both). Every
+  section's Look "backdrop" dials (photo/film behind the words) are named
+  Backdrop … and only show when Background = a photo or film; The film
+  section has no backdrop dials at all.
 - The public QASR cut is deliberately curated — mud room, sauna, guest
   suites, powder, dining, cellar etc. are held back pre-sale. Do not add
   rooms without Naomi's sign-off. The full private tour lives on Naomi's

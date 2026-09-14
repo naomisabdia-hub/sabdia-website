@@ -135,7 +135,8 @@
       "type": "text",
       "id": "film_url",
       "label": "Film (URL)",
-      "info": "A direct .mp4 link, used when nothing is uploaded above."
+      "info": "A direct .mp4 link, used when nothing is uploaded above.",
+      "visible_if": "{{ section.settings.use_links }}"
     },
     {
       "type": "image_picker",
@@ -147,7 +148,15 @@
       "type": "text",
       "id": "poster_url",
       "label": "Poster (URL)",
-      "info": "Used when no poster is chosen above."
+      "info": "Used when no poster is chosen above.",
+      "visible_if": "{{ section.settings.use_links }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_links",
+      "label": "Use links instead of uploads",
+      "default": false,
+      "info": "Shows the URL boxes for a film or poster hosted elsewhere."
     },
     {
       "type": "header",
@@ -234,17 +243,9 @@
     {"type": "range", "id": "reel_height", "label": "Film height, at most", "min": 360, "max": 900, "step": 20, "default": 680, "unit": "px"},
     {"type": "header", "content": "Look"},
     {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
-    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
-    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
-    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
-    {"type": "header", "content": "Photo or film behind the section"},
-    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
-    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
-    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
-    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
-    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
-    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
-    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface. A backdrop photo or film is not offered here: this section is the film."},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE", "visible_if": "{{ section.settings.look_surface == 'custom' }}"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light", "visible_if": "{{ section.settings.look_surface == 'custom' }}"},
     {"type": "header", "content": "Space"},
     {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
     {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},

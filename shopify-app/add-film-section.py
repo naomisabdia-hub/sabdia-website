@@ -52,7 +52,14 @@ def main():
             print("  already has The film:", rel); continue
         data["sections"]["film"] = {"type": "residence-film", "settings": {}}
         order = data.get("order", list(data["sections"]))
-        anchor = next((k for k in order if data["sections"][k]["type"] == "main-property"), order[0])
+        # After the Closing band on a split page (14 Sep 2026), else after the
+        # Gallery, else after the old all-in-one Property page section.
+        anchor = None
+        for typ in ("residence-closing", "residence-gallery", "main-property"):
+            anchor = next((k for k in order if data["sections"][k]["type"] == typ), None)
+            if anchor:
+                break
+        anchor = anchor or order[0]
         order.insert(order.index(anchor) + 1, "film")
         data["order"] = order
         open(path, "w").write(json.dumps(data, indent=2, ensure_ascii=False) + "\n")

@@ -1,5 +1,9 @@
 {%- comment -%}
-  Property page - the "Explore more Sabdia residences" row: up to three
+  More Sabdia residences - the row of other residences at the foot of a
+  residence page, and the share row under it.
+
+  Hand-picked: add Residence blocks (⊕ Add block) and the row shows those
+  residences in that order. With no blocks it is automatic: up to three
   other live residences (never the one being viewed), in the For Sale
   collection's order. The heading switches when this residence's Status
   is in the Sold group.
@@ -25,6 +29,18 @@
 -%}
 {%- capture cards -%}
   {%- assign shown = 0 -%}
+  {%- if section.blocks.size > 0 -%}
+    {%- comment -%} Hand-picked residences, in block order. The residence being viewed is skipped. {%- endcomment -%}
+    {%- for block in section.blocks -%}
+      {%- assign p = block.settings.product -%}
+      {%- if p == blank or p.id == product.id -%}{%- continue -%}{%- endif -%}
+      {%- assign shown = shown | plus: 1 -%}
+      {%- assign delay = '' -%}
+      {%- if shown == 2 -%}{%- assign delay = ' d1' -%}{%- elsif shown > 2 -%}{%- assign delay = ' d2' -%}{%- endif -%}
+      {%- assign card_class = 'reveal' | append: delay -%}
+      <div class="prop-related-pick" {{ block.shopify_attributes }}>{% render 'property-card', product: p, class: card_class, style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}</div>
+    {%- endfor -%}
+  {%- else -%}
   {%- for h in live_handles -%}
     {%- if shown >= rp_count -%}{%- break -%}{%- endif -%}
     {%- for p in collections.all.products -%}
@@ -38,6 +54,7 @@
       {%- break -%}
     {%- endfor -%}
   {%- endfor -%}
+  {%- endif -%}
 {%- endcapture -%}
 {%- assign cards_stripped = cards | strip -%}
 {%- if cards_stripped != blank -%}
@@ -73,16 +90,20 @@
   </div>
 </section>
 {%- endif -%}
+<style>
+  .prop-related-pick{min-width:0}.prop-related-pick>.pc{width:100%}
+  .share-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:36px}
+  .share-l{font-size:10px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}
+  .share-a{background:none;border:none;cursor:pointer;padding:4px 0;font-family:var(--font-u);font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(var(--gold-rgb),.35);transition:color .25s,border-color .25s;text-decoration:none}
+  .share-a:hover{color:var(--ink);border-color:var(--gold)}
+</style>
 
 {% schema %}
 {
-  "name": "Related residences",
+  "name": "More Sabdia residences",
   "settings": [
-    {"type": "header", "content": "Share row (under the residences)"},
-    {"type": "checkbox", "id": "show_share", "label": "Show the share row", "default": true},
-    {"type": "text", "id": "share_label", "label": "Share label", "default": "Share"},
-    {"type": "text", "id": "copy_link_label", "label": "Copy link button", "default": "Copy link"},
-    { "type": "collection", "id": "related_collection", "label": "Collection", "info": "Defaults to for-sale; sets the order. Any residence whose Status is live is included; the one being viewed is never shown" },
+    {"type": "paragraph", "content": "The other residences at the foot of this page. Hand-pick them with ⊕ Add block › Residence (shown in that order), or leave the blocks empty and the row fills itself from the collection below: up to the number set under Layout, live residences only, never the one being viewed."},
+    { "type": "collection", "id": "related_collection", "label": "Collection (automatic row)", "info": "Defaults to For Sale; sets the order. Any residence whose Status is live is included; the one being viewed is never shown. Ignored while Residence blocks are added." },
     { "type": "html", "id": "heading_html", "label": "Heading (HTML)", "default": "More <em>Sabdia residences<\/em>" },
     { "type": "html", "id": "heading_sold_html", "label": "Heading when sold (HTML)", "default": "Residences <em>for sale now<\/em>" },
     {"type": "header", "content": "Show"},
@@ -91,26 +112,31 @@
     {"type": "checkbox", "id": "show_cars", "label": "Garage count on the cards", "default": true},
     {"type": "checkbox", "id": "show_land", "label": "Land size on the cards", "default": false},
     {"type": "header", "content": "Layout"},
-    {"type": "range", "id": "count", "label": "Residences shown", "min": 1, "max": 6, "step": 1, "default": 3},
+    {"type": "range", "id": "count", "label": "Residences shown (automatic row)", "min": 1, "max": 6, "step": 1, "default": 3, "info": "Hand-picked Residence blocks all show."},
     {"type": "select", "id": "columns", "label": "Cards across", "options": [{"value": "2", "label": "Two"}, {"value": "3", "label": "Three"}, {"value": "4", "label": "Four"}], "default": "3"},
     {"type": "select", "id": "card_shape", "label": "Card shape", "options": [{"value": "16/10", "label": "Landscape 16:10"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "1/1", "label": "Square"}, {"value": "4/5", "label": "Portrait 4:5"}], "default": "4/3"},
     {"type": "range", "id": "gap", "label": "Gap between cards", "min": 0, "max": 40, "step": 2, "default": 10, "unit": "px"},
     {"type": "header", "content": "Button (optional)"},
     {"type": "text", "id": "cta_label", "label": "Button label", "info": "Leave empty for no button."},
     {"type": "url", "id": "cta_link", "label": "Button link", "info": "Defaults to the For Sale page."},
+    {"type": "header", "content": "Share row (under the residences)"},
+    {"type": "checkbox", "id": "show_share", "label": "Show the share row", "default": true},
+    {"type": "text", "id": "share_label", "label": "Share label", "default": "Share"},
+    {"type": "text", "id": "copy_link_label", "label": "Copy link button", "default": "Copy link"},
     {"type": "header", "content": "Look"},
     {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
     {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
-    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
-    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
-    {"type": "header", "content": "Photo or film behind the section"},
-    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
-    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
-    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
-    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
-    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
-    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
-    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE", "visible_if": "{{ section.settings.look_surface == 'custom' }}"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light", "visible_if": "{{ section.settings.look_surface == 'custom' }}"},
+    {"type": "header", "content": "Backdrop photo or film", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "paragraph", "content": "A backdrop behind this section's words, used only while Background is a photo or film. It is not the residence film. Real photographs and real footage only, never generated.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "image_picker", "id": "look_image", "label": "Backdrop photo", "info": "Also the poster while a backdrop film loads.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "video", "id": "look_video", "label": "Backdrop film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "checkbox", "id": "look_media_link", "label": "Use a film link instead of an upload", "default": false, "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "text", "id": "look_video_url", "label": "Backdrop film (URL)", "info": "A direct .mp4 link, used when no backdrop film is uploaded above.", "visible_if": "{{ section.settings.look_surface == 'media' and section.settings.look_media_link }}"},
+    {"type": "range", "id": "look_dim", "label": "Darken the backdrop", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "select", "id": "look_focus", "label": "Backdrop crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the backdrop", "options": [{"value": "dark", "label": "Light words on a darkened backdrop"}, {"value": "light", "label": "Dark words on a pale backdrop"}], "default": "dark", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
     {"type": "header", "content": "Space"},
     {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
     {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
@@ -126,6 +152,16 @@
     {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
     {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
   ],
-  "presets": [{ "name": "Related residences" }]
+  "blocks": [
+    {
+      "type": "residence",
+      "name": "Residence",
+      "settings": [
+        {"type": "product", "id": "product", "label": "Residence", "info": "A residence from Products. It shows here whatever its Status; the residence being viewed is skipped."}
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [{ "name": "More Sabdia residences" }]
 }
 {% endschema %}

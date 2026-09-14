@@ -1,22 +1,52 @@
 {
   "sections": {
-    "main": {
-      "type": "main-property"
+    "header": {
+      "type": "residence-header",
+      "settings": {}
     },
-    "walkthrough": {
-      "type": "scroll-walk"
+    "specs": {
+      "type": "residence-specs",
+      "settings": {}
+    },
+    "story": {
+      "type": "residence-story",
+      "settings": {}
+    },
+    "gallery": {
+      "type": "residence-gallery",
+      "settings": {}
+    },
+    "closing": {
+      "type": "residence-closing",
+      "settings": {}
+    },
+    "film": {
+      "type": "residence-film",
+      "settings": {}
     },
     "series": {
-      "type": "series-strip"
+      "type": "series-strip",
+      "settings": {}
     },
     "related": {
-      "type": "related-properties"
+      "type": "related-properties",
+      "settings": {}
+    },
+    "walkthrough": {
+      "type": "scroll-walk",
+      "settings": {},
+      "disabled": true
     }
   },
   "order": [
-    "main",
-    "walkthrough",
+    "header",
+    "specs",
+    "story",
+    "gallery",
+    "closing",
+    "film",
     "series",
-    "related"
+    "related",
+    "walkthrough"
   ]
 }

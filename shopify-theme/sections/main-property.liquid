@@ -4,6 +4,12 @@
   count-adaptive gallery with lightbox, and the residence film. The
   scroll walkthrough renders from its own section beneath this one.
 
+  OLDER, ALL IN ONE (14 Sep 2026): the residence page now comes as its own
+  sections - residence-header, residence-specs, residence-story,
+  residence-gallery, residence-film, residence-closing - moved over by
+  shopify-app/split-property-page.py. This stays only for templates not yet
+  moved; it is hidden from ⊕ Add section.
+
   Product fields used: title, description (paragraphs), featured image
   (hero), remaining images (gallery), Status (custom.status, see the
   residence-status snippet - the old "sold" tag still works), and metafields
@@ -103,8 +109,9 @@
     .prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house,.prop-house{font-size:calc(1em * {{ nf_scale | strip }})}
     .prop-house{text-transform:none}
     em .prop-house,.prop-house em{font-size:1em}
+    .prop-gallery-h em:has(>.res-face),.prop-cta-h em:has(>.res-face),.film-h em:has(>.res-face){font-size:1em}
     .psb-name{font-size:calc(var(--t-body) * var(--s-t,1) * {{ nf_scale | strip }})}
-    .prop-name{font-size:calc(var(--t-display-xl) * {{ section.settings.name_font_scale | default: 100 | divided_by: 100.0 }} * {{ nf_scale | strip }});letter-spacing:{{ section.settings.name_font_tracking | default: -4 | divided_by: 100.0 }}em;line-height:.95}
+    .prop-name{letter-spacing:{{ section.settings.name_font_tracking | default: -4 | divided_by: 100.0 }}em;line-height:.95}
   </style>
 {%- endif -%}
 
@@ -134,7 +141,7 @@
   endif
 -%}
 <style>@media(prefers-reduced-motion:reduce){.prop-hero video{display:none}}</style>
-<section class="prop-hero{% if section.settings.hero_words == 'centre' %} prop-hero-centre{% endif %}" style="--prop-h:{{ pr_h }};--prop-dim:{{ pr_dim }}">
+<section class="prop-hero{% if section.settings.hero_words == 'centre' %} prop-hero-centre{% endif %}" style="--prop-h:{{ pr_h }};--prop-dim:{{ pr_dim }};--ph-status:{{ section.settings.status_font_scale | default: 100 | divided_by: 100.0 }};--ph-name:{{ section.settings.name_font_scale | default: 100 | divided_by: 100.0 }};--ph-loc:{{ section.settings.loc_font_scale | default: 100 | divided_by: 100.0 }}">
   {%- liquid
     # Header media (Customize › Header): the residence's main photo as
     # designed, a photo chosen here, or a film. Real photographs and real
@@ -690,61 +697,6 @@
   })();
 </script>
 
-{%- liquid
-  # The residence film. A film or poster picked in the customizer (this
-  # residence's own template) wins; otherwise the product's Film video /
-  # Film poster metafields, as before.
-  assign film_src = mf.film_video.value
-  if section.settings.film
-    assign fmp4 = section.settings.film.sources | where: 'format', 'mp4' | first
-    if fmp4
-      assign film_src = fmp4.url
-    endif
-  endif
-  assign film_poster = mf.film_poster.value
-  if section.settings.film_poster
-    assign film_poster = section.settings.film_poster | image_url: width: 1600
-  endif
--%}
-{%- if film_src != blank and section.settings.show_film -%}
-  <section class="film-band film-inline{% if section.settings.film_side == 'left' %} film-flip{% endif %}" id="film-inline" style="--film-ar:{{ section.settings.film_shape | default: '9/16' }}">
-    <div class="film-grid">
-      <div class="film-copy">
-        {%- if section.settings.film_label != blank -%}<div class="slabel slabel-dark reveal">{{ section.settings.film_label }}</div>{%- endif -%}
-        {%- liquid
-          assign film_h = section.settings.film_heading_html
-          if film_h == blank
-            assign film_h = 'Experience <em>' | append: name_token | append: '</em>.'
-          endif
-        -%}
-        <h2 class="film-h reveal d1">{{ film_h | replace: name_token, name_span }}</h2>
-        {%- liquid
-          assign film_text = section.settings.film_text
-          if film_text == blank
-            assign film_text = 'A walk through ' | append: name_token | append: ', on film.'
-          endif
-        -%}
-        <p class="film-p reveal d2">{{ film_text | replace: name_token, name_span }}</p>
-      </div>
-      <div class="reveal d2">
-        <div class="film-frame" data-film>
-          <video src="{{ film_src }}" {% if film_poster != blank %}poster="{{ film_poster }}"{% endif %} muted loop playsinline preload="none"></video>
-          <button class="film-sound" type="button" aria-label="Toggle sound" data-sound>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-            <span data-sound-label>{{ section.settings.sound_label | default: "Sound On" }}</span>
-          </button>
-        </div>
-        {%- if section.settings.show_film_caption -%}
-        <div class="film-caption">
-          <span><b>{{ name_span }} - On Film</b></span>
-          <span>{{ mf.suburb.value }}, {{ state }}</span>
-        </div>
-        {%- endif -%}
-      </div>
-    </div>
-  </section>
-{%- endif -%}
-
 {%- unless sold or section.settings.show_cta == false -%}
   <section class="prop-cta">
     <div class="inner prop-cta-inner">
@@ -799,6 +751,10 @@
 <style>
   /* [hidden] alone loses to .lb{display:flex} in style.css, so the photo viewer never hid. */
   .lb[hidden]{display:none}
+  /* Header word sizes: the Status, Name and Suburb dials in Customize (100% = as designed). */
+  .prop-hero .prop-status{font-size:calc(clamp(15px,1.7vw,22px)*var(--ph-status,1))}
+  .prop-hero .prop-name{font-size:calc(var(--t-display-xl)*var(--s-h,1)*var(--ph-name,1){% if nf != blank or nf_file != blank %}*{{ nf_scale | strip }}{% endif %})}
+  .prop-hero .prop-loc{font-size:calc(var(--t-small)*var(--s-t,1)*var(--ph-loc,1))}
   .prop-hero-centre{align-items:center}.prop-hero-centre .prop-hero-content{text-align:center}.prop-hero-centre .prop-status{justify-content:center}
   .prop-specs-centre .prop-specs-inner{justify-content:center}
   @media(min-width:1201px){.prop-body .prop-layout{grid-template-columns:var(--prop-split,7fr 5fr)}}
@@ -808,10 +764,6 @@
   .pg-norooms .pg-rooms{display:none}
   .pg-noexpand .pg-expand{display:none}
   .prop-gallery .pg-stage{aspect-ratio:var(--pgs-ar,16/9)}
-  .film-band .film-frame{aspect-ratio:var(--film-ar,9/16)}
-  /* The film has its own section since 14 Sep 2026 (sections/residence-film.liquid). When it is on the page, this built-in one steps aside. */
-  body:has(.residence-film) .film-band.film-inline{display:none}
-  @media(min-width:901px){.film-flip .film-grid>.film-copy{order:2}}
   .share-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:36px}
   .share-l{font-size:10px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}
   .share-a{background:none;border:none;cursor:pointer;padding:4px 0;font-family:var(--font-u);font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(var(--gold-rgb),.35);transition:color .25s,border-color .25s;text-decoration:none}
@@ -820,7 +772,7 @@
 
 {% schema %}
 {
-  "name": "Property page",
+  "name": "Property page (older)",
   "max_blocks": 50,
   "blocks": [
     {
@@ -869,6 +821,10 @@
     }
   ],
   "settings": [
+    {
+      "type": "paragraph",
+      "content": "Older, all-in-one residence page. Since 14 Sep 2026 the residence page is built from its own sections - Header, Specs bar, Description and enquiry, Gallery, The film, Closing - each with its own panel (⊕ Add section). This section is kept only for residence pages not yet moved over."
+    },
     {
       "type": "header",
       "content": "Header"
@@ -1010,10 +966,41 @@
       "default": true
     },
     {
+      "type": "range",
+      "id": "status_font_scale",
+      "label": "Status size",
+      "min": 50,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "name_font_scale",
+      "label": "Name size",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "100% is as designed. The name also follows this section's Look › Heading size."
+    },
+    {
       "type": "checkbox",
       "id": "show_location",
       "label": "Suburb under the name",
       "default": true
+    },
+    {
+      "type": "range",
+      "id": "loc_font_scale",
+      "label": "Suburb size",
+      "min": 50,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 100
     },
     {
       "type": "paragraph",
@@ -1507,104 +1494,6 @@
     },
     {
       "type": "header",
-      "content": "Film"
-    },
-    {
-      "type": "paragraph",
-      "content": "Easier since 14 Sep 2026: the film is its own section, The film, in the left sidebar (⊕ Add section › The film), with the film upload as its first setting. When that section is on the page this built-in film steps aside and the settings below do nothing. Without it, the film playing here comes from Products › the residence › Metafields › Film video and Film poster, or the pickers below."
-    },
-    {
-      "type": "checkbox",
-      "id": "show_film",
-      "label": "Show the film",
-      "default": true
-    },
-    {
-      "type": "video",
-      "id": "film",
-      "label": "Film (upload)",
-      "info": "Upload the residence film (mp4) and it takes over from the Film video metafield. Leave empty to keep the metafield."
-    },
-    {
-      "type": "image_picker",
-      "id": "film_poster",
-      "label": "Film poster",
-      "info": "The still shown before the film plays. Choose one and it takes over from the Film poster metafield."
-    },
-    {
-      "type": "text",
-      "id": "film_label",
-      "label": "Film label",
-      "default": "The Film"
-    },
-    {
-      "type": "html",
-      "id": "film_heading_html",
-      "label": "Film heading",
-      "default": "Experience <em>{name}</em>.",
-      "info": "{name} becomes the residence's name."
-    },
-    {
-      "type": "text",
-      "id": "film_text",
-      "label": "Film line",
-      "default": "A walk through {name}, on film.",
-      "info": "{name} becomes the residence's name."
-    },
-    {
-      "type": "checkbox",
-      "id": "show_film_caption",
-      "label": "Caption under the film",
-      "default": true
-    },
-    {
-      "type": "select",
-      "id": "film_side",
-      "label": "Film sits",
-      "options": [
-        {
-          "value": "right",
-          "label": "Right (as designed)"
-        },
-        {
-          "value": "left",
-          "label": "Left"
-        }
-      ],
-      "default": "right"
-    },
-    {
-      "type": "select",
-      "id": "film_shape",
-      "label": "Film shape",
-      "options": [
-        {
-          "value": "9/16",
-          "label": "Portrait 9:16 (as designed)"
-        },
-        {
-          "value": "4/5",
-          "label": "Portrait 4:5"
-        },
-        {
-          "value": "1/1",
-          "label": "Square"
-        },
-        {
-          "value": "16/9",
-          "label": "Landscape 16:9"
-        }
-      ],
-      "default": "9/16"
-    },
-    {
-      "type": "text",
-      "id": "sound_label",
-      "label": "Film sound button",
-      "default": "Sound On"
-    },
-    {
-      "type": "header",
       "content": "Closing"
     },
     {
@@ -1694,16 +1583,6 @@
       "label": "Weight",
       "default": "400",
       "info": "A number the face has: 300, 400, 500, 600, 700."
-    },
-    {
-      "type": "range",
-      "id": "name_font_scale",
-      "label": "Name size",
-      "min": 50,
-      "max": 130,
-      "step": 5,
-      "unit": "%",
-      "default": 100
     },
     {
       "type": "range",
@@ -1860,6 +1739,11 @@
       "label": "Anchor name",
       "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
     }
-  ]
+  ],
+  "disabled_on": {
+    "templates": [
+      "*"
+    ]
+  }
 }
 {% endschema %}

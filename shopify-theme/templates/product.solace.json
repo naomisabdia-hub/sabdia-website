@@ -1,14 +1,31 @@
 {
   "sections": {
-    "main": {
-      "type": "main-property",
+    "header": {
+      "type": "residence-header",
+      "settings": {}
+    },
+    "specs": {
+      "type": "residence-specs",
       "settings": {
-        "sold_notice": "This residence has been sold. View our current properties for sale below.",
+        "sold_notice": "This residence has been sold. View our current properties for sale below."
+      }
+    },
+    "story": {
+      "type": "residence-story",
+      "settings": {}
+    },
+    "gallery": {
+      "type": "residence-gallery",
+      "settings": {}
+    },
+    "closing": {
+      "type": "residence-closing",
+      "settings": {
         "cta_text": "Inspections are by private appointment. Leave your details and we will be in touch within a business day."
       }
     },
-    "walkthrough": {
-      "type": "scroll-walk",
+    "film": {
+      "type": "residence-film",
       "settings": {}
     },
     "series": {
@@ -18,12 +35,22 @@
     "related": {
       "type": "related-properties",
       "settings": {}
+    },
+    "walkthrough": {
+      "type": "scroll-walk",
+      "settings": {},
+      "disabled": true
     }
   },
   "order": [
-    "main",
-    "walkthrough",
+    "header",
+    "specs",
+    "story",
+    "gallery",
+    "closing",
+    "film",
     "series",
-    "related"
+    "related",
+    "walkthrough"
   ]
 }

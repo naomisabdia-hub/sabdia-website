@@ -15,11 +15,17 @@
   posts. The Instagram sync (shopify-app/sync-instagram.mjs, run daily by
   GitHub Actions) fills this automatically from @_sabdia: reels bring a
   "video", carousels bring "slides", every post its Instagram "url".
-  Renders nothing when the residence has no posts.
+  Renders nothing when the residence has no posts and no Post blocks.
 
-  Clicking a tile: the "Reels and carousels" setting decides whether they
-  play here on the site (with a "View on Instagram" link in the player) or
-  open the real post on Instagram.
+  Post blocks (theme editor): a block whose Instagram link matches a
+  synced post replaces that post's photo, film, caption, date or link (or
+  hides it); a block with any other link adds a tile of its own, slotted
+  by date. Clicking a tile in the editor selects its block.
+
+  A reel's film plays silently while the pointer rests on the tile (while
+  in view on touch screens). Clicking a tile: the "Reels and carousels"
+  setting decides whether it plays here on the site (with a "View on
+  Instagram" link in the player) or opens the real post on Instagram.
 {%- endcomment -%}
 {%- liquid
   # Works on product pages AND on collection-item pages: the posts and
@@ -40,6 +46,11 @@
       assign visible = visible | plus: 1
     endunless
   endfor
+  for block in section.blocks
+    if block.type == 'post' and block.settings.hidden == false
+      assign visible = visible | plus: 1
+    endif
+  endfor
 -%}
 {%- if visible > 0 -%}
 {%- liquid
@@ -51,11 +62,24 @@
 {% render 'section-look', section: section, designed: look_designed %}
 {%- liquid
   assign ss_limit = section.settings.limit | default: 0
-  assign ss_posts = posts
+  assign ss_reverse = false
   if section.settings.order == 'reverse'
+    assign ss_reverse = true
+  endif
+  assign ss_posts = posts
+  if ss_reverse
     assign ss_posts = posts | reverse
   endif
   assign ss_shown = 0
+  assign ig_home = section.settings.instagram_url | default: settings.instagram_url
+  # Every block's slot date as a number (20260911) so tiles can be merged
+  # in date order without building arrays. No date = newest.
+  assign has_blocks = false
+  for block in section.blocks
+    if block.type == 'post'
+      assign has_blocks = true
+    endif
+  endfor
 -%}
 <section class="series-band{% if section.settings.dark %} on-dark{% endif %}{% if section.settings.show_arrows == false %} series-noarrows{% endif %}{% if section.settings.show_kind == false %} series-nokind{% endif %}" data-series style="--series-w:{% if section.settings.card_width > 0 %}{{ section.settings.card_width }}px{% else %}clamp(200px,22vw,270px){% endif %};--series-ar:{{ section.settings.card_shape | default: '9/14' }};--series-gap:{{ section.settings.gap | default: 14 }}px;--series-lines:{{ section.settings.caption_lines | default: 3 }}">
   <div class="series-hdr">
@@ -63,7 +87,7 @@
       {%- if section.settings.show_label -%}<div class="slabel {% if section.settings.dark %}slabel-dark {% endif %}reveal">{{ section.settings.label }}</div>{%- endif -%}
       {%- if section.settings.show_heading -%}<h2 class="series-h reveal d1">{{ section.settings.heading_prefix }} <em>{{ series_name_html }}</em>.</h2>{%- endif -%}
       {%- if section.settings.show_handle -%}
-      <a href="{{ section.settings.instagram_url | default: settings.instagram_url }}" target="_blank" rel="noopener" class="series-handle reveal d2">
+      <a href="{{ ig_home }}" target="_blank" rel="noopener" class="series-handle reveal d2">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
         {{ section.settings.handle_line }} {{ section.settings.handle | default: settings.instagram_label }}
       </a>
@@ -75,80 +99,165 @@
     <button class="series-nav series-prev" type="button" aria-label="Scroll back" data-series-prev>&larr;</button>
     <button class="series-nav series-next" type="button" aria-label="Scroll forward" data-series-next>&rarr;</button>
     <div class="series-track" data-series-track>
+      {%- liquid
+        if ss_reverse
+          assign prev_num = 0
+        else
+          assign prev_num = 99999999
+        endif
+      -%}
       {%- for item in ss_posts -%}
         {%- if item.hidden == true -%}{%- continue -%}{%- endif -%}
-        {%- if ss_limit > 0 and ss_shown >= ss_limit -%}{%- break -%}{%- endif -%}
-        {%- assign ss_shown = ss_shown | plus: 1 -%}
         {%- liquid
-          # Where does a click go? On-site player when the setting says so
-          # and we hold the media; otherwise the Instagram post itself - or
-          # the @_sabdia profile while a post has no link of its own yet.
-          assign ig_link = item.url
-          if ig_link == blank
-            assign ig_link = section.settings.instagram_url | default: settings.instagram_url
-          endif
-          assign has_media = false
-          if item.video != blank or item.slides.size > 0
-            assign has_media = true
+          assign item_num = item.date | remove: '-' | plus: 0
+          assign item_url = item.url | remove: 'https://' | remove: 'http://' | remove: 'www.' | remove_last: '/' | downcase
+        -%}
+        {%- comment -%} Own blocks that sit between the previous synced post and this one. {%- endcomment -%}
+        {%- if has_blocks -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type != 'post' or block.settings.hidden -%}{%- continue -%}{%- endif -%}
+            {%- liquid
+              assign b_url = block.settings.url | remove: 'https://' | remove: 'http://' | remove: 'www.' | remove_last: '/' | downcase
+              assign b_is_override = false
+              if b_url != blank
+                for p in posts
+                  assign p_url = p.url | remove: 'https://' | remove: 'http://' | remove: 'www.' | remove_last: '/' | downcase
+                  if p_url == b_url
+                    assign b_is_override = true
+                    break
+                  endif
+                endfor
+              endif
+              if b_is_override
+                continue
+              endif
+              assign b_num = block.settings.date | remove: '-' | plus: 0
+              if block.settings.date == blank
+                assign b_num = 99999999
+              endif
+              assign slot = false
+              if ss_reverse
+                if b_num < item_num and b_num >= prev_num
+                  assign slot = true
+                endif
+              else
+                if b_num > item_num and b_num <= prev_num
+                  assign slot = true
+                endif
+              endif
+            -%}
+            {%- if slot -%}
+              {%- if ss_limit > 0 and ss_shown >= ss_limit -%}{%- break -%}{%- endif -%}
+              {%- assign ss_shown = ss_shown | plus: 1 -%}
+              {%- render 'series-tile-block', block: block, section: section, ig_home: ig_home, brand_from: brand_from, brand_to: brand_to -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+        {%- if ss_limit > 0 and ss_shown >= ss_limit -%}{%- break -%}{%- endif -%}
+        {%- comment -%} The synced post, with any block that overrides it. {%- endcomment -%}
+        {%- liquid
+          assign t_thumb = item.thumb
+          assign t_video = item.video
+          assign t_slides = item.slides
+          assign t_caption = item.caption
+          assign t_date = item.date
+          assign t_kind = item.type
+          assign t_link = item.url | default: ig_home
+          assign t_attrs = ''
+          assign t_hidden = false
+          if has_blocks
+            for block in section.blocks
+              if block.type != 'post'
+                continue
+              endif
+              assign b_url = block.settings.url | remove: 'https://' | remove: 'http://' | remove: 'www.' | remove_last: '/' | downcase
+              if b_url == blank or b_url != item_url
+                continue
+              endif
+              assign t_attrs = block.shopify_attributes
+              if block.settings.hidden
+                assign t_hidden = true
+              endif
+              if block.settings.image != blank
+                assign t_thumb = block.settings.image | image_url: width: 810
+              endif
+              if block.settings.video != blank
+                assign mp4 = block.settings.video.sources | where: 'format', 'mp4' | first
+                if mp4
+                  assign t_video = mp4.url
+                endif
+              elsif block.settings.video_url != blank
+                assign t_video = block.settings.video_url
+              endif
+              if block.settings.caption != blank
+                assign t_caption = block.settings.caption
+              endif
+              if block.settings.date != blank
+                assign t_date = block.settings.date
+              endif
+              if block.settings.kind != blank and block.settings.kind != 'auto'
+                assign t_kind = block.settings.kind
+              endif
+              if block.settings.link != blank
+                assign t_link = block.settings.link
+              endif
+              break
+            endfor
           endif
           assign on_site = false
-          if section.settings.reel_mode == 'site' and has_media
-            assign on_site = true
-          endif
-          assign kind = item.type | default: ''
-          if kind == blank
-            if item.video != blank
-              assign kind = 'REEL'
-            elsif item.slides.size > 0
-              assign kind = 'CAROUSEL'
+          if section.settings.reel_mode == 'site'
+            if t_video != blank or t_slides.size > 0
+              assign on_site = true
             endif
           endif
-          assign alt = item.caption | replace: brand_from, brand_to | default: series_name | escape
         -%}
-        {%- capture card_meta -%}
-          <div class="series-card-ov"></div>
-          {%- if kind == 'REEL' -%}
-            <div class="series-play" aria-hidden="true" title="Reel">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-            </div>
-          {%- elsif kind == 'CAROUSEL' -%}
-            <div class="series-play" aria-hidden="true" title="Carousel">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="14" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v11"/></svg>
-            </div>
-          {%- else -%}
-            <div class="series-play" aria-hidden="true" title="Instagram post">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
-            </div>
-          {%- endif -%}
-          <div class="series-card-meta">
-            {%- if section.settings.show_dates -%}<div class="series-card-date">{{ item.date | date: "%b %Y" }}</div>{%- endif -%}
-            {%- if item.caption != blank and section.settings.show_captions -%}<div class="series-card-cap">{{ item.caption | replace: brand_from, brand_to }}</div>{%- endif -%}
-          </div>
-        {%- endcapture -%}
-        {%- if on_site -%}
-          <div
-            class="series-card"
-            data-series-card
-            {% if item.video != blank %}data-video="{{ item.video }}"{% endif %}
-            {% if item.slides.size > 0 %}data-slides="{{ item.slides | join: '|' | escape }}"{% endif %}
-            {% if item.url != blank %}data-url="{{ item.url }}"{% endif %}
-            data-caption="{{ item.caption | replace: brand_from, brand_to | escape }}"
-            role="button" tabindex="0"
-            aria-label="{% if item.video != blank %}Play reel{% else %}View carousel{% endif %}: {{ alt }}"
-          >
-            <img src="{{ item.thumb }}" alt="{{ alt }}" loading="lazy" width="540" height="840">
-            {{ card_meta }}
-          </div>
-        {%- else -%}
-          {%- comment -%} The click-through: the post opens on Instagram
-              itself, where the view and any engagement count. {%- endcomment -%}
-          <a class="series-card" href="{{ ig_link }}" target="_blank" rel="noopener"
-             aria-label="{{ alt }} - view on Instagram">
-            <img src="{{ item.thumb }}" alt="{{ alt }}" loading="lazy" width="540" height="840">
-            {{ card_meta }}
-          </a>
-        {%- endif -%}
+        {%- unless t_hidden -%}
+          {%- assign ss_shown = ss_shown | plus: 1 -%}
+          {%- render 'series-tile', thumb: t_thumb, video: t_video, slides: t_slides, url: item.url, link: t_link, caption: t_caption, date: t_date, kind: t_kind, alt: series_name, on_site: on_site, attrs: t_attrs, synced: true, section: section, brand_from: brand_from, brand_to: brand_to -%}
+        {%- endunless -%}
+        {%- assign prev_num = item_num -%}
       {%- endfor -%}
+      {%- comment -%} Own blocks older than every synced post (or all of them when nothing is synced). {%- endcomment -%}
+      {%- if has_blocks -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type != 'post' or block.settings.hidden -%}{%- continue -%}{%- endif -%}
+          {%- if ss_limit > 0 and ss_shown >= ss_limit -%}{%- break -%}{%- endif -%}
+          {%- liquid
+            assign b_url = block.settings.url | remove: 'https://' | remove: 'http://' | remove: 'www.' | remove_last: '/' | downcase
+            assign b_is_override = false
+            if b_url != blank
+              for p in posts
+                assign p_url = p.url | remove: 'https://' | remove: 'http://' | remove: 'www.' | remove_last: '/' | downcase
+                if p_url == b_url
+                  assign b_is_override = true
+                  break
+                endif
+              endfor
+            endif
+            if b_is_override
+              continue
+            endif
+            assign b_num = block.settings.date | remove: '-' | plus: 0
+            if block.settings.date == blank
+              assign b_num = 99999999
+            endif
+            assign slot = false
+            if ss_reverse
+              if b_num >= prev_num
+                assign slot = true
+              endif
+            else
+              if b_num <= prev_num
+                assign slot = true
+              endif
+            endif
+          -%}
+          {%- if slot -%}
+            {%- assign ss_shown = ss_shown | plus: 1 -%}
+            {%- render 'series-tile-block', block: block, section: section, ig_home: ig_home, brand_from: brand_from, brand_to: brand_to -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
     </div>
   </div>
 </section>
@@ -169,6 +278,11 @@
 </div>
 
 <style>
+  .series-card .series-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s;pointer-events:none}
+  .series-card.is-playing .series-vid{opacity:1}
+  .series-card.is-playing img{filter:saturate(1)}
+  .series-synced{position:absolute;top:14px;left:14px;z-index:3;font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:4px 7px;background:rgba(10,9,8,.6);color:rgba(var(--white-rgb),.8);border:1px solid rgba(var(--white-rgb),.25);cursor:help}
+  .series-card-empty{display:flex;align-items:flex-end;background:repeating-linear-gradient(45deg,var(--bg3),var(--bg3) 10px,var(--bg2) 10px,var(--bg2) 20px)}
   .lbv [hidden]{display:none!important}
   .lbv-slides{position:relative;display:flex;align-items:center;justify-content:center;max-width:calc(100vw - 100px);max-height:calc(100vh - 120px)}
   .lbv-slides img{display:block;width:auto;height:auto;max-width:calc(100vw - 100px);max-height:calc(100vh - 190px);object-fit:contain;background:#000;box-shadow:0 30px 90px rgba(0,0,0,.7);border:1px solid rgba(var(--gold2-rgb),.25)}
@@ -192,7 +306,48 @@
 <script>
   (function () {
     document.addEventListener('keydown', function (e) {
-      var lbv = document.getElementById('lbv');
+      // Films play silently while the pointer rests on a tile; on touch
+    // screens the tile that is mostly in view plays. Clicks are untouched.
+    var vids = document.querySelectorAll('[data-series] .series-card .series-vid');
+    if (vids.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      function playCard(card) {
+        var v = card.querySelector('.series-vid');
+        if (!v) return;
+        if (!v.getAttribute('src')) v.src = v.dataset.src;
+        var p = v.play();
+        if (p && p.then) p.then(function () { card.classList.add('is-playing'); }).catch(function () {});
+        else card.classList.add('is-playing');
+      }
+      function stopCard(card) {
+        var v = card.querySelector('.series-vid');
+        if (!v) return;
+        v.pause();
+        card.classList.remove('is-playing');
+      }
+      vids.forEach(function (v) {
+        var card = v.closest('.series-card');
+        if (!card || card.dataset.hover) return;
+        card.dataset.hover = '1';
+        if (fine) {
+          card.addEventListener('pointerenter', function () { playCard(card); });
+          card.addEventListener('pointerleave', function () { stopCard(card); });
+          card.addEventListener('focus', function () { playCard(card); });
+          card.addEventListener('blur', function () { stopCard(card); });
+        }
+      });
+      if (!fine && 'IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            var card = e.target;
+            if (e.isIntersecting && e.intersectionRatio >= 0.75) playCard(card); else stopCard(card);
+          });
+        }, { threshold: [0, 0.75] });
+        vids.forEach(function (v) { var card = v.closest('.series-card'); if (card) io.observe(card); });
+      }
+    }
+
+    var lbv = document.getElementById('lbv');
       if (!lbv || !lbv.classList.contains('open')) return;
       if (e.key === 'Escape') closeSeriesFilm(lbv);
       if (e.key === 'ArrowLeft') lbv.dispatchEvent(new CustomEvent('lbv:step', { detail: -1 }));
@@ -341,16 +496,17 @@
     {"type": "header", "content": "Look"},
     {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
     {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},
-    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE"},
-    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light"},
-    {"type": "header", "content": "Photo or film behind the section"},
-    {"type": "paragraph", "content": "Used when Background is set to a photo or film. Real photographs and real footage only, never generated."},
-    {"type": "image_picker", "id": "look_image", "label": "Photo", "info": "Also the poster while a film loads."},
-    {"type": "video", "id": "look_video", "label": "Film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast."},
-    {"type": "text", "id": "look_video_url", "label": "Current film (URL)", "info": "A direct .mp4 link, used when no film is uploaded above."},
-    {"type": "range", "id": "look_dim", "label": "Darken the photo or film", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%."},
-    {"type": "select", "id": "look_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center"},
-    {"type": "select", "id": "look_media_tone", "label": "Words over the photo", "options": [{"value": "dark", "label": "Light words on a darkened photo"}, {"value": "light", "label": "Dark words on a pale photo"}], "default": "dark"},
+    {"type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE", "visible_if": "{{ section.settings.look_surface == 'custom' }}"},
+    {"type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light", "visible_if": "{{ section.settings.look_surface == 'custom' }}"},
+    {"type": "header", "content": "Backdrop photo or film", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "paragraph", "content": "A backdrop behind this section's words, used only while Background is a photo or film. It is not the residence film. Real photographs and real footage only, never generated.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "image_picker", "id": "look_image", "label": "Backdrop photo", "info": "Also the poster while a backdrop film loads.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "video", "id": "look_video", "label": "Backdrop film (upload)", "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "checkbox", "id": "look_media_link", "label": "Use a film link instead of an upload", "default": false, "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "text", "id": "look_video_url", "label": "Backdrop film (URL)", "info": "A direct .mp4 link, used when no backdrop film is uploaded above.", "visible_if": "{{ section.settings.look_surface == 'media' and section.settings.look_media_link }}"},
+    {"type": "range", "id": "look_dim", "label": "Darken the backdrop", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 55, "info": "Lower = brighter. The words stay readable down to about 40%.", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "select", "id": "look_focus", "label": "Backdrop crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
+    {"type": "select", "id": "look_media_tone", "label": "Words over the backdrop", "options": [{"value": "dark", "label": "Light words on a darkened backdrop"}, {"value": "light", "label": "Dark words on a pale backdrop"}], "default": "dark", "visible_if": "{{ section.settings.look_surface == 'media' }}"},
     {"type": "header", "content": "Space"},
     {"type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."},
     {"type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100},
@@ -365,6 +521,24 @@
     {"type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false},
     {"type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false},
     {"type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."}
+  ],
+  "blocks": [
+    {
+      "type": "post",
+      "name": "Post",
+      "settings": [
+        { "type": "paragraph", "content": "A post of your own, or a change to one that arrived from Instagram. Paste the Instagram post link: if that post is already in the strip, whatever you fill in below replaces it (or hides it); any other link adds a new tile, placed by its date." },
+        { "type": "url", "id": "url", "label": "Instagram post link" },
+        { "type": "url", "id": "link", "label": "Send clicks to", "info": "Leave empty to open the Instagram post." },
+        { "type": "image_picker", "id": "image", "label": "Photo", "info": "The tile. Real photographs and renders only." },
+        { "type": "video", "id": "video", "label": "Film (upload)", "info": "Plays silently while the pointer rests on the tile. Portrait 9:16, under 10 MB keeps the page fast." },
+        { "type": "text", "id": "video_url", "label": "Film URL (.mp4)", "info": "Used when no film is uploaded above." },
+        { "type": "textarea", "id": "caption", "label": "Caption" },
+        { "type": "text", "id": "date", "label": "Date", "info": "YYYY-MM-DD. Decides where the tile sits (newest first) and the small date on it." },
+        { "type": "select", "id": "kind", "label": "Icon", "options": [ { "value": "auto", "label": "Automatic" }, { "value": "REEL", "label": "Reel" }, { "value": "CAROUSEL", "label": "Carousel" }, { "value": "IMAGE", "label": "Post" } ], "default": "auto" },
+        { "type": "checkbox", "id": "hidden", "label": "Hide this post", "default": false }
+      ]
+    }
   ],
   "presets": [{ "name": "The Series" }]
 }

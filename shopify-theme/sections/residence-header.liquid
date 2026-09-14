@@ -1,0 +1,604 @@
+{%- comment -%}
+  Header - the top of the residence page
+
+  The photographic (or filmed) hero with the residence's name, status
+  line and suburb, and the residence's own display face (metafields first, this section's fallback second) which
+  is written once here and applies wherever the name appears on the page.
+
+  Split out of the all-in-one Property page section on 14 Sep 2026 so each
+  part of the residence page has its own panel in the customizer. Real
+  photographs and real footage only, never generated.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign mf = product.metafields.custom
+  # The {name} token editors write in the shared framing copy. Built with
+  # append because Shopify's Liquid parser rejects literal braces inside
+  # an output tag's string arguments.
+  assign name_token = '{' | append: 'name' | append: '}'
+  capture pstatus
+    render 'residence-status', product: product
+  endcapture
+  assign sold = false
+  if pstatus contains 'Sold'
+    assign sold = true
+  endif
+  assign state = mf.state.value | default: 'QLD'
+  # The residence's name in its own brochure face (Products › the residence
+  # › Metafields › Residence name font …), for headings that carry it.
+  capture name_span
+    render 'residence-name', product: product
+  endcapture
+  # The name as the brochure writes it (Sierra, not SIERRA) where it is
+  # printed as plain text.
+  assign prop_name = product.title
+  assign nf_any = mf.name_font.value | strip | append: mf.name_font_file.value
+  if nf_any != blank
+    unless mf.name_font_caps.value
+      assign prop_name = product.title | downcase | capitalize
+    endunless
+  endif
+-%}
+{%- liquid
+  # The residence's own display font (its brochure face): a Google Fonts
+  # family by name, or a font file uploaded to Content › Files. Applied to
+  # the name wherever it appears on this page.
+  #
+  # The residence's metafields lead (Products › the residence › Residence
+  # name font / font file / weight / capitals: custom.name_font,
+  # name_font_file, name_font_weight, name_font_caps), so the one entry
+  # also sets the face on the For Sale and Collection cards. The section
+  # settings below are the fallback while the metafields are empty.
+  assign nf = mf.name_font.value | strip
+  assign nf_file = mf.name_font_file.value | strip
+  if nf != blank or nf_file != blank
+    assign nf_weight = mf.name_font_weight.value | default: 400
+    assign nf_caps = mf.name_font_caps.value
+    assign nf_fallback = 'ResidenceFace-' | append: product.handle
+  else
+    assign nf = section.settings.name_font | strip
+    assign nf_file = section.settings.name_font_file | strip
+    assign nf_weight = section.settings.name_font_weight | default: 400
+    assign nf_caps = section.settings.name_font_caps
+    assign nf_fallback = 'ResidenceFace'
+  endif
+-%}
+{%- liquid
+  # The name as the brochure writes it (Sierra, not SIERRA) wherever a
+  # heading names the house: the face's letters exist only in that case.
+  assign prop_name = product.title
+  if nf != blank or nf_file != blank
+    unless nf_caps
+      assign prop_name = product.title | downcase | capitalize
+    endunless
+  endif
+  capture nf_scale
+    render 'residence-face-scale', product: product
+  endcapture
+  # Headings that carry the name in running text (Enquire About Sierra,
+  # Inside Sierra, Experience Sierra) set it in the face with this span;
+  # the words around it stay in the site type, as the brochures do.
+  capture name_span
+    echo '<span class="pg-house prop-house">'
+    echo prop_name
+    echo '</span>'
+  endcapture
+-%}
+{%- if nf != blank or nf_file != blank -%}
+  {%- if nf_file != blank -%}
+    {%- assign nf_family = nf | default: nf_fallback -%}
+    {%- liquid
+      assign nf_fmt = 'woff2'
+      if nf_file contains '.ttf'
+        assign nf_fmt = 'truetype'
+      elsif nf_file contains '.otf'
+        assign nf_fmt = 'opentype'
+      elsif nf_file contains '.woff2'
+        assign nf_fmt = 'woff2'
+      elsif nf_file contains '.woff'
+        assign nf_fmt = 'woff'
+      endif
+    -%}
+    <style>
+  /* [hidden] alone loses to .lb{display:flex} in style.css, so the viewer never hid. */
+  @font-face{font-family:'{{ nf_family }}';src:url('{{ nf_file }}') format('{{ nf_fmt }}');font-weight:{{ nf_weight }};font-display:swap}</style>
+  {%- else -%}
+    {%- assign nf_family = nf -%}
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family={{ nf | replace: ' ', '+' }}:wght@{{ nf_weight }}&display=swap">
+  {%- endif -%}
+  <style>
+    .prop-name,.psb-name,.prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house,.prop-house{font-family:'{{ nf_family }}',var(--font-d);font-weight:{{ nf_weight }}{% if nf_caps %};text-transform:uppercase{% endif %}}
+    .prop-gallery-h em,.prop-cta-h em,.film-h em,.pg-house,.prop-house{font-size:calc(1em * {{ nf_scale | strip }})}
+    .prop-house{text-transform:none}
+    em .prop-house,.prop-house em{font-size:1em}
+    /* The name printed by the residence-name snippet sizes itself; the em around it must not scale it again. */
+    .prop-gallery-h em:has(>.res-face),.prop-cta-h em:has(>.res-face),.film-h em:has(>.res-face){font-size:1em}
+    .psb-name{font-size:calc(var(--t-body) * var(--s-t,1) * {{ nf_scale | strip }})}
+    .prop-name{letter-spacing:{{ section.settings.name_font_tracking | default: -4 | divided_by: 100.0 }}em;line-height:.95}
+  </style>
+{%- endif -%}
+
+{% render 'section-look', section: section, mode: 'hero' %}
+{%- liquid
+  assign pr_dim = section.settings.hero_dim | default: 44 | divided_by: 100.0
+  if sold
+    assign pr_dim = pr_dim | plus: 0.12
+  endif
+  case section.settings.hero_height
+    when 'full'
+      assign pr_h = '100svh'
+    when 'tall'
+      assign pr_h = '92vh'
+    when 'standard'
+      assign pr_h = '72vh'
+    when 'short'
+      assign pr_h = '56vh'
+    else
+      assign pr_h = '92vh'
+  endcase
+-%}
+<style>@media(prefers-reduced-motion:reduce){.prop-hero video{display:none}}</style>
+<section class="prop-hero{% if section.settings.hero_words == 'centre' %} prop-hero-centre{% endif %}" style="--prop-h:{{ pr_h }};--prop-dim:{{ pr_dim }};--ph-status:{{ section.settings.status_font_scale | default: 100 | divided_by: 100.0 }};--ph-name:{{ section.settings.name_font_scale | default: 100 | divided_by: 100.0 }};--ph-loc:{{ section.settings.loc_font_scale | default: 100 | divided_by: 100.0 }}">
+  {%- liquid
+    # Header media (Customize › Header): the residence's main photo as
+    # designed, a photo chosen here, or a film. Real photographs and real
+    # footage only, never generated.
+    assign hm = section.settings.hero_media | default: 'residence'
+    assign hero_src = section.settings.hero_video_url
+    if section.settings.hero_video
+      assign hmp4 = section.settings.hero_video.sources | where: 'format', 'mp4' | first
+      if hmp4
+        assign hero_src = hmp4.url
+      endif
+    endif
+    assign hero_img = product.featured_image
+    if hm == 'image' and section.settings.hero_image
+      assign hero_img = section.settings.hero_image
+    endif
+    if hm == 'video' and section.settings.hero_poster
+      assign hero_img = section.settings.hero_poster
+    endif
+    assign hfocus = section.settings.hero_focus | default: 'center'
+  -%}
+  {%- if hm == 'video' and hero_src != blank -%}
+    <video src="{{ hero_src }}"{% if hero_img %} poster="{{ hero_img | image_url: width: 1920, height: 1080, crop: hfocus }}"{% endif %} autoplay muted loop playsinline preload="metadata" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ hfocus }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)"></video>
+  {%- elsif hm == 'image' and section.settings.hero_image_ext != blank and section.settings.hero_image == blank -%}
+    <img src="{% render 'ext-variant', src: section.settings.hero_image_ext, w: 1920, h: 1080 %}" alt="{{ product.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ hfocus }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)">
+  {%- elsif hero_img -%}
+    <img src="{{ hero_img | image_url: width: 1920, height: 1080, crop: hfocus }}" alt="{{ product.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ hfocus }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)">
+  {%- endif -%}
+  <div class="prop-hero-ov" style="opacity:calc(var(--prop-dim,.44) / .44)"></div>
+  <div class="prop-hero-content inner">
+    {%- if section.settings.show_status -%}
+    <div class="prop-status" {% if sold %}style="margin-bottom:14px"{% endif %}>
+      <div class="prop-status-dot {% if sold %}sold{% elsif pstatus == 'For Sale' %}active{% endif %}"></div>
+      <span style="color:rgba(var(--white-rgb),.88)">{{ pstatus }}</span>
+    </div>
+    {%- endif -%}
+    {%- liquid
+      assign prop_name = product.title
+      if nf != blank or nf_file != blank
+        unless nf_caps
+          assign prop_name = product.title | downcase | capitalize
+        endunless
+      endif
+    -%}
+    <div class="prop-name">{{ prop_name }}</div>
+    {%- if section.settings.show_location -%}<div class="prop-loc">{{ mf.suburb.value }}, {{ state }}</div>{%- endif -%}
+  </div>
+</section>
+
+<style>
+  /* Header word sizes: the Status, Name and Suburb dials in Customize (100% = as designed). */
+  .prop-hero .prop-status{font-size:calc(clamp(15px,1.7vw,22px)*var(--ph-status,1))}
+  .prop-hero .prop-name{font-size:calc(var(--t-display-xl)*var(--s-h,1)*var(--ph-name,1){% if nf != blank or nf_file != blank %}*{{ nf_scale | strip }}{% endif %})}
+  .prop-hero .prop-loc{font-size:calc(var(--t-small)*var(--s-t,1)*var(--ph-loc,1))}
+  .prop-hero-centre{align-items:center}.prop-hero-centre .prop-hero-content{text-align:center}.prop-hero-centre .prop-status{justify-content:center}
+</style>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The top of the residence page: the big photo or film, the residence's name, its status line and suburb. The name, status and suburb come from Products › the residence. The sold banner and the specs bar under the hero live in the Property page section."
+    },
+    {
+      "type": "header",
+      "content": "Header media"
+    },
+    {
+      "type": "select",
+      "id": "hero_media",
+      "label": "Header media",
+      "options": [
+        {
+          "value": "residence",
+          "label": "The residence's main photo (as designed)"
+        },
+        {
+          "value": "image",
+          "label": "A photo chosen below"
+        },
+        {
+          "value": "video",
+          "label": "A film"
+        }
+      ],
+      "default": "residence",
+      "info": "Real photographs and real footage only, never generated."
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Header photo",
+      "info": "Used when Header media is a chosen photo.",
+      "visible_if": "{{ section.settings.hero_media == 'image' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "hero_use_links",
+      "label": "Use links instead of uploads",
+      "default": false,
+      "info": "Shows the URL boxes for a photo or film hosted elsewhere.",
+      "visible_if": "{{ section.settings.hero_media != 'residence' }}"
+    },
+    {
+      "type": "text",
+      "id": "hero_image_ext",
+      "label": "Header photo (URL)",
+      "info": "A link to a photo, used when none is chosen above.",
+      "visible_if": "{{ section.settings.hero_media == 'image' and section.settings.hero_use_links }}"
+    },
+    {
+      "type": "video",
+      "id": "hero_video",
+      "label": "Header film (upload)",
+      "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast.",
+      "visible_if": "{{ section.settings.hero_media == 'video' }}"
+    },
+    {
+      "type": "text",
+      "id": "hero_video_url",
+      "label": "Header film (URL)",
+      "info": "A direct .mp4 link, used when no film is uploaded.",
+      "visible_if": "{{ section.settings.hero_media == 'video' and section.settings.hero_use_links }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_poster",
+      "label": "Film poster",
+      "info": "Shown while the film loads. Empty = the residence's main photo.",
+      "visible_if": "{{ section.settings.hero_media == 'video' }}"
+    },
+    {
+      "type": "range",
+      "id": "hero_dim",
+      "label": "Darken the header photo or film",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "default": 44,
+      "unit": "%",
+      "info": "Lower = brighter. A sold residence sits a touch darker."
+    },
+    {
+      "type": "select",
+      "id": "hero_height",
+      "label": "Hero height",
+      "options": [
+        {
+          "value": "tall",
+          "label": "Tall (as designed)"
+        },
+        {
+          "value": "full",
+          "label": "Full screen"
+        },
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "short",
+          "label": "Short"
+        }
+      ],
+      "default": "tall"
+    },
+    {
+      "type": "select",
+      "id": "hero_focus",
+      "label": "Crop focus",
+      "options": [
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "hero_words",
+      "label": "Where the words sit",
+      "options": [
+        {
+          "value": "base-left",
+          "label": "Base, left (as designed)"
+        },
+        {
+          "value": "centre",
+          "label": "Centre"
+        }
+      ],
+      "default": "base-left"
+    },
+    {
+      "type": "header",
+      "content": "Words on the header"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_status",
+      "label": "Status line above the name",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "status_font_scale",
+      "label": "Status size",
+      "min": 50,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "name_font_scale",
+      "label": "Name size",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "100% is as designed. The name also follows this section's Look › Heading size."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_location",
+      "label": "Suburb under the name",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "loc_font_scale",
+      "label": "Suburb size",
+      "min": 50,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Residence name font (fallback)"
+    },
+    {
+      "type": "paragraph",
+      "content": "Each residence has its own template, so the face set here belongs to this residence only - use the face from its brochure (Tamsin, 10 Sep 2026). Either type a Google Fonts family (fonts.google.com, e.g. Cinzel, Cormorant, Inter, Marcellus) or upload the brochure's font file to Content › Files and paste its link below."
+    },
+    {
+      "type": "text",
+      "id": "name_font",
+      "label": "Google Fonts family",
+      "info": "Exactly as written on fonts.google.com. Leave empty to keep the site serif."
+    },
+    {
+      "type": "text",
+      "id": "name_font_file",
+      "label": "Font file link (.woff2 / .woff / .ttf / .otf)",
+      "info": "From Content › Files. When set, the family above is only the name the file is given."
+    },
+    {
+      "type": "text",
+      "id": "name_font_weight",
+      "label": "Weight",
+      "default": "400",
+      "info": "A number the face has: 300, 400, 500, 600, 700."
+    },
+    {
+      "type": "range",
+      "id": "name_font_tracking",
+      "label": "Letter spacing",
+      "min": -8,
+      "max": 30,
+      "step": 1,
+      "unit": "%",
+      "default": -4,
+      "info": "Hundredths of an em: -4 is the site's tight serif; 10 to 20 suits a spaced capitals face."
+    },
+    {
+      "type": "checkbox",
+      "id": "name_font_caps",
+      "label": "Set the name in capitals",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Look"
+    },
+    {
+      "type": "paragraph",
+      "content": "Space, type and finishing for this section. Leave everything as designed and nothing changes; every dial is undoable."
+    },
+    {
+      "type": "header",
+      "content": "Space"
+    },
+    {
+      "type": "range",
+      "id": "look_space_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."
+    },
+    {
+      "type": "range",
+      "id": "look_space_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "look_width",
+      "label": "Content width",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme setting (Layout › Content width)"
+        },
+        {
+          "value": "720",
+          "label": "Narrow (720px)"
+        },
+        {
+          "value": "900",
+          "label": "Reading (900px)"
+        },
+        {
+          "value": "1100",
+          "label": "Medium (1100px)"
+        },
+        {
+          "value": "1300",
+          "label": "Wide (1300px)"
+        },
+        {
+          "value": "1600",
+          "label": "Very wide (1600px)"
+        },
+        {
+          "value": "edge",
+          "label": "Edge to edge"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "look_margins",
+      "label": "Side margins",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "look_heading",
+      "label": "Heading size",
+      "min": 50,
+      "max": 160,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Scales the serif headings and titles in this section."
+    },
+    {
+      "type": "range",
+      "id": "look_text",
+      "label": "Text size",
+      "min": 70,
+      "max": 140,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Paragraphs, captions and standfirsts."
+    },
+    {
+      "type": "range",
+      "id": "look_label",
+      "label": "Small label size",
+      "min": 0,
+      "max": 20,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."
+    },
+    {
+      "type": "header",
+      "content": "Finishing"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_animate",
+      "label": "Fade in as it scrolls into view",
+      "default": true,
+      "info": "Off = the section is simply there, no entrance."
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_top",
+      "label": "Hairline above",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_bottom",
+      "label": "Hairline below",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "look_anchor",
+      "label": "Anchor name",
+      "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
+    }
+  ],
+  "enabled_on": {
+    "templates": [
+      "product"
+    ]
+  },
+  "presets": [
+    {
+      "name": "Header"
+    }
+  ]
+}
+{% endschema %}

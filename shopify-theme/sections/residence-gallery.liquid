@@ -1,0 +1,852 @@
+{%- comment -%}
+  Gallery - the residence's photos and clips
+
+  Stage + filmstrip (or a grid of tiles) with the full-screen viewer.
+  Photo / Video blocks hand-pick the set; with none, the residence's
+  photos from Products › Media in order.
+
+  Split out of the all-in-one Property page section on 14 Sep 2026 so each
+  part of the residence page has its own panel in the customizer. Real
+  photographs and real footage only, never generated.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign mf = product.metafields.custom
+  # The {name} token editors write in the shared framing copy. Built with
+  # append because Shopify's Liquid parser rejects literal braces inside
+  # an output tag's string arguments.
+  assign name_token = '{' | append: 'name' | append: '}'
+  capture pstatus
+    render 'residence-status', product: product
+  endcapture
+  assign sold = false
+  if pstatus contains 'Sold'
+    assign sold = true
+  endif
+  assign state = mf.state.value | default: 'QLD'
+  # The residence's name in its own brochure face (Products › the residence
+  # › Metafields › Residence name font …), for headings that carry it.
+  capture name_span
+    render 'residence-name', product: product
+  endcapture
+  # The name as the brochure writes it (Sierra, not SIERRA) where it is
+  # printed as plain text.
+  assign prop_name = product.title
+  assign nf_any = mf.name_font.value | strip | append: mf.name_font_file.value
+  if nf_any != blank
+    unless mf.name_font_caps.value
+      assign prop_name = product.title | downcase | capitalize
+    endunless
+  endif
+-%}
+{%- assign tiles = s.gallery_tiles | default: 9 -%}
+{% render 'section-look', section: section %}
+{%- liquid
+  # Gallery source: Photo / Video blocks picked in Customize (this residence's
+  # own template), or, when none are added, the residence's photos from
+  # Products › Media in order. Either way the grid shows the first few and
+  # the viewer carries the lot.
+  assign use_blocks = false
+  if section.blocks.size > 0
+    assign use_blocks = true
+    assign all_count = section.blocks.size
+  else
+    assign all_count = product.images.size | minus: 1
+  endif
+  assign gallery_count = all_count
+  if gallery_count > tiles
+    assign gallery_count = tiles
+  endif
+  assign glayout = section.settings.gallery_layout | default: 'stage'
+-%}
+{%- if gallery_count > 0 and section.settings.show_gallery -%}
+  <div class="prop-gallery s-surface inner{% if section.settings.show_thumbs == false %} pg-nothumbs{% endif %}{% if section.settings.show_rooms == false %} pg-norooms{% endif %}{% if section.settings.show_expand == false %} pg-noexpand{% endif %}" style="--pgs-ar:{{ section.settings.stage_shape | default: '16/9' }}">
+    {%- if section.settings.gallery_label != blank -%}<div class="slabel reveal">{{ section.settings.gallery_label }}</div>{%- endif -%}
+    <h2 class="prop-gallery-h reveal d1">{{ section.settings.gallery_heading_html | replace: name_token, name_span }}</h2>
+    {%- if glayout == 'grid' -%}
+    <div class="prop-gallery-grid gn-{{ gallery_count }}" id="galleryGrid">
+      {%- assign gdelays = ',d1,d2' | split: ',' -%}
+      {%- if use_blocks -%}
+        {%- for block in section.blocks -%}
+          {%- assign i = forloop.index0 | modulo: 3 -%}
+          {%- assign in_grid = true -%}
+          {%- if forloop.index > tiles -%}{%- assign in_grid = false -%}{%- endif -%}
+          {%- liquid
+            assign cap = block.settings.caption
+            assign vid = ''
+            assign pic = block.settings.image
+            if block.type == 'video'
+              assign pic = block.settings.poster
+              if block.settings.video != blank
+                for src in block.settings.video.sources
+                  if src.format == 'mp4'
+                    assign vid = src.url
+                  endif
+                endfor
+                if pic == blank
+                  assign pic = block.settings.video.preview_image
+                endif
+              elsif block.settings.video_url != blank
+                assign vid = block.settings.video_url
+              endif
+            endif
+            if cap == blank
+              if pic != blank and pic.alt != blank
+                assign cap = pic.alt
+              else
+                assign cap = product.title
+              endif
+            endif
+          -%}
+          {%- if pic == blank and vid == blank -%}{%- continue -%}{%- endif -%}
+          {%- if in_grid -%}
+            <div class="gallery-item gallery-tile reveal-wipe {{ gdelays[i] }}{% if vid != blank %} gallery-video{% endif %}" data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 1800, height: 1350, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}" role="button" tabindex="0" aria-label="{% if vid != blank %}Play video{% else %}View photo{% endif %}: {{ cap | escape }}" {{ block.shopify_attributes }}>
+              {%- if pic != blank -%}
+                <img class="gallery-img" src="{{ pic | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ cap | escape }}" width="900" height="675" loading="lazy" decoding="async">
+              {%- else -%}
+                <video class="gallery-img" src="{{ vid }}" muted playsinline preload="metadata"></video>
+              {%- endif -%}
+            </div>
+          {%- else -%}
+            <span hidden data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}"></span>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for image in product.images offset: 1 limit: tiles -%}
+          {%- assign i = forloop.index0 | modulo: 3 -%}
+          <div class="gallery-item gallery-tile reveal-wipe {{ gdelays[i] }}" data-lb-item data-src="{{ image | image_url: width: 1800, height: 1350, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}" role="button" tabindex="0" aria-label="View photo: {{ image.alt | default: product.title | escape }}">
+            <img class="gallery-img" src="{{ image | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ image.alt | default: product.title | escape }}" width="900" height="675" loading="lazy" decoding="async">
+          </div>
+        {%- endfor -%}
+        {%- if all_count > tiles -%}
+          <div hidden>
+            {%- assign extra_offset = tiles | plus: 1 -%}
+            {%- for image in product.images offset: extra_offset -%}
+              <span data-lb-item data-src="{{ image | image_url: width: 2000, height: 1400, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}"></span>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+    {%- if all_count > 1 -%}
+      <div class="gallery-more reveal d2">
+        <button type="button" class="btn-g" id="galleryAll">{{ section.settings.gallery_all_label | default: "View all photos" }} ({{ all_count }}) &rarr;</button>
+      </div>
+    {%- endif -%}
+    {%- else -%}
+    {%- comment -%} Stage + filmstrip. Every photo (blocks or Products › Media) is
+        listed once as data; the stage, the strip, the room index and the
+        full-screen viewer all read from it. {%- endcomment -%}
+    <div hidden id="pgData">
+      {%- if use_blocks -%}
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign cap = block.settings.caption
+            assign vid = ''
+            assign pic = block.settings.image
+            if block.type == 'video'
+              assign pic = block.settings.poster
+              if block.settings.video != blank
+                for src in block.settings.video.sources
+                  if src.format == 'mp4'
+                    assign vid = src.url
+                  endif
+                endfor
+                if pic == blank
+                  assign pic = block.settings.video.preview_image
+                endif
+              elsif block.settings.video_url != blank
+                assign vid = block.settings.video_url
+              endif
+            endif
+            if cap == blank
+              if pic != blank and pic.alt != blank
+                assign cap = pic.alt
+              else
+                assign cap = product.title
+              endif
+            endif
+          -%}
+          {%- if pic == blank and vid == blank -%}{%- continue -%}{%- endif -%}
+          <span data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}{% endif %}" data-stage="{% if pic != blank %}{{ pic | image_url: width: 1800 }}{% endif %}" data-thumb="{% if pic != blank %}{{ pic | image_url: width: 320, height: 240, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}" {{ block.shopify_attributes }}></span>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for image in product.images offset: 1 -%}
+          <span data-lb-item data-src="{{ image | image_url: width: 2000, height: 1400, crop: 'center' }}" data-stage="{{ image | image_url: width: 1800 }}" data-thumb="{{ image | image_url: width: 320, height: 240, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}"></span>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+    <div class="pg reveal d1" id="pg" data-house="{{ product.title | escape }}">
+      <div class="pg-stage" id="pgStage" tabindex="0" aria-roledescription="carousel" aria-label="{{ product.title | escape }} photos">
+        <img class="pg-img" id="pgImgA" alt="" decoding="async">
+        <img class="pg-img" id="pgImgB" alt="" decoding="async">
+        <video class="pg-vid" id="pgVid" muted playsinline loop preload="none" hidden></video>
+        <div class="pg-veil" aria-hidden="true"></div>
+        <div class="pg-top"><span class="pg-house">{{ prop_name }}{% if mf.suburb.value != blank %} &middot; {{ mf.suburb.value }}{% endif %}</span><span class="pg-count" id="pgCount"></span></div>
+        <div class="pg-cap" id="pgCap" aria-live="polite"></div>
+        <button type="button" class="pg-arrow pg-prev" id="pgPrev" aria-label="Previous photo">&larr;</button>
+        <button type="button" class="pg-arrow pg-next" id="pgNext" aria-label="Next photo">&rarr;</button>
+        <button type="button" class="pg-expand" id="pgExpand"><span aria-hidden="true">&#x2922;</span> {{ section.settings.gallery_all_label | default: "View all photos" }} ({{ all_count }})</button>
+      </div>
+      <div class="pg-strip" id="pgStrip" role="tablist" aria-label="Photo thumbnails"></div>
+      <div class="pg-rooms" id="pgRooms" aria-label="Rooms"></div>
+    </div>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+  <img id="lbImg" src="" alt="">
+  <video id="lbVideo" controls playsinline hidden></video>
+  <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&larr;</button>
+  <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&rarr;</button>
+  <button class="lb-close" id="lbClose" aria-label="Close">&#10005;</button>
+  <div class="lb-meta"><span class="lb-cap" id="lbCap"></span><span id="lbCount"></span></div>
+</div>
+<script>
+  (function () {
+    var lb = document.getElementById('lb');
+    if (!lb || lb.dataset.lbInit) return;
+    lb.dataset.lbInit = '1';
+    var items = Array.prototype.slice.call(document.querySelectorAll('[data-lb-item]')).filter(function (el) { return !el.closest('[id^="pg-"]'); });
+    if (!items.length) return;
+    var img = document.getElementById('lbImg'), cap = document.getElementById('lbCap'), count = document.getElementById('lbCount');
+    var i = 0, lastFocus = null;
+    var house = {{ product.handle | json }};
+    /* Photos are named house-room-NN; alt text arrives as "SOLACE - solace-kitchen-01"
+       or "SOLACE - Kitchen 01". Show just the room, and say when it is a render. */
+    function caption(alt) {
+      var s = (alt || '').split(' - ').pop().toLowerCase().replace(/\.[a-z]+$/, '');
+      if (s.indexOf(house + '-') === 0 || s.indexOf(house + ' ') === 0) s = s.slice(house.length + 1);
+      var render = /(^|-)render(-|$)/.test(s);
+      s = s.replace(/(^|-)render(-|$)/, '$1').replace(/[-_]?\d+$/, '').replace(/[-_]+/g, ' ').trim();
+      if (!s || s === house) s = {{ product.title | json }};
+      s = s.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+      return render ? s + ' \u00b7 Artist impression' : s;
+    }
+    function show(n) {
+      i = (n + items.length) % items.length;
+      var it = items[i];
+      var vid = document.getElementById('lbVideo'), vsrc = it.getAttribute('data-video');
+      if (vsrc) {
+        img.hidden = true; img.removeAttribute('src');
+        vid.hidden = false; if (vid.getAttribute('src') !== vsrc) vid.src = vsrc; vid.play().catch(function () {});
+      } else {
+        vid.pause(); vid.hidden = true;
+        img.hidden = false; img.src = it.getAttribute('data-src');
+      }
+      img.alt = it.getAttribute('data-alt') || '';
+      cap.textContent = caption(it.getAttribute('data-alt'));
+      count.textContent = (i + 1) + ' / ' + items.length;
+      [i + 1, i - 1].forEach(function (k) { var n = items[(k + items.length) % items.length]; if (!n.getAttribute('data-video') && n.getAttribute('data-src')) { var p = new Image(); p.src = n.getAttribute('data-src'); } });
+    }
+    function open(n) {
+      lastFocus = document.activeElement;
+      lb.hidden = false;
+      requestAnimationFrame(function () { lb.classList.add('open'); });
+      document.documentElement.style.overflow = 'hidden';
+      show(n);
+      document.getElementById('lbClose').focus();
+    }
+    function close() {
+      document.getElementById('lbVideo').pause();
+      lb.classList.remove('open');
+      document.documentElement.style.overflow = '';
+      setTimeout(function () { lb.hidden = true; }, 350);
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+    items.forEach(function (it, n) {
+      it.addEventListener('click', function () { open(n); });
+      it.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(n); } });
+    });
+    lb.__open = open; lb.__caption = caption;
+    var allBtn = document.getElementById('galleryAll');
+    if (allBtn) allBtn.addEventListener('click', function () { open(0); });
+    /* Swipe to page on touch screens */
+    var tx = null;
+    lb.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].clientX; }, { passive: true });
+    lb.addEventListener('touchend', function (e) {
+      if (tx === null) return;
+      var dx = e.changedTouches[0].clientX - tx; tx = null;
+      if (Math.abs(dx) > 40) show(dx < 0 ? i + 1 : i - 1);
+    }, { passive: true });
+    document.getElementById('lbPrev').addEventListener('click', function () { show(i - 1); });
+    document.getElementById('lbNext').addEventListener('click', function () { show(i + 1); });
+    document.getElementById('lbClose').addEventListener('click', close);
+    lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+    document.addEventListener('keydown', function (e) {
+      if (lb.hidden) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowRight') show(i + 1);
+      else if (e.key === 'ArrowLeft') show(i - 1);
+    });
+  })();
+</script>
+<script>
+  (function () {
+    var pg = document.getElementById('pg');
+    if (!pg || pg.dataset.init) return;
+    pg.dataset.init = '1';
+    var data = Array.prototype.slice.call(document.querySelectorAll('#pgData [data-lb-item]'));
+    if (!data.length) { pg.hidden = true; return; }
+    var lb = document.getElementById('lb');
+    var imgs = [document.getElementById('pgImgA'), document.getElementById('pgImgB')];
+    var vid = document.getElementById('pgVid'), cap = document.getElementById('pgCap'), count = document.getElementById('pgCount');
+    var strip = document.getElementById('pgStrip'), rooms = document.getElementById('pgRooms'), stage = document.getElementById('pgStage');
+    var i = 0, on = 0, reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function capOf(n) { var a = data[n].getAttribute('data-alt') || ''; return (lb && lb.__caption) ? lb.__caption(a) : a; }
+    function roomOf(n) { return capOf(n).replace(/\s*·.*$/, ''); }
+    /* Filmstrip */
+    data.forEach(function (el, n) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'pg-thumb' + (el.getAttribute('data-video') ? ' pg-thumb-video' : '');
+      b.setAttribute('role', 'tab'); b.setAttribute('aria-label', capOf(n));
+      var im = document.createElement('img'); im.loading = 'lazy'; im.decoding = 'async'; im.alt = '';
+      im.src = el.getAttribute('data-thumb') || el.getAttribute('data-src'); b.appendChild(im);
+      b.addEventListener('click', function () { show(n); });
+      strip.appendChild(b);
+    });
+    /* Room index: one entry per room, in photo order */
+    /* Group by the full caption ("Kitchen", "Master Suite"); when photos are
+       named more finely than that ("Pool Night", "Pool Day"), group by the
+       first word so the index stays a short row of rooms. */
+    /* One index entry per room. Photo names carry the room ("kitchen-01",
+       "pool-night-03", "formal-living-fireplace-01"); this maps them onto a
+       short list of rooms so the index reads like a floor plan. */
+    var ROOMS = [['walk in robe', 'Walk-in Robe'], ['robe', 'Walk-in Robe'], ['master', 'Master Suite'], ['ensuite', 'Ensuite'], ['bedroom', 'Bedrooms'], ['bed ', 'Bedrooms'], ['bathroom', 'Bathrooms'], ['bath', 'Bathrooms'], ['powder', 'Powder Room'], ['kitchen', 'Kitchen'], ['butler', 'Kitchen'], ['pantry', 'Kitchen'], ['dining', 'Dining'], ['living', 'Living'], ['lounge', 'Living'], ['family', 'Living'], ['games', 'Games Room'], ['media', 'Media Room'], ['cinema', 'Cinema'], ['study', 'Study'], ['office', 'Study'], ['gym', 'Gym'], ['sauna', 'Wellness'], ['spa', 'Wellness'], ['cellar', 'Cellar'], ['laundry', 'Laundry'], ['mud', 'Mud Room'], ['garage', 'Garage'], ['pool', 'Pool'], ['cabana', 'Pool'], ['alfresco', 'Alfresco'], ['terrace', 'Terrace'], ['balcony', 'Balcony'], ['rooftop', 'Rooftop'], ['courtyard', 'Courtyard'], ['garden', 'Garden'], ['entry', 'Entry'], ['foyer', 'Entry'], ['hall', 'Entry'], ['stair', 'Staircase'], ['facade', 'Exterior'], ['exterior', 'Exterior'], ['street', 'Exterior'], ['front', 'Exterior'], ['rear', 'Exterior'], ['aerial', 'Aerial'], ['interior', 'Interior']];
+    var house = (pg.getAttribute('data-house') || '').toLowerCase();
+    var roomKey = function (n) {
+      var c = roomOf(n).toLowerCase();
+      for (var k = 0; k < ROOMS.length; k++) { if (c.indexOf(ROOMS[k][0]) !== -1) return ROOMS[k][1]; }
+      var w = c.replace(/\b\d+\b/g, '').trim().split(/\s+/).filter(function (x) { return x && x !== house; });
+      return w.length ? w.slice(0, 2).join(' ').replace(/\b\w/g, function (ch) { return ch.toUpperCase(); }) : '';
+    };
+    var roomAt = {}, roomKeys = [];
+    data.forEach(function (el, n) { var r = roomKey(n); if (r && !(r in roomAt)) { roomAt[r] = n; roomKeys.push(r); } });
+    if (roomKeys.length > 1 && roomKeys.length <= 16) {
+      roomKeys.forEach(function (r) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'pg-room'; b.textContent = r;
+        b.addEventListener('click', function () { show(roomAt[r]); });
+        rooms.appendChild(b);
+      });
+    } else { rooms.hidden = true; }
+    function show(n, instant) {
+      i = (n + data.length) % data.length;
+      var el = data[i], v = el.getAttribute('data-video');
+      if (v) {
+        imgs.forEach(function (im) { im.classList.remove('is-on'); });
+        vid.hidden = false; if (vid.getAttribute('src') !== v) vid.src = v; vid.play().catch(function () {});
+      } else {
+        vid.pause(); vid.hidden = true;
+        var nxt = imgs[1 - on], src = el.getAttribute('data-stage') || el.getAttribute('data-src');
+        var swap = function () { imgs[on].classList.remove('is-on'); nxt.classList.add('is-on'); on = 1 - on; nxt.onload = null; };
+        nxt.alt = capOf(i);
+        if (nxt.getAttribute('src') === src && nxt.complete) swap();
+        else { nxt.onload = swap; nxt.src = src; }
+      }
+      cap.textContent = capOf(i); count.textContent = (i + 1) + ' / ' + data.length;
+      var th = strip.children;
+      for (var k = 0; k < th.length; k++) { th[k].classList.toggle('is-on', k === i); th[k].setAttribute('aria-selected', k === i ? 'true' : 'false'); }
+      if (th[i]) strip.scrollTo({ left: th[i].offsetLeft - strip.clientWidth / 2 + th[i].offsetWidth / 2, behavior: (instant || reduce) ? 'auto' : 'smooth' });
+      var rk = roomKey(i);
+      Array.prototype.forEach.call(rooms.children, function (b) { b.classList.toggle('is-on', b.textContent === rk); });
+      [i + 1, i - 1].forEach(function (k) { var e = data[(k + data.length) % data.length]; if (!e.getAttribute('data-video')) { var p = new Image(); p.src = e.getAttribute('data-stage') || e.getAttribute('data-src'); } });
+    }
+    document.getElementById('pgPrev').addEventListener('click', function (e) { e.stopPropagation(); show(i - 1); });
+    document.getElementById('pgNext').addEventListener('click', function (e) { e.stopPropagation(); show(i + 1); });
+    var openFull = function (e) { if (e) e.stopPropagation(); if (lb && lb.__open) lb.__open(i); };
+    document.getElementById('pgExpand').addEventListener('click', openFull);
+    stage.addEventListener('click', function (e) { if (e.target.closest('button')) return; openFull(); });
+    stage.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(i + 1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); show(i - 1); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFull(); }
+    });
+    var tx = null;
+    stage.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].clientX; }, { passive: true });
+    stage.addEventListener('touchend', function (e) {
+      if (tx === null) return; var dx = e.changedTouches[0].clientX - tx; tx = null;
+      if (Math.abs(dx) > 40) show(dx < 0 ? i + 1 : i - 1);
+    }, { passive: true });
+    show(0, true);
+  })();
+</script>
+<style>
+  /* [hidden] alone loses to .lb{display:flex} in style.css, so the photo viewer never hid. */
+  .lb[hidden]{display:none}
+  .pg-nothumbs .pg-strip{display:none}
+  .pg-norooms .pg-rooms{display:none}
+  .pg-noexpand .pg-expand{display:none}
+  .prop-gallery .pg-stage{aspect-ratio:var(--pgs-ar,16/9)}
+</style>
+
+{% schema %}
+{
+  "name": "The residence",
+  "max_blocks": 50,
+  "blocks": [
+    {
+      "type": "photo",
+      "name": "Photo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Photo"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption",
+          "info": "Shown in the viewer, e.g. Kitchen. Leave empty to use the photo's alt text."
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video (uploaded to Shopify)"
+        },
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "or video file URL",
+          "info": "A direct .mp4 link, used when no Shopify video is picked."
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Poster (optional)"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The residence in pictures: add Photo and Video blocks (⊕ Add block) to hand-pick this residence's gallery. With no blocks it shows the photos from Products › this residence › Media, in order. Each residence has its own template, so blocks picked here belong to this residence only. Real photographs and real footage only, never generated."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gallery",
+      "label": "Show the gallery",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "gallery_label",
+      "label": "Gallery label",
+      "default": "The Residence",
+      "visible_if": "{{ section.settings.show_gallery }}"
+    },
+    {
+      "type": "html",
+      "id": "gallery_heading_html",
+      "label": "Gallery heading",
+      "default": "Inside <em>{name}</em>.",
+      "visible_if": "{{ section.settings.show_gallery }}"
+    },
+    {
+      "type": "select",
+      "id": "gallery_layout",
+      "label": "Gallery layout",
+      "default": "stage",
+      "options": [
+        {
+          "value": "stage",
+          "label": "Stage + filmstrip"
+        },
+        {
+          "value": "grid",
+          "label": "Grid of tiles"
+        }
+      ],
+      "info": "Stage: arrows, swipe and keyboard move through every photo; the room names under the strip jump straight to a room; the photo opens full screen on click.",
+      "visible_if": "{{ section.settings.show_gallery }}"
+    },
+    {
+      "type": "range",
+      "id": "gallery_tiles",
+      "label": "Photos in the grid (Grid layout only)",
+      "min": 3,
+      "max": 12,
+      "step": 3,
+      "default": 9,
+      "info": "Small even tiles; the rest open in the viewer.",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'grid' }}"
+    },
+    {
+      "type": "select",
+      "id": "stage_shape",
+      "label": "Stage shape",
+      "options": [
+        {
+          "value": "16/9",
+          "label": "Wide 16:9 (as designed)"
+        },
+        {
+          "value": "3/2",
+          "label": "Landscape 3:2"
+        },
+        {
+          "value": "4/3",
+          "label": "Landscape 4:3"
+        },
+        {
+          "value": "21/9",
+          "label": "Cinematic 21:9"
+        }
+      ],
+      "default": "16/9",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_thumbs",
+      "label": "Filmstrip of thumbnails (Stage layout)",
+      "default": true,
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rooms",
+      "label": "Room names under the strip (Stage layout)",
+      "default": true,
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_expand",
+      "label": "\"View all photos\" button on the stage",
+      "default": true,
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' }}"
+    },
+    {
+      "type": "text",
+      "id": "gallery_all_label",
+      "label": "View all photos button",
+      "default": "View all photos",
+      "info": "The photo count is added automatically. Every photo on the residence (Products › the residence › Media) opens in the viewer; the grid shows the first six after the hero.",
+      "visible_if": "{{ section.settings.show_gallery }}"
+    },
+    {
+      "type": "header",
+      "content": "Look"
+    },
+    {
+      "type": "paragraph",
+      "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."
+    },
+    {
+      "type": "select",
+      "id": "look_surface",
+      "label": "Background",
+      "options": [
+        {
+          "value": "design",
+          "label": "As designed"
+        },
+        {
+          "value": "cream",
+          "label": "Cream (the page colour)"
+        },
+        {
+          "value": "stone",
+          "label": "Stone (soft panel)"
+        },
+        {
+          "value": "obsidian",
+          "label": "Obsidian (dark)"
+        },
+        {
+          "value": "custom",
+          "label": "A colour of your own (below)"
+        },
+        {
+          "value": "media",
+          "label": "A photo or film behind it (below)"
+        }
+      ],
+      "default": "design",
+      "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."
+    },
+    {
+      "type": "color",
+      "id": "look_color",
+      "label": "Your colour",
+      "default": "#F0EADE",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_tone",
+      "label": "Words on your colour",
+      "options": [
+        {
+          "value": "light",
+          "label": "Dark words (for a light colour)"
+        },
+        {
+          "value": "dark",
+          "label": "Light words (for a dark colour)"
+        }
+      ],
+      "default": "light",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "Backdrop photo or film",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "A backdrop behind this section's words, used only while Background is a photo or film. It is not the residence film. Real photographs and real footage only, never generated.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "look_image",
+      "label": "Backdrop photo",
+      "info": "Also the poster while a backdrop film loads.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "video",
+      "id": "look_video",
+      "label": "Backdrop film (upload)",
+      "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_media_link",
+      "label": "Use a film link instead of an upload",
+      "default": false,
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "text",
+      "id": "look_video_url",
+      "label": "Backdrop film (URL)",
+      "info": "A direct .mp4 link, used when no backdrop film is uploaded above.",
+      "visible_if": "{{ section.settings.look_surface == 'media' and section.settings.look_media_link }}"
+    },
+    {
+      "type": "range",
+      "id": "look_dim",
+      "label": "Darken the backdrop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 55,
+      "info": "Lower = brighter. The words stay readable down to about 40%.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_focus",
+      "label": "Backdrop crop focus",
+      "options": [
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_media_tone",
+      "label": "Words over the backdrop",
+      "options": [
+        {
+          "value": "dark",
+          "label": "Light words on a darkened backdrop"
+        },
+        {
+          "value": "light",
+          "label": "Dark words on a pale backdrop"
+        }
+      ],
+      "default": "dark",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "header",
+      "content": "Space"
+    },
+    {
+      "type": "range",
+      "id": "look_space_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."
+    },
+    {
+      "type": "range",
+      "id": "look_space_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "look_width",
+      "label": "Content width",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme setting (Layout › Content width)"
+        },
+        {
+          "value": "720",
+          "label": "Narrow (720px)"
+        },
+        {
+          "value": "900",
+          "label": "Reading (900px)"
+        },
+        {
+          "value": "1100",
+          "label": "Medium (1100px)"
+        },
+        {
+          "value": "1300",
+          "label": "Wide (1300px)"
+        },
+        {
+          "value": "1600",
+          "label": "Very wide (1600px)"
+        },
+        {
+          "value": "edge",
+          "label": "Edge to edge"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "look_margins",
+      "label": "Side margins",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "look_heading",
+      "label": "Heading size",
+      "min": 50,
+      "max": 160,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Scales the serif headings and titles in this section."
+    },
+    {
+      "type": "range",
+      "id": "look_text",
+      "label": "Text size",
+      "min": 70,
+      "max": 140,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Paragraphs, captions and standfirsts."
+    },
+    {
+      "type": "range",
+      "id": "look_label",
+      "label": "Small label size",
+      "min": 0,
+      "max": 20,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."
+    },
+    {
+      "type": "header",
+      "content": "Finishing"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_animate",
+      "label": "Fade in as it scrolls into view",
+      "default": true,
+      "info": "Off = the section is simply there, no entrance."
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_top",
+      "label": "Hairline above",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_bottom",
+      "label": "Hairline below",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "look_anchor",
+      "label": "Anchor name",
+      "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
+    }
+  ],
+  "enabled_on": {
+    "templates": [
+      "product"
+    ]
+  },
+  "presets": [
+    {
+      "name": "The residence"
+    }
+  ]
+}
+{% endschema %}

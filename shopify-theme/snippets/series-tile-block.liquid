@@ -1,0 +1,37 @@
+{%- comment -%}
+  A "Post" block of The Series rendered as a tile of its own (its link is
+  not one of the synced posts). Params: block, section, ig_home,
+  brand_from, brand_to.
+{%- endcomment -%}
+{%- liquid
+  assign b_thumb = ''
+  if block.settings.image != blank
+    assign b_thumb = block.settings.image | image_url: width: 810
+  endif
+  assign b_video = ''
+  if block.settings.video != blank
+    assign mp4 = block.settings.video.sources | where: 'format', 'mp4' | first
+    if mp4
+      assign b_video = mp4.url
+    endif
+  elsif block.settings.video_url != blank
+    assign b_video = block.settings.video_url
+  endif
+  if b_thumb == blank and block.settings.video != blank and block.settings.video.preview_image
+    assign b_thumb = block.settings.video.preview_image | image_url: width: 810
+  endif
+  assign b_kind = block.settings.kind
+  if b_kind == 'auto'
+    assign b_kind = ''
+  endif
+  assign b_link = block.settings.link | default: block.settings.url | default: ig_home
+  assign on_site = false
+  if section.settings.reel_mode == 'site' and b_video != blank
+    assign on_site = true
+  endif
+-%}
+{%- if b_thumb != blank or b_video != blank -%}
+  {%- render 'series-tile', thumb: b_thumb, video: b_video, url: block.settings.url, link: b_link, caption: block.settings.caption, date: block.settings.date, kind: b_kind, alt: block.settings.caption, on_site: on_site, attrs: block.shopify_attributes, synced: false, section: section, brand_from: brand_from, brand_to: brand_to -%}
+{%- elsif request.design_mode -%}
+  <div class="series-card series-card-empty" {{ block.shopify_attributes }}><div class="series-card-meta"><div class="series-card-cap">Add a photo or a film to this post.</div></div></div>
+{%- endif -%}

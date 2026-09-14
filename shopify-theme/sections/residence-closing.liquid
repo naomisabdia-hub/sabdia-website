@@ -1,0 +1,408 @@
+{%- comment -%}
+  Private appointments - the closing band
+
+  "Experience {name} in person" with a button to the enquiry form
+  (not shown on a sold residence). The share row lives under More Sabdia
+  residences (Naomi, 14 Sep 2026), not here.
+
+  Split out of the all-in-one Property page section on 14 Sep 2026 so each
+  part of the residence page has its own panel in the customizer. Real
+  photographs and real footage only, never generated.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign mf = product.metafields.custom
+  # The {name} token editors write in the shared framing copy. Built with
+  # append because Shopify's Liquid parser rejects literal braces inside
+  # an output tag's string arguments.
+  assign name_token = '{' | append: 'name' | append: '}'
+  capture pstatus
+    render 'residence-status', product: product
+  endcapture
+  assign sold = false
+  if pstatus contains 'Sold'
+    assign sold = true
+  endif
+  assign state = mf.state.value | default: 'QLD'
+  # The residence's name in its own brochure face (Products › the residence
+  # › Metafields › Residence name font …), for headings that carry it.
+  capture name_span
+    render 'residence-name', product: product
+  endcapture
+  # The name as the brochure writes it (Sierra, not SIERRA) where it is
+  # printed as plain text.
+  assign prop_name = product.title
+  assign nf_any = mf.name_font.value | strip | append: mf.name_font_file.value
+  if nf_any != blank
+    unless mf.name_font_caps.value
+      assign prop_name = product.title | downcase | capitalize
+    endunless
+  endif
+-%}
+{% render 'section-look', section: section %}
+{%- unless sold or section.settings.show_cta == false -%}
+  <section class="prop-cta s-surface">
+    <div class="inner prop-cta-inner">
+      <div class="slabel reveal" style="justify-content:center">{{ section.settings.cta_label }}</div>
+      <h2 class="prop-cta-h reveal d1">{{ section.settings.cta_heading_html | replace: name_token, name_span }}</h2>
+      <p class="prop-cta-p reveal d2">{{ section.settings.cta_text | replace: name_token, name_span }}</p>
+      <a href="#cform" class="btn-p reveal d3">{{ section.settings.cta_button | replace: name_token, prop_name }} &rarr;</a>
+    </div>
+  </section>
+{%- endunless -%}
+
+
+{% schema %}
+{
+  "name": "Private appointments",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The closing \"Experience {name} in person\" band - private appointments - with a button back up to the enquiry form. Hidden on a sold residence."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Closing \"Experience in person\" band",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Closing CTA label",
+      "default": "Private Appointments",
+      "visible_if": "{{ section.settings.show_cta }}"
+    },
+    {
+      "type": "html",
+      "id": "cta_heading_html",
+      "label": "Closing CTA heading",
+      "default": "Experience <em>{name}</em> in person.",
+      "visible_if": "{{ section.settings.show_cta }}"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "Closing CTA text",
+      "default": "Private inspections are available by appointment.",
+      "visible_if": "{{ section.settings.show_cta }}"
+    },
+    {
+      "type": "text",
+      "id": "cta_button",
+      "label": "Closing CTA button",
+      "default": "Enquire About {name}",
+      "visible_if": "{{ section.settings.show_cta }}"
+    },
+    {
+      "type": "header",
+      "content": "Look"
+    },
+    {
+      "type": "paragraph",
+      "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."
+    },
+    {
+      "type": "select",
+      "id": "look_surface",
+      "label": "Background",
+      "options": [
+        {
+          "value": "design",
+          "label": "As designed"
+        },
+        {
+          "value": "cream",
+          "label": "Cream (the page colour)"
+        },
+        {
+          "value": "stone",
+          "label": "Stone (soft panel)"
+        },
+        {
+          "value": "obsidian",
+          "label": "Obsidian (dark)"
+        },
+        {
+          "value": "custom",
+          "label": "A colour of your own (below)"
+        },
+        {
+          "value": "media",
+          "label": "A photo or film behind it (below)"
+        }
+      ],
+      "default": "design",
+      "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."
+    },
+    {
+      "type": "color",
+      "id": "look_color",
+      "label": "Your colour",
+      "default": "#F0EADE",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_tone",
+      "label": "Words on your colour",
+      "options": [
+        {
+          "value": "light",
+          "label": "Dark words (for a light colour)"
+        },
+        {
+          "value": "dark",
+          "label": "Light words (for a dark colour)"
+        }
+      ],
+      "default": "light",
+      "visible_if": "{{ section.settings.look_surface == 'custom' }}"
+    },
+    {
+      "type": "header",
+      "content": "Backdrop photo or film",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "A backdrop behind this section's words, used only while Background is a photo or film. It is not the residence film. Real photographs and real footage only, never generated.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "look_image",
+      "label": "Backdrop photo",
+      "info": "Also the poster while a backdrop film loads.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "video",
+      "id": "look_video",
+      "label": "Backdrop film (upload)",
+      "info": "Plays silently on a loop. Landscape 16:9, under 20 MB keeps the page fast.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_media_link",
+      "label": "Use a film link instead of an upload",
+      "default": false,
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "text",
+      "id": "look_video_url",
+      "label": "Backdrop film (URL)",
+      "info": "A direct .mp4 link, used when no backdrop film is uploaded above.",
+      "visible_if": "{{ section.settings.look_surface == 'media' and section.settings.look_media_link }}"
+    },
+    {
+      "type": "range",
+      "id": "look_dim",
+      "label": "Darken the backdrop",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 55,
+      "info": "Lower = brighter. The words stay readable down to about 40%.",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_focus",
+      "label": "Backdrop crop focus",
+      "options": [
+        {
+          "value": "center",
+          "label": "Centre"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "select",
+      "id": "look_media_tone",
+      "label": "Words over the backdrop",
+      "options": [
+        {
+          "value": "dark",
+          "label": "Light words on a darkened backdrop"
+        },
+        {
+          "value": "light",
+          "label": "Dark words on a pale backdrop"
+        }
+      ],
+      "default": "dark",
+      "visible_if": "{{ section.settings.look_surface == 'media' }}"
+    },
+    {
+      "type": "header",
+      "content": "Space"
+    },
+    {
+      "type": "range",
+      "id": "look_space_top",
+      "label": "Space above",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only."
+    },
+    {
+      "type": "range",
+      "id": "look_space_bottom",
+      "label": "Space below",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "look_width",
+      "label": "Content width",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme setting (Layout › Content width)"
+        },
+        {
+          "value": "720",
+          "label": "Narrow (720px)"
+        },
+        {
+          "value": "900",
+          "label": "Reading (900px)"
+        },
+        {
+          "value": "1100",
+          "label": "Medium (1100px)"
+        },
+        {
+          "value": "1300",
+          "label": "Wide (1300px)"
+        },
+        {
+          "value": "1600",
+          "label": "Very wide (1600px)"
+        },
+        {
+          "value": "edge",
+          "label": "Edge to edge"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "look_margins",
+      "label": "Side margins",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "default": 100,
+      "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges."
+    },
+    {
+      "type": "header",
+      "content": "Type"
+    },
+    {
+      "type": "range",
+      "id": "look_heading",
+      "label": "Heading size",
+      "min": 50,
+      "max": 160,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Scales the serif headings and titles in this section."
+    },
+    {
+      "type": "range",
+      "id": "look_text",
+      "label": "Text size",
+      "min": 70,
+      "max": 140,
+      "step": 5,
+      "unit": "%",
+      "default": 100,
+      "info": "Paragraphs, captions and standfirsts."
+    },
+    {
+      "type": "range",
+      "id": "look_label",
+      "label": "Small label size",
+      "min": 0,
+      "max": 20,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = the site-wide size (Theme settings › Layout › Section label size)."
+    },
+    {
+      "type": "header",
+      "content": "Finishing"
+    },
+    {
+      "type": "checkbox",
+      "id": "look_animate",
+      "label": "Fade in as it scrolls into view",
+      "default": true,
+      "info": "Off = the section is simply there, no entrance."
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_top",
+      "label": "Hairline above",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "look_rule_bottom",
+      "label": "Hairline below",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "look_anchor",
+      "label": "Anchor name",
+      "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
+    }
+  ],
+  "enabled_on": {
+    "templates": [
+      "product"
+    ]
+  },
+  "presets": [
+    {
+      "name": "Private appointments"
+    }
+  ]
+}
+{% endschema %}

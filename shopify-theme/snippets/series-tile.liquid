@@ -1,0 +1,67 @@
+{%- comment -%}
+  One tile of "The Series" strip (sections/series-strip.liquid).
+  Params: thumb, video, slides, url (the Instagram post), link (where a
+  click goes), caption, date, kind, alt, on_site (play here instead of
+  opening Instagram), attrs (theme-editor attributes for a block tile),
+  synced (came from the Instagram sync), section, brand_from, brand_to.
+  A film plays silently while the pointer rests on the tile (in view, on
+  touch screens); the click still goes to the post.
+{%- endcomment -%}
+{%- liquid
+  assign cap = caption | replace: brand_from, brand_to
+  assign t_alt = cap | default: alt | escape
+  assign has_slides = false
+  if slides != blank and slides.size > 0
+    assign has_slides = true
+  endif
+  assign t_kind = kind | default: ''
+  if t_kind == blank
+    if video != blank
+      assign t_kind = 'REEL'
+    elsif has_slides
+      assign t_kind = 'CAROUSEL'
+    endif
+  endif
+-%}
+{%- capture card_inner -%}
+  <img src="{{ thumb }}" alt="{{ t_alt }}" loading="lazy" width="540" height="840">
+  {%- if video != blank -%}
+    <video class="series-vid" muted loop playsinline preload="none" data-src="{{ video }}" aria-hidden="true" tabindex="-1"></video>
+  {%- endif -%}
+  <div class="series-card-ov"></div>
+  {%- if t_kind == 'REEL' -%}
+    <div class="series-play" aria-hidden="true" title="Reel">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+    </div>
+  {%- elsif t_kind == 'CAROUSEL' -%}
+    <div class="series-play" aria-hidden="true" title="Carousel">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="14" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v11"/></svg>
+    </div>
+  {%- else -%}
+    <div class="series-play" aria-hidden="true" title="Instagram post">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+    </div>
+  {%- endif -%}
+  {%- if request.design_mode and synced -%}
+    <span class="series-synced" title="Synced from Instagram. To change this tile, add a Post block to this section and paste this post's link into it: {{ url }}">Instagram</span>
+  {%- endif -%}
+  <div class="series-card-meta">
+    {%- if section.settings.show_dates and date != blank -%}<div class="series-card-date">{{ date | date: "%b %Y" }}</div>{%- endif -%}
+    {%- if cap != blank and section.settings.show_captions -%}<div class="series-card-cap">{{ cap }}</div>{%- endif -%}
+  </div>
+{%- endcapture -%}
+{%- if on_site -%}
+  <div
+    class="series-card"
+    data-series-card
+    {% if video != blank %}data-video="{{ video }}"{% endif %}
+    {% if has_slides %}data-slides="{{ slides | join: '|' | escape }}"{% endif %}
+    {% if url != blank %}data-url="{{ url }}"{% endif %}
+    data-caption="{{ cap | escape }}"
+    role="button" tabindex="0"
+    aria-label="{% if video != blank %}Play reel{% else %}View carousel{% endif %}: {{ t_alt }}"
+    {{ attrs }}
+  >{{ card_inner }}</div>
+{%- else -%}
+  <a class="series-card" href="{{ link }}" target="_blank" rel="noopener" aria-label="{{ t_alt }} - view on Instagram" {{ attrs }}>{{ card_inner }}</a>
+{%- endif -%}

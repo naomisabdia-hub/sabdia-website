@@ -82,6 +82,48 @@ Brisbane via GitHub Actions (**Actions → Instagram → The Series**, where
 *Run workflow* triggers it on demand). The theme change (the on-site
 player for reels and carousels) goes live with the next theme push.
 
+## Interim: the lists built on 14 Sep 2026 (until the sync runs)
+
+The sync above is not running yet (the app still lacks `write_files`, and
+there is no Instagram token). Meanwhile every residence's strip was rebuilt
+by hand-capturing the @_sabdia feed on 14 Sep 2026: all 665 posts were
+read, every reel, carousel and photo whose caption names a residence was
+kept (340 entries across 16 residences, AETHER 18), thumbnails were copied
+to Supabase `media/series/ig/<code>.jpg`, and each entry carries the real
+post link so a tile opens that post on Instagram.
+
+The result is in `shopify-app/series-posts.json`. Writing it to the store is
+one command (the Shopify write is the step Claude cannot run):
+
+```bash
+npm run series:apply
+```
+
+`node shopify-app/apply-series.mjs --dry-run` lists what it would write.
+Saves are live at once (the site is SSR); no theme push is needed. When
+the real sync starts, its entries replace these (they carry an `id`, so
+the sync treats them as its own and refreshes them from Instagram).
+
+## Films on the tiles, and Post blocks (14 Sep 2026)
+
+- A reel's film plays silently while the pointer rests on its tile (on a
+  phone, the tile that is mostly in view plays). The click still opens the
+  post on Instagram (or the on-site player, if that setting is chosen).
+  Entries carry the film as `video`; the interim lists hold every matched
+  reel at Supabase `media/series/ig/<code>.mp4` (the smallest 720p copy
+  Instagram serves), and the real sync brings its own copy from Shopify
+  Files when it runs.
+- **Post blocks** are the hand-editable layer. Every synced post on the six
+  residence pages has one (`python3 shopify-app/add-series-blocks.py <theme>`
+  adds any that are missing; `push-live.sh` runs it), so in Customize › the
+  residence page › The Series you click a tile, its block opens, and *Send
+  clicks to* sets where that tile goes. Photo, film, caption and date
+  replace the synced ones when filled in; *Hide this post* removes the
+  tile. *Add block › Post* with any other Instagram link adds a tile of
+  your own, slotted by its date. Links use the `instagram.com/p/<code>/`
+  form: the Instagram app opens that exact post, where the `/reel/` form
+  can land in the Reels feed on a phone.
+
 ## What is pulled
 
 Feed posts only: **reels, carousels and single photos**. Stories are never

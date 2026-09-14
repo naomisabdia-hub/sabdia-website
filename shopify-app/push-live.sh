@@ -27,4 +27,21 @@ fi
 # templates are store-side, so this adds it where it is missing and nothing else.
 echo "== The film section on the residence templates"
 python3 shopify-app/add-film-section.py $THEME
+# The residence page as its own sections (14 Sep 2026): Header, Specs bar,
+# Description and enquiry, Gallery, Closing. Moves any template still on the
+# all-in-one Property page section over, settings and gallery blocks intact.
+echo "== The residence page split into its own sections"
+python3 shopify-app/split-property-page.py $THEME
+# The residence page arranged as Naomi's sections (14 Sep 2026): Header,
+# Property page (specs bar, sold banner, sticky bar), About and enquiry, The
+# residence, Private appointments, The film, The Series, More Sabdia
+# residences, Scroll walkthrough (hidden unless the residence has one).
+# Settings move with their section; nothing Naomi set is lost.
+echo "== The residence page arranged into its sections"
+python3 shopify-app/arrange-residence-page.py $THEME
+# One editable Post block per synced post in The Series (14 Sep 2026), so a
+# tile can be clicked in the editor and its link changed. Adds only what is
+# missing; hand edits survive.
+echo "== Post blocks in The Series"
+python3 shopify-app/add-series-blocks.py $THEME
 echo "Done."

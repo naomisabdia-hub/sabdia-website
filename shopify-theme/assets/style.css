@@ -656,6 +656,8 @@ a.cd-v:hover{color:var(--gold)}
 .cform{display:flex;flex-direction:column;gap:16px}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .fg{display:flex;flex-direction:column;gap:7px}
+/* display:flex beats the hidden attribute, so a hidden field group (the careers CV) showed for everyone. */
+.fg[hidden]{display:none}
 .fl{font-size:var(--t-label);font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:var(--taupe-d)}
 .fi,.fta,.fsel{background:var(--white);border:1px solid var(--border);color:var(--ink);padding:13px 16px;font-family:var(--font-u);font-size:calc(var(--t-body)*var(--s-t,1));font-weight:300;outline:none;transition:border-color .3s,box-shadow .3s;width:100%;border-radius:var(--r-sm)}
 .fi:focus,.fta:focus,.fsel:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(var(--gold-rgb),.08)}
