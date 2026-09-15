@@ -88,7 +88,8 @@ architecture, layout, interiors, or finishes. No exceptions.**
   `add-collection-card-blocks.py <theme>` adds the card blocks where a
   grid has none (push-live.sh runs both). Size chips and filter (15 Sep 2026): every card shows
   Build size (house icon) then Land size (lot icon) from custom.build_size /
-  custom.land; the Refine toolbar's Size filter and sort read Build size only. The same template serves /collections/sold: toolbar, Now
+  custom.land; the Refine toolbar's Size filter and sort read Land size
+  (Naomi changed it from build to land the same day). The same template serves /collections/sold: toolbar, Now
   selling, featured banner, sold band, how strip skip themselves there. Every
   section's Look "backdrop" dials (photo/film behind the words) are named
   Backdrop … and only show when Background = a photo or film; The film
