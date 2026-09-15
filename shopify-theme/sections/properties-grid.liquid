@@ -70,7 +70,8 @@
       {%- liquid
         assign cards = 0
         for block in section.blocks
-          if block.settings.residence != blank
+          assign pgb = block.settings.residence_page | default: block.settings.residence
+          if pgb != blank
             assign cards = cards | plus: 1
           endif
         endfor
@@ -79,12 +80,12 @@
       <div class="proj-grid proj-grid-main">
         {%- assign n = 0 -%}
         {%- for block in section.blocks -%}
-          {%- if block.settings.residence == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign pgb = block.settings.residence_page | default: block.settings.residence -%}{%- if pgb == blank -%}{%- continue -%}{%- endif -%}
           {%- assign n = n | plus: 1 -%}
           {%- if n > 3 -%}{%- break -%}{%- endif -%}
           {%- assign slots = 'hero,a,b' | split: ',' -%}
           {%- assign si = n | minus: 1 -%}
-          {% render 'residence-card', product: block.settings.residence, slot: slots[si], s: section.settings, block: block %}
+          {% render 'residence-card', product: pgb, slot: slots[si], s: section.settings, block: block %}
         {%- endfor -%}
       </div>
       {%- endif -%}
@@ -94,11 +95,11 @@
         <div class="{% if pg_layout == 'two' %}proj-grid-2{% else %}proj-grid-3 proj-grid-flow{% endif %}" style="{% if pg_layout == 'editorial' %}margin-top:var(--proj-gap,10px){% endif %}">
           {%- assign n = 0 -%}
           {%- for block in section.blocks -%}
-            {%- if block.settings.residence == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign pgb = block.settings.residence_page | default: block.settings.residence -%}{%- if pgb == blank -%}{%- continue -%}{%- endif -%}
             {%- assign n = n | plus: 1 -%}
             {%- if n <= skip -%}{%- continue -%}{%- endif -%}
             {%- assign di = n | minus: skip | minus: 1 | modulo: 3 -%}
-            {% render 'residence-card', product: block.settings.residence, slot: 'row', di: di, s: section.settings, block: block %}
+            {% render 'residence-card', product: pgb, slot: 'row', di: di, s: section.settings, block: block %}
           {%- endfor -%}
         </div>
       {%- endif -%}
@@ -107,17 +108,15 @@
     <div class="proj-grid proj-grid-main">
       {%- for h in live_handles limit: 3 -%}
         {%- assign i = forloop.index -%}
-        {%- for product in collections.all.products -%}
-          {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+        {%- assign pg_res = pages[h] -%}{%- if pg_res == blank -%}{%- for cand in collections.all.products -%}{%- if cand.handle == h -%}{%- assign pg_res = cand -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+        {%- if pg_res == blank -%}{%- continue -%}{%- endif -%}
           {%- if i == 1 -%}
-            {% render 'residence-card', product: product, slot: 'hero', s: section.settings %}
+            {% render 'residence-card', product: pg_res, slot: 'hero', s: section.settings %}
           {%- elsif i == 2 -%}
-            {% render 'residence-card', product: product, slot: 'a', s: section.settings %}
+            {% render 'residence-card', product: pg_res, slot: 'a', s: section.settings %}
           {%- else -%}
-            {% render 'residence-card', product: product, slot: 'b', s: section.settings %}
+            {% render 'residence-card', product: pg_res, slot: 'b', s: section.settings %}
           {%- endif -%}
-          {%- break -%}
-        {%- endfor -%}
       {%- endfor -%}
     </div>
     {%- endif -%}
@@ -126,11 +125,8 @@
       <div class="{% if pg_layout == 'two' %}proj-grid-2{% else %}proj-grid-3 proj-grid-flow{% endif %}" style="{% if pg_layout == 'editorial' %}margin-top:var(--proj-gap,10px){% endif %}">
         {%- for h in rest_handles limit: rest_limit -%}
           {%- assign di = forloop.index0 | modulo: 3 -%}
-          {%- for product in collections.all.products -%}
-            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
-            {% render 'residence-card', product: product, slot: 'row', di: di, s: section.settings %}
-            {%- break -%}
-          {%- endfor -%}
+          {%- assign pg_res = pages[h] -%}{%- if pg_res == blank -%}{%- for cand in collections.all.products -%}{%- if cand.handle == h -%}{%- assign pg_res = cand -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+          {%- if pg_res != blank -%}{% render 'residence-card', product: pg_res, slot: 'row', di: di, s: section.settings %}{%- endif -%}
         {%- endfor -%}
       </div>
     {%- endif -%}
@@ -209,6 +205,7 @@
       "type": "card",
       "name": "Residence card",
       "settings": [
+        { "type": "page", "id": "residence_page", "label": "Residence page", "info": "The residence's page (Content › Pages). Leads over the product below; the residences moved to pages on 15 Sep 2026." },
         { "type": "product", "id": "residence", "label": "Residence" },
         { "type": "image_picker", "id": "image", "label": "Photo", "info": "Empty = the residence's main photo (Products › the residence › Media, first photo). Its other photos are in the picker's library. Real photographs and renders only, never generated." },
         { "type": "url", "id": "link", "label": "Send clicks to", "info": "Empty = the residence's own page." },

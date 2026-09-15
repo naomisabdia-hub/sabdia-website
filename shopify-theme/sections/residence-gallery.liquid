@@ -11,13 +11,19 @@
 {%- endcomment -%}
 {%- liquid
   assign s = section.settings
-  assign mf = product.metafields.custom
+  # The residence being shown: its product, or its page (15 Sep 2026: the
+  # residences moved from $0 products to pages - same fields, same design).
+  assign res = product
+  if res == blank and page != blank
+    assign res = page
+  endif
+  assign mf = res.metafields.custom
   # The {name} token editors write in the shared framing copy. Built with
   # append because Shopify's Liquid parser rejects literal braces inside
   # an output tag's string arguments.
   assign name_token = '{' | append: 'name' | append: '}'
   capture pstatus
-    render 'residence-status', product: product
+    render 'residence-status', product: res
   endcapture
   assign sold = false
   if pstatus contains 'Sold'
@@ -27,15 +33,15 @@
   # The residence's name in its own brochure face (Products › the residence
   # › Metafields › Residence name font …), for headings that carry it.
   capture name_span
-    render 'residence-name', product: product
+    render 'residence-name', product: res
   endcapture
   # The name as the brochure writes it (Sierra, not SIERRA) where it is
   # printed as plain text.
-  assign prop_name = product.title
+  assign prop_name = res.title
   assign nf_any = mf.name_font.value | strip | append: mf.name_font_file.value
   if nf_any != blank
     unless mf.name_font_caps.value
-      assign prop_name = product.title | downcase | capitalize
+      assign prop_name = res.title | downcase | capitalize
     endunless
   endif
 -%}
@@ -109,7 +115,7 @@
               if pic != blank and pic.alt != blank
                 assign cap = pic.alt
               else
-                assign cap = product.title
+                assign cap = res.title
               endif
             endif
           -%}
@@ -134,15 +140,15 @@
       {%- else -%}
         {%- for image in product.images offset: 1 limit: tiles -%}
           {%- assign i = forloop.index0 | modulo: 3 -%}
-          <div class="gallery-item gallery-tile reveal-wipe {{ gdelays[i] }}" data-lb-item data-src="{{ image | image_url: width: 1800, height: 1350, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}" role="button" tabindex="0" aria-label="View photo: {{ image.alt | default: product.title | escape }}">
-            <img class="gallery-img" src="{{ image | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ image.alt | default: product.title | escape }}" width="900" height="675" loading="lazy" decoding="async">
+          <div class="gallery-item gallery-tile reveal-wipe {{ gdelays[i] }}" data-lb-item data-src="{{ image | image_url: width: 1800, height: 1350, crop: 'center' }}" data-alt="{{ image.alt | default: res.title | escape }}" role="button" tabindex="0" aria-label="View photo: {{ image.alt | default: res.title | escape }}">
+            <img class="gallery-img" src="{{ image | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ image.alt | default: res.title | escape }}" width="900" height="675" loading="lazy" decoding="async">
           </div>
         {%- endfor -%}
         {%- if all_count > tiles -%}
           <div hidden>
             {%- assign extra_offset = tiles | plus: 1 -%}
             {%- for image in product.images offset: extra_offset -%}
-              <span data-lb-item data-src="{{ image | image_url: width: 2000, height: 1400, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}"></span>
+              <span data-lb-item data-src="{{ image | image_url: width: 2000, height: 1400, crop: 'center' }}" data-alt="{{ image.alt | default: res.title | escape }}"></span>
             {%- endfor -%}
           </div>
         {%- endif -%}
@@ -183,7 +189,7 @@
               if pic != blank and pic.alt != blank
                 assign cap = pic.alt
               else
-                assign cap = product.title
+                assign cap = res.title
               endif
             endif
           -%}
@@ -192,12 +198,12 @@
         {%- endfor -%}
       {%- else -%}
         {%- for image in product.images offset: 1 -%}
-          <span data-lb-item data-src="{{ image | image_url: width: 2000, height: 1400, crop: 'center' }}" data-stage="{{ image | image_url: width: 1800 }}" data-thumb="{{ image | image_url: width: 320, height: 240, crop: 'center' }}" data-alt="{{ image.alt | default: product.title | escape }}"></span>
+          <span data-lb-item data-src="{{ image | image_url: width: 2000, height: 1400, crop: 'center' }}" data-stage="{{ image | image_url: width: 1800 }}" data-thumb="{{ image | image_url: width: 320, height: 240, crop: 'center' }}" data-alt="{{ image.alt | default: res.title | escape }}"></span>
         {%- endfor -%}
       {%- endif -%}
     </div>
-    <div class="pg reveal d1" id="pg" data-house="{{ product.title | escape }}">
-      <div class="pg-stage" id="pgStage" tabindex="0" aria-roledescription="carousel" aria-label="{{ product.title | escape }} photos">
+    <div class="pg reveal d1" id="pg" data-house="{{ res.title | escape }}">
+      <div class="pg-stage" id="pgStage" tabindex="0" aria-roledescription="carousel" aria-label="{{ res.title | escape }} photos">
         <img class="pg-img" id="pgImgA" alt="" decoding="async">
         <img class="pg-img" id="pgImgB" alt="" decoding="async">
         <video class="pg-vid" id="pgVid" muted playsinline loop preload="none" hidden></video>
@@ -234,7 +240,7 @@
     if (items.length < 2) { document.getElementById('lbPrev').style.display = 'none'; document.getElementById('lbNext').style.display = 'none'; }
     var img = document.getElementById('lbImg'), cap = document.getElementById('lbCap'), count = document.getElementById('lbCount');
     var i = 0, lastFocus = null;
-    var house = {{ product.handle | json }};
+    var house = {{ res.handle | json }};
     /* Photos are named house-room-NN; alt text arrives as "SOLACE - solace-kitchen-01"
        or "SOLACE - Kitchen 01". Show just the room, and say when it is a render. */
     function caption(alt) {
@@ -242,7 +248,7 @@
       if (s.indexOf(house + '-') === 0 || s.indexOf(house + ' ') === 0) s = s.slice(house.length + 1);
       var render = /(^|-)render(-|$)/.test(s);
       s = s.replace(/(^|-)render(-|$)/, '$1').replace(/[-_]?\d+$/, '').replace(/[-_]+/g, ' ').trim();
-      if (!s || s === house) s = {{ product.title | json }};
+      if (!s || s === house) s = {{ res.title | json }};
       s = s.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
       return render ? s + ' \u00b7 Artist impression' : s;
     }
@@ -865,7 +871,8 @@
   ],
   "enabled_on": {
     "templates": [
-      "product"
+      "product",
+      "page"
     ]
   },
   "presets": [

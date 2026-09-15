@@ -31,38 +31,53 @@
     assign picked = true
     assign list_csv = ''
     for block in section.blocks
-      if block.settings.product == blank
+      assign gb_res = block.settings.page | default: block.settings.product
+      if gb_res == blank
         continue
       endif
-      assign list_csv = list_csv | append: block.settings.product.handle | append: ','
+      assign list_csv = list_csv | append: gb_res.handle | append: ','
     endfor
     assign handles = list_csv | split: ','
     assign count = handles.size
   endif
   assign featured = false
   assign first_handle = handles.first
-  for p in collections.all.products
-    if p.handle == first_handle
-      assign featured = p
-      break
-    endif
-  endfor
+  # The residence's page leads (15 Sep 2026); one still only in Products is found there.
+  if first_handle != blank and pages[first_handle] != blank
+    assign featured = pages[first_handle]
+  else
+    for p in collections.all.products
+      if p.handle == first_handle
+        assign featured = p
+        break
+      endif
+    endfor
+  endif
   # Every distinct brochure face to load, so a card can set its name in it.
   assign gfonts = ''
   assign ffiles = ''
   for h in handles
-    for p in collections.all.products
-      if p.handle != h
-        continue
-      endif
-      assign pm = p.metafields.custom
+    assign fp_res = pages[h]
+    if fp_res == blank
+      for cand in collections.all.products
+        if cand.handle == h
+          assign fp_res = cand
+          break
+        endif
+      endfor
+    endif
+    if fp_res == blank
+      continue
+    endif
+    for p in (1..1)
+      assign pm = fp_res.metafields.custom
       assign pf = pm.name_font.value | strip
       assign pff = pm.name_font_file.value | strip
       assign pfw = pm.name_font_weight.value | default: 400
       if pff != blank
         assign pfam = pf
         if pfam == blank
-          assign pfam = 'ResidenceFace-' | append: p.handle
+          assign pfam = 'ResidenceFace-' | append: fp_res.handle
         endif
         assign ffiles = ffiles | append: pfam | append: '¦' | append: pff | append: '¦' | append: pfw | append: '||'
       elsif pf != blank
@@ -81,7 +96,8 @@
   assign fb = false
   if picked
     for block in section.blocks
-      if block.settings.product != blank
+      assign fb_res = block.settings.page | default: block.settings.product
+      if fb_res != blank
         assign fb = block.settings
         break
       endif
@@ -125,6 +141,11 @@
       assign fstatus = fb.status | strip
     endif
     assign f_img = featured.featured_image
+    if f_img == blank
+      # A residence page has no product photo: its main photo by name in Content › Files.
+      assign f_hero = featured.handle | append: '-hero.jpg'
+      assign f_img = images[f_hero]
+    endif
     assign f_url = featured.url
     assign f_focus = 'center'
     assign f_suburb = fmf.suburb.value | append: ', ' | append: fmf.state.value | default: 'QLD'
@@ -233,17 +254,19 @@
       {%- if picked -%}
         {%- assign gi = 0 -%}
         {%- for block in section.blocks -%}
-          {%- if block.settings.product == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign gb_res = block.settings.page | default: block.settings.product -%}
+          {%- if gb_res == blank -%}{%- continue -%}{%- endif -%}
           {%- assign gi = gi | plus: 1 -%}
           {%- assign lead = false -%}{%- if show_rich and mc_featured -%}{%- assign lead = true -%}{%- endif -%}
-          {% render 'collection-card', product: block.settings.product, index: gi, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
+          {% render 'collection-card', product: gb_res, index: gi, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
         {%- endfor -%}
       {%- else -%}
       {%- for h in handles -%}
-        {%- for product in collections.all.products -%}
-        {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+        {%- assign gc_res = pages[h] -%}{%- if gc_res == blank -%}{%- for cand in collections.all.products -%}{%- if cand.handle == h -%}{%- assign gc_res = cand -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+        {%- if gc_res == blank -%}{%- continue -%}{%- endif -%}
+        {%- for once in (1..1) -%}
           {%- assign lead = false -%}{%- if show_rich and mc_featured -%}{%- assign lead = true -%}{%- endif -%}
-          {% render 'collection-card', product: product, index: forloop.parentloop.index, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
+          {% render 'collection-card', product: gc_res, index: forloop.parentloop.index, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
         {%- break -%}
         {%- endfor -%}
       {%- endfor -%}
@@ -819,6 +842,12 @@
       "type": "residence",
       "name": "Residence",
       "settings": [
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Residence page",
+          "info": "The residence's page (Content › Pages). Leads over the product below; the residences moved to pages on 15 Sep 2026."
+        },
         {
           "type": "product",
           "id": "product",

@@ -84,6 +84,11 @@
 {%- liquid
   assign pc_focus = focus | default: 'center'
   assign pc_img = image | default: product.featured_image | default: product.featured_media.preview_image
+  if pc_img == blank and product.handle != blank
+    # A residence page (15 Sep 2026) has no product photo: its main photo by name in Content › Files.
+    assign pc_img_hero = product.handle | append: '-hero.jpg'
+    assign pc_img = images[pc_img_hero]
+  endif
 -%}
 <a href="{{ url | default: product.url }}" class="pc {{ class }}" {% if style != blank %}style="{{ style }}"{% endif %} data-beds="{{ v_beds }}" data-baths="{{ v_baths }}" data-status="{{ pstatus | escape }}" data-feats="{{ feats }}" data-year="{{ mf.year.value }}" {{ attrs }}>
   {%- if pc_img -%}

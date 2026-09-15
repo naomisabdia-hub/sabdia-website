@@ -160,9 +160,14 @@
         <div class="fyh-q" data-fyh-results-heading>{{ section.settings.r_heading }}</div>
         <p class="fyh-note" data-fyh-results-note></p>
         <div class="fyh-matches" data-fyh-matches>
-          {%- for product in col.products -%}
+          {%- comment -%} The live residences in the collection's order, pages first (15 Sep 2026: the residences moved from $0 products to pages). {%- endcomment -%}
+          {%- capture fyh_csv -%}{% render 'residence-handles', col: col, group: 'live' %}{%- endcapture -%}
+          {%- assign fyh_handles = fyh_csv | split: ',' -%}
+          {%- for fyh_h in fyh_handles -%}
+            {%- assign fyh_res = pages[fyh_h] -%}{%- if fyh_res == blank -%}{%- for cand in collections.all.products -%}{%- if cand.handle == fyh_h -%}{%- assign fyh_res = cand -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+            {%- if fyh_res == blank -%}{%- continue -%}{%- endif -%}
             {%- liquid
-              assign suburb = product.metafields.custom.suburb.value
+              assign suburb = fyh_res.metafields.custom.suburb.value
               assign parea = 'other'
               for line in area_lines
                 assign mparts = line | split: '=>'
@@ -173,8 +178,8 @@
                 endif
               endfor
             -%}
-            <div data-fyh-card data-beds="{{ product.metafields.custom.beds.value }}" data-area="{{ parea }}">
-              {% render 'property-card', product: product, style: 'aspect-ratio:16/10', img_w: 800, img_h: 500, show_cars: false %}
+            <div data-fyh-card data-beds="{{ fyh_res.metafields.custom.beds.value }}" data-area="{{ parea }}">
+              {% render 'property-card', product: fyh_res, style: 'aspect-ratio:16/10', img_w: 800, img_h: 500, show_cars: false %}
             </div>
           {%- endfor -%}
         </div>

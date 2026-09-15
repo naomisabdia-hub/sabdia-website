@@ -1,0 +1,706 @@
+{
+  "sections": {
+    "film": {
+      "type": "residence-film",
+      "settings": {
+        "film": "shopify://files/videos/Sabdia Coming soon reel v2 (1).mp4",
+        "film_url": "",
+        "poster": "shopify://shop_images/Screenshot_2026-09-14_at_1.50.47_pm.png",
+        "poster_url": "",
+        "label": "The Film",
+        "heading_html": "",
+        "text": "",
+        "name": "",
+        "caption_left": "",
+        "caption_right": "",
+        "sound_label": "Sound On",
+        "show_label": true,
+        "show_heading": true,
+        "show_text": true,
+        "show_caption": true,
+        "show_sound": true,
+        "autoplay": true,
+        "side": "right",
+        "shape": "9/16",
+        "reel_height": 680,
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "walkthrough": {
+      "type": "scroll-walk",
+      "settings": {
+        "folder": "",
+        "name": "",
+        "walk_label": "The Walkthrough",
+        "hint_walk": "Scroll to walk",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": "",
+        "show_intro": true,
+        "show_label": true,
+        "show_rooms": true,
+        "show_caption": true,
+        "show_progress": true,
+        "show_hint": true,
+        "frame_border": true,
+        "vignette": true,
+        "heading_html": "",
+        "stage_size": "cinema",
+        "scroll_pace": 12
+      },
+      "disabled": true
+    },
+    "series": {
+      "type": "series-strip",
+      "blocks": {
+        "post_DdJBzsJo8tJ": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DdJBzsJo8tJ/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DdJBzsJo8tJ.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DdJBzsJo8tJ.mp4",
+            "caption": "AETHER The first look. A residence of movement, light and form. 15.09.26",
+            "date": "2026-09-11",
+            "kind": "REEL"
+          }
+        },
+        "post_DdBM6L5E3Fk": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DdBM6L5E3Fk/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DdBM6L5E3Fk.jpg",
+            "caption": "AETHER A new chapter has begun for Sabdia, north of the river. For years our homes have taken shape across Brisbane’s south, from Camp Hill to Holland Park West to Coorparoo, and with every home the work has grown. Crossing to the north side began in Hendra, and the site offered what we look for: an elevated aspect,…",
+            "date": "2026-09-08",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DXwAAeFDmgp": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DXwAAeFDmgp/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DXwAAeFDmgp.jpg",
+            "caption": "AETHER Light, air, and quiet precision. Positioned within Hendra, AETHER draws from its surroundings—an established, elevated pocket where openness and outlook are everything. The architecture leans into this, shaped by clarity and restraint, allowing space, light, and view to take precedence. Every line is…",
+            "date": "2026-04-30",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DVqGroYIDzY": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DVqGroYIDzY/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DVqGroYIDzY.jpg",
+            "caption": "AETHER Progress continues to unfold at AETHER, where every element of the home is being carefully brought to life. Positioned in a highly sought-after pocket, the residence has been designed to respond to its surroundings—balancing privacy, light, and connection to the landscape. From the architectural form through…",
+            "date": "2026-03-09",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DU5LkUyEok6": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DU5LkUyEok6/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DU5LkUyEok6.jpg",
+            "caption": "AETHER Step inside AETHER as the home begins to take shape. From light-filled living areas to carefully considered layouts, every space flows seamlessly, revealing the thoughtfulness behind the design. This walkthrough captures the rhythm of the home—where architecture, detail, and lifestyle come together in harmony.…",
+            "date": "2026-02-18",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DTKbpNykYGG": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DTKbpNykYGG/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DTKbpNykYGG.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DTKbpNykYGG.mp4",
+            "caption": "AETHER In Hendra, AETHER stands as a contemporary, bespoke home where organic curves and thoughtful design create a truly unique sanctuary. Expansive living spaces flow seamlessly to alfresco and poolside areas, while layers of materials and textures add depth, warmth, and character to every corner. A home designed…",
+            "date": "2026-01-06",
+            "kind": "REEL"
+          }
+        },
+        "post_DQ_cVGlkehO": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DQ_cVGlkehO/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQ_cVGlkehO.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQ_cVGlkehO.mp4",
+            "caption": "AETHER AETHER is defined by movement and form — bespoke curves flow throughout the home, guiding you from one space to the next. The sculptural staircase at the entry acts as a work of art, while behind, full-height glazing frames the pool, drawing the outdoors in. Every element has been meticulously considered,…",
+            "date": "2025-11-13",
+            "kind": "REEL"
+          }
+        },
+        "post_DQLzsOvD6mZ": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DQLzsOvD6mZ/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQLzsOvD6mZ.jpg",
+            "caption": "AETHER Defined by its curving, bespoke façade in Hendra. Inside, the home seamlessly connects indoor and outdoor spaces, filled with natural light and enhanced by large central voids. Expansive outdoor entertaining areas and a generous balcony provide refined settings for relaxation and gatherings, while the master…",
+            "date": "2025-10-24",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DPdduJmgTYn": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DPdduJmgTYn/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DPdduJmgTYn.jpg",
+            "caption": "AETHER A striking centerpiece in the home, the staircase combines sculptural form with refined finishes, creating a feature that is both functional and a statement of considered design. All enquiries to sales@sabdia.com.au DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2025-10-06",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DPQo3YEkfBl": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DPQo3YEkfBl/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DPQo3YEkfBl.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DPQo3YEkfBl.mp4",
+            "caption": "AETHER Every curve, surface, and detail in AETHER has been meticulously considered, creating a harmonious blend of bespoke finishes and refined design. From the tactile materials to the seamless transitions, each element has been crafted to elevate the living experience in Hendra. DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2025-10-01",
+            "kind": "REEL"
+          }
+        },
+        "post_DPDtcVSiX4W": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DPDtcVSiX4W/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DPDtcVSiX4W.jpg",
+            "caption": "AETHER Under the night sky, its bespoke curves and ethereal, whispy facade are brought to life, creating a home that is sculptural, refined, and enduring in every detail. From its considered architectural form to the seamless integration of premium finishes, AETHER redefines luxury living — a standard unmatched…",
+            "date": "2025-09-26",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DOvKimVkUoO": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DOvKimVkUoO/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DOvKimVkUoO.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DOvKimVkUoO.mp4",
+            "caption": "AETHER A bespoke residence where refined architecture and custom detailing converge. Every element has been carefully curated to create a one-of-a-kind home that embodies timeless luxury and modern living. For enquiries, please contact us at sales@sabdia.com.au DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2025-09-18",
+            "kind": "REEL"
+          }
+        },
+        "post_DOdGFTPDLvI": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DOdGFTPDLvI/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DOdGFTPDLvI.jpg",
+            "caption": "AETHER Rising gracefully within Hendra’s leafy streets, AETHER reveals its bespoke façade as dusk falls. Every angle has been considered to create a sculptural form that is as unique as it is refined. A home designed to stand apart, with details crafted entirely for this site. All enquires to sales@sabdia.com.au…",
+            "date": "2025-09-11",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DONovVmk5Hs": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DONovVmk5Hs/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DONovVmk5Hs.jpg",
+            "caption": "AETHER Inside, AETHER embraces a softer architectural language. Curved forms flow throughout the interiors, creating a sense of movement and ease, while natural tones and refined finishes bring warmth to every space. The balance of form and materiality makes the home feel both modern and inviting. Located in Hendra,…",
+            "date": "2025-09-05",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DNz40HjXMEQ": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DNz40HjXMEQ/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DNz40HjXMEQ.jpg",
+            "caption": "AETHER AETHER rises with a curving façade that redefines the streetscape of Hendra. Inside, sculptural forms flow seamlessly through layered interiors, creating a residence where refinement and warmth coexist. Every detail speaks to a vision of luxury shaped with intention. Enquire now to experience AETHER…",
+            "date": "2025-08-26",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DNkcDV2xcKh": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DNkcDV2xcKh/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DNkcDV2xcKh.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DNkcDV2xcKh.mp4",
+            "caption": "AETHER Currently taking shape in Hendra, AETHER is emerging as a sculptural residence defined by its flowing curves and refined contemporary design. Even in progress, the gentle arcs and textured forms hint at the serene, neutral interiors to come, where light and movement will be celebrated in every space. This home…",
+            "date": "2025-08-20",
+            "kind": "REEL"
+          }
+        },
+        "post_DMpNwPoO8jN": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DMpNwPoO8jN/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DMpNwPoO8jN.jpg",
+            "caption": "AETHER Bold curves. Raw materials. Elevated form. Anchored by a central pool, the design commands attention from every angle. Positioned in the heart of Hendra, AETHER’s façade is a statement of sculptural strength and refined simplicity. Enquire via sales@sabdia.com.au DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2025-07-28",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DMZyCUZx3P6": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DMZyCUZx3P6/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DMZyCUZx3P6.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DMZyCUZx3P6.mp4",
+            "caption": "AETHER Introducing our latest project — AETHER (“EE-thər”), unveiled in the heart of Hendra. Inspired by the Greek term for the upper air and clear sky, AETHER evokes fluidity, softened curves, and an elevated calm. A sculptural statement in form and finish, this home redefines street presence with its bold curves,…",
+            "date": "2025-07-22",
+            "kind": "REEL"
+          }
+        }
+      },
+      "block_order": [
+        "post_DdJBzsJo8tJ",
+        "post_DdBM6L5E3Fk",
+        "post_DXwAAeFDmgp",
+        "post_DVqGroYIDzY",
+        "post_DU5LkUyEok6",
+        "post_DTKbpNykYGG",
+        "post_DQ_cVGlkehO",
+        "post_DQLzsOvD6mZ",
+        "post_DPdduJmgTYn",
+        "post_DPQo3YEkfBl",
+        "post_DPDtcVSiX4W",
+        "post_DOvKimVkUoO",
+        "post_DOdGFTPDLvI",
+        "post_DONovVmk5Hs",
+        "post_DNz40HjXMEQ",
+        "post_DNkcDV2xcKh",
+        "post_DMpNwPoO8jN",
+        "post_DMZyCUZx3P6"
+      ],
+      "settings": {
+        "label": "The Series",
+        "heading_prefix": "The story of",
+        "handle_line": "As documented on",
+        "handle": "",
+        "instagram_url": "",
+        "sub": "The build, as it was posted. Hover over the video or click to view the full post.",
+        "reel_mode": "instagram",
+        "view_on_instagram": "View on Instagram",
+        "brand_caps": true,
+        "dark": false,
+        "show_label": true,
+        "show_heading": true,
+        "show_handle": true,
+        "show_sub": true,
+        "show_dates": true,
+        "show_captions": true,
+        "show_kind": true,
+        "show_arrows": true,
+        "card_width": 0,
+        "card_shape": "9/14",
+        "gap": 14,
+        "caption_lines": 3,
+        "limit": 0,
+        "order": "posted",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "related": {
+      "type": "related-properties",
+      "settings": {
+        "show_share": true,
+        "share_label": "Share",
+        "copy_link_label": "Copy link",
+        "related_collection": "",
+        "heading_html": "More <em>Sabdia residences</em>",
+        "heading_sold_html": "Residences <em>for sale now</em>",
+        "show_heading": true,
+        "label": "",
+        "show_cars": true,
+        "show_land": false,
+        "count": 3,
+        "columns": "3",
+        "card_shape": "4/3",
+        "gap": 10,
+        "cta_label": "",
+        "cta_link": "",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "header": {
+      "type": "residence-header",
+      "settings": {
+        "hero_media": "video",
+        "hero_image": "shopify://shop_images/aether-exterior-front-01.jpg",
+        "hero_image_ext": "",
+        "hero_video": "shopify://files/videos/AETHER Landscape video - Agent.mp4",
+        "hero_video_url": "",
+        "hero_poster": "shopify://shop_images/aether-exterior-front-01.jpg",
+        "hero_dim": 20,
+        "hero_height": "tall",
+        "hero_focus": "center",
+        "hero_words": "base-left",
+        "show_status": true,
+        "name_font_scale": 100,
+        "show_location": true,
+        "name_font": "",
+        "name_font_file": "",
+        "name_font_weight": "400",
+        "name_font_tracking": -4,
+        "name_font_caps": false,
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "specs": {
+      "type": "residence-specs",
+      "settings": {
+        "hide_specs": false,
+        "spec_show_location": true,
+        "spec_show_beds": true,
+        "spec_show_baths": true,
+        "spec_show_cars": true,
+        "spec_show_land": true,
+        "spec_show_build": true,
+        "spec_show_status": true,
+        "specs_align": "left",
+        "spec_location": "Location",
+        "spec_beds": "Bedrooms",
+        "spec_baths": "Bathrooms",
+        "spec_cars": "Garages",
+        "spec_land": "Land Size",
+        "spec_build": "Build Size",
+        "spec_status": "Status",
+        "show_sold_banner": false,
+        "sold_notice": "",
+        "sold_banner_label": "View Available",
+        "sold_banner_link": "",
+        "show_sticky": true,
+        "sticky_label": "Enquire"
+      }
+    },
+    "story": {
+      "type": "residence-story",
+      "settings": {
+        "show_about_label": true,
+        "about_label": "About {name}",
+        "show_headline": true,
+        "show_description": true,
+        "show_features": true,
+        "features_heading": "Key Features",
+        "sticky_desc": true,
+        "body_layout": "beside",
+        "show_enquiry": true,
+        "enquiry_types": "General enquiry about {name} | Thank you for your enquiry about {name}. A member of the Sabdia team will be in touch shortly.\nArrange an inspection | Thank you. Inspections of {name} are by private appointment, and a member of the Sabdia team will be in touch shortly to arrange a time.\nRegister my interest | Thank you for registering your interest in {name}. A member of the Sabdia team will be in touch shortly.",
+        "f_first": "First Name*",
+        "f_last": "Last Name*",
+        "f_email": "Email*",
+        "f_phone": "Phone",
+        "f_interest": "Enquiry Type",
+        "f_message": "Message",
+        "optin_label": "Keep me updated on new Sabdia releases",
+        "privacy_note": "By submitting this form you agree to our privacy policy. Your details will not be shared with third parties.",
+        "success_text": "Thank you. A member of the Sabdia team will be in touch shortly.",
+        "show_brochure": false,
+        "brochure_label": "Download Brochure",
+        "show_general": true,
+        "general_label": "General Enquiry",
+        "general_link": "",
+        "sold_cta_label": "View Current Properties",
+        "prequal_budget_label": "Budget range",
+        "prequal_budget": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say",
+        "prequal_timeline_label": "Timeline",
+        "prequal_timeline": "Ready now\n1 - 3 months\n3 - 6 months\n6 - 12 months\nJust researching",
+        "prequal_flex_label": "Location and flexibility",
+        "prequal_flex": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases",
+        "prequal_loc_label": "Preferred locations",
+        "prequal_loc_label_other": "Also considering (optional)",
+        "prequal_locations": ""
+      }
+    },
+    "gallery": {
+      "type": "residence-gallery",
+      "settings": {
+        "show_gallery": true,
+        "gallery_label": "The Residence",
+        "gallery_heading_html": "Inside <em>{name}</em>.",
+        "gallery_layout": "stage",
+        "gallery_tiles": 9,
+        "stage_shape": "16/9",
+        "show_thumbs": true,
+        "show_rooms": true,
+        "show_expand": true,
+        "gallery_all_label": "View all photos"
+      },
+      "blocks": {
+        "photo_1": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-living-01.jpg"
+          }
+        },
+        "photo_2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-exterior-front-01.jpg"
+          }
+        },
+        "photo_3": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-entry-01.jpg"
+          }
+        },
+        "photo_4": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-entry-courtyard-01.jpg"
+          }
+        },
+        "photo_5": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-living-bar-01.jpg"
+          }
+        },
+        "photo_6": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-master-bedroom-01.jpg"
+          }
+        },
+        "photo_7": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-kitchen-dining-01.jpg"
+          }
+        },
+        "photo_8": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-staircase-01.jpg"
+          }
+        },
+        "photo_9": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-hallway-pool-01.jpg"
+          }
+        },
+        "photo_10": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-kitchen-living-01.jpg"
+          }
+        },
+        "photo_11": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-exterior-rear-pool-01.jpg"
+          }
+        },
+        "photo_12": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-staircase-02.jpg"
+          }
+        },
+        "photo_13": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-bedroom-01.jpg"
+          }
+        },
+        "photo_14": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-bathroom-01.jpg"
+          }
+        },
+        "photo_15": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-bedroom-02.jpg"
+          }
+        },
+        "photo_16": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-study-01.jpg"
+          }
+        },
+        "photo_17": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-bedroom-03.jpg"
+          }
+        },
+        "photo_18": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-exterior-front-dusk-01.jpg"
+          }
+        },
+        "photo_19": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-exterior-front-dusk-02.jpg"
+          }
+        },
+        "photo_20": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-staircase-03.jpg"
+          }
+        },
+        "photo_21": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-exterior-rear-dusk-01.jpg"
+          }
+        },
+        "photo_22": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-alfresco-pool-dusk-01.jpg"
+          }
+        },
+        "photo_23": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-master-bedroom-02.jpg"
+          }
+        },
+        "photo_24": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-ensuite-01.jpg"
+          }
+        },
+        "photo_25": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-dressing-room-01.jpg"
+          }
+        },
+        "photo_26": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-living-02.jpg"
+          }
+        },
+        "photo_27": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-kitchen-01.jpg"
+          }
+        },
+        "photo_28": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-aerial-dusk-01.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "photo_1",
+        "photo_2",
+        "photo_3",
+        "photo_4",
+        "photo_5",
+        "photo_6",
+        "photo_7",
+        "photo_8",
+        "photo_9",
+        "photo_10",
+        "photo_11",
+        "photo_12",
+        "photo_13",
+        "photo_14",
+        "photo_15",
+        "photo_16",
+        "photo_17",
+        "photo_18",
+        "photo_19",
+        "photo_20",
+        "photo_21",
+        "photo_22",
+        "photo_23",
+        "photo_24",
+        "photo_25",
+        "photo_26",
+        "photo_27",
+        "photo_28"
+      ]
+    },
+    "closing": {
+      "type": "residence-closing",
+      "settings": {
+        "show_cta": true,
+        "cta_label": "Private Appointments",
+        "cta_heading_html": "Experience <em>{name}</em> in person.",
+        "cta_text": "Inspections are by private appointment. Leave your details and we will be in touch within a business day.",
+        "cta_button": "Enquire About {name}"
+      }
+    }
+  },
+  "order": [
+    "header",
+    "specs",
+    "story",
+    "gallery",
+    "closing",
+    "film",
+    "series",
+    "related",
+    "walkthrough"
+  ]
+}

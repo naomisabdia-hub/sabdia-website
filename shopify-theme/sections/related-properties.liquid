@@ -11,9 +11,14 @@
 {%- comment -%} The residences' own brochure faces, so a card name prints in its house's face. {%- endcomment -%}
 {% render 'residence-faces' %}
 {%- liquid
+  # The residence being viewed: its product, or its page (15 Sep 2026).
+  assign rp_res = product
+  if rp_res == blank and page != blank
+    assign rp_res = page
+  endif
   assign col = section.settings.related_collection | default: collections['for-sale']
   capture pstatus
-    render 'residence-status', product: product
+    render 'residence-status', product: rp_res
   endcapture
   assign sold = false
   if pstatus contains 'Sold'
@@ -32,8 +37,8 @@
   {%- if section.blocks.size > 0 -%}
     {%- comment -%} Hand-picked residences, in block order. The residence being viewed is skipped. {%- endcomment -%}
     {%- for block in section.blocks -%}
-      {%- assign p = block.settings.product -%}
-      {%- if p == blank or p.id == product.id -%}{%- continue -%}{%- endif -%}
+      {%- assign p = block.settings.page | default: block.settings.product -%}
+      {%- if p == blank or p.handle == rp_res.handle -%}{%- continue -%}{%- endif -%}
       {%- assign shown = shown | plus: 1 -%}
       {%- assign delay = '' -%}
       {%- if shown == 2 -%}{%- assign delay = ' d1' -%}{%- elsif shown > 2 -%}{%- assign delay = ' d2' -%}{%- endif -%}
@@ -43,16 +48,16 @@
   {%- else -%}
   {%- for h in live_handles -%}
     {%- if shown >= rp_count -%}{%- break -%}{%- endif -%}
-    {%- for p in collections.all.products -%}
-      {%- if p.handle != h or p.id == product.id -%}{%- continue -%}{%- endif -%}
-      {%- assign shown = shown | plus: 1 -%}
-      {%- case shown -%}
-        {%- when 1 -%}{% render 'property-card', product: p, class: 'reveal', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
-        {%- when 2 -%}{% render 'property-card', product: p, class: 'reveal d1', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
-        {%- else -%}{% render 'property-card', product: p, class: 'reveal d2', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
-      {%- endcase -%}
-      {%- break -%}
-    {%- endfor -%}
+    {%- if h == rp_res.handle -%}{%- continue -%}{%- endif -%}
+    {%- comment -%} The residence's page leads (15 Sep 2026); a residence still only in Products is found there. {%- endcomment -%}
+    {%- assign rp_card = pages[h] -%}{%- if rp_card == blank -%}{%- for cand in collections.all.products -%}{%- if cand.handle == h -%}{%- assign rp_card = cand -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+    {%- if rp_card == blank -%}{%- continue -%}{%- endif -%}
+    {%- assign shown = shown | plus: 1 -%}
+    {%- case shown -%}
+      {%- when 1 -%}{% render 'property-card', product: rp_card, class: 'reveal', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
+      {%- when 2 -%}{% render 'property-card', product: rp_card, class: 'reveal d1', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
+      {%- else -%}{% render 'property-card', product: rp_card, class: 'reveal d2', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
+    {%- endcase -%}
   {%- endfor -%}
   {%- endif -%}
 {%- endcapture -%}
@@ -71,9 +76,9 @@
 {%- comment -%} The share row lives under "More Sabdia residences" (Naomi, 14 Sep 2026). {%- endcomment -%}
 {%- if section.settings.show_share -%}
 {%- liquid
-  assign mf = product.metafields.custom
-  assign share_url = shop.url | append: product.url
-  assign share_title = product.title | append: ' - ' | append: mf.suburb.value | append: ' | Sabdia Constructions'
+  assign mf = rp_res.metafields.custom
+  assign share_url = shop.url | append: rp_res.url
+  assign share_title = rp_res.title | append: ' - ' | append: mf.suburb.value | append: ' | Sabdia Constructions'
   assign eu = share_url | url_encode
   assign et = share_title | url_encode
 -%}
@@ -158,6 +163,7 @@
       "type": "residence",
       "name": "Residence",
       "settings": [
+        {"type": "page", "id": "page", "label": "Residence page", "info": "The residence's page (Content › Pages). Leads over the product below; the residences moved to pages on 15 Sep 2026."},
         {"type": "product", "id": "product", "label": "Residence", "info": "A residence from Products. It shows here whatever its Status; the residence being viewed is skipped."}
       ]
     }

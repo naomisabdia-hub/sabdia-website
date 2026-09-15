@@ -12,24 +12,31 @@
   Publishing a new cut is just pointing at the new folder.
 {%- endcomment -%}
 {%- liquid
+  # The residence: its product, or its page (15 Sep 2026, same fields).
+  assign sw_res = nil
+  if template.name == 'product' and product != blank
+    assign sw_res = product
+  elsif page != blank and page.metafields.custom.status != blank
+    assign sw_res = page
+  endif
   assign folder = section.settings.folder
-  if folder == blank and template.name == 'product'
-    assign folder = product.metafields.custom.scrollwalk_folder.value
+  if folder == blank and sw_res != blank
+    assign folder = sw_res.metafields.custom.scrollwalk_folder.value
   endif
   # Per-residence switch: Products › the residence › "Show the scroll
   # walkthrough". Off hides it even when a folder is set; unset = on.
-  if template.name == 'product'
-    assign sw_switch = product.metafields.custom.show_walkthrough
+  if sw_res != blank
+    assign sw_switch = sw_res.metafields.custom.show_walkthrough
     if sw_switch != blank and sw_switch.value == false
       assign folder = blank
     endif
   endif
   assign wt_name = section.settings.name
   assign wt_name_html = wt_name
-  if wt_name == blank and template.name == 'product'
-    assign wt_name = product.title
+  if wt_name == blank and sw_res != blank
+    assign wt_name = sw_res.title
     capture wt_name_html
-      render 'residence-name', product: product
+      render 'residence-name', product: sw_res
     endcapture
   endif
   assign base = folder

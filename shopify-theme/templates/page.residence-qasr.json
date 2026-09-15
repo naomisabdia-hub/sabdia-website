@@ -1,0 +1,493 @@
+{
+  "sections": {
+    "walkthrough": {
+      "type": "scroll-walk",
+      "settings": {}
+    },
+    "series": {
+      "type": "series-strip",
+      "settings": {},
+      "blocks": {
+        "post_DcdOwClmZr6": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DcdOwClmZr6/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DcdOwClmZr6.jpg",
+            "caption": "QASR Set on a commanding corner in Coorparoo, one of Brisbane’s established inner suburbs, QASR is a residence defined by its arches, its curves and the light they carry. Inside, tall arched windows face the courtyard and the pool beyond, while a sculptural staircase rises through the double-height void. The same…",
+            "date": "2026-08-25",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DachoLaCFbM": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DachoLaCFbM/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DachoLaCFbM.jpg",
+            "caption": "QASR KAH-sar. Arabic for palace. True to its name, QASR is beginning to come to life as construction continues to progress. Inspired by the timeless elegance of Arabian architecture, this home reinterprets traditional forms through a refined, contemporary lens. From the signature arches to the carefully considered…",
+            "date": "2026-07-06",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DZW8aFEhRGb": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DZW8aFEhRGb/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DZW8aFEhRGb.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DZW8aFEhRGb.mp4",
+            "caption": "QASR Positioned high on one of Coorparoo’s most prestigious addresses, QASR is a residence designed to make a lasting impression. Drawing inspiration from Arabian architecture, this bespoke home combines grand proportions with an extraordinary level of detail. Rich natural stone, handcrafted textures, warm bronze…",
+            "date": "2026-06-09",
+            "kind": "REEL"
+          }
+        },
+        "post_DYg7eptAXxT": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DYg7eptAXxT/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYg7eptAXxT.jpg",
+            "caption": "QASR Progress continues to unfold at QASR. A home inspired by Arabian architecture, where scale, texture and materiality come together to create something truly immersive. From the warmth of natural stone and bronze detailing to the layered forms and refined curves, every element has been carefully considered to…",
+            "date": "2026-05-19",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DWirAgTlSOv": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DWirAgTlSOv/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DWirAgTlSOv.jpg",
+            "caption": "QASR QASR is a celebration of detail and design. Inspired by the elegance of Arabian architecture, the home weaves together warm textures, sculptural forms, and intricate patterns that create depth and character. From the striking façade with its rhythm of geometric elements to the interiors where natural materials…",
+            "date": "2026-03-31",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DV-plN6FWq1": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DV-plN6FWq1/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DV-plN6FWq1.jpg",
+            "caption": "QASR Every element of the façade has been carefully composed to create a layered architectural story. Breeze blocks introduce rhythm and texture, softening the structure while allowing light and shadow to move across the elevation throughout the day. Landscaping has been designed as an extension of the…",
+            "date": "2026-03-17",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DVdJjmmGGq2": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DVdJjmmGGq2/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DVdJjmmGGq2.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DVdJjmmGGq2.mp4",
+            "caption": "QASR Inspired by timeless architecture and a refined material palette, QASR is a home where texture and craftsmanship shape every experience of space. Natural stone, warm timber, and bespoke finishes are layered with intention—each material selected not only for its beauty, but for how it interacts with light,…",
+            "date": "2026-03-04",
+            "kind": "REEL"
+          }
+        },
+        "post_DVLNIGrk-qC": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DVLNIGrk-qC/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DVLNIGrk-qC.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DVLNIGrk-qC.mp4",
+            "caption": "QASR The dining space at QASR is designed to be both intimate and grand. A central fireplace anchors the room, creating warmth and ambience, while expansive windows frame serene views of the pool and landscaped surroundings. Materials are layered thoughtfully—natural timbers, stone, and bespoke finishes converse…",
+            "date": "2026-02-25",
+            "kind": "REEL"
+          }
+        },
+        "post_DUkhX3qkX8c": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DUkhX3qkX8c/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DUkhX3qkX8c.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DUkhX3qkX8c.mp4",
+            "caption": "QASR The ground level is where QASR truly comes to life. Designed for gathering, entertaining and lingering moments, the kitchen becomes the anchor of the home — bold yet inviting. Warm brown tones wrap the space, setting a rich and grounded mood, while the marble red hero island commands attention at its centre.…",
+            "date": "2026-02-10",
+            "kind": "REEL"
+          }
+        },
+        "post_DUP7ZCMEbKY": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DUP7ZCMEbKY/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DUP7ZCMEbKY.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DUP7ZCMEbKY.mp4",
+            "caption": "QASR On a coveted corner in Coorparoo, this home takes full advantage of its position — drawing light, framing views, and creating flow at every turn. Entering the nine-car basement garage, the scale and attention to detail are immediately clear. From there, a luxury home gym with sauna unfolds, before leading…",
+            "date": "2026-02-02",
+            "kind": "REEL"
+          }
+        },
+        "post_DUDG3J8El0b": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DUDG3J8El0b/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DUDG3J8El0b.jpg",
+            "caption": "QASR The formal living embodies refined grandeur. Meticulous detailing, considered proportions, and exquisite finishes come together to create a space that is both commanding and effortlessly inviting. This is a home defined by sophistication, where every moment feels exceptional. Enquire now to experience QASR.…",
+            "date": "2026-01-28",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DTugkILkeBc": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DTugkILkeBc/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DTugkILkeBc.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DTugkILkeBc.mp4",
+            "caption": "QASR Beneath the home, a world of scale and luxury unfolds. The 9-car basement garage impresses from the first step — on one side, a private gym and sauna redefine relaxation. On the other, a curated mudroom and a lift provide seamless access to the ground floor above. Every detail is designed for function, flow, and…",
+            "date": "2026-01-20",
+            "kind": "REEL"
+          }
+        },
+        "post_DThoiKwEceD": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DThoiKwEceD/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DThoiKwEceD.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DThoiKwEceD.mp4",
+            "caption": "QASR Even the most functional spaces deserve attention. Here, luxury begins before you step inside. Every line, surface, and detail of the garage has been crafted to reflect the home’s sophistication and layered refinement. All enquires to sales@sabdia.com.au DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2026-01-15",
+            "kind": "REEL"
+          }
+        },
+        "post_DTPlTTnkf2N": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DTPlTTnkf2N/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DTPlTTnkf2N.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DTPlTTnkf2N.mp4",
+            "caption": "QASR Light filters through the towering breezeblock wall, casting patterns that hint at the serenity within. Arched windows frame a private oasis — a pool deck and serene cabanas creating a calm, elevated retreat. Inside, a central floating fireplace separates the intimate formal living from the elegant dining space,…",
+            "date": "2026-01-08",
+            "kind": "REEL"
+          }
+        },
+        "post_DSRz6KOkl1r": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DSRz6KOkl1r/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DSRz6KOkl1r.jpg",
+            "caption": "QASR 'The Sol' — a retreat inspired by the sun, where light, warmth, and serenity intertwine. By day, it welcomes golden sunlight across the pool and alfresco. By night, it transforms into an intimate sanctuary, framed by cabanas and softened by ambient lighting. Every corner is layered, considered, and designed to…",
+            "date": "2025-12-15",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DSE75-bkXtf": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DSE75-bkXtf/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DSE75-bkXtf.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DSE75-bkXtf.mp4",
+            "caption": "QASR The doors open to QASR, an Arabesque-inspired modern home where every layer of material and texture tells a story. Warm timber, soft stone, and subtle lighting create a rhythm that guides you through the space, inviting you to pause, explore, and feel. A home like no other, designed to be experienced, not just…",
+            "date": "2025-12-10",
+            "kind": "REEL"
+          }
+        },
+        "post_DR1fKPwEVuy": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DR1fKPwEVuy/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DR1fKPwEVuy.jpg",
+            "caption": "QASR Every detail converses with the next, forming a dialogue of form, texture, and proportion that elevates the architecture into a cohesive masterpiece. Sitting proudly on a central corner block in Coorparoo, QASR responds to its site with presence and intention, where scale, perspective, and design are in perfect…",
+            "date": "2025-12-04",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DRtwwyNEwXR": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DRtwwyNEwXR/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DRtwwyNEwXR.jpg",
+            "caption": "QASR On the corner of Buena Vista Avenue, Coorparoo, QASR rises with a presence shaped by Arabian architectural influence and contemporary refinement. Sculpted forms, layered textures, and a considered play of light and shadow come together to create a home defined by quiet luxury and intentional detail. Every…",
+            "date": "2025-12-01",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DRjeXQ9kfNB": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DRjeXQ9kfNB/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DRjeXQ9kfNB.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DRjeXQ9kfNB.mp4",
+            "caption": "QASR Every surface, every material, every texture has been meticulously curated — a deliberate composition of depth, light, and detail. This is craftsmanship elevated, where layered textures define modern luxury and the home becomes a tangible expression of refined design. More to come — stay tuned as QASR continues…",
+            "date": "2025-11-27",
+            "kind": "REEL"
+          }
+        },
+        "post_DRO6B3jEUqN": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DRO6B3jEUqN/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DRO6B3jEUqN.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DRO6B3jEUqN.mp4",
+            "caption": "QASR The gates open to Coorparoo’s newest landmark — a residence defined by scale, craftsmanship, and intention. Every surface, texture, and line has been meticulously curated to embody modern luxury and architectural refinement. Our most ambitious project to date, with more to come. DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2025-11-19",
+            "kind": "REEL"
+          }
+        },
+        "post_DRJpOPiEWAk": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DRJpOPiEWAk/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DRJpOPiEWAk.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DRJpOPiEWAk.mp4",
+            "caption": "QASR Every detail of this home reflects the expertise and dedication of our in-house design. From architectural form to bespoke finishes, each element has been carefully curated to embody refined luxury and considered design. Currently under construction, with more to be revealed soon. DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2025-11-17",
+            "kind": "REEL"
+          }
+        },
+        "post_DQqvvcAkVjs": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DQqvvcAkVjs/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQqvvcAkVjs.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQqvvcAkVjs.mp4",
+            "caption": "QASR Written in the sand, a name that marks a new chapter in luxury. “Kah-sar” — meaning palace — represents scale, elegance, and enduring refinement. Architecturally bold yet timeless, QASR is shaped through bespoke detailing, premium finishes, and an unwavering focus on craftsmanship. Coming soon. DESIGN · DEVELOP…",
+            "date": "2025-11-05",
+            "kind": "REEL"
+          }
+        }
+      },
+      "block_order": [
+        "post_DcdOwClmZr6",
+        "post_DachoLaCFbM",
+        "post_DZW8aFEhRGb",
+        "post_DYg7eptAXxT",
+        "post_DWirAgTlSOv",
+        "post_DV-plN6FWq1",
+        "post_DVdJjmmGGq2",
+        "post_DVLNIGrk-qC",
+        "post_DUkhX3qkX8c",
+        "post_DUP7ZCMEbKY",
+        "post_DUDG3J8El0b",
+        "post_DTugkILkeBc",
+        "post_DThoiKwEceD",
+        "post_DTPlTTnkf2N",
+        "post_DSRz6KOkl1r",
+        "post_DSE75-bkXtf",
+        "post_DR1fKPwEVuy",
+        "post_DRtwwyNEwXR",
+        "post_DRjeXQ9kfNB",
+        "post_DRO6B3jEUqN",
+        "post_DRJpOPiEWAk",
+        "post_DQqvvcAkVjs"
+      ]
+    },
+    "related": {
+      "type": "related-properties",
+      "settings": {}
+    },
+    "film": {
+      "type": "residence-film",
+      "settings": {}
+    },
+    "header": {
+      "type": "residence-header",
+      "settings": {}
+    },
+    "specs": {
+      "type": "residence-specs",
+      "settings": {
+        "sold_notice": "This residence has been sold. View our current properties for sale below."
+      }
+    },
+    "story": {
+      "type": "residence-story",
+      "settings": {}
+    },
+    "gallery": {
+      "type": "residence-gallery",
+      "settings": {},
+      "blocks": {
+        "photo_1": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-exterior-front-evening-01.jpg"
+          }
+        },
+        "photo_2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-pool-night-01.jpg"
+          }
+        },
+        "photo_3": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-kitchen-01.jpg"
+          }
+        },
+        "photo_4": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-formal-living-01.jpg"
+          }
+        },
+        "photo_5": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-master-ensuite-01.jpg"
+          }
+        },
+        "photo_6": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-games-room-01.jpg"
+          }
+        },
+        "photo_7": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/home-hero-1.jpg"
+          }
+        },
+        "photo_8": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/home-hero-2.jpg"
+          }
+        },
+        "photo_9": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-exterior-front-day-01.jpg"
+          }
+        },
+        "photo_10": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-exterior-front-night-01.jpg"
+          }
+        },
+        "photo_11": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-facade-detail-01.jpg"
+          }
+        },
+        "photo_12": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-formal-living-02.jpg"
+          }
+        },
+        "photo_13": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-formal-living-03.jpg"
+          }
+        },
+        "photo_14": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-formal-living-fireplace-01.jpg"
+          }
+        },
+        "photo_15": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-formal-living-staircase-01.jpg"
+          }
+        },
+        "photo_16": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-kitchen-living-01.jpg"
+          }
+        },
+        "photo_17": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-master-ensuite-02.jpg"
+          }
+        },
+        "photo_18": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-pool-01.jpg"
+          }
+        },
+        "photo_19": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-pool-cabanas-01.jpg"
+          }
+        },
+        "photo_20": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-pool-night-02.jpg"
+          }
+        },
+        "photo_21": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-pool-night-03.jpg"
+          }
+        },
+        "photo_22": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-pool-night-04.jpg"
+          }
+        },
+        "photo_23": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-pool-night-05.jpg"
+          }
+        },
+        "photo_24": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-walk-in-robe-01.jpg"
+          }
+        },
+        "photo_25": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-walk-in-robe-02.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "photo_1",
+        "photo_2",
+        "photo_3",
+        "photo_4",
+        "photo_5",
+        "photo_6",
+        "photo_7",
+        "photo_8",
+        "photo_9",
+        "photo_10",
+        "photo_11",
+        "photo_12",
+        "photo_13",
+        "photo_14",
+        "photo_15",
+        "photo_16",
+        "photo_17",
+        "photo_18",
+        "photo_19",
+        "photo_20",
+        "photo_21",
+        "photo_22",
+        "photo_23",
+        "photo_24",
+        "photo_25"
+      ]
+    },
+    "closing": {
+      "type": "residence-closing",
+      "settings": {
+        "cta_text": "Inspections are by private appointment. Leave your details and we will be in touch within a business day."
+      }
+    }
+  },
+  "order": [
+    "header",
+    "specs",
+    "story",
+    "gallery",
+    "closing",
+    "film",
+    "series",
+    "related",
+    "walkthrough"
+  ]
+}

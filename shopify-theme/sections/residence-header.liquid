@@ -11,13 +11,19 @@
 {%- endcomment -%}
 {%- liquid
   assign s = section.settings
-  assign mf = product.metafields.custom
+  # The residence being shown: its product, or its page (15 Sep 2026: the
+  # residences moved from $0 products to pages - same fields, same design).
+  assign res = product
+  if res == blank and page != blank
+    assign res = page
+  endif
+  assign mf = res.metafields.custom
   # The {name} token editors write in the shared framing copy. Built with
   # append because Shopify's Liquid parser rejects literal braces inside
   # an output tag's string arguments.
   assign name_token = '{' | append: 'name' | append: '}'
   capture pstatus
-    render 'residence-status', product: product
+    render 'residence-status', product: res
   endcapture
   assign sold = false
   if pstatus contains 'Sold'
@@ -27,15 +33,15 @@
   # The residence's name in its own brochure face (Products › the residence
   # › Metafields › Residence name font …), for headings that carry it.
   capture name_span
-    render 'residence-name', product: product
+    render 'residence-name', product: res
   endcapture
   # The name as the brochure writes it (Sierra, not SIERRA) where it is
   # printed as plain text.
-  assign prop_name = product.title
+  assign prop_name = res.title
   assign nf_any = mf.name_font.value | strip | append: mf.name_font_file.value
   if nf_any != blank
     unless mf.name_font_caps.value
-      assign prop_name = product.title | downcase | capitalize
+      assign prop_name = res.title | downcase | capitalize
     endunless
   endif
 -%}
@@ -54,7 +60,7 @@
   if nf != blank or nf_file != blank
     assign nf_weight = mf.name_font_weight.value | default: 400
     assign nf_caps = mf.name_font_caps.value
-    assign nf_fallback = 'ResidenceFace-' | append: product.handle
+    assign nf_fallback = 'ResidenceFace-' | append: res.handle
   else
     assign nf = section.settings.name_font | strip
     assign nf_file = section.settings.name_font_file | strip
@@ -66,14 +72,14 @@
 {%- liquid
   # The name as the brochure writes it (Sierra, not SIERRA) wherever a
   # heading names the house: the face's letters exist only in that case.
-  assign prop_name = product.title
+  assign prop_name = res.title
   if nf != blank or nf_file != blank
     unless nf_caps
-      assign prop_name = product.title | downcase | capitalize
+      assign prop_name = res.title | downcase | capitalize
     endunless
   endif
   capture nf_scale
-    render 'residence-face-scale', product: product
+    render 'residence-face-scale', product: res
   endcapture
   # Headings that carry the name in running text (Enquire About Sierra,
   # Inside Sierra, Experience Sierra) set it in the face with this span;
@@ -145,7 +151,7 @@
   {%- else -%}
     {%- assign bc_label = s.crumb_for_sale | default: 'For Sale' -%}{%- assign bc_url = '/collections/for-sale' -%}
   {%- endif -%}
-  {% render 'back-crumb', label: bc_label, url: bc_url, name: product.title, from: '/collections/' %}
+  {% render 'back-crumb', label: bc_label, url: bc_url, name: res.title, from: '/collections/' %}
 {%- endif -%}
 <style>@media(prefers-reduced-motion:reduce){.prop-hero video{display:none}}</style>
 <section class="prop-hero{% if section.settings.hero_words == 'centre' %} prop-hero-centre{% endif %}" style="--prop-h:{{ pr_h }};--prop-dim:{{ pr_dim }};--ph-status:{{ section.settings.status_font_scale | default: 100 | divided_by: 100.0 }};--ph-name:{{ section.settings.name_font_scale | default: 100 | divided_by: 100.0 }};--ph-loc:{{ section.settings.loc_font_scale | default: 100 | divided_by: 100.0 }}">
@@ -176,6 +182,12 @@
       endfor
     endif
     assign hero_img = product.featured_image
+    if hero_img == blank and res != blank
+      # A residence page has no product photo: the same main photo by name
+      # in Content › Files (house-hero.jpg), as the product showed it.
+      assign hero_file = res.handle | append: '-hero.jpg'
+      assign hero_img = images[hero_file]
+    endif
     if hm == 'image' and section.settings.hero_image
       assign hero_img = section.settings.hero_image
     endif
@@ -187,9 +199,9 @@
   {%- if hm == 'video' and hero_src != blank -%}
     <video src="{{ hero_src }}"{% if hero_img %} poster="{{ hero_img | image_url: width: 1920, height: 1080, crop: hfocus }}"{% endif %} autoplay muted loop playsinline preload="metadata" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ hfocus }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)"></video>
   {%- elsif hm == 'image' and section.settings.hero_image_ext != blank and section.settings.hero_image == blank -%}
-    <img src="{% render 'ext-variant', src: section.settings.hero_image_ext, w: 1920, h: 1080 %}" alt="{{ product.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ hfocus }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)">
+    <img src="{% render 'ext-variant', src: section.settings.hero_image_ext, w: 1920, h: 1080 %}" alt="{{ res.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ hfocus }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)">
   {%- elsif hero_img -%}
-    <img src="{{ hero_img | image_url: width: 1920, height: 1080, crop: hfocus }}" alt="{{ product.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ hfocus }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)">
+    <img src="{{ hero_img | image_url: width: 1920, height: 1080, crop: hfocus }}" alt="{{ res.title | escape }}" width="1920" height="1080" loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{{ hfocus }};filter:brightness(calc(1 - var(--prop-dim,.44) * .5)) saturate(.96)">
   {%- endif -%}
   <div class="prop-hero-ov" style="opacity:calc(var(--prop-dim,.44) / .44)"></div>
   <div class="prop-hero-content inner">
@@ -200,10 +212,10 @@
     </div>
     {%- endif -%}
     {%- liquid
-      assign prop_name = product.title
+      assign prop_name = res.title
       if nf != blank or nf_file != blank
         unless nf_caps
-          assign prop_name = product.title | downcase | capitalize
+          assign prop_name = res.title | downcase | capitalize
         endunless
       endif
     -%}
@@ -619,7 +631,8 @@
   ],
   "enabled_on": {
     "templates": [
-      "product"
+      "product",
+      "page"
     ]
   },
   "presets": [

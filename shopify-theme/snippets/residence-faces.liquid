@@ -31,6 +31,31 @@
       assign gfonts = gfonts | append: pf | append: ':wght@' | append: pfw | append: '||'
     endif
   endfor
+  # Residence pages (15 Sep 2026: the residences moved from $0 products to pages).
+  assign rf_list = settings.residence_pages | default: 'aether,sierra,solace,caspian,qasr,capri' | newline_to_br | strip_newlines | replace: '<br />', ',' | split: ','
+  for rf_h in rf_list
+    assign rf_hs = rf_h | strip
+    if rf_hs == blank
+      continue
+    endif
+    assign rfp = pages[rf_hs]
+    if rfp == blank
+      continue
+    endif
+    assign pm = rfp.metafields.custom
+    assign pf = pm.name_font.value | strip
+    assign pff = pm.name_font_file.value | strip
+    assign pfw = pm.name_font_weight.value | default: 400
+    if pff != blank
+      assign pfam = pf
+      if pfam == blank
+        assign pfam = 'ResidenceFace-' | append: rfp.handle
+      endif
+      assign ffiles = ffiles | append: pfam | append: '¦' | append: pff | append: '¦' | append: pfw | append: '||'
+    elsif pf != blank
+      assign gfonts = gfonts | append: pf | append: ':wght@' | append: pfw | append: '||'
+    endif
+  endfor
   assign gfont_list = gfonts | split: '||' | uniq
   assign ffile_list = ffiles | split: '||' | uniq
 -%}

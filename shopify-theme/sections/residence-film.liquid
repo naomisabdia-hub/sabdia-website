@@ -17,9 +17,17 @@
 {%- liquid
   assign s = section.settings
   assign on_product = false
+  assign res = nil
   if template.name == 'product' and product != blank
     assign on_product = true
-    assign mf = product.metafields.custom
+    assign res = product
+  elsif page != blank and page.metafields.custom.status != blank
+    # A residence page (15 Sep 2026): the residence's fields live on the page.
+    assign on_product = true
+    assign res = page
+  endif
+  if on_product
+    assign mf = res.metafields.custom
   endif
 
   assign film_src = ''
@@ -71,7 +79,7 @@
   assign name_html = s.name
   if name_html == blank and on_product
     capture name_html
-      render 'residence-name', product: product
+      render 'residence-name', product: res
     endcapture
   endif
   if name_html == blank

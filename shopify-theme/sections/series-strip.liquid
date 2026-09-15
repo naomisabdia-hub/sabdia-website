@@ -39,6 +39,12 @@
     assign posts = page.metafields.custom.series_posts.value
     assign series_name = page.title
     assign series_name_html = page.title
+    if page.metafields.custom.status != blank
+      # A residence page (15 Sep 2026): the name in its brochure face, as on the product.
+      capture series_name_html
+        render 'residence-name', product: page
+      endcapture
+    endif
   endif
   assign visible = 0
   for item in posts

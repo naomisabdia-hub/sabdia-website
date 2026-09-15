@@ -45,11 +45,20 @@
   assign gfonts = ''
   assign ffiles = ''
   for h in handles
-    for p in collections.all.products
-      if p.handle != h
-        continue
-      endif
-      assign pm = p.metafields.custom
+    assign tb_res = pages[h]
+    if tb_res == blank
+      for cand in collections.all.products
+        if cand.handle == h
+          assign tb_res = cand
+          break
+        endif
+      endfor
+    endif
+    if tb_res == blank
+      continue
+    endif
+    for once in (1..1)
+      assign pm = tb_res.metafields.custom
       if pm.suburb.value != blank
         assign live_suburbs = live_suburbs | append: pm.suburb.value | append: '¦'
       endif
@@ -76,11 +85,11 @@
         assign land_vals = land_vals | append: pl | append: '¦'
       endif
       capture pst
-        render 'residence-status', product: p
+        render 'residence-status', product: tb_res
       endcapture
       assign statuses = statuses | append: pst | append: '¦'
       capture pft
-        render 'residence-feats', product: p
+        render 'residence-feats', product: tb_res
       endcapture
       assign feats_all = feats_all | append: ' ' | append: pft
       if pm.year.value != blank
@@ -92,7 +101,7 @@
       if pff != blank
         assign pfam = pf
         if pfam == blank
-          assign pfam = 'ResidenceFace-' | append: p.handle
+          assign pfam = 'ResidenceFace-' | append: tb_res.handle
         endif
         assign ffiles = ffiles | append: pfam | append: '¦' | append: pff | append: '¦' | append: pfw | append: '||'
       elsif pf != blank

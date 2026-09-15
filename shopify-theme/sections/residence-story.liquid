@@ -12,13 +12,24 @@
 {%- endcomment -%}
 {%- liquid
   assign s = section.settings
-  assign mf = product.metafields.custom
+  # The residence being shown: its product, or its page (15 Sep 2026: the
+  # residences moved from $0 products to pages - same fields, same design).
+  assign res = product
+  if res == blank and page != blank
+    assign res = page
+  endif
+  assign mf = res.metafields.custom
+  # The description: the product's, or the page's body (the same words).
+  assign res_desc = product.description
+  if res_desc == blank and res != blank
+    assign res_desc = res.content
+  endif
   # The {name} token editors write in the shared framing copy. Built with
   # append because Shopify's Liquid parser rejects literal braces inside
   # an output tag's string arguments.
   assign name_token = '{' | append: 'name' | append: '}'
   capture pstatus
-    render 'residence-status', product: product
+    render 'residence-status', product: res
   endcapture
   assign sold = false
   if pstatus contains 'Sold'
@@ -28,15 +39,15 @@
   # The residence's name in its own brochure face (Products › the residence
   # › Metafields › Residence name font …), for headings that carry it.
   capture name_span
-    render 'residence-name', product: product
+    render 'residence-name', product: res
   endcapture
   # The name as the brochure writes it (Sierra, not SIERRA) where it is
   # printed as plain text.
-  assign prop_name = product.title
+  assign prop_name = res.title
   assign nf_any = mf.name_font.value | strip | append: mf.name_font_file.value
   if nf_any != blank
     unless mf.name_font_caps.value
-      assign prop_name = product.title | downcase | capitalize
+      assign prop_name = res.title | downcase | capitalize
     endunless
   endif
 -%}
@@ -54,7 +65,7 @@
     <div class="{% if section.settings.sticky_desc %}prop-desc{% endif %}">
       {%- if section.settings.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, name_span }}</div>{%- endif -%}
       {%- if section.settings.show_headline and mf.headline.value != blank -%}<h1 class="prop-body-h reveal d1">{{ mf.headline.value }}</h1>{%- endif -%}
-      {%- if section.settings.show_description -%}{{ product.description | replace: '<p>', '<p class="prop-body-p reveal d2">' }}{%- endif -%}
+      {%- if section.settings.show_description -%}{{ res_desc | replace: '<p>', '<p class="prop-body-p reveal d2">' }}{%- endif -%}
 
       {%- if mf.features.value.size > 0 and section.settings.show_features -%}
         <div class="prop-features reveal d3">
@@ -71,12 +82,12 @@
     {%- if section.settings.show_enquiry -%}
     <div class="reveal d2 prop-side">
       <div class="prop-enquire">
-        <div class="prop-enquire-h">{{ mf.enquiry_heading.value | default: 'Enquire Now' | replace: product.title, name_span }}</div>
+        <div class="prop-enquire-h">{{ mf.enquiry_heading.value | default: 'Enquire Now' | replace: res.title, name_span }}</div>
         <p style="font-size:13px;font-weight:300;color:var(--ink3);line-height:1.75;margin-bottom:24px">{{ mf.enquiry_text.value }}</p>
         {%- if settings.form_backend == 'vercel' -%}
         <form class="cform" id="cform" name="property-enquiry" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
           <input type="hidden" name="form-name" value="property-enquiry">
-          <input type="hidden" name="property" value="{{ product.title | escape }}">
+          <input type="hidden" name="property" value="{{ res.title | escape }}">
           <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
           <div class="frow">
             <div class="fg"><label class="fl" for="pe-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="pe-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
@@ -116,7 +127,7 @@
           {%- if form.errors -%}
             <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
           {%- endif -%}
-          <input type="hidden" name="contact[Property]" value="{{ product.title | escape }}">
+          <input type="hidden" name="contact[Property]" value="{{ res.title | escape }}">
           <div class="frow">
             <div class="fg"><label class="fl" for="pe-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="pe-first" name="contact[First name]" class="fi" placeholder="First name" autocomplete="given-name" required></div>
             <div class="fg"><label class="fl" for="pe-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="pe-last" name="contact[Last name]" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
@@ -147,7 +158,7 @@
           <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
         {%- endif -%}
           {% endform %}
-          {%- assign cm_uid = 'cm-' | append: section.id -%}{% render 'customer-mirror', uid: cm_uid, residence: product.handle %}
+          {%- assign cm_uid = 'cm-' | append: section.id -%}{% render 'customer-mirror', uid: cm_uid, residence: res.handle %}
         {%- endif -%}
       </div>
       <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
@@ -755,7 +766,8 @@
   ],
   "enabled_on": {
     "templates": [
-      "product"
+      "product",
+      "page"
     ]
   },
   "presets": [

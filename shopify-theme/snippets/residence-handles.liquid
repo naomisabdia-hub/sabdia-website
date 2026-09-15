@@ -19,6 +19,41 @@
 {%- endcomment -%}
 {%- liquid
   assign out = ','
+  # Residence pages lead (15 Sep 2026: the residences moved from $0 products
+  # to pages), in the order set in Theme settings › Residences › Residence
+  # pages, each placed by its own Status exactly like a product below.
+  assign rp_csv = settings.residence_pages | default: 'aether,sierra,solace,caspian,qasr,capri' | newline_to_br | replace: '<br />', ','
+  assign rp_list = rp_csv | split: ','
+  for rp_h in rp_list
+    assign rp_hs = rp_h | strip
+    if rp_hs == blank
+      continue
+    endif
+    assign rp = pages[rp_hs]
+    if rp == blank
+      continue
+    endif
+    capture st
+      render 'residence-status', product: rp
+    endcapture
+    if st contains 'Completed'
+      continue
+    endif
+    assign in_sold = false
+    if st contains 'Sold'
+      assign in_sold = true
+    endif
+    if group == 'sold' and in_sold == false
+      continue
+    endif
+    if group != 'sold' and in_sold
+      continue
+    endif
+    assign key = ',' | append: rp_hs | append: ','
+    unless out contains key
+      assign out = out | append: rp_hs | append: ','
+    endunless
+  endfor
   if col
     for p in col.products
       capture st

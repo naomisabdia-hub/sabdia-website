@@ -416,6 +416,13 @@
         "info": "Wording on cards whose Status is For Sale. Other statuses (Under Offer, Coming Soon…) print their own word - Products › the residence › Status."
       },
       {
+        "type": "textarea",
+        "id": "residence_pages",
+        "label": "Residence pages",
+        "default": "aether\nsierra\nsolace\ncaspian\nqasr\ncapri",
+        "info": "The residences that live as pages (Content › Pages, one page handle per line), in the order lists show them. Each page's Status decides For Sale or Sold, exactly as the product did. The residences moved from products to pages on 15 Sep 2026."
+      },
+      {
         "type": "text",
         "id": "label_sold_badge",
         "label": "Sold badge",

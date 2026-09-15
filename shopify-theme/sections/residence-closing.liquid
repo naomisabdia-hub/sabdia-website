@@ -11,13 +11,19 @@
 {%- endcomment -%}
 {%- liquid
   assign s = section.settings
-  assign mf = product.metafields.custom
+  # The residence being shown: its product, or its page (15 Sep 2026: the
+  # residences moved from $0 products to pages - same fields, same design).
+  assign res = product
+  if res == blank and page != blank
+    assign res = page
+  endif
+  assign mf = res.metafields.custom
   # The {name} token editors write in the shared framing copy. Built with
   # append because Shopify's Liquid parser rejects literal braces inside
   # an output tag's string arguments.
   assign name_token = '{' | append: 'name' | append: '}'
   capture pstatus
-    render 'residence-status', product: product
+    render 'residence-status', product: res
   endcapture
   assign sold = false
   if pstatus contains 'Sold'
@@ -27,15 +33,15 @@
   # The residence's name in its own brochure face (Products › the residence
   # › Metafields › Residence name font …), for headings that carry it.
   capture name_span
-    render 'residence-name', product: product
+    render 'residence-name', product: res
   endcapture
   # The name as the brochure writes it (Sierra, not SIERRA) where it is
   # printed as plain text.
-  assign prop_name = product.title
+  assign prop_name = res.title
   assign nf_any = mf.name_font.value | strip | append: mf.name_font_file.value
   if nf_any != blank
     unless mf.name_font_caps.value
-      assign prop_name = product.title | downcase | capitalize
+      assign prop_name = res.title | downcase | capitalize
     endunless
   endif
 -%}
@@ -396,7 +402,8 @@
   ],
   "enabled_on": {
     "templates": [
-      "product"
+      "product",
+      "page"
     ]
   },
   "presets": [

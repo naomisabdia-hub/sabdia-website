@@ -16,12 +16,19 @@
     {%- if section.settings.show_label -%}<div class="slabel reveal" style="margin-bottom:20px">{{ section.settings.label }}</div>{%- endif -%}
     {%- if section.settings.show_heading -%}<h2 class="about-h reveal d1" style="font-size:calc(clamp(32px,4vw,52px)*var(--s-h,1));margin-bottom:48px">{{ section.settings.heading_html }}</h2>{%- endif -%}
     <div class="agent-listings-grid">
-      {%- for product in col.products limit: al_count -%}
-        {%- assign odd = forloop.index0 | modulo: 2 -%}
+      {%- capture al_csv -%}{% render 'residence-handles', col: col, group: 'live' %}{%- endcapture -%}
+      {%- assign al_handles = al_csv | split: ',' -%}
+      {%- assign al_shown = 0 -%}
+      {%- for al_h in al_handles -%}
+        {%- if al_shown >= al_count -%}{%- break -%}{%- endif -%}
+        {%- assign al_res = pages[al_h] -%}{%- if al_res == blank -%}{%- for cand in collections.all.products -%}{%- if cand.handle == al_h -%}{%- assign al_res = cand -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+        {%- if al_res == blank -%}{%- continue -%}{%- endif -%}
+        {%- assign odd = al_shown | modulo: 2 -%}
+        {%- assign al_shown = al_shown | plus: 1 -%}
         {%- if odd == 1 -%}
-          {% render 'property-card', product: product, class: 'reveal d1', style: al_style, img_w: 900, img_h: 560, show_cars: section.settings.show_cars %}
+          {% render 'property-card', product: al_res, class: 'reveal d1', style: al_style, img_w: 900, img_h: 560, show_cars: section.settings.show_cars %}
         {%- else -%}
-          {% render 'property-card', product: product, class: 'reveal', style: al_style, img_w: 900, img_h: 560, show_cars: section.settings.show_cars %}
+          {% render 'property-card', product: al_res, class: 'reveal', style: al_style, img_w: 900, img_h: 560, show_cars: section.settings.show_cars %}
         {%- endif -%}
       {%- endfor -%}
     </div>

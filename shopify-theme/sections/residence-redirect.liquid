@@ -5,9 +5,15 @@
   photographs and film (Products › the residence › Media, the per-house
   folder in the file picker); the residence's page is the Collection page
   at /pages/collection-<handle>. Anyone landing on the product address is
-  sent there. Search engines are told not to index this address.
+  sent there. Since 15 Sep 2026 the residences for sale (QASR, SOLACE,
+  SIERRA, CASPIAN, AETHER, CAPRI) live as pages at /pages/<handle> too, and
+  their products use this section (template product.to-page) to forward. Search engines are told not to index this address.
 {%- endcomment -%}
 {%- assign target = section.settings.target -%}
+{%- if target == blank and pages[product.handle] != blank -%}
+  {%- comment -%} A residence for sale that moved to its own page (15 Sep 2026: no $0 price anywhere): /pages/<handle>. {%- endcomment -%}
+  {%- assign target = pages[product.handle].url -%}
+{%- endif -%}
 {%- if target == blank -%}
   {%- assign target = '/pages/collection-' | append: product.handle -%}
 {%- endif -%}

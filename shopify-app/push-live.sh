@@ -20,6 +20,13 @@ done
 for h in milos petra kirra hermosa encanto haven spectre ammos alhambra eden calle elysium nero; do
   grep -q "^templates/page.collection-$h.json" shopify-theme/.shopifyignore || echo "templates/page.collection-$h.json" >> shopify-theme/.shopifyignore
 done
+# The residences for sale as pages (15 Sep 2026): their page templates and
+# the products' forwarding template ship on their first push only; after that
+# the store copies (Naomi's customizer edits) are the source of truth.
+for h in qasr solace sierra caspian aether capri; do
+  grep -q "^templates/page.residence-$h.json" shopify-theme/.shopifyignore || echo "templates/page.residence-$h.json" >> shopify-theme/.shopifyignore
+done
+grep -q "^templates/product.to-page.json" shopify-theme/.shopifyignore || echo "templates/product.to-page.json" >> shopify-theme/.shopifyignore
 # DISABLED 14 Sep 2026 (Naomi lost her home page edits - the dusk facade and
 # sneak-peek reel on the Featured residence - when this step pushed the
 # 10 Sep Desktop copy of templates/index.json over the live one). The
@@ -126,4 +133,14 @@ python3 shopify-app/move-now-selling-to-process.py $THEME
 # photo and description; idempotent.
 echo "== One photograph per testimonial"
 python3 shopify-app/testimonial-photos.py $THEME
+# The residences for sale live as pages (15 Sep 2026, Naomi: every Shopify
+# product has a price and a $0 price must not appear anywhere). Same design:
+# each page's template is a copy of its product template. Every residence
+# card block (For Sale grid, Sold band, home Current Residences, More Sabdia
+# residences) points at its page; the pages go on their templates; the
+# product addresses forward to the pages. Idempotent.
+echo "== Residence card blocks point at the residence pages"
+python3 shopify-app/add-residence-page-picks.py $THEME --allow-live
+echo "== Residence pages on their templates, product addresses forwarding to them"
+python3 shopify-app/switch-residences-to-pages.py
 echo "Done."

@@ -49,12 +49,17 @@
   endif
   assign featured = false
   assign first_handle = handles.first
-  for p in collections.all.products
-    if p.handle == first_handle
-      assign featured = p
-      break
-    endif
-  endfor
+  # The residence's page leads (15 Sep 2026); one still only in Products is found there.
+  if first_handle != blank and pages[first_handle] != blank
+    assign featured = pages[first_handle]
+  else
+    for p in collections.all.products
+      if p.handle == first_handle
+        assign featured = p
+        break
+      endif
+    endfor
+  endif
 
   # Hero film (uploaded or URL) beats the hero photo. With neither chosen the
   # hero shows a different residence from the featured banner underneath
@@ -77,6 +82,13 @@
   endif
   if use_chosen == false and featured
     assign second_handle = handles[1]
+    # A residence page has no product photo: its main photo by name in Content › Files.
+    if second_handle != blank and pages[second_handle] != blank
+      assign second_file = second_handle | append: '-hero.jpg'
+      if images[second_file]
+        assign hero_auto = images[second_file]
+      endif
+    endif
     for p in collections.all.products
       if p.handle == second_handle and p.featured_image
         assign hero_auto = p.featured_image

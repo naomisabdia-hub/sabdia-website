@@ -43,15 +43,18 @@
   endcase
   assign live_suburbs = ''
   for h in handles
-    for p in collections.all.products
-      if p.handle != h
-        continue
-      endif
-      if p.metafields.custom.suburb.value != blank
-        assign live_suburbs = live_suburbs | append: p.metafields.custom.suburb.value | append: '¦'
-      endif
-      break
-    endfor
+    assign ci_res = pages[h]
+    if ci_res == blank
+      for cand in collections.all.products
+        if cand.handle == h
+          assign ci_res = cand
+          break
+        endif
+      endfor
+    endif
+    if ci_res.metafields.custom.suburb.value != blank
+      assign live_suburbs = live_suburbs | append: ci_res.metafields.custom.suburb.value | append: '¦'
+    endif
   endfor
   assign suburb_list = live_suburbs | split: '¦' | uniq | sort
   assign count_token = '{' | append: 'count' | append: '}'

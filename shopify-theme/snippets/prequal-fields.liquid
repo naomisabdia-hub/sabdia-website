@@ -24,6 +24,18 @@
     assign l_opts = s.prequal_locations | newline_to_br | split: '<br />'
   else
     assign seen = ''
+    # Residence pages first (15 Sep 2026: the residences moved from $0 products to pages).
+    assign pq_list = settings.residence_pages | default: 'aether,sierra,solace,caspian,qasr,capri' | newline_to_br | strip_newlines | replace: '<br />', ',' | split: ','
+    for pq_h in pq_list
+      assign pq_p = pages[pq_h]
+      if pq_p and pq_p.metafields.custom.suburb.value != blank
+        assign sub = pq_p.metafields.custom.suburb.value | strip
+        assign key = sub | append: ','
+        unless seen contains key
+          assign seen = seen | append: key
+        endunless
+      endif
+    endfor
     for p in collections.all.products
       if p.tags contains 'property' and p.metafields.custom.suburb.value != blank
         assign sub = p.metafields.custom.suburb.value | strip

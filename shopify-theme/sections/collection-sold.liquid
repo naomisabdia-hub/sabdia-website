@@ -30,10 +30,11 @@
     assign picked = true
     assign sold_csv = ''
     for block in section.blocks
-      if block.settings.product == blank
+      assign sb_res = block.settings.page | default: block.settings.product
+      if sb_res == blank
         continue
       endif
-      assign sold_csv = sold_csv | append: block.settings.product.handle | append: ','
+      assign sold_csv = sold_csv | append: sb_res.handle | append: ','
     endfor
     assign sold_handles = sold_csv | split: ','
   endif
@@ -49,26 +50,25 @@
         {%- if picked -%}
         {%- assign si = 0 -%}
         {%- for block in section.blocks -%}
-          {%- if block.settings.product == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign sb_res = block.settings.page | default: block.settings.product -%}{%- if sb_res == blank -%}{%- continue -%}{%- endif -%}
           {%- assign sdelay = si | modulo: 2 -%}{%- assign si = si | plus: 1 -%}
           {%- if sdelay == 1 -%}
-            {% render 'sold-card', product: block.settings.product, class: 'reveal d1', img_w: 900, img_h: 560, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
+            {% render 'sold-card', product: sb_res, class: 'reveal d1', img_w: 900, img_h: 560, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
           {%- else -%}
-            {% render 'sold-card', product: block.settings.product, class: 'reveal', img_w: 900, img_h: 560, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
+            {% render 'sold-card', product: sb_res, class: 'reveal', img_w: 900, img_h: 560, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
           {%- endif -%}
         {%- endfor -%}
         {%- else -%}
         {%- for h in sold_handles -%}
           {%- assign sdelay = forloop.index0 | modulo: 2 -%}
-          {%- for product in collections.all.products -%}
-            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+          {%- assign ss_res = pages[h] -%}{%- if ss_res == blank -%}{%- for cand in collections.all.products -%}{%- if cand.handle == h -%}{%- assign ss_res = cand -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+          {%- if ss_res != blank -%}
             {%- if sdelay == 1 -%}
-              {% render 'sold-card', product: product, class: 'reveal d1', img_w: 900, img_h: 560 %}
+              {% render 'sold-card', product: ss_res, class: 'reveal d1', img_w: 900, img_h: 560 %}
             {%- else -%}
-              {% render 'sold-card', product: product, class: 'reveal', img_w: 900, img_h: 560 %}
+              {% render 'sold-card', product: ss_res, class: 'reveal', img_w: 900, img_h: 560 %}
             {%- endif -%}
-            {%- break -%}
-          {%- endfor -%}
+          {%- endif -%}
         {%- endfor -%}
         {%- endif -%}
       </div>
@@ -410,6 +410,12 @@
       "type": "residence",
       "name": "Residence",
       "settings": [
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Residence page",
+          "info": "The residence's page (Content › Pages). Leads over the product below; the residences moved to pages on 15 Sep 2026."
+        },
         {
           "type": "product",
           "id": "product",

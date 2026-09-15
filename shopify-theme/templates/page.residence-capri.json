@@ -1,0 +1,334 @@
+{
+  "sections": {
+    "walkthrough": {
+      "type": "scroll-walk",
+      "settings": {},
+      "disabled": true
+    },
+    "series": {
+      "type": "series-strip",
+      "settings": {},
+      "blocks": {
+        "post_DcyEDE5IMxm": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DcyEDE5IMxm/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DcyEDE5IMxm.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DcyEDE5IMxm.mp4",
+            "caption": "CAPRI Some homes announce themselves from the street. CAPRI waits until the front door opens. Past the arches of the entry, travertine crazy pave gives way to light oak floors and the home begins to unfold - living spaces stretching toward the garden, and the kitchen gathering around its oak island, stone and joinery…",
+            "date": "2026-09-02",
+            "kind": "REEL"
+          }
+        },
+        "post_DcOJtNHIczP": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DcOJtNHIczP/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DcOJtNHIczP.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DcOJtNHIczP.mp4",
+            "caption": "CAPRI Holding a commanding presence on its prized north - facing corner in Holland Park West, CAPRI is a residence defined by sweeping arches, soft curves and light-filled interiors. Inside, light oak flooring flows through living, kitchen and dining, past the internal garden to the curved oak staircase. A refined…",
+            "date": "2026-08-19",
+            "kind": "REEL"
+          }
+        },
+        "post_DZwvzmdBByc": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DZwvzmdBByc/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DZwvzmdBByc.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DZwvzmdBByc.mp4",
+            "caption": "CAPRI Now in its final stages and ready to welcome its new owners, CAPRI is a refined expression of modern Mediterranean living in the heart of Holland Park West. Sold off-market prior to completion, this residence showcases a carefully curated palette of natural materials and timeless finishes. Light oak timber…",
+            "date": "2026-06-19",
+            "kind": "REEL"
+          }
+        },
+        "post_DZcJZCeEr7H": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DZcJZCeEr7H/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DZcJZCeEr7H.jpg",
+            "caption": "CAPRI Sold prior to completion. A home defined by considered design, natural materials, and timeless architecture, CAPRI captured attention long before the final touches were complete. Positioned within one of Holland Park West's most sought-after pockets, this residence brings together warm timber tones, natural…",
+            "date": "2026-06-11",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DXOiO2Ejp3-": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DXOiO2Ejp3-/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DXOiO2Ejp3-.jpg",
+            "caption": "CAPRI Now nearing completion, this residence has been carefully shaped from concept through to construction — balancing warmth, texture and architectural clarity. From the layered façade to the considered interior palette, every element has been resolved to create a home that feels both elevated and enduring.…",
+            "date": "2026-04-17",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DVx1EMlGcQX": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DVx1EMlGcQX/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DVx1EMlGcQX.jpg",
+            "caption": "CAPRI Set high in Holland Park West, CAPRI captures elevated outlooks toward the Brisbane city skyline while embracing a refined Modern Mediterranean influence. Soft arches, layered textures and warm natural materials shape the home’s architectural language, creating interiors that feel both calm and considered.…",
+            "date": "2026-03-12",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DVfzgnsmUzD": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DVfzgnsmUzD/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DVfzgnsmUzD.jpg",
+            "caption": "CAPRI Recently sold off market in Holland Park West, CAPRI brings a refined Modern Mediterranean influence to contemporary living. Clean architectural lines, warm natural materials, and thoughtfully curated finishes create a home that feels both elevated and effortless. Designed to balance light, texture, and flow,…",
+            "date": "2026-03-05",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DUiAZ22Eko2": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DUiAZ22Eko2/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DUiAZ22Eko2.jpg",
+            "caption": "CAPRI A modern Mediterranean dream, sitting proudly on a corner block in Holland Park West. Elevated city views frame the home, while every detail has been considered — from the carefully composed proportions to the refined finishes that define its character. Sold off-market, CAPRI is a demonstration of design-led…",
+            "date": "2026-02-09",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DUAiCmREZrT": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DUAiCmREZrT/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DUAiCmREZrT.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DUAiCmREZrT.mp4",
+            "caption": "CAPRI Step inside the heart of CAPRI — where living, kitchen, and dining flow seamlessly together. Thoughtfully designed for connection, light, and effortless movement, these spaces are shaping into a home that balances everyday life with elevated design. Under construction, but already a glimpse of the lifestyle and…",
+            "date": "2026-01-27",
+            "kind": "REEL"
+          }
+        },
+        "post_DR_yTNYE9A0": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DR_yTNYE9A0/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DR_yTNYE9A0.jpg",
+            "caption": "CAPRI A modern Mediterranean dream set against the night sky — softly illuminated, defined by its sweeping arch windows and timeless curves. Recently sold in Holland Park West, this residence holds a commanding presence on the hillside, with expansive city views that shape the experience from every angle. DESIGN ·…",
+            "date": "2025-12-08",
+            "kind": "IMAGE"
+          }
+        },
+        "post_DRbrrogkemB": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DRbrrogkemB/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DRbrrogkemB.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DRbrrogkemB.mp4",
+            "caption": "CAPRI The moment you step inside CAPRI, the city unfolds before you. A sweeping entry frames breathtaking views, inviting light and perspective into the heart of the home. Sold off-market, this residence is a testament to considered design, where every detail enhances the experience of elevated living. DESIGN ·…",
+            "date": "2025-11-24",
+            "kind": "REEL"
+          }
+        },
+        "post_DQ81p2RFQwU": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DQ81p2RFQwU/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQ81p2RFQwU.jpg",
+            "caption": "SIERRA Nestled in Holland Park West, SIERRA captures panoramic city views, bringing Brisbane’s skyline into the home’s luxurious design. Bespoke joinery and custom finishes throughout redefine modern living, where every detail is thoughtfully considered. Next door, CAPRI has sold — a rare opportunity in this coveted…",
+            "date": "2025-11-12",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DQoL1OUEVrA": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DQoL1OUEVrA/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQoL1OUEVrA.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQoL1OUEVrA.mp4",
+            "caption": "CAPRI Recently sold and taking shape in Holland Park West. Positioned on a prominent corner block, this Modern Mediterranean-inspired home offers sweeping city views and a lifestyle that balances elegance with comfort. With every detail carefully considered, CAPRI is set to be a true standout in the area. Currently…",
+            "date": "2025-11-04",
+            "kind": "REEL"
+          }
+        },
+        "post_DQbRVOfEQJy": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DQbRVOfEQJy/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQbRVOfEQJy.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQbRVOfEQJy.mp4",
+            "caption": "CAPRI — NOW SOLD A statement of refined design and craftsmanship, CAPRI embodies modern Mediterranean living at its finest. Set on a generous 600m² corner block in Holland Park West, this residence offers exceptional street presence, bespoke interiors designed for contemporary family living, and captivating city…",
+            "date": "2025-10-30",
+            "kind": "REEL"
+          }
+        },
+        "post_DPLb0kOjhcq": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DPLb0kOjhcq/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DPLb0kOjhcq.jpg",
+            "caption": "CAPRI A Modern Mediterranean vision brought to life. From graceful arched windows to sweeping curves, every element of this Holland Park residence reflects timeless elegance and thoughtful design. The combination of refined finishes and considered architectural details creates a home that feels both luxurious and…",
+            "date": "2025-09-29",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DPBIpQ0D3Hk": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DPBIpQ0D3Hk/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DPBIpQ0D3Hk.jpg",
+            "caption": "CAPRI A commanding presence on its corner block, CAPRI combines a light, textured facade with timber battens and elegant arched windows, creating a home that is both sculptural and inviting. Elevated to capture city views, every detail has been considered to balance modern Mediterranean charm with contemporary…",
+            "date": "2025-09-25",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DOIfKBVjhBG": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DOIfKBVjhBG/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DOIfKBVjhBG.jpg",
+            "caption": "CAPRI Positioned on a commanding corner block in Holland Park West, CAPRI captures city views and a bold architectural presence. Designed to elevate everyday living, this residence balances refined form with a seamless connection to its surrounds. From the considered orientation to the interplay of light, space and…",
+            "date": "2025-09-03",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DNxUjfM3CmL": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DNxUjfM3CmL/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DNxUjfM3CmL.jpg",
+            "caption": "CAPRI Perched high in Holland Park West, CAPRI offers more than just architecture — it frames the Brisbane skyline as part of everyday living. Currently under construction, this residence is set to embody refined design and elevated comfort. Enquires to sales@sabdia.com.au DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2025-08-25",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DNFiht7x5qd": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DNFiht7x5qd/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DNFiht7x5qd.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DNFiht7x5qd.mp4",
+            "caption": "CAPRI Soft tones. Curved form. City views. Now under construction in Holland Park West, CAPRI brings a modern Mediterranean influence to an elevated corner site. A composition of sculptural curves, refined textures, and warm restraint—designed to capture light and framed outlooks at every turn. Enquire via…",
+            "date": "2025-08-08",
+            "kind": "REEL"
+          }
+        },
+        "post_DMryj4qxRJV": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DMryj4qxRJV/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DMryj4qxRJV.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DMryj4qxRJV.mp4",
+            "caption": "CAPRI Soft tones. Curved form. City views. Now under construction in Holland Park West, CAPRI brings a modern Mediterranean influence to an elevated corner site. A composition of sculptural curves, refined textures, and warm restraint—designed to capture light and framed outlooks at every turn. Enquire via…",
+            "date": "2025-07-29",
+            "kind": "REEL"
+          }
+        },
+        "post_DMe6kVNMICL": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DMe6kVNMICL/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DMe6kVNMICL.jpg",
+            "caption": "CAPRI A Modern Mediterranean-inspired home, beautifully positioned on a corner block in Holland Park West. Enjoy captivating city views that perfectly complement its serene suburban setting. A sanctuary of refined elegance. Designed with soft, grounding textures and natural light, CAPRI embodies quiet sophistication,…",
+            "date": "2025-07-24",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DMM5APeMbZ9": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DMM5APeMbZ9/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DMM5APeMbZ9.jpg",
+            "caption": "CAPRI A fresh take on modern Mediterranean-inspired living, CAPRI is perfectly positioned on a prominent corner block in Holland Park West, capturing stunning city views. Showcasing clean lines, a thoughtful layout, and carefully curated finishes, this home is designed to balance effortless comfort with refined…",
+            "date": "2025-07-17",
+            "kind": "CAROUSEL"
+          }
+        },
+        "post_DMFOn7zRT7o": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DMFOn7zRT7o/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DMFOn7zRT7o.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DMFOn7zRT7o.mp4",
+            "caption": "CAPRI A bold new chapter begins. Perched on an elevated corner block in Holland Park West, CAPRI commands attention with sweeping city views and striking architectural form. From the very first sketch, this home was envisioned as a seamless blend of structure and setting — a residence that transforms with the light,…",
+            "date": "2025-07-14",
+            "kind": "REEL"
+          }
+        },
+        "post_DLraqcqN1hX": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DLraqcqN1hX/",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DLraqcqN1hX.jpg",
+            "caption": "CAPRI Introducing CAPRI — a striking Modern Mediterranean-inspired home perfectly positioned on a corner block in Holland Park West. With layered textures, soft curves, and expansive city views, CAPRI captures both architectural presence and breathtaking outlooks. Setting a new standard for refined living. All…",
+            "date": "2025-07-04",
+            "kind": "CAROUSEL"
+          }
+        }
+      },
+      "block_order": [
+        "post_DcyEDE5IMxm",
+        "post_DcOJtNHIczP",
+        "post_DZwvzmdBByc",
+        "post_DZcJZCeEr7H",
+        "post_DXOiO2Ejp3-",
+        "post_DVx1EMlGcQX",
+        "post_DVfzgnsmUzD",
+        "post_DUiAZ22Eko2",
+        "post_DUAiCmREZrT",
+        "post_DR_yTNYE9A0",
+        "post_DRbrrogkemB",
+        "post_DQ81p2RFQwU",
+        "post_DQoL1OUEVrA",
+        "post_DQbRVOfEQJy",
+        "post_DPLb0kOjhcq",
+        "post_DPBIpQ0D3Hk",
+        "post_DOIfKBVjhBG",
+        "post_DNxUjfM3CmL",
+        "post_DNFiht7x5qd",
+        "post_DMryj4qxRJV",
+        "post_DMe6kVNMICL",
+        "post_DMM5APeMbZ9",
+        "post_DMFOn7zRT7o",
+        "post_DLraqcqN1hX"
+      ]
+    },
+    "related": {
+      "type": "related-properties",
+      "settings": {}
+    },
+    "film": {
+      "type": "residence-film",
+      "settings": {}
+    },
+    "header": {
+      "type": "residence-header",
+      "settings": {}
+    },
+    "specs": {
+      "type": "residence-specs",
+      "settings": {
+        "sold_notice": "This residence has been sold. View our current properties for sale below."
+      }
+    },
+    "story": {
+      "type": "residence-story",
+      "settings": {}
+    },
+    "gallery": {
+      "type": "residence-gallery",
+      "settings": {}
+    },
+    "closing": {
+      "type": "residence-closing",
+      "settings": {
+        "cta_text": "Inspections are by private appointment. Leave your details and we will be in touch within a business day."
+      }
+    }
+  },
+  "order": [
+    "header",
+    "specs",
+    "story",
+    "gallery",
+    "closing",
+    "film",
+    "series",
+    "related",
+    "walkthrough"
+  ]
+}

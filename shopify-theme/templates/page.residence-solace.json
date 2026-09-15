@@ -1,0 +1,1208 @@
+{
+  "sections": {
+    "header": {
+      "type": "residence-header",
+      "settings": {
+        "hero_media": "video",
+        "hero_use_links": false,
+        "hero_image_ext": "",
+        "hero_video": "shopify://files/videos/SOLACE LAUNCH VIDEO.MP4",
+        "hero_video_url": "",
+        "hero_dim": 16,
+        "hero_height": "tall",
+        "hero_focus": "center",
+        "hero_words": "base-left",
+        "show_status": true,
+        "status_font_scale": 100,
+        "name_font_scale": 100,
+        "show_location": true,
+        "loc_font_scale": 100,
+        "name_font": "",
+        "name_font_file": "",
+        "name_font_weight": "400",
+        "name_font_tracking": -4,
+        "name_font_caps": false,
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "specs": {
+      "type": "residence-specs",
+      "settings": {
+        "hide_specs": false,
+        "spec_show_location": true,
+        "spec_show_beds": true,
+        "spec_show_baths": true,
+        "spec_show_cars": true,
+        "spec_show_land": true,
+        "spec_show_build": true,
+        "spec_show_status": true,
+        "specs_align": "left",
+        "spec_location": "Location",
+        "spec_beds": "Bedrooms",
+        "spec_baths": "Bathrooms",
+        "spec_cars": "Garages",
+        "spec_land": "Land Size",
+        "spec_build": "Build Size",
+        "spec_status": "Status",
+        "show_sold_banner": true,
+        "sold_notice": "This residence has been sold. View our current properties for sale below.",
+        "sold_banner_label": "View Available",
+        "sold_banner_link": "",
+        "show_sticky": true,
+        "sticky_label": "Enquire",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "story": {
+      "type": "residence-story",
+      "settings": {
+        "show_about_label": true,
+        "about_label": "About {name}",
+        "show_headline": true,
+        "show_description": true,
+        "show_features": true,
+        "features_heading": "Key Features",
+        "sticky_desc": true,
+        "body_layout": "beside",
+        "show_enquiry": true,
+        "enquiry_types": "General enquiry about {name} | Thank you for your enquiry about {name}. A member of the Sabdia team will be in touch shortly.\nArrange an inspection | Thank you. Inspections of {name} are by private appointment, and a member of the Sabdia team will be in touch shortly to arrange a time.\nRegister my interest | Thank you for registering your interest in {name}. A member of the Sabdia team will be in touch shortly.",
+        "f_first": "First Name*",
+        "f_last": "Last Name*",
+        "f_email": "Email*",
+        "f_phone": "Phone",
+        "f_interest": "Enquiry Type",
+        "f_message": "Message",
+        "optin_label": "Keep me updated on new Sabdia releases",
+        "privacy_note": "By submitting this form you agree to our privacy policy. Your details will not be shared with third parties.",
+        "success_text": "Thank you. A member of the Sabdia team will be in touch shortly.",
+        "show_brochure": true,
+        "brochure_label": "Download Brochure",
+        "show_general": true,
+        "general_label": "General Enquiry",
+        "general_link": "",
+        "sold_cta_label": "View Current Properties",
+        "prequal_budget_label": "Budget range",
+        "prequal_budget": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say",
+        "prequal_timeline_label": "Timeline",
+        "prequal_timeline": "Ready now\n1 - 3 months\n3 - 6 months\n6 - 12 months\nJust researching",
+        "prequal_flex_label": "Location and flexibility",
+        "prequal_flex": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases",
+        "prequal_loc_label": "Preferred locations",
+        "prequal_loc_label_other": "Also considering (optional)",
+        "prequal_locations": "",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "gallery": {
+      "type": "residence-gallery",
+      "blocks": {
+        "photo_1": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-staircase-02.jpg",
+            "caption": ""
+          }
+        },
+        "photo_2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-kitchen-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_3": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-exterior-front-dusk-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_4": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-ensuite-03.jpg",
+            "caption": ""
+          }
+        },
+        "photo_5": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-living-fireplace-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_6": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-alfresco-pool-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_7": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-master-bedroom-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_8": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-dressing-room-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_9": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-games-room-bar-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_10": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-staircase-03.jpg",
+            "caption": ""
+          }
+        },
+        "photo_11": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-dining-kitchen-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_12": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-ensuite-02.jpg",
+            "caption": ""
+          }
+        },
+        "photo_13": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-living-alfresco-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_14": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-city-view-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_15": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-exterior-street-dusk-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_16": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-staircase-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_17": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-ensuite-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_18": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/home-hero-1_a1914102-7c60-4e3c-afb9-26997cf4d744.jpg",
+            "caption": ""
+          }
+        },
+        "photo_19": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/home-hero-2_9be3b1ee-6c0a-47d0-8784-c72db0a6bd0e.jpg",
+            "caption": ""
+          }
+        },
+        "photo_20": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-alfresco-dining-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_21": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-bedroom-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_22": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-bedroom-02.jpg",
+            "caption": ""
+          }
+        },
+        "photo_23": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-bedroom-03.jpg",
+            "caption": ""
+          }
+        },
+        "photo_24": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-dining-living-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_25": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-entry-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_26": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-exterior-front-dusk-02.jpg",
+            "caption": ""
+          }
+        },
+        "photo_27": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-games-room-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_28": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-kitchen-detail-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_29": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-kitchen-dining-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_30": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-kitchen-dining-02.jpg",
+            "caption": ""
+          }
+        },
+        "photo_31": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-living-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_32": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-media-room-01.jpg",
+            "caption": ""
+          }
+        },
+        "photo_33": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-study-01.jpg",
+            "caption": ""
+          }
+        }
+      },
+      "block_order": [
+        "photo_1",
+        "photo_2",
+        "photo_3",
+        "photo_4",
+        "photo_5",
+        "photo_6",
+        "photo_7",
+        "photo_8",
+        "photo_9",
+        "photo_10",
+        "photo_11",
+        "photo_12",
+        "photo_13",
+        "photo_14",
+        "photo_15",
+        "photo_16",
+        "photo_17",
+        "photo_18",
+        "photo_19",
+        "photo_20",
+        "photo_21",
+        "photo_22",
+        "photo_23",
+        "photo_24",
+        "photo_25",
+        "photo_26",
+        "photo_27",
+        "photo_28",
+        "photo_29",
+        "photo_30",
+        "photo_31",
+        "photo_32",
+        "photo_33"
+      ],
+      "settings": {
+        "show_gallery": true,
+        "gallery_label": "The Residence",
+        "gallery_heading_html": "Inside <em>{name}</em>.",
+        "gallery_layout": "stage",
+        "gallery_tiles": 9,
+        "stage_shape": "16/9",
+        "show_thumbs": true,
+        "show_rooms": true,
+        "show_expand": true,
+        "gallery_all_label": "View all photos",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "closing": {
+      "type": "residence-closing",
+      "settings": {
+        "show_cta": true,
+        "cta_label": "Private Appointments",
+        "cta_heading_html": "Experience <em>{name}</em> in person.",
+        "cta_text": "Inspections are by private appointment. Leave your details and we will be in touch within a business day.",
+        "cta_button": "Enquire About {name}",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "film": {
+      "type": "residence-film",
+      "settings": {
+        "film_url": "",
+        "poster_url": "",
+        "use_links": false,
+        "label": "The Film",
+        "heading_html": "",
+        "text": "",
+        "name": "",
+        "caption_left": "",
+        "caption_right": "",
+        "sound_label": "Sound On",
+        "show_label": true,
+        "show_heading": true,
+        "show_text": true,
+        "show_caption": true,
+        "show_sound": true,
+        "autoplay": true,
+        "side": "right",
+        "shape": "9/16",
+        "reel_height": 680,
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "series": {
+      "type": "series-strip",
+      "blocks": {
+        "post_DdEH0MHmYBQ": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DdEH0MHmYBQ/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DdEH0MHmYBQ.jpg",
+            "video_url": "",
+            "caption": "SOLACE Positioned in the heart of Camp Hill, SOLACE was designed around a small palette of materials, returned to in every room so the home reads as one considered piece. Travertine is the constant. It is laid through the floors in a crazy pave, wrapped around the kitchen island with the fluting cut into the stone…",
+            "date": "2026-09-09",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DcgBG56ISNx": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DcgBG56ISNx/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DcgBG56ISNx.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DcgBG56ISNx.mp4",
+            "caption": "SOLACE The kitchen at SOLACE was designed to be looked at as closely as it is used. Set in the heart of Camp Hill, the residence returns to the same few materials in every room, and the kitchen is where they all meet. Silver travertine wraps the island and the benchtops, with the fluting cut into the stone itself and…",
+            "date": "2026-08-26",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_Dbu6tvCGyld": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/Dbu6tvCGyld/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/Dbu6tvCGyld.jpg",
+            "video_url": "",
+            "caption": "SOLACE The master ensuite at SOLACE is designed to feel less like a bathroom and more like a private retreat. Wrapped in natural travertine and softened by handcrafted Venetian plaster walls, every detail has been thoughtfully considered to create a timeless sense of luxury. A bespoke walnut vanity is complemented by…",
+            "date": "2026-08-07",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DbB1087kktr": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DbB1087kktr/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DbB1087kktr.jpg",
+            "video_url": "",
+            "caption": "96 Newman Avenue, Camp Hill QLD 4152 For sale Solace, designed and built by SABDIA Completed across 632sqm on a 607sqm north-to-rear parcel, Solace brings together five bedrooms, 5.5 bathrooms, a four-car garage and a series of layered living and entertaining spaces. The central living, dining and kitchen zone is…",
+            "date": "2026-07-21",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DafGEiREnIX": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DafGEiREnIX/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DafGEiREnIX.jpg",
+            "video_url": "",
+            "caption": "SOLACE SOLACE is a home defined by calm, balance, and considered design. Every space has been thoughtfully crafted to create a sense of warmth, sophistication, and effortless liveability, with timeless materials and refined detailing throughout. Positioned in the heart of Camp Hill, SOLACE offers a seamless blend of…",
+            "date": "2026-07-07",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DZUUQiRxdWt": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DZUUQiRxdWt/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DZUUQiRxdWt.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DZUUQiRxdWt.mp4",
+            "caption": "SOLACE A home defined by texture, warmth, and timeless materiality. From natural vein-cut travertine and handcrafted finishes to rich timber tones and layers of natural stone, every element has been carefully considered to create a sense of calm, permanence, and understated luxury. Designed to feel both refined and…",
+            "date": "2026-06-08",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DYy5SKhHzGF": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DYy5SKhHzGF/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYy5SKhHzGF.jpg",
+            "video_url": "",
+            "caption": "SOLACE. On The Market. ⠀⠀⠀⠀⠀⠀⠀⠀⠀ Find your sanctuary. A home where every detail has been considered with intention — where soaring spaces invite stillness and every room tells a story of refined, enduring luxury. ⠀⠀⠀⠀⠀⠀⠀⠀⠀ Crafted to be lived in and loved. SOLACE is not just a home. It’s a feeling. ⠀⠀⠀⠀⠀⠀⠀⠀⠀ 5 Bed |…",
+            "date": "2026-05-26",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DYRa4W9hY42": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DYRa4W9hY42/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYRa4W9hY42.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYRa4W9hY42.mp4",
+            "caption": "SOLACE Time, texture, and restraint define this residence — where every surface has been considered, refined, and resolved through craft. Natural stone, warm timber tones, and softened neutrals establish a grounded, cohesive palette that carries through the home. Every junction and transition has been carefully…",
+            "date": "2026-05-13",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DYO15SUxPVQ": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DYO15SUxPVQ/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYO15SUxPVQ.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYO15SUxPVQ.mp4",
+            "caption": "SOLACE Welcome to SOLACE. A residence where warmth, texture and timeless refinement come together to create a home that feels both calming and elevated. From the sculptural architecture to the layered natural materials and softly curated interiors, every element has been intentionally designed to create an atmosphere…",
+            "date": "2026-05-12",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DYOvD33E8AW": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DYOvD33E8AW/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYOvD33E8AW.jpg",
+            "video_url": "",
+            "caption": "Welcome to ‘SOLACE’ a completed residence by SABDIA — designed and built on a prized 607sqm north-to-rear parcel in one of Camp Hill’s most tightly held streets. Architectural restraint, material honesty and considered liveability have been resolved into a single, cohesive expression across 632 square metres. More at…",
+            "date": "2026-05-12",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DYMUxAFHJWh": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DYMUxAFHJWh/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYMUxAFHJWh.jpg",
+            "video_url": "",
+            "caption": "SOLACE A BESPOKE RESIDENCE BY SABDIA Defined by sculptural form, warm natural materials, and refined architectural detail, SOLACE is a residence designed and built by SABDIA. Positioned on a prized north-facing parcel in Camp Hill, the home unfolds through soaring voids, expansive open-plan living, curated retreat…",
+            "date": "2026-05-11",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DYJr540RW2_": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DYJr540RW2_/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYJr540RW2_.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYJr540RW2_.mp4",
+            "caption": "SOLACE A new benchmark for refined living is about to arrive in Camp Hill. A residence defined by quiet luxury, refined materiality, and a level of detail designed to be experienced rather than simply seen. From the architectural form through to the layered interiors, every space has been carefully considered to…",
+            "date": "2026-05-10",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DYEpZUSxgBH": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DYEpZUSxgBH/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYEpZUSxgBH.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DYEpZUSxgBH.mp4",
+            "caption": "SOLACE Coming to Camp Hill. Designed and built by SABDIA, SOLACE is a study in calm architecture and material restraint — where natural stone, soft plaster, warm timber, and brushed copper come together in a cohesive expression of refined living. North-facing light, expansive volumes, and seamless indoor-outdoor…",
+            "date": "2026-05-08",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DXl3vaJEXt1": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DXl3vaJEXt1/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DXl3vaJEXt1.jpg",
+            "video_url": "",
+            "caption": "“SOLACE”",
+            "date": "2026-04-26",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DXgYbPDEYgL": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DXgYbPDEYgL/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DXgYbPDEYgL.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DXgYbPDEYgL.mp4",
+            "caption": "SOLACE Spaces that flow seamlessly, finishes that speak of intention and longevity. Designed and built entirely in-house, SOLACE is a home of quiet refinement and rare craftsmanship, where every detail invites you to experience luxury. All enquiries to @torresproperty Coming soon DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2026-04-24",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DXd2iEpkYbu": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DXd2iEpkYbu/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DXd2iEpkYbu.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DXd2iEpkYbu.mp4",
+            "caption": "SOLACE From the textures within, to the sculpted form of its facade — every line, every material, every detail has been crafted to be experienced, not just seen. A home of rare intention and bespoke finishes designed and built entirely in-house. Soon, the full experience will be revealed. All enquiries to…",
+            "date": "2026-04-23",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DW52X9kEVkL": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DW52X9kEVkL/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DW52X9kEVkL.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DW52X9kEVkL.mp4",
+            "caption": "SOLACE Spaces that invite pause, finishes that draw the eye, proportions that feel intuitive. Designed and built in-house, SOLACE is a home to be experienced, a statement in refined, bespoke living. Coming Soon. DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2026-04-09",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DWTTabZloUm": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DWTTabZloUm/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DWTTabZloUm.jpg",
+            "video_url": "",
+            "caption": "SOLACE Approaching completion in one of Camp Hill’s most tightly held streets, SOLACE is beginning to reveal the full intent behind its design. A home defined by restraint and precision, where every element has been considered, refined, and executed in-house. Bespoke joinery anchors each space, paired with layered…",
+            "date": "2026-03-25",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DVsrf4xzzFf": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DVsrf4xzzFf/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DVsrf4xzzFf.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DVsrf4xzzFf.mp4",
+            "caption": "SOLACE Progress at SOLACE is moving through the final stages, with the home now taking its full form. From structure to finishes, each phase of the build has been carefully executed by our in-house team—allowing the design intent to carry through every detail. With joinery being installed, materials coming together…",
+            "date": "2026-03-10",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DVQWtj_E16r": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DVQWtj_E16r/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DVQWtj_E16r.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DVQWtj_E16r.mp4",
+            "caption": "SOLACE Part of the Newman Avenue collection, SOLACE is a home where texture and detail meet an effortless connection to the outdoors. Thoughtfully designed openings frame glimpses of landscaped courtyards, allowing natural light to animate the interiors throughout the day. The layering of materials—timber, stone, and…",
+            "date": "2026-02-27",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DU2mxoQEix-": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DU2mxoQEix-/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DU2mxoQEix-.jpg",
+            "video_url": "",
+            "caption": "SOLACE Set within Camp Hill, SOLACE stands as the final expression of the Newman Avenue Collection — a home defined by quiet confidence and enduring presence. Designed to be both grounding and elevated, SOLACE brings together considered architecture, refined materiality and a sense of calm that carries through every…",
+            "date": "2026-02-17",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DUz7GLCEczG": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DUz7GLCEczG/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DUz7GLCEczG.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DUz7GLCEczG.mp4",
+            "caption": "CALLE CALLE is complete — and now proudly handed over to its new owners. From the very beginning, this home was about materiality, texture, and timeless warmth. Natural stone anchors the spaces, while vein-cut travertine crazy pave creates movement and character underfoot. Rich dark timber cabinetry adds depth and…",
+            "date": "2026-02-16",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DUSjpVUkrlC": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DUSjpVUkrlC/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DUSjpVUkrlC.jpg",
+            "video_url": "",
+            "caption": "SOLACE Step inside and every detail tells a story. Italian travertine stone benches and floor tiles set a timeless foundation, while bespoke cabinetry frames each space with quiet sophistication. Every surface, every joinery detail, speaks to a level of craftsmanship that elevates daily living into an experience.…",
+            "date": "2026-02-03",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DTce8NYkmdc": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DTce8NYkmdc/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DTce8NYkmdc.jpg",
+            "video_url": "",
+            "caption": "SOLACE In the main living and dining spaces of SOLACE, everyday moments become experiences. Mornings are bathed in soft sunlight, coffee in hand, while evenings gather loved ones around the dining table, laughter echoing beneath warm, textured interiors. Here, the flow between indoor comfort and outdoor serenity…",
+            "date": "2026-01-13",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DSo_DyDj9Xk": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DSo_DyDj9Xk/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DSo_DyDj9Xk.jpg",
+            "video_url": "",
+            "caption": "SOLACE Redefining luxury in Camp Hill, SOLACE is where every detail has been carefully considered — from layered materials and textures to seamless indoor-outdoor living. Designed for entertaining and refined living, this home invites you to experience elegance, comfort, and style like never before. Enquire now to…",
+            "date": "2025-12-24",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DReT_UCEncj": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DReT_UCEncj/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DReT_UCEncj.jpg",
+            "video_url": "",
+            "caption": "SOLACE As night falls, SOLACE comes alive — a residence where light and shadow define form, and every surface has been meticulously considered. A home of refined luxury, where architecture and atmosphere converge to create a commanding sense of calm and sophistication. All enquires to sales@sabdia.com.au DESIGN ·…",
+            "date": "2025-11-25",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DQd0vDzkieN": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DQd0vDzkieN/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQd0vDzkieN.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DQd0vDzkieN.mp4",
+            "caption": "SOLACE A study in texture and tone — natural stone, custom oak cabinetry, and layered finishes create a refined sense of warmth throughout the kitchen and living spaces. Designed for entertaining, the open plan flows effortlessly to the alfresco and pool, capturing light and connection in every detail. Positioned in…",
+            "date": "2025-10-31",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DPyDvZAD4iY": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DPyDvZAD4iY/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DPyDvZAD4iY.jpg",
+            "video_url": "",
+            "caption": "SOLACE The kitchen and living space are the heart of the home, opening through an over eight-metre stacker door to create a striking indoor-outdoor flow. Bathed in natural light and crafted with refined detailing, this space is designed for entertaining, relaxing, and living at its most elevated. Enquiries to…",
+            "date": "2025-10-14",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DPOACPsDhUk": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DPOACPsDhUk/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DPOACPsDhUk.jpg",
+            "video_url": "",
+            "caption": "SOLACE When the sun sets, the home transforms — soft lighting highlights the bespoke finishes and architectural details, creating an atmosphere of refined luxury that endures long after dark. All enquiries to sales@sabdia.com.au DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2025-09-30",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DO7_qtPAJh7": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DO7_qtPAJh7/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DO7_qtPAJh7.jpg",
+            "video_url": "",
+            "caption": "SOLACE A residence where redefined luxury takes form in every detail. From bespoke finishes to carefully integrated features, each element has been considered to create a home that feels both distinctive and enduring. All enquires to sales@sabdia.com.au DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2025-09-23",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DOfqUcpjoRy": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DOfqUcpjoRy/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DOfqUcpjoRy.jpg",
+            "video_url": "",
+            "caption": "SOLACE Every element of this home has been thoughtfully considered, with a focus on flow, light, and timeless materials. The staircase serves as a striking centerpiece — a sculptural feature that anchors the interiors while guiding movement through the space. Its design balances elegance and presence, creating both…",
+            "date": "2025-09-12",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DOF6XYOEd_I": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DOF6XYOEd_I/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DOF6XYOEd_I.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DOF6XYOEd_I.mp4",
+            "caption": "SOLACE City lights reveal the home’s refined elegance. At night, every line, texture, and detail comes alive, highlighting the serene sophistication and thoughtful design of SOLACE. Enquire now sales@sabdia.com.au DESIGN · DEVELOP · CONSTRUCT",
+            "date": "2025-09-02",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DN5CZtrjmdu": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DN5CZtrjmdu/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DN5CZtrjmdu.jpg",
+            "video_url": "",
+            "caption": "CALLE Perched on Newman Avenue in Camp Hill, CALLE is redefining luxury living in one of Brisbane’s most sought-after pockets. Currently under construction, this residence blends elevated design with meticulous attention to detail, setting a new benchmark for refined modern living. Missed out on CALLE? Your…",
+            "date": "2025-08-28",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DNAY34cRspb": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DNAY34cRspb/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DNAY34cRspb.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DNAY34cRspb.mp4",
+            "caption": "SOLACE Raw textures. Refined finishes. SOLACE sets the tone — with a palette of natural materials, considered transitions, and spaces designed for both movement and stillness. Functional yet elevated, every detail speaks to understated luxury. Now accepting expressions of interest sales@sabdia.com.au DESIGN · DEVELOP…",
+            "date": "2025-08-06",
+            "kind": "REEL",
+            "hidden": false
+          }
+        },
+        "post_DMw8IerNUot": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DMw8IerNUot/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DMw8IerNUot.jpg",
+            "video_url": "",
+            "caption": "SOLACE A refined balance of light, texture, and form. Located in Camp Hill and part of the Newman Avenue Collection, SOLACE brings together layers of natural stone, gentle curves, and considered finishes to create a calm, grounded sense of luxury. Every space is intentionally composed—soft light, warm materiality,…",
+            "date": "2025-07-31",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DMHvaVltPQM": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DMHvaVltPQM/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DMHvaVltPQM.jpg",
+            "video_url": "",
+            "caption": "CALLE Nestled in one of Camp Hill’s most sought-after streets, CALLE redefines modern luxury living with clean lines, layered textures, and a seamless connection to its lush surroundings. This striking home from the Newman Avenue Collection offers spacious, light-filled interiors and thoughtful design moments that…",
+            "date": "2025-07-15",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DL63cCRN3T2": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DL63cCRN3T2/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DL63cCRN3T2.jpg",
+            "video_url": "",
+            "caption": "SOLACE Experience a residence crafted to impress. SOLACE blends warm, layered textures with refined design to create a home that’s both elegant and inviting. Set in the heart of Camp Hill, this residence features expansive living zones, premium finishes, and considered details throughout — a new benchmark in…",
+            "date": "2025-07-10",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DLUPYnQNcTq": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DLUPYnQNcTq/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DLUPYnQNcTq.jpg",
+            "video_url": "",
+            "caption": "SOLACE The facade of SOLACE takes shape — a testament to refined architecture and thoughtful design within the Newman Avenue Collection. Every angle reveals a balance of clean geometry and organic accents, crafted to stand out on one of Camp Hill’s most coveted streets. The story continues — stay with us for the next…",
+            "date": "2025-06-25",
+            "kind": "CAROUSEL",
+            "hidden": false
+          }
+        },
+        "post_DK_pHditk1Q": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/DK_pHditk1Q/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/DK_pHditk1Q.jpg",
+            "video_url": "",
+            "caption": "SOLACE Introducing the next chapter in the Newman Avenue Collection — SOLACE. An address of distinction in the heart of Camp Hill, this residence continues the vision for timeless architecture, refined living, and quiet luxury. A composition of organic forms, rich textures, and tonal depth — SOLACE brings a new level…",
+            "date": "2025-06-17",
+            "kind": "IMAGE",
+            "hidden": false
+          }
+        },
+        "post_CykmD_ZPivh": {
+          "type": "post",
+          "settings": {
+            "url": "https://www.instagram.com/p/CykmD_ZPivh/",
+            "link": "",
+            "photo_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/CykmD_ZPivh.jpg",
+            "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/series/ig/CykmD_ZPivh.mp4",
+            "caption": "HAVEN. On The Market. Experience the allure of HAVEN, where breathtaking design seamlessly blends with uncompromising functionality. With luxurious textures and detail, HAVEN in Camp Hill is a masterpiece designed to elevate your lifestyle. Delight in a kitchen that ignites culinary passion, a master suite that…",
+            "date": "2023-10-19",
+            "kind": "REEL",
+            "hidden": false
+          }
+        }
+      },
+      "block_order": [
+        "post_DdEH0MHmYBQ",
+        "post_DcgBG56ISNx",
+        "post_Dbu6tvCGyld",
+        "post_DbB1087kktr",
+        "post_DafGEiREnIX",
+        "post_DZUUQiRxdWt",
+        "post_DYy5SKhHzGF",
+        "post_DYRa4W9hY42",
+        "post_DYO15SUxPVQ",
+        "post_DYOvD33E8AW",
+        "post_DYMUxAFHJWh",
+        "post_DYJr540RW2_",
+        "post_DYEpZUSxgBH",
+        "post_DXl3vaJEXt1",
+        "post_DXgYbPDEYgL",
+        "post_DXd2iEpkYbu",
+        "post_DW52X9kEVkL",
+        "post_DWTTabZloUm",
+        "post_DVsrf4xzzFf",
+        "post_DVQWtj_E16r",
+        "post_DU2mxoQEix-",
+        "post_DUz7GLCEczG",
+        "post_DUSjpVUkrlC",
+        "post_DTce8NYkmdc",
+        "post_DSo_DyDj9Xk",
+        "post_DReT_UCEncj",
+        "post_DQd0vDzkieN",
+        "post_DPyDvZAD4iY",
+        "post_DPOACPsDhUk",
+        "post_DO7_qtPAJh7",
+        "post_DOfqUcpjoRy",
+        "post_DOF6XYOEd_I",
+        "post_DN5CZtrjmdu",
+        "post_DNAY34cRspb",
+        "post_DMw8IerNUot",
+        "post_DMHvaVltPQM",
+        "post_DL63cCRN3T2",
+        "post_DLUPYnQNcTq",
+        "post_DK_pHditk1Q",
+        "post_CykmD_ZPivh"
+      ],
+      "settings": {
+        "label": "The Series",
+        "heading_prefix": "The story of",
+        "handle_line": "As documented on",
+        "handle": "",
+        "instagram_url": "",
+        "sub": "The build, as it was posted.",
+        "reel_mode": "instagram",
+        "view_on_instagram": "View on Instagram",
+        "brand_caps": true,
+        "dark": false,
+        "show_label": true,
+        "show_heading": true,
+        "show_handle": true,
+        "show_sub": true,
+        "show_dates": true,
+        "show_captions": true,
+        "show_kind": true,
+        "show_arrows": true,
+        "card_width": 0,
+        "card_shape": "9/14",
+        "gap": 14,
+        "caption_lines": 3,
+        "limit": 0,
+        "order": "posted",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "related": {
+      "type": "related-properties",
+      "settings": {
+        "related_collection": "",
+        "heading_html": "More <em>Sabdia residences</em>",
+        "heading_sold_html": "Residences <em>for sale now</em>",
+        "show_heading": true,
+        "label": "",
+        "show_cars": true,
+        "show_build": false,
+        "show_land": false,
+        "count": 3,
+        "columns": "3",
+        "card_shape": "4/3",
+        "gap": 10,
+        "cta_label": "",
+        "cta_link": "",
+        "show_share": true,
+        "share_label": "Share",
+        "copy_link_label": "Copy link",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "walkthrough": {
+      "type": "scroll-walk",
+      "disabled": true,
+      "settings": {
+        "folder": "",
+        "name": "",
+        "walk_label": "The Walkthrough",
+        "hint_walk": "Scroll to walk",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": "",
+        "show_intro": true,
+        "show_label": true,
+        "show_rooms": true,
+        "show_caption": true,
+        "show_progress": true,
+        "show_hint": true,
+        "frame_border": true,
+        "vignette": true,
+        "heading_html": "",
+        "stage_size": "cinema",
+        "scroll_pace": 12
+      }
+    }
+  },
+  "order": [
+    "header",
+    "specs",
+    "story",
+    "gallery",
+    "closing",
+    "film",
+    "series",
+    "related",
+    "walkthrough"
+  ]
+}

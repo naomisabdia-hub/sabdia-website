@@ -59,7 +59,7 @@
             <p class="nl-done">{{ section.settings.nl_success }}</p>
           {%- else -%}
             {%- comment -%} On a residence page the subscriber is also tagged with that house, so Customers › Segments can filter "customer_tags CONTAINS 'qasr'". {%- endcomment -%}
-            <input type="hidden" name="contact[tags]" value="newsletter{% if product %}, {{ product.handle }}{% endif %}">
+            <input type="hidden" name="contact[tags]" value="newsletter{% if product %}, {{ product.handle }}{% elsif page and page.metafields.custom.status != blank %}, {{ page.handle }}{% endif %}">
             <label class="sr-only" for="nlEmail">Email address</label>
             <input class="nl-in" id="nlEmail" type="email" name="contact[email]" placeholder="{{ section.settings.nl_placeholder | escape }}" autocomplete="email" required>
             <button class="nl-btn" type="submit">{{ section.settings.nl_button }}</button>
@@ -106,12 +106,11 @@
           {%- assign live_handles = live_csv | split: ',' -%}
           {%- assign fs_limit = section.settings.for_sale_limit | default: 8 -%}
           {%- for h in live_handles limit: fs_limit -%}
-            {%- for p in collections.all.products -%}
-              {%- if p.handle != h -%}{%- continue -%}{%- endif -%}
+            {%- assign fs_res = pages[h] -%}{%- if fs_res == blank -%}{%- for cand in collections.all.products -%}{%- if cand.handle == h -%}{%- assign fs_res = cand -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+            {%- if fs_res != blank -%}
               {%- comment -%} The footer is the one place the name stays in the site type (Naomi, 14 Sep 2026). {%- endcomment -%}
-              <li><a href="{{ p.url }}">{{ p.title }}{% if p.metafields.custom.suburb.value != blank %} - {{ p.metafields.custom.suburb.value }}{% endif %}</a></li>
-              {%- break -%}
-            {%- endfor -%}
+              <li><a href="{{ fs_res.url }}">{{ fs_res.title }}{% if fs_res.metafields.custom.suburb.value != blank %} - {{ fs_res.metafields.custom.suburb.value }}{% endif %}</a></li>
+            {%- endif -%}
           {%- endfor -%}
         {%- endif -%}
         {%- if section.settings.show_view_all -%}<li><a href="/collections/for-sale">{{ section.settings.view_all_label | default: "View All Properties" }}</a></li>{%- endif -%}

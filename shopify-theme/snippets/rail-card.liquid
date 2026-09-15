@@ -12,6 +12,11 @@
     assign chip = settings.label_for_sale
   endif
   assign img = product.featured_image | default: product.featured_media.preview_image
+  if img == blank and product.handle != blank
+    # A residence page (15 Sep 2026) has no product photo: its main photo by name in Content › Files.
+    assign img_hero = product.handle | append: '-hero.jpg'
+    assign img = images[img_hero]
+  endif
   if featured
     assign iw = 900
   else

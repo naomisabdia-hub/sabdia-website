@@ -65,13 +65,12 @@
     {%- unless residences_done -%}
       {%- assign residences_done = true -%}
       {%- for h in live -%}
-        {%- for p in collections.all.products -%}
-          {%- if p.handle == h and p.tags contains 'property' -%}
-            {%- assign sub = p.metafields.custom.suburb.value -%}
-            <option>{{ p.title | escape }}{% if sub != blank %} - {{ sub | escape }}{% endif %}</option>
-            {%- break -%}
-          {%- endif -%}
-        {%- endfor -%}
+        {%- assign ef_res = pages[h] -%}
+        {%- if ef_res == blank -%}{%- for cand in collections.all.products -%}{%- if cand.handle == h and cand.tags contains 'property' -%}{%- assign ef_res = cand -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+        {%- if ef_res != blank -%}
+            {%- assign sub = ef_res.metafields.custom.suburb.value -%}
+            <option>{{ ef_res.title | escape }}{% if sub != blank %} - {{ sub | escape }}{% endif %}</option>
+        {%- endif -%}
       {%- endfor -%}
     {%- endunless -%}
   {%- endfor -%}

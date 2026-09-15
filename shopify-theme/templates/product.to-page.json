@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "redirect": {
+      "type": "residence-redirect",
+      "settings": {}
+    }
+  },
+  "order": [
+    "redirect"
+  ]
+}

@@ -14,6 +14,12 @@
   endif
   if template.name == 'product' and product.featured_image
     assign og_image = product.featured_image | image_url: width: 1200, height: 630, crop: 'center'
+  elsif page != blank and page.metafields.custom.status != blank
+    # A residence page (15 Sep 2026): its main photo by name, as the product page shared.
+    assign og_hero = page.handle | append: '-hero.jpg'
+    if images[og_hero]
+      assign og_image = images[og_hero] | image_url: width: 1200, height: 630, crop: 'center'
+    endif
   endif
 -%}
 <meta property="og:title" content="{{ og_title | escape }}">

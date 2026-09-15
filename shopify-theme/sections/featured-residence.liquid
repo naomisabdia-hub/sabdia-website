@@ -14,12 +14,17 @@
       render 'residence-handles', col: collections['for-sale'], group: 'live'
     endcapture
     assign first_h = live_csv | split: ',' | first
-    for p in collections.all.products
-      if p.handle == first_h
-        assign res = p
-        break
-      endif
-    endfor
+    # The residence's page leads (15 Sep 2026: the residences moved from $0
+    # products to pages); a residence still only in Products is found there.
+    assign res = pages[first_h]
+    if res == blank
+      for p in collections.all.products
+        if p.handle == first_h
+          assign res = p
+          break
+        endif
+      endfor
+    endif
   endif
 -%}
 {%- if res -%}
@@ -35,7 +40,7 @@
   endif
   assign fr_text = section.settings.text
   if fr_text == blank and section.settings.text_source == 'description'
-    assign fr_text = res.description | strip_html | split: '. ' | first | append: '.'
+    assign fr_text = res.description | default: res.content | strip_html | split: '. ' | first | append: '.'
   endif
   assign fr_video = section.settings.video_url
   if section.settings.video
@@ -50,6 +55,11 @@
   assign fr_img = section.settings.image
   if fr_img == blank
     assign fr_img = res.featured_image
+    if fr_img == blank
+      # A residence page has no product photo: its main photo by name in Content › Files.
+      assign fr_hero = res.handle | append: '-hero.jpg'
+      assign fr_img = images[fr_hero]
+    endif
   endif
   assign fr_focus = section.settings.focus | default: 'center'
   assign fr_dim = section.settings.dim | default: 45 | divided_by: 100.0
