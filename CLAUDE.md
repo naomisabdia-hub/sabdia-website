@@ -111,6 +111,12 @@ architecture, layout, interiors, or finishes. No exceptions.**
   the repo copies) moves any store-side page.collection-*.json over
   (push-live.sh runs it); `make-residence-templates.py` writes new
   templates in this shape.
+- Back link (15 Sep 2026): residence and Collection residence pages show a
+  slim line fixed under the menu (For Sale / Sold / The Collection › name),
+  `snippets/back-crumb.liquid`, rendered by `residence-header` and
+  `collection-item-header` (their Back link settings). It lifts itself to
+  <body>, sits flush under the menu at any height, and steps back in history
+  (same scroll place) when the visitor came from that list.
 - Completed residences stay Collection PAGES (Content › Pages, template
   collection-item). Since 14 Sep 2026 MILOS, PETRA, KIRRA, HERMOSA,
   ENCANTO, HAVEN, SPECTRE, AMMOS, ALHAMBRA, EDEN each have their own copy of that template

@@ -107,6 +107,12 @@
   {%- if hero_pick -%}{{ hero_pick | image_url: width: 900, height: 1600, crop: cd_focus }} 900w, {{ hero_pick | image_url: width: 1300, height: 2311, crop: cd_focus }} 1300w{%- elsif hero != blank -%}{% render 'ext-variant', src: hero, w: 900, h: 1600 %} 900w{%- endif -%}
 {%- endcapture -%}
 {%- assign hero_portrait = hero_portrait | strip -%}
+{%- comment -%} Back link under the menu: The Collection › the residence, in reach wherever the page scrolls (15 Sep 2026). {%- endcomment -%}
+{%- if s.show_crumb != false -%}
+  {%- assign bc_label = s.crumb_label | default: 'The Collection' -%}
+  {%- assign bc_url = s.crumb_link | default: '/pages/collection' -%}
+  {% render 'back-crumb', label: bc_label, url: bc_url, name: res_title %}
+{%- endif -%}
 <section class="cd-hero{% if s.hero_words == 'centre' %} cd-hero-centre{% endif %}{% if hero_film %} cd-hero-film cd-hero-fit-{{ s.hero_film_fit | default: 'cover' }}{% endif %}" id="{{ s.look_anchor | default: 'top' }}" style="--cd-h:{{ cd_h }};--cd-dim:{{ cd_dim }};--cd-focus:{{ cd_focus }}">
   {%- if hero_poster != blank -%}
     <picture>
@@ -224,6 +230,10 @@
   "name": "Header",
   "settings": [
     { "type": "paragraph", "content": "The top of a completed residence's page: the photograph or film behind the name, the badge, suburb · style · year, and the specs bar. Real photographs and real footage only, never generated." },
+    { "type": "header", "content": "Back link" },
+    { "type": "checkbox", "id": "show_crumb", "label": "Back link under the menu", "default": true, "info": "A slim line under the menu, The Collection › the residence, that stays in reach while the page scrolls. It returns visitors to the Collection where they left it." },
+    { "type": "text", "id": "crumb_label", "label": "List name", "default": "The Collection" },
+    { "type": "url", "id": "crumb_link", "label": "List address", "info": "Empty = the Collection page." },
     { "type": "header", "content": "Photo and film" },
     { "type": "product", "id": "media_product", "label": "Media folder", "info": "The residence's folder in Products (its photographs and film live in Products › the residence › Media). Empty pickers below fall back to it: its first picture as the hero, its film behind the name." },
     { "type": "image_picker", "id": "hero_image", "label": "Hero photo", "info": "Empty = the first picture of the Media folder, else the page's Hero image metafield." },

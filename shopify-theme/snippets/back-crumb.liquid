@@ -1,0 +1,80 @@
+{%- comment -%}
+  Back link under the menu on a residence page or a Collection residence
+  page (Naomi, 15 Sep 2026: "we need to add back for them to go back ...
+  the collection > milos ... wherever they scroll ... without ruining the
+  formatting").
+
+  A slim line fixed just below the menu, so it is in reach wherever the
+  page is scrolled: see-through with light words over the hero, then the
+  menu's own frosted ground once the page scrolls (the menu's hairline
+  hands over to the line's, so the two read as one bar). It floats, so no
+  section moves and no layout changes. When the visitor came from that
+  list, the link steps back in the browser's history, so the list opens
+  where they left it; otherwise it simply goes to the list's address.
+
+  Params: label (the list's name), url (its address), name (this page),
+  from (the address a referring list starts with; default url)
+{%- endcomment -%}
+{%- assign bc_from = from | default: url -%}
+<nav class="bcrumb" aria-label="Breadcrumb" data-bcrumb data-from="{{ bc_from | escape }}">
+  <a class="bcrumb-back" href="{{ url }}" data-bcrumb-back>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    <span>{{ label }}</span>
+  </a>
+  <span class="bcrumb-sep" aria-hidden="true">&rsaquo;</span>
+  <span class="bcrumb-here" aria-current="page">{{ name }}</span>
+</nav>
+<style>
+  .bcrumb{position:fixed;left:0;right:0;top:var(--nav-h,80px);z-index:998;display:flex;align-items:center;gap:.75em;height:40px;padding:0 var(--nav-pad,28px);font-family:var(--font-u);font-size:10.5px;font-weight:400;letter-spacing:.22em;text-transform:uppercase;color:rgba(var(--white-rgb),.88);text-shadow:0 1px 14px rgba(0,0,0,.28);border-bottom:1px solid transparent;pointer-events:none;transition:background .45s,border-color .45s,color .45s,text-shadow .45s}
+  .bcrumb a,.bcrumb span{pointer-events:auto}
+  .bcrumb-back{display:inline-flex;align-items:center;gap:.45em;color:inherit;text-decoration:none;padding:8px 0}
+  .bcrumb-back svg{width:13px;height:13px;flex-shrink:0;transition:transform .3s}
+  .bcrumb-back:hover svg{transform:translateX(-3px)}
+  .bcrumb-back:focus-visible{outline:1px solid currentColor;outline-offset:4px}
+  .bcrumb-sep{opacity:.55}
+  .bcrumb-here{opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  body.top-light .bcrumb:not(.sc){color:var(--ink3);text-shadow:none}
+  .bcrumb.sc{background:rgba(var(--bg-rgb),.95);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-color:var(--border);color:var(--ink3);text-shadow:none}
+  html:has(.bcrumb.sc) #mainNav.sc{border-bottom-color:transparent}
+  html:has(.bcrumb){scroll-padding-top:calc(var(--nav-h,80px) + 48px)}
+  html:has(.bcrumb) .s-anchor{scroll-margin-top:calc(var(--nav-h,80px) + 48px)}
+  @media(max-width:768px){.bcrumb{height:36px;padding:0 var(--nav-pad-m,18px);font-size:10px;letter-spacing:.18em}}
+  @media print{.bcrumb{display:none}}
+</style>
+<script>
+  (function () {
+    function initCrumb() {
+      var bar = document.querySelector('[data-bcrumb]:not([data-bcrumb-init])');
+      if (!bar) return;
+      bar.setAttribute('data-bcrumb-init', '1');
+      // Lift the line out to <body>: a fixed element inside a moved or
+      // animated section would scroll away with it. A copy left by an
+      // earlier load (the theme editor re-renders the section) goes first.
+      Array.prototype.forEach.call(document.querySelectorAll('body > [data-bcrumb][data-bcrumb-init]'), function (old) { if (old !== bar) old.remove(); });
+      if (bar.parentNode !== document.body) document.body.appendChild(bar);
+      var nav = document.getElementById('mainNav');
+      // Sit flush under the menu at whatever height it has (it shrinks on scroll).
+      function place() { if (nav) bar.style.top = Math.max(0, nav.getBoundingClientRect().bottom) + 'px'; }
+      function paint() { bar.classList.toggle('sc', window.scrollY > 60); }
+      place(); paint();
+      if (nav && 'ResizeObserver' in window) new ResizeObserver(place).observe(nav);
+      window.addEventListener('resize', place, { passive: true });
+      window.addEventListener('scroll', function () { paint(); place(); }, { passive: true });
+      var back = bar.querySelector('[data-bcrumb-back]');
+      if (!back) return;
+      back.addEventListener('click', function (e) {
+        var from = bar.getAttribute('data-from') || '';
+        try {
+          var ref = document.referrer ? new URL(document.referrer) : null;
+          if (ref && ref.origin === location.origin && from && ref.pathname.indexOf(from) === 0 && history.length > 1) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            history.back();
+          }
+        } catch (err) {}
+      });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCrumb);
+    else initCrumb();
+  })();
+</script>

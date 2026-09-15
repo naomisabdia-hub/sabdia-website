@@ -138,6 +138,15 @@
       assign pr_h = '92vh'
   endcase
 -%}
+{%- comment -%} Back link under the menu: For Sale (or Sold) › the residence, in reach wherever the page scrolls (15 Sep 2026). {%- endcomment -%}
+{%- if s.show_crumb != false -%}
+  {%- if sold -%}
+    {%- assign bc_label = s.crumb_sold | default: 'Sold' -%}{%- assign bc_url = '/collections/sold' -%}
+  {%- else -%}
+    {%- assign bc_label = s.crumb_for_sale | default: 'For Sale' -%}{%- assign bc_url = '/collections/for-sale' -%}
+  {%- endif -%}
+  {% render 'back-crumb', label: bc_label, url: bc_url, name: product.title, from: '/collections/' %}
+{%- endif -%}
 <style>@media(prefers-reduced-motion:reduce){.prop-hero video{display:none}}</style>
 <section class="prop-hero{% if section.settings.hero_words == 'centre' %} prop-hero-centre{% endif %}" style="--prop-h:{{ pr_h }};--prop-dim:{{ pr_dim }};--ph-status:{{ section.settings.status_font_scale | default: 100 | divided_by: 100.0 }};--ph-name:{{ section.settings.name_font_scale | default: 100 | divided_by: 100.0 }};--ph-loc:{{ section.settings.loc_font_scale | default: 100 | divided_by: 100.0 }}">
   {%- liquid
@@ -219,6 +228,10 @@
       "type": "paragraph",
       "content": "The top of the residence page: the big photo or film, the residence's name, its status line and suburb. The name, status and suburb come from Products › the residence. The sold banner and the specs bar under the hero live in the Property page section."
     },
+    {"type": "header", "content": "Back link"},
+    {"type": "checkbox", "id": "show_crumb", "label": "Back link under the menu", "default": true, "info": "A slim line under the menu, For Sale › the residence, that stays in reach while the page scrolls. It returns visitors to the list where they left it."},
+    {"type": "text", "id": "crumb_for_sale", "label": "List name for a residence for sale", "default": "For Sale"},
+    {"type": "text", "id": "crumb_sold", "label": "List name for a sold residence", "default": "Sold"},
     {
       "type": "header",
       "content": "Header media"
