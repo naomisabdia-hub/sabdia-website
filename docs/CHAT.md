@@ -1,3 +1,16 @@
+# The site chat - Shopify Inbox's AI agent (since 15 September 2026)
+
+**Ask Sabdia is archived.** Naomi, 15 Sep 2026: the site chat is now Shopify Inbox with its AI **Agent** switched on (Inbox › Chat settings › Agent). The residences for sale are pages and every product is Draft, so Inbox has no $0 product to show.
+
+- **The agent's rules** live in Inbox › Agent › Persona, pasted at the end of the existing text as "Sabdia Rules": an AI note in the first reply (some information may not be accurate), no pricing ("We don't disclose pricing unless it has been discussed with our Director"), collect name, email, phone, residence, budget, timeline and suburbs one or two at a time or point to /pages/contact, name the residence being enquired about, only website facts, the client-builds reply, Sabdia voice.
+- **Customers:** Inbox › Chat settings › Collect customer details files name and email in Customers. Budget, timeline and residence stay in the conversation; they are not added as customer tags the way Ask Sabdia did.
+- **Pricing is instruction, not a lock.** Read Inbox › View conversations now and then for any reply that strays.
+- **Ask Sabdia is kept, not deleted:** `sections/concierge.liquid`, its Sabdia replies in Customize and its style.css rules are all still in the theme. `layout/theme.liquid` no longer renders it; to bring it back, put `{% section 'concierge' %}` back there inside an `unless locked`, and style.css hides the Inbox bubble again automatically.
+
+Everything below describes Ask Sabdia as it worked from 11 to 15 September 2026.
+
+---
+
 # The site chat ("Ask Sabdia") - how it works, in plain English
 
 Since 11 September 2026 the small **Ask Sabdia** button in the bottom corner of every page is Sabdia's own chat. Shopify Inbox is still installed, but it is only the hand-over: its bubble stays hidden until a visitor presses **Chat with a person**.

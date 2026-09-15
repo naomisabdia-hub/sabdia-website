@@ -230,14 +230,13 @@ try {
 {% sections 'footer-group' %}
 {% endunless -%}
 {%- comment -%}
-  Ask Sabdia (sections/concierge.liquid) is the front chat: scripted answers
-  edited in Customize › Sabdia replies, live residence facts from Products
-  (never a price), and the enquiry form inside the chat. Shopify Inbox stays
-  installed as the hand-over only: style.css hides its bubble while the
-  concierge is present and shows it when the visitor chooses "Chat with a
-  person" (.cc.handoff). Naomi, 11 Sep 2026.
+  Ask Sabdia (sections/concierge.liquid) is ARCHIVED (Naomi, 15 Sep 2026):
+  Shopify Inbox's AI agent is the site chat now, configured in Inbox › Agent.
+  The section, its Sabdia replies and its style.css rules stay in the theme.
+  With no .cc on the page, style.css no longer hides the Inbox bubble. To
+  bring Ask Sabdia back, put {% section 'concierge' %} here again, inside
+  an unless locked.
 {%- endcomment -%}
-{%- unless locked %}{% section 'concierge' %}{% endunless -%}
 {%- if locked -%}
 {%- comment -%}
   Nothing about the site itself goes onto the closed page. SabdiaForms
