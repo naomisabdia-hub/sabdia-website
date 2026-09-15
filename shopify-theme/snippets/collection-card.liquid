@@ -4,8 +4,11 @@
 
   Params: product, index (1-based position), featured (true hides the
   first card behind the featured banner), style (aspect-ratio), show_cars,
-  show_land, image (optional photo instead of the residence's main photo),
-  attrs (a block's shopify_attributes, optional)
+  show_land, show_build, image (optional photo instead of the residence's main photo),
+  attrs (a block's shopify_attributes, optional), and the Residence
+  block's overrides (15 Sep 2026): url, focus, name, suburb, status, beds,
+  baths, cars, build, land - each replaces the residence's own line when given,
+  on the card and in the toolbar's filters.
 {%- endcomment -%}
 {%- liquid
   assign mfp = product.metafields.custom
@@ -13,6 +16,16 @@
   capture pstatus
     render 'residence-status', product: product
   endcapture
+  if status != blank
+    assign pstatus = status | strip
+  endif
+  assign v_suburb = suburb | default: mfp.suburb.value
+  assign v_beds = beds | default: mfp.beds.value
+  assign v_baths = baths | default: mfp.baths.value
+  assign v_cars = cars | default: mfp.cars.value
+  assign v_build = build | default: mfp.build_size.value
+  assign v_land = land | default: mfp.land.value
+  assign v_name = name | default: product.title
   capture pfeats
     render 'residence-feats', product: product
   endcapture
@@ -20,26 +33,26 @@
 <div
   data-prop-card
   {% if featured and index == 1 %}data-featured="1" style="display:none"{% endif %}
-  data-suburb="{{ mfp.suburb.value | escape }}"
-  data-cars="{{ mfp.cars.value }}"
-  data-land="{{ mfp.land.value }}"
-  data-build="{{ mfp.build_size.value }}"
-  data-beds="{{ mfp.beds.value }}"
-  data-baths="{{ mfp.baths.value }}"
+  data-suburb="{{ v_suburb | escape }}"
+  data-cars="{{ v_cars }}"
+  data-land="{{ v_land }}"
+  data-build="{{ v_build }}"
+  data-beds="{{ v_beds }}"
+  data-baths="{{ v_baths }}"
   data-status="{{ pstatus | escape }}"
   data-feats="{{ pfeats }}"
   data-year="{{ mfp.year.value }}"
-  data-name="{{ product.title | escape }}"
+  data-name="{{ v_name | escape }}"
   data-order="{{ index }}"
   {{ attrs }}
 >
   {%- if pstatus contains 'Sold' -%}
-    {% render 'sold-card', product: product, class: 'reveal-wipe', img_w: 800, img_h: 500, show_suburb: true %}
+    {% render 'sold-card', product: product, class: 'reveal-wipe', img_w: 800, img_h: 500, show_suburb: true, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build %}
   {%- elsif delay == 1 -%}
-    {% render 'property-card', product: product, class: 'reveal d1', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image %}
+    {% render 'property-card', product: product, class: 'reveal d1', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build %}
   {%- elsif delay == 2 -%}
-    {% render 'property-card', product: product, class: 'reveal d2', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image %}
+    {% render 'property-card', product: product, class: 'reveal d2', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build %}
   {%- else -%}
-    {% render 'property-card', product: product, class: 'reveal', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image %}
+    {% render 'property-card', product: product, class: 'reveal', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build %}
   {%- endif -%}
 </div>

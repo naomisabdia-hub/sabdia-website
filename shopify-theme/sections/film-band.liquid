@@ -42,7 +42,31 @@
   assign fc_speed = section.settings.carousel_speed | default: 45
   assign fc_gap = section.settings.carousel_gap | default: 10
 -%}
-{%- assign panels = section.blocks -%}
+{%- liquid
+  assign panels = section.blocks
+  # Only blocks with something to show count as panels (15 Sep 2026): a
+  # Photo block with its photo removed, or a Second film with no film,
+  # takes no slot and leaves no empty frame beside the reel.
+  assign panel_count = 0
+  for block in panels
+    if block.type == 'photo'
+      if block.settings.image or block.settings.ext != blank
+        assign panel_count = panel_count | plus: 1
+      endif
+    elsif block.type == 'film'
+      assign pc_src = block.settings.video_url
+      if block.settings.film
+        assign pc_mp4 = block.settings.film.sources | where: 'format', 'mp4' | first
+        if pc_mp4
+          assign pc_src = pc_mp4.url
+        endif
+      endif
+      if pc_src != blank
+        assign panel_count = panel_count | plus: 1
+      endif
+    endif
+  endfor
+-%}
 {%- if film_src != blank -%}
 {%- capture film_copy_html -%}
       {%- if section.settings.show_label -%}<div class="slabel slabel-dark reveal">{{ section.settings.label }}</div>{%- endif -%}
@@ -120,16 +144,20 @@
     </div>
   </div>
 {%- else -%}
-  <div class="film-grid{% if panels.size > 0 %} has-panels{% endif %}">
+  <div class="film-grid{% if panel_count > 0 %} has-panels{% endif %}">
     <div class="film-copy">
       {{ film_copy_html }}
     </div>
-    {%- if panels.size > 0 -%}
+    {%- if panel_count > 0 -%}
     {%- comment -%} Between the copy and the reel: up to three photos or a second film,
         side by side, the second a touch smaller (Tamsin's sketch, 11 Sep 2026). {%- endcomment -%}
     <div class="film-panels reveal d3">
-      {%- for block in panels limit: 3 -%}
+      {%- assign pn = 0 -%}
+      {%- for block in panels -%}
+        {%- if pn >= 3 -%}{%- break -%}{%- endif -%}
         {%- if block.type == 'photo' -%}
+          {%- if block.settings.image == blank and block.settings.ext == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign pn = pn | plus: 1 -%}
           <figure class="film-panel" {{ block.shopify_attributes }}>
             {%- if block.settings.image -%}
               <img src="{{ block.settings.image | image_url: width: 800, height: 1000, crop: block.settings.focus }}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="800" height="1000" style="object-position:{{ block.settings.focus | default: 'center' }}">
@@ -149,6 +177,7 @@
             endif
           -%}
           {%- if p_src != blank -%}
+          {%- assign pn = pn | plus: 1 -%}
           <div class="film-panel film-panel-film" {{ block.shopify_attributes }}>
             <div class="film-frame film-frame-sm" data-film>
               <video src="{{ p_src }}" {% if block.settings.poster %}poster="{{ block.settings.poster | image_url: width: 700 }}"{% elsif block.settings.poster_ext != blank %}poster="{{ block.settings.poster_ext }}"{% endif %} muted loop playsinline preload="none"></video>

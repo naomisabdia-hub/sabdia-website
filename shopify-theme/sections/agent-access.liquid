@@ -2,7 +2,11 @@
 {%- comment -%} Theme settings › Features › Agent Access off: this section renders nothing. {%- endcomment -%}
 {%- if settings.agent_access_enabled -%}
 {% render 'section-look', section: section %}
-<div class="agent-grid s-surface{% if section.settings.image_side == 'right' %} agent-flip{% endif %}{% if section.settings.frame == false %} agent-noframe{% endif %}" id="agents" style="--agent-min:{{ section.settings.min_height | default: 640 }}px">
+{%- comment -%} No photo chosen and no photo address (15 Sep 2026): the picture column, its frame and badge step aside and the words take the width, never an empty framed column. {%- endcomment -%}
+{%- assign agent_has_img = false -%}
+{%- if section.settings.image or section.settings.image_ext != blank -%}{%- assign agent_has_img = true -%}{%- endif -%}
+<div class="agent-grid s-surface{% if section.settings.image_side == 'right' %} agent-flip{% endif %}{% if section.settings.frame == false %} agent-noframe{% endif %}{% unless agent_has_img %} agent-noimg{% endunless %}" id="agents" style="--agent-min:{{ section.settings.min_height | default: 640 }}px">
+  {%- if agent_has_img -%}
   <div class="agent-vis reveal-wipe-x">
     {%- if section.settings.image -%}
       <img src="{{ section.settings.image | image_url: width: 900, height: 1100, crop: 'center' }}" alt="{{ section.settings.image_alt | default: 'Sabdia agent program' | escape }}" loading="lazy" decoding="async" width="900" height="1100">
@@ -12,6 +16,7 @@
     <div class="agent-frame"></div>
     {%- if section.settings.show_badge and section.settings.badge != blank -%}<div class="agent-badge">{{ section.settings.badge }}</div>{%- endif -%}
   </div>
+  {%- endif -%}
   <div class="agent-content">
     {%- if section.settings.show_label -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
     {%- if section.settings.show_heading -%}<h2 class="agent-h reveal d1">{{ section.settings.heading_html }}</h2>{%- endif -%}
@@ -44,6 +49,7 @@
     {%- endif -%}
   </div>
 </div>
+<style>.agent-grid.agent-noimg{grid-template-columns:1fr}</style>
 
 {%- endif -%}
 {% schema %}

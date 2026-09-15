@@ -9,6 +9,10 @@
     {% render 'section-look', section: section, designed: 'dark' %}
     {% render 'section-look', section: section, mode: 'hero' %}
 
+  A chosen Background (anything but As designed) paints the section and
+  lifts its designed top and bottom hairlines, since the colour change now
+  marks the edge; Look › the hairline dials still draw one on purpose.
+
   designed - 'light' (default) or 'dark': how the section is coloured as
     designed. Choosing a surface of the other tone flips the palette. Every
     colour in style.css is a token (the rgba() colours read r,g,b tokens),
@@ -70,10 +74,16 @@
       assign tone = s.look_tone | default: 'light'
     when 'media'
       assign tone = s.look_media_tone | default: 'dark'
+      assign film_poster = ''
       if s.look_video
         assign mp4 = s.look_video.sources | where: 'format', 'mp4' | first
         if mp4
           assign film_src = mp4.url
+          # The uploaded film's own frame is its poster when the Backdrop
+          # photo is removed (15 Sep 2026).
+          if s.look_video.preview_image
+            assign film_poster = s.look_video.preview_image | image_url: width: 1920
+          endif
         endif
       endif
       if film_src == blank and s.look_video_url != blank
@@ -85,7 +95,12 @@
       if film_src != blank or poster_src != blank
         assign has_media = true
       endif
-      if tone == 'dark'
+      # Photo and film both removed (15 Sep 2026): the section goes back to
+      # as designed, not an empty dark or cream panel with its words flipped
+      # for a backdrop that is no longer there.
+      if has_media == false
+        assign tone = designed
+      elsif tone == 'dark'
         assign bg = obsidian
       else
         assign bg = cream
@@ -174,7 +189,7 @@
 #shopify-section-{{ sid }}{ {{ decl }} }
 {%- endif -%}
 {%- if bg != blank -%}
-#shopify-section-{{ sid }}>section,#shopify-section-{{ sid }}>article,#shopify-section-{{ sid }}>footer,#shopify-section-{{ sid }}>.s-surface{background:transparent!important;position:relative;z-index:1}
+#shopify-section-{{ sid }}>section,#shopify-section-{{ sid }}>article,#shopify-section-{{ sid }}>footer,#shopify-section-{{ sid }}>.s-surface{background:transparent!important;border-top-width:0!important;border-bottom-width:0!important;position:relative;z-index:1}
 {%- endif -%}
 {%- if animate == false -%}
 html.js #shopify-section-{{ sid }} .reveal,html.js #shopify-section-{{ sid }} .reveal-x,html.js #shopify-section-{{ sid }} .reveal-r{opacity:1;transform:none;transition:none}
@@ -196,7 +211,7 @@ html.js #shopify-section-{{ sid }} .proc-track .proc-n{transform:none;opacity:1;
   -%}
   <div class="s-backdrop" aria-hidden="true" style="--s-dim:{{ dim }};--s-focus:{{ focus }};--s-scrim:{{ scrim }}">
     {%- if film_src != blank -%}
-      <video src="{{ film_src }}"{% if poster_src != blank %} poster="{{ poster_src }}"{% endif %} autoplay muted loop playsinline preload="metadata" tabindex="-1"></video>
+      <video src="{{ film_src }}"{% if poster_src != blank %} poster="{{ poster_src }}"{% elsif film_poster != blank %} poster="{{ film_poster }}"{% endif %} autoplay muted loop playsinline preload="metadata" tabindex="-1"></video>
     {%- else -%}
       <img src="{{ poster_src }}" srcset="{{ s.look_image | image_url: width: 768 }} 768w, {{ s.look_image | image_url: width: 1280 }} 1280w, {{ s.look_image | image_url: width: 1920 }} 1920w" sizes="100vw" alt="" width="1920" height="1080" loading="lazy" decoding="async">
     {%- endif -%}

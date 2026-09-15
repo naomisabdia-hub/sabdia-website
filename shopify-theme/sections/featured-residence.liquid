@@ -121,7 +121,8 @@
   hero: no scrim, no words over the photo.
 {%- endcomment -%}
 {% render 'section-look', section: section %}
-<section class="sp fre fre-{{ fr_side }}{% if fr_reel == blank %} fre-noreel{% endif %}" id="featured" style="--fre-ar:{{ section.settings.shape | default: '4/3' }}">
+{%- comment -%} No photo on the band or the residence (15 Sep 2026): the photograph and the reel that overlaps it step aside and the words take the width, never an empty grey frame. {%- endcomment -%}
+<section class="sp fre fre-{{ fr_side }}{% if fr_reel == blank %} fre-noreel{% endif %}{% unless fr_img %} fre-nophoto{% endunless %}" id="featured" style="--fre-ar:{{ section.settings.shape | default: '4/3' }}">
   <div class="inner fre-grid">
     <div class="fre-words">
       {%- if section.settings.show_label and fr_label != blank -%}<div class="slabel reveal">{{ fr_label }}{% if section.settings.show_status and fr_status != blank %}<span class="fre-status">{{ fr_status }}</span>{% endif %}</div>{%- endif -%}
@@ -135,6 +136,7 @@
         {%- if m.beds.value != blank -%}<div><dt>Bedrooms</dt><dd>{{ m.beds.value }}</dd></div>{%- endif -%}
         {%- if m.baths.value != blank -%}<div><dt>Bathrooms</dt><dd>{{ m.baths.value }}</dd></div>{%- endif -%}
         {%- if m.cars.value != blank -%}<div><dt>Garage</dt><dd>{{ m.cars.value }}</dd></div>{%- endif -%}
+        {%- if m.build_size.value != blank -%}<div><dt>Build</dt><dd>{{ m.build_size.value }}<span>m&sup2;</span></dd></div>{%- endif -%}
         {%- if m.land.value != blank -%}<div><dt>Land</dt><dd>{{ m.land.value }}<span>m&sup2;</span></dd></div>{%- endif -%}
       </dl>
       {%- endif -%}
@@ -145,6 +147,7 @@
       </div>
       {%- endif -%}
     </div>
+    {%- if fr_img -%}
     <div class="fre-media">
       <a href="{{ res.url }}" class="fre-photo reveal-wipe d1" aria-label="{{ res.title }}">
         {%- if fr_img -%}
@@ -158,22 +161,24 @@
       </div>
       {%- endif -%}
     </div>
+    {%- endif -%}
   </div>
 </section>
 <style>
   .fre{background:var(--bg2);overflow:hidden}
   .fre-grid{display:grid;grid-template-columns:5fr 7fr;gap:clamp(36px,5vw,80px);align-items:center}
+  .fre-nophoto .fre-grid{grid-template-columns:1fr}
   .fre-left .fre-words{order:2}.fre-left .fre-media{order:1}
   .fre-words{padding:8px 0}
   .fre-status{margin-left:14px;padding-left:14px;border-left:1px solid var(--border);font-weight:300;color:var(--ink3)}
   .fre-name{font-family:var(--font-d);font-size:calc(clamp(56px,7.5vw,116px)*var(--s-h,1)*var(--face-scale,1));font-weight:500;line-height:.92;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);margin:0}
   .fre-loc{margin-top:14px;font-size:var(--t-label);font-weight:400;letter-spacing:.32em;text-transform:uppercase;color:var(--ink3)}
   .fre-rule{width:48px;height:1px;background:var(--ink);margin:28px 0 24px;opacity:.6}
-  .fre-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:500;line-height:1.15;color:var(--ink);margin:0 0 14px;letter-spacing:-.01em}
+  .fre-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:400;line-height:1.15;color:var(--ink);margin:0 0 14px;letter-spacing:-.01em}
   .fre-words .about-p{max-width:460px}
   .fre-facts{margin:28px 0 0;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:12px clamp(20px,3vw,44px)}
   .fre-facts dt{font-size:var(--t-micro);font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
-  .fre-facts dd{margin:0;font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:500;color:var(--ink);line-height:1}
+  .fre-facts dd{margin:0;font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:400;color:var(--ink);line-height:1}
   .fre-facts dd span{font-size:.6em;margin-left:2px;font-weight:400;color:var(--ink3)}
   .fre-btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
   /* The photograph runs off the right edge of the page; the reel sits over its lower-left corner. */
@@ -206,8 +211,12 @@
   other. Never full-bleed, never a hero.
 {%- endcomment -%}
 {% render 'section-look', section: section %}
-<section class="sp frs frs-{{ fr_side }}" style="--frs-ar:{{ section.settings.shape | default: '4/5' }}">
+{%- comment -%} No film and no photo (15 Sep 2026): the photo half steps aside and the stone panel takes the width, never an empty grey half. {%- endcomment -%}
+{%- assign frs_media = false -%}
+{%- if fr_video != blank or fr_img -%}{%- assign frs_media = true -%}{%- endif -%}
+<section class="sp frs frs-{{ fr_side }}{% unless frs_media %} frs-nomedia{% endunless %}" style="--frs-ar:{{ section.settings.shape | default: '4/5' }}">
   <div class="inner frs-grid">
+    {%- if frs_media -%}
     <div class="frs-media reveal-wipe d1">
       {%- if fr_video != blank -%}
         <video src="{{ fr_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if fr_img %} poster="{{ fr_img | image_url: width: 1200 }}"{% endif %}></video>
@@ -216,6 +225,7 @@
       {%- endif -%}
       {%- if section.settings.show_status and fr_status != blank -%}<span class="pc-status-chip"><span class="pc-dot"></span>{{ fr_status }}</span>{%- endif -%}
     </div>
+    {%- endif -%}
     <div class="frs-panel">
       {%- if section.settings.show_label and fr_label != blank -%}<div class="slabel reveal">{{ fr_label }}</div>{%- endif -%}
       <div class="frs-name reveal d1"{% if fr_name_style != blank %} style="{{ fr_name_style }}"{% endif %}>{{ fr_name }}</div>
@@ -227,7 +237,7 @@
         {%- if m.beds.value != blank -%}<li><b>{{ m.beds.value }}</b> Bed</li>{%- endif -%}
         {%- if m.baths.value != blank -%}<li><b>{{ m.baths.value }}</b> Bath</li>{%- endif -%}
         {%- if m.cars.value != blank -%}<li><b>{{ m.cars.value }}</b> Garage</li>{%- endif -%}
-        {%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>m&sup2; land</li>{%- endif -%}
+        {%- if m.build_size.value != blank -%}<li><b>{{ m.build_size.value }}</b>m&sup2; build</li>{%- endif -%}{%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>m&sup2; land</li>{%- endif -%}
       </ul>
       {%- endif -%}
       {%- if section.settings.show_buttons -%}
@@ -241,6 +251,7 @@
 </section>
 <style>
   .frs-grid{display:grid;grid-template-columns:7fr 5fr;gap:0;align-items:stretch;background:var(--bg2)}
+  .frs-nomedia .frs-grid{grid-template-columns:1fr}
   .frs-right .frs-media{order:2}.frs-right .frs-panel{order:1}
   .frs-media{position:relative;aspect-ratio:var(--frs-ar,4/5);min-height:100%;overflow:hidden;background:var(--bg3)}
   .frs-media img,.frs-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95)}
@@ -248,17 +259,18 @@
   .frs-panel{padding:clamp(32px,4.5vw,64px);display:flex;flex-direction:column;justify-content:center}
   .frs-name{font-family:var(--font-d);font-size:calc(clamp(30px,3.6vw,52px)*var(--s-h,1)*var(--face-scale,1));font-weight:500;line-height:1;letter-spacing:.02em;text-transform:uppercase;color:var(--ink)}
   .frs-loc{margin-top:8px;font-size:var(--t-label);font-weight:400;letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}
-  .frs-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:500;line-height:1.12;color:var(--ink);margin:26px 0 14px;letter-spacing:-.01em}
+  .frs-h{font-family:var(--font-d);font-size:calc(var(--t-h2)*var(--s-h,1));font-weight:400;line-height:1.12;color:var(--ink);margin:26px 0 14px;letter-spacing:-.01em}
   .frs-panel .about-p{max-width:none}
   .frs-facts{list-style:none;margin:22px 0 0;padding:18px 0 0;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px 26px;font-size:var(--t-small);letter-spacing:.06em;color:var(--ink3)}
-  .frs-facts b{font-weight:500;color:var(--ink)}
+  .frs-facts b{font-weight:400;color:var(--ink)}
   .frs-btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
   @media(prefers-reduced-motion:reduce){.frs-media video{display:none}}
   @media(max-width:900px){.frs-grid{grid-template-columns:1fr}.frs-right .frs-media{order:1}.frs-right .frs-panel{order:2}.frs-media{aspect-ratio:4/3;min-height:0}.frs-panel{padding:28px 22px 36px}}
 </style>
 {%- else -%}
 {% render 'section-look', section: section, mode: 'hero' %}
-<section class="page-hero ph-sized fr ph-pos-{{ section.settings.words | default: 'base-left' }} ph-scrim-{{ section.settings.scrim | default: 'corner' }}" style="--ph-h:{{ fr_h }};--ph-hm:{{ fr_hm }};--ph-dim:{{ fr_dim }}">
+{%- comment -%} No film and no photo (15 Sep 2026): the band stands on the dark ground so its light words still read. {%- endcomment -%}
+<section class="page-hero ph-sized fr ph-pos-{{ section.settings.words | default: 'base-left' }} ph-scrim-{{ section.settings.scrim | default: 'corner' }}" style="--ph-h:{{ fr_h }};--ph-hm:{{ fr_hm }};--ph-dim:{{ fr_dim }}{% if fr_video == blank and fr_img == blank %};background:var(--dark){% endif %}">
   {%- if fr_video != blank -%}
     <video class="page-hero-video" src="{{ fr_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if fr_img %} poster="{{ fr_img | image_url: width: 1920, height: 1080, crop: fr_focus }}"{% endif %}></video>
   {%- elsif fr_img -%}
@@ -277,7 +289,7 @@
       {%- if m.beds.value != blank -%}<li><b>{{ m.beds.value }}</b> Bed</li>{%- endif -%}
       {%- if m.baths.value != blank -%}<li><b>{{ m.baths.value }}</b> Bath</li>{%- endif -%}
       {%- if m.cars.value != blank -%}<li><b>{{ m.cars.value }}</b> Garage</li>{%- endif -%}
-      {%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>m&sup2; land</li>{%- endif -%}
+      {%- if m.build_size.value != blank -%}<li><b>{{ m.build_size.value }}</b>m&sup2; build</li>{%- endif -%}{%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>m&sup2; land</li>{%- endif -%}
     </ul>
     {%- endif -%}
     {%- if section.settings.show_buttons -%}
@@ -295,7 +307,7 @@
   .fr-name span{font-weight:300;letter-spacing:.2em;opacity:.7;margin-left:12px}
   .fr-status{font-weight:300;opacity:.75}
   .fr-facts{list-style:none;margin:22px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px 28px;font-size:var(--t-small);letter-spacing:.06em;color:rgba(var(--white-rgb),.8)}
-  .fr-facts b{font-weight:500;color:var(--white)}
+  .fr-facts b{font-weight:400;color:var(--white)}
   .fr-btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
   .ph-pos-base-centre.fr .fr-facts,.ph-pos-centre.fr .fr-facts,.ph-pos-base-centre.fr .fr-btns,.ph-pos-centre.fr .fr-btns{justify-content:center}
   @media(prefers-reduced-motion:reduce){.fr .page-hero-video{display:none}}
@@ -319,7 +331,7 @@
     {"type": "header", "content": "Show"},
     {"type": "checkbox", "id": "show_label", "label": "Small label", "default": true},
     {"type": "checkbox", "id": "show_text", "label": "The line", "default": true},
-    {"type": "checkbox", "id": "show_facts", "label": "Bed, bath, garage, land", "default": true},
+    {"type": "checkbox", "id": "show_facts", "label": "Bed, bath, garage, build, land", "default": true},
     {"type": "checkbox", "id": "show_buttons", "label": "The two buttons", "default": true},
     {"type": "text", "id": "cta1_label", "label": "Button 1 (to the residence)", "default": "Explore {name}", "info": "{name} becomes the residence's name."},
     {"type": "text", "id": "cta2_label", "label": "Button 2", "default": "Arrange an Inspection"},

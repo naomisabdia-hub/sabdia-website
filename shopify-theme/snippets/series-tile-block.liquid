@@ -7,6 +7,8 @@
   assign b_thumb = ''
   if block.settings.image != blank
     assign b_thumb = block.settings.image | image_url: width: 810
+  elsif block.settings.photo_url != blank
+    assign b_thumb = block.settings.photo_url
   endif
   assign b_video = ''
   if block.settings.video != blank

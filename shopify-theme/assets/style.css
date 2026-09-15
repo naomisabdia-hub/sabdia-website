@@ -512,29 +512,31 @@ html.js .slabel.reveal.vis::before{width:24px}
 .pc-sm-b{grid-column:9/13;grid-row:2;aspect-ratio:unset}
 
 .pc{position:relative;overflow:hidden;cursor:pointer;display:block;transition:transform .55s var(--ease)}
-.pc img{width:100%;height:100%;object-fit:cover;filter:brightness(1) saturate(.97);transition:filter .7s var(--ease),transform .7s var(--ease)}
+.pc picture{display:contents}.pc img{width:100%;height:100%;object-fit:cover;filter:brightness(1) saturate(.97);transition:filter .7s var(--ease),transform .7s var(--ease)}
 .pc:hover img{filter:brightness(.82) saturate(1);transform:scale(1.035)}
-.pc-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(var(--dark-rgb),.86) 0%,rgba(var(--dark-rgb),.16) 52%,transparent 78%);transition:opacity .4s}
-.pc-info{position:absolute;bottom:0;left:0;right:0;padding:28px 32px}
+.pc-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(var(--dark-rgb),.9) 0%,rgba(var(--dark-rgb),.55) 30%,rgba(var(--dark-rgb),.14) 58%,transparent 80%);transition:opacity .4s}
+.pc-info{position:absolute;bottom:0;left:0;right:0;padding:22px 26px}
 /* Status moved out of the text stack and up to the corner as a chip,
    the way every reference treats it — it reads as metadata about the
    listing rather than as a line of the title block. */
-.pc-status-chip{position:absolute;top:20px;left:20px;z-index:2;display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:var(--r-sm);background:rgba(var(--dark-rgb),.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(var(--gold3-rgb),.28);font-size:var(--t-label);font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold3)}
+.pc-status-chip{position:absolute;top:20px;left:20px;z-index:2;display:inline-flex;align-items:center;gap:7px;padding:.45em .95em;border-radius:var(--r-sm);background:rgba(var(--dark-rgb),.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(var(--gold3-rgb),.28);font-size:var(--t-label);font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold3)}
 .pc-dot{width:5px;height:5px;border-radius:50%;background:var(--gold2);animation:pulse 2.2s ease-in-out infinite;flex-shrink:0}
 .pc-dot.sold{background:#8C8880;animation:none}
 .pc-dot.still{animation:none}
-.pc-name{font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:300;color:var(--white);line-height:1.05;margin-bottom:6px}
-.pc-loc{display:flex;align-items:center;gap:6px;font-size:var(--t-label);font-weight:400;letter-spacing:.18em;color:rgba(var(--white-rgb),.78);text-transform:uppercase}
+.pc-name{font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1)*var(--pc-name-scale,1));font-weight:300;color:var(--white);line-height:1.05;margin-bottom:6px;text-shadow:0 1px 14px rgba(0,0,0,.45),0 1px 2px rgba(0,0,0,.35)}
+.pc-loc{display:flex;align-items:center;gap:6px;font-size:var(--t-label);font-weight:400;letter-spacing:.18em;color:rgba(var(--white-rgb),.94);text-transform:uppercase;text-shadow:0 1px 10px rgba(0,0,0,.45)}
 .pc-loc svg{width:1.25em;height:1.25em;flex-shrink:0;opacity:.8}
 /* Specs were opacity:0 until :hover — which meant they never appeared
    at all on a touch device, hiding bed/bath/car counts from every phone
    visitor. They are now persistent chips. */
-.pc-specs{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;list-style:none;padding:0}
-.pc-spec{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:var(--r-sm);background:rgba(var(--dark-rgb),.38);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(var(--white-rgb),.22);font-size:calc(var(--t-small)*var(--s-t,1));font-weight:400;letter-spacing:.04em;color:rgba(var(--white-rgb),.92);white-space:nowrap}
-.pc-spec svg{width:1.25em;height:1.25em;flex-shrink:0;opacity:.75}
+.pc-specs{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;list-style:none;padding:0}
+.pc-spec{display:inline-flex;align-items:center;gap:.35em;padding:.3em .65em;border-radius:var(--r-sm);background:rgba(var(--dark-rgb),.38);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(var(--white-rgb),.22);font-size:calc(var(--t-small)*var(--s-t,1));font-weight:400;letter-spacing:.04em;color:rgba(var(--white-rgb),.92);white-space:nowrap}
+.pc-spec svg{width:1.1em;height:1.1em;flex-shrink:0;opacity:.75}
+/* The word after a size (build / land): read aloud beside the icon, printed on phones where the icons hide (15 Sep 2026). */
+.pc-spec-k{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .pc-arrow{position:absolute;top:22px;right:22px;width:38px;height:38px;border:1px solid rgba(var(--gold2-rgb),.35);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.6);transition:opacity .35s,transform .45s var(--ease);color:var(--gold2);font-size:14px}
 .pc:hover .pc-arrow{opacity:1;transform:scale(1)}
-.pc-hero .pc-name{font-size:calc(var(--t-h2)*var(--s-h,1))}
+.pc-hero .pc-name{font-size:calc(var(--t-h2)*var(--s-h,1)*var(--pc-name-scale,1))}
 .pc-hero .pc-info{padding:40px 44px}
 
 /* 3-col row grid (for properties page). The listing markup used to set
@@ -568,12 +570,12 @@ html.js .slabel.reveal.vis::before{width:24px}
 /* Sold homes were the most heavily muted on the site. They are proof of
    demand, so they now read at nearly full strength — the "sold" signal
    comes from the badge, not from dimming the photograph. */
-.sc-card img{width:100%;height:100%;object-fit:cover;filter:brightness(.95) saturate(.9);transition:filter .6s,transform .8s var(--ease)}
+.sc-card picture{display:contents}.sc-card img{width:100%;height:100%;object-fit:cover;filter:brightness(.95) saturate(.9);transition:filter .6s,transform .8s var(--ease)}
 .sc-card:hover img{filter:brightness(.8) saturate(.95);transform:scale(1.035)}
 .sc-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(var(--dark-rgb),.84) 0%,rgba(var(--dark-rgb),.14) 50%,transparent 76%)}
-.sc-badge{position:absolute;top:16px;left:16px;padding:6px 13px;border-radius:var(--r-sm);background:rgba(var(--dark-rgb),.78);border:1px solid rgba(var(--gold2-rgb),.34);font-size:var(--t-label);font-weight:400;letter-spacing:.24em;text-transform:uppercase;color:var(--gold3);backdrop-filter:blur(8px)}
+.sc-badge{position:absolute;top:16px;left:16px;padding:.45em .95em;border-radius:var(--r-sm);background:rgba(var(--dark-rgb),.78);border:1px solid rgba(var(--gold2-rgb),.34);font-size:calc(var(--t-label)*var(--pc-status,1));font-weight:400;letter-spacing:.24em;text-transform:uppercase;color:var(--gold3);backdrop-filter:blur(8px)}
 .sc-info{position:absolute;bottom:0;left:0;right:0;padding:22px 26px}
-.sc-name{font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1));font-weight:300;color:var(--white);line-height:1.05;margin-bottom:4px}
+.sc-name{font-family:var(--font-d);font-size:calc(var(--t-h3)*var(--s-h,1)*var(--pc-name-scale,1));font-weight:300;color:var(--white);line-height:1.05;margin-bottom:4px}
 .sc-loc{font-size:var(--t-label);font-weight:300;letter-spacing:.14em;color:rgba(var(--white-rgb),.55);text-transform:uppercase}
 
 /* ── SERVICES ── */
@@ -1127,9 +1129,9 @@ h1 em, h2 em, h3 em,
 .mq-item{font-size:var(--mq-size,var(--t-label));letter-spacing:calc(var(--mq-track,26) * .01em);color:var(--ink2)}
 .stat-l{font-size:var(--stat-l,var(--t-label));letter-spacing:.24em}
 .sold-label{font-size:var(--t-label);letter-spacing:.28em}
-.pc-status-chip{font-size:var(--t-label);letter-spacing:.22em}
+.pc-status-chip{font-size:calc(9.5px*var(--pc-status,1));letter-spacing:.2em}
 .pc-loc{font-size:var(--t-label)}
-.pc-spec{font-size:calc(var(--t-small)*var(--s-t,1))}
+.pc-spec{font-size:calc(11px*var(--s-t,1)*var(--pc-chip,1))}
 .sc-loc{font-size:var(--t-label)}
 .proj-card-year{font-size:var(--t-label);letter-spacing:.26em}
 .proj-card-loc{font-size:var(--t-label)}
@@ -1626,19 +1628,19 @@ html.bk .about-h{font-size:calc(clamp(30px,3.4vw,50px)*var(--s-h,1));margin-bott
 @media(max-width:560px){html.bk .about-h{font-size:calc(var(--t-h1)*var(--s-h,1))}}
 html.bk .stat-n{font-size:calc(clamp(40px,5vw,66px)*var(--s-h,1));font-weight:300;letter-spacing:-.02em}
 html.bk .stats-compact .stat-n{font-size:calc(clamp(34px,4vw,52px)*var(--s-h,1))}
-html.bk .about-h,html.bk .proj-h,html.bk .svc-h,html.bk .agent-h,html.bk .contact-h,html.bk .film-h,html.bk .cs-h,html.bk .prop-cta-h,html.bk .jn-title,html.bk .footer-tag-h,html.bk .svc-detail-h{font-weight:500;line-height:1.1;letter-spacing:-.01em}
-html.bk .page-h{font-weight:500;line-height:1.02;letter-spacing:-.015em}
-html.bk .prop-name,html.bk .cd-name{font-weight:500;line-height:.98;letter-spacing:-.02em}
-html.bk .prop-body-h,html.bk .prop-gallery-h,html.bk .prop-related-h,html.bk .series-h,html.bk .sw-h,html.bk .jn-lead-h{font-weight:500;line-height:1.12;letter-spacing:-.01em}
-html.bk .pc-name,html.bk .sc-name,html.bk .proj-card-name,html.bk .svc-t,html.bk .proc-t,html.bk .prop-features-h,html.bk .prop-enquire-h,html.bk .nl-h,html.bk .cs-col-t,html.bk .jn-card-h,html.bk .pf-name,html.bk .cc-title,html.bk .tl-title,html.bk .award-title,html.bk .h-title-serif .h-title{font-weight:500;letter-spacing:0}
+html.bk .about-h,html.bk .proj-h,html.bk .svc-h,html.bk .agent-h,html.bk .contact-h,html.bk .film-h,html.bk .cs-h,html.bk .prop-cta-h,html.bk .jn-title,html.bk .footer-tag-h,html.bk .svc-detail-h{font-weight:400;line-height:1.1;letter-spacing:-.01em}
+html.bk .page-h{font-weight:400;line-height:1.02;letter-spacing:-.015em}
+html.bk .prop-name,html.bk .cd-name{font-weight:400;line-height:.98;letter-spacing:-.02em}
+html.bk .prop-body-h,html.bk .prop-gallery-h,html.bk .prop-related-h,html.bk .series-h,html.bk .sw-h,html.bk .jn-lead-h{font-weight:400;line-height:1.12;letter-spacing:-.01em}
+html.bk .pc-name,html.bk .sc-name,html.bk .proj-card-name,html.bk .svc-t,html.bk .proc-t,html.bk .prop-features-h,html.bk .prop-enquire-h,html.bk .nl-h,html.bk .cs-col-t,html.bk .jn-card-h,html.bk .pf-name,html.bk .cc-title,html.bk .tl-title,html.bk .award-title,html.bk .h-title-serif .h-title{font-weight:400;letter-spacing:0}
 html.bk .testi-text,html.bk .cs-quote,html.bk .jn-body blockquote,html.bk .nl-done{font-style:normal;font-weight:300;line-height:1.45}
 html.bk .about-h em,html.bk .proj-h em,html.bk .svc-h em,html.bk .agent-h em,html.bk .contact-h em,html.bk .footer-tag-h em,html.bk .page-h em,html.bk .prop-body-h em,html.bk .prop-gallery-h em,html.bk .prop-cta-h em,html.bk .prop-related-h em,html.bk .sw-h em,html.bk .film-h em,html.bk .series-h em,html.bk .cs-h em,html.bk .prop-spec-v em,html.bk .svc-detail-h em,html.bk .jn-title em,html.bk .stats-band .about-h em,html.bk .series-band.on-dark .series-h em,html.bk .cs-dark .cs-h em{font-style:normal;font-weight:inherit;color:inherit}
 html.bk .h-award{font-family:var(--font-u);font-size:var(--t-label);font-weight:400;font-style:normal;letter-spacing:.3em;text-transform:uppercase;color:rgba(var(--white-rgb),.85);white-space:normal}
 html.bk .h-award em{font-style:normal}
 html.bk .h-eyebrow-txt,html.bk .h-title-dot{color:rgba(var(--white-rgb),.85)}
 html.bk .h-bottom-rule{background:rgba(var(--white-rgb),.4)}
-html.bk .proc-n{font-family:var(--font-u);font-style:normal;font-weight:500;font-size:calc(var(--proc-n,48px)*.34);letter-spacing:.06em}
-html.bk .svc-num{font-style:normal;font-weight:500;color:rgba(var(--dark-rgb),.07)}
+html.bk .proc-n{font-family:var(--font-u);font-style:normal;font-weight:400;font-size:calc(var(--proc-n,48px)*.34);letter-spacing:.06em}
+html.bk .svc-num{font-style:normal;font-weight:400;color:rgba(var(--dark-rgb),.07)}
 html.bk .testi-q-mark{display:none}
 html.bk .slabel::before{background:var(--ink)}
 html.bk .slabel-dark,html.bk .page-hero-content .slabel,html.bk .fct,html.bk .mob-nav-group{color:rgba(var(--white-rgb),.85)}
@@ -1700,3 +1702,39 @@ html.bk .chip input:focus-visible+span{outline-color:var(--ink)}
 html.bk .prop-enquire{border-top-color:var(--ink)}
 .fi-file{padding:11px 14px;cursor:pointer}
 .fi-file::file-selector-button{font-family:var(--font-u);font-size:var(--t-label);letter-spacing:.18em;text-transform:uppercase;padding:8px 14px;margin-right:14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg2);color:var(--ink);cursor:pointer}
+/* Careers documents: the picked list under the file field (15 Sep 2026). */
+.cv-files{list-style:none;margin:10px 0 4px;padding:0;display:flex;flex-direction:column;gap:6px}.cv-files[hidden]{display:none}
+.cv-files li{display:flex;align-items:center;gap:12px;padding:9px 12px 9px 14px;border:1px solid var(--border);border-radius:var(--r-sm);font-size:13px;line-height:1.4;color:var(--ink2)}
+.cv-files li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cv-files li small{flex:none;font-size:11px;color:var(--taupe)}
+.cv-files .cv-skip{border-style:dashed;color:var(--taupe-d)}
+.cv-remove{flex:none;background:none;border:0;padding:2px 0;font-family:var(--font-u);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--taupe-d);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.cv-remove:hover,.cv-remove:focus-visible{color:var(--ink)}
+
+/* ── Residence cards on the phone only (Naomi, 14 Sep 2026: "make the layout
+   on phone gorgeous"; the computer view stays exactly as designed). Under
+   768px each card is a container: its type, chip and spacing scale from the
+   card's own width, the photo sits behind as a backdrop, the words sit in
+   flow at the foot so the name can never slide under the status chip, and
+   the spec chips become one quiet dotted line. ── */
+@media(max-width:768px){
+  .pc,.sc-card{container-type:inline-size;display:flex;flex-direction:column;justify-content:flex-end;--pc-name:clamp(30px,10.5cqi,46px);--pc-pad-y:clamp(20px,6cqi,28px);--pc-pad-x:clamp(20px,6cqi,28px);--pc-chip:16px;border-radius:var(--r-sm)}
+  .pc>img,.sc-card>img,.pc>picture>img,.sc-card>picture>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .pc-hero{--pc-name:clamp(32px,11cqi,50px)}
+  .proj-grid-3,.proj-grid-3.mc-grid,.proj-grid-2,.proj-grid-flow{gap:14px}
+  .mc-grid .pc,.proj-grid-flow .pc-row,.proj-grid-2 .pc,.proj-grid-3>.pc,.proj-grid-3>[data-prop-card]>.pc{aspect-ratio:4/5 !important}
+  .mc-grid .sc-card,.proj-grid-flow .sc-card,.proj-grid-2 .sc-card{aspect-ratio:4/5}
+  .pgrid .pc-hero{min-height:0;aspect-ratio:4/5}
+  .pc-info,.sc-info{position:relative;bottom:auto;left:auto;right:auto;padding:var(--pc-pad-y) var(--pc-pad-x);padding-top:calc(var(--pc-chip) + 2.6em + var(--pc-pad-y) * .5)}
+  .pc-hero .pc-info{padding:var(--pc-pad-y) var(--pc-pad-x);padding-top:calc(var(--pc-chip) + 2.6em + var(--pc-pad-y) * .5)}
+  .pc-name,.sc-name,.pc-hero .pc-name{font-size:calc(var(--pc-name) * var(--s-h,1) * var(--pc-name-scale,1));margin-bottom:.22em;text-wrap:balance}
+  .pc-ov,.sc-ov{background:linear-gradient(to top,rgba(var(--dark-rgb),.9) 0%,rgba(var(--dark-rgb),.42) 38%,rgba(var(--dark-rgb),.06) 62%,transparent 80%)}
+  .pc-loc,.sc-loc{font-size:11px;letter-spacing:.2em;margin-top:.3em}
+  .pc-status-chip,.sc-badge{top:var(--pc-chip);left:var(--pc-chip);font-size:calc(10px*var(--pc-status,1));padding:.55em 1.1em}
+  .pc-arrow{display:none}
+  .pc-specs{gap:.35em 0;margin-top:.75em}
+  .pc-spec{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none;font-size:calc(12.5px*var(--pc-chip,1));color:rgba(var(--white-rgb),.88)}
+  .pc-spec+.pc-spec::before{content:'\00b7';margin:0 .7em;opacity:.45}
+  .pc-spec svg{display:none}
+  .pc-spec-k{position:static;width:auto;height:auto;margin:0;overflow:visible;clip:auto}
+}

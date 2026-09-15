@@ -371,10 +371,36 @@
   # own template), or, when none are added, the residence's photos from
   # Products › Media in order. Either way the grid shows the first few and
   # the viewer carries the lot.
+  # Only blocks that still carry a photo or film count (15 Sep 2026): a
+  # Photo block whose picture was removed is not a tile, a thumbnail or a
+  # number in "View all photos", and with none left the photos in
+  # Products › Media fill the gallery as they do with no blocks.
   assign use_blocks = false
-  if section.blocks.size > 0
+  assign all_count = 0
+  for block in section.blocks
+    assign bpic = block.settings.image
+    assign bvid = ''
+    if block.type == 'video'
+      assign bpic = block.settings.poster
+      if block.settings.video != blank
+        for bsrc in block.settings.video.sources
+          if bsrc.format == 'mp4'
+            assign bvid = bsrc.url
+          endif
+        endfor
+        if bpic == blank
+          assign bpic = block.settings.video.preview_image
+        endif
+      elsif block.settings.video_url != blank
+        assign bvid = block.settings.video_url
+      endif
+    endif
+    if bpic != blank or bvid != blank
+      assign all_count = all_count | plus: 1
+    endif
+  endfor
+  if all_count > 0
     assign use_blocks = true
-    assign all_count = section.blocks.size
   else
     assign all_count = product.images.size | minus: 1
   endif
@@ -392,10 +418,8 @@
     <div class="prop-gallery-grid gn-{{ gallery_count }}" id="galleryGrid">
       {%- assign gdelays = ',d1,d2' | split: ',' -%}
       {%- if use_blocks -%}
+        {%- assign gn = 0 -%}
         {%- for block in section.blocks -%}
-          {%- assign i = forloop.index0 | modulo: 3 -%}
-          {%- assign in_grid = true -%}
-          {%- if forloop.index > tiles -%}{%- assign in_grid = false -%}{%- endif -%}
           {%- liquid
             assign cap = block.settings.caption
             assign vid = ''
@@ -424,8 +448,13 @@
             endif
           -%}
           {%- if pic == blank and vid == blank -%}{%- continue -%}{%- endif -%}
+          {%- comment -%} Placed by the photos that exist, so a removed photo leaves no hole in the grid (15 Sep 2026). {%- endcomment -%}
+          {%- assign i = gn | modulo: 3 -%}
+          {%- assign gn = gn | plus: 1 -%}
+          {%- assign in_grid = true -%}
+          {%- if gn > tiles -%}{%- assign in_grid = false -%}{%- endif -%}
           {%- if in_grid -%}
-            <div class="gallery-item gallery-tile reveal-wipe {{ gdelays[i] }}{% if vid != blank %} gallery-video{% endif %}" data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 1800, height: 1350, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}" role="button" tabindex="0" aria-label="{% if vid != blank %}Play video{% else %}View photo{% endif %}: {{ cap | escape }}" {{ block.shopify_attributes }}>
+            <div class="gallery-item gallery-tile reveal-wipe {{ gdelays[i] }}{% if vid != blank %} gallery-video{% endif %}" data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} {% if pic != blank %}data-src="{{ pic | image_url: width: 1800, height: 1350, crop: 'center' }}"{% endif %} data-alt="{{ cap | escape }}" role="button" tabindex="0" aria-label="{% if vid != blank %}Play video{% else %}View photo{% endif %}: {{ cap | escape }}" {{ block.shopify_attributes }}>
               {%- if pic != blank -%}
                 <img class="gallery-img" src="{{ pic | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ cap | escape }}" width="900" height="675" loading="lazy" decoding="async">
               {%- else -%}
@@ -433,7 +462,7 @@
               {%- endif -%}
             </div>
           {%- else -%}
-            <span hidden data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}"></span>
+            <span hidden data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} {% if pic != blank %}data-src="{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}"{% endif %} data-alt="{{ cap | escape }}"></span>
           {%- endif -%}
         {%- endfor -%}
       {%- else -%}
@@ -493,7 +522,7 @@
             endif
           -%}
           {%- if pic == blank and vid == blank -%}{%- continue -%}{%- endif -%}
-          <span data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}{% endif %}" data-stage="{% if pic != blank %}{{ pic | image_url: width: 1800 }}{% endif %}" data-thumb="{% if pic != blank %}{{ pic | image_url: width: 320, height: 240, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}" {{ block.shopify_attributes }}></span>
+          <span data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} {% if pic != blank %}data-src="{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}" data-stage="{{ pic | image_url: width: 1800 }}" data-thumb="{{ pic | image_url: width: 320, height: 240, crop: 'center' }}"{% endif %} data-alt="{{ cap | escape }}" {{ block.shopify_attributes }}></span>
         {%- endfor -%}
       {%- else -%}
         {%- for image in product.images offset: 1 -%}
@@ -521,7 +550,7 @@
 {%- endif -%}
 
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
-  <img id="lbImg" src="" alt="">
+  <img id="lbImg" alt="">
   <video id="lbVideo" controls playsinline hidden></video>
   <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&larr;</button>
   <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&rarr;</button>
@@ -536,6 +565,8 @@
     var items = Array.prototype.slice.call(document.querySelectorAll('[data-lb-item]')).filter(function (el) { return !el.closest('[id^="pg-"]'); });
     if (!items.length) return;
     var img = document.getElementById('lbImg'), cap = document.getElementById('lbCap'), count = document.getElementById('lbCount');
+    /* A single photo has no neighbours: no arrows or counter in the viewer (15 Sep 2026). */
+    if (items.length < 2) { document.getElementById('lbPrev').style.display = 'none'; document.getElementById('lbNext').style.display = 'none'; count.style.display = 'none'; }
     var i = 0, lastFocus = null;
     var house = {{ product.handle | json }};
     /* Photos are named house-room-NN; alt text arrives as "SOLACE - solace-kitchen-01"
@@ -619,6 +650,8 @@
     var vid = document.getElementById('pgVid'), cap = document.getElementById('pgCap'), count = document.getElementById('pgCount');
     var strip = document.getElementById('pgStrip'), rooms = document.getElementById('pgRooms'), stage = document.getElementById('pgStage');
     var i = 0, on = 0, reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    /* One photo or film: nothing to page through, so no arrows, counter or strip (15 Sep 2026). */
+    if (data.length < 2) { ['pgPrev', 'pgNext'].forEach(function (id) { var b = document.getElementById(id); if (b) b.style.display = 'none'; }); count.style.display = 'none'; strip.style.display = 'none'; }
     function capOf(n) { var a = data[n].getAttribute('data-alt') || ''; return (lb && lb.__caption) ? lb.__caption(a) : a; }
     function roomOf(n) { return capOf(n).replace(/\s*·.*$/, ''); }
     /* Filmstrip */
@@ -627,7 +660,8 @@
       b.type = 'button'; b.className = 'pg-thumb' + (el.getAttribute('data-video') ? ' pg-thumb-video' : '');
       b.setAttribute('role', 'tab'); b.setAttribute('aria-label', capOf(n));
       var im = document.createElement('img'); im.loading = 'lazy'; im.decoding = 'async'; im.alt = '';
-      im.src = el.getAttribute('data-thumb') || el.getAttribute('data-src'); b.appendChild(im);
+      /* A film with no poster keeps its play mark on a plain thumbnail rather than a broken picture. */
+      var ts = el.getAttribute('data-thumb') || el.getAttribute('data-src'); if (ts) { im.src = ts; b.appendChild(im); }
       b.addEventListener('click', function () { show(n); });
       strip.appendChild(b);
     });

@@ -23,12 +23,25 @@
     assign use_video = true
   endif
 
-  # Poster: the chosen poster, else the first slide's picture.
+  # Slides that actually carry a picture (15 Sep 2026): a Slide block left
+  # in place with its photo removed is skipped, so it never shows as a
+  # blank slide, a dead dot or a wrong count.
+  assign hs_total = 0
+  assign first_slide = nil
+  for block in section.blocks
+    if block.settings.image or block.settings.ext != blank
+      if hs_total == 0
+        assign first_slide = block
+      endif
+      assign hs_total = hs_total | plus: 1
+    endif
+  endfor
+
+  # Poster: the chosen poster, else the first slide that has a picture.
   assign poster_src = ''
   if section.settings.video_poster
     assign poster_src = section.settings.video_poster | image_url: width: 1920
   else
-    assign first_slide = section.blocks | first
     if first_slide.settings.image
       assign poster_src = first_slide.settings.image | image_url: width: 1920
     elsif first_slide.settings.ext != blank
@@ -51,7 +64,7 @@
       assign hero_h = '100svh'
   endcase
 -%}
-<section class="hero{% if use_video %} hero-video{% endif %}{% if section.settings.ken_burns == false %} hero-still{% endif %}{% if section.settings.title_font == 'serif' %} h-title-serif{% endif %}{% if section.settings.show_bottom_rule == false %} h-norule{% endif %}" id="hero" style="--h-dim:{{ dim }};--hero-h:{{ hero_h }};--h-title:{{ section.settings.words_size | default: 30 }}px;--h-title-track:{{ section.settings.words_tracking | default: 28 }}">
+<section class="hero{% if use_video %} hero-video{% endif %}{% if section.settings.ken_burns == false %} hero-still{% endif %}{% if section.settings.title_font == 'serif' %} h-title-serif{% endif %}{% if section.settings.show_bottom_rule == false %} h-norule{% endif %}" id="hero" style="--h-dim:{{ dim }};--hero-h:{{ hero_h }};--h-title:{{ section.settings.words_size | default: 30 }}px;--h-title-track:{{ section.settings.words_tracking | default: 28 }}{% unless use_video or hs_total > 0 %};background:var(--dark){% endunless %}">
   {%- if use_video -%}
   <div class="h-video" id="hVideo">
     <video
@@ -68,24 +81,27 @@
   </div>
   {%- else -%}
   <div class="h-slides" id="hSlides" data-every="{{ section.settings.slide_every | default: 6.2 | times: 1000 | round }}">
+    {%- assign hs_i = 0 -%}
     {%- for block in section.blocks -%}
-      <div class="h-slide{% if forloop.first %} active{% endif %}" {{ block.shopify_attributes }}>
+      {%- unless block.settings.image or block.settings.ext != blank -%}{%- continue -%}{%- endunless -%}
+      <div class="h-slide{% if hs_i == 0 %} active{% endif %}" {{ block.shopify_attributes }}>
         {%- if block.settings.image -%}
           <img
             src="{{ block.settings.image | image_url: width: 1920 }}"
             srcset="{{ block.settings.image | image_url: width: 768 }} 768w, {{ block.settings.image | image_url: width: 1280 }} 1280w, {{ block.settings.image | image_url: width: 1920 }} 1920w"
             sizes="100vw"
             alt="{{ block.settings.alt | escape }}" width="1920" height="1080"
-            {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy" decoding="async"{% endif %}>
+            {% if hs_i == 0 %}loading="eager" fetchpriority="high"{% else %}loading="lazy" decoding="async"{% endif %}>
         {%- elsif block.settings.ext != blank -%}
           {%- capture src -%}{% render 'ext-variant', src: block.settings.ext, w: 1920, h: 1080, q: 80 %}{%- endcapture -%}
           <picture>
             <source media="(max-width: 767px)" srcset="{% render 'ext-variant', src: block.settings.ext, w: 768, h: 1365, q: 80 %}" sizes="100vw">
             <img src="{{ src | strip }}" sizes="100vw" alt="{{ block.settings.alt | escape }}" width="1920" height="1080"
-              {% if forloop.first %}loading="eager" fetchpriority="high"{% else %}loading="lazy" decoding="async"{% endif %}>
+              {% if hs_i == 0 %}loading="eager" fetchpriority="high"{% else %}loading="lazy" decoding="async"{% endif %}>
           </picture>
         {%- endif -%}
       </div>
+      {%- assign hs_i = hs_i | plus: 1 -%}
     {%- endfor -%}
   </div>
   {%- endif -%}
@@ -147,10 +163,10 @@
     <div class="h-bottom-rule"></div>
     <div class="h-bottom-inner inner">
       <div class="h-bottom-left">
-        {%- unless use_video or section.settings.show_dots == false -%}
+        {%- unless use_video or section.settings.show_dots == false or hs_total < 2 -%}
         <div class="h-dots" id="hDots">
-          {%- for block in section.blocks -%}
-            <button type="button" class="h-dot{% if forloop.first %} active{% endif %}" aria-label="Show slide {{ forloop.index }} of {{ section.blocks.size }}"></button>
+          {%- for n in (1..hs_total) -%}
+            <button type="button" class="h-dot{% if forloop.first %} active{% endif %}" aria-label="Show slide {{ n }} of {{ hs_total }}"></button>
           {%- endfor -%}
         </div>
         {%- endunless -%}
@@ -166,7 +182,7 @@
   </div>
   {%- if section.settings.show_scroll_cue -%}
   <div class="h-scroll-wrap">
-    {%- unless use_video -%}<span class="h-scroll-num">01 / {{ section.blocks.size | prepend: '00' | slice: -2, 2 }}</span>{%- endunless -%}
+    {%- unless use_video or hs_total == 0 -%}<span class="h-scroll-num">01 / {{ hs_total | prepend: '00' | slice: -2, 2 }}</span>{%- endunless -%}
     <div class="h-scroll-line"></div>
   </div>
   {%- endif -%}

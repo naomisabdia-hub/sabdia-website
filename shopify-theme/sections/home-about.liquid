@@ -7,6 +7,17 @@
   right-hand photo moves into the left-hand slot (a conveyor) while a new
   one arrives on the right. Each incoming photo fades in with a short drift
   from the right; reduced motion gets a plain swap.
+
+  15 Sep 2026 (Naomi): One image, full width rotates too, one slot through
+  the whole set, and Photo fit "Whole photo" (the default) shows every
+  photograph complete, never cropped or stretched. The theme editor never
+  re-runs this script after a setting change; assets/main.js does that for
+  every section.
+
+  Later on 15 Sep 2026 (Naomi): arrows (and swipe) to step through the
+  photos, a click opens the full-screen viewer (the gallery's .lb styles),
+  and any photo a section higher on the page already shows (the Featured
+  residence photo) is left out of the strip.
 {%- endcomment -%}
 {% render 'section-look', section: section %}
 {%- liquid
@@ -53,16 +64,37 @@
         endcase
         # Request the crop at twice the display height for retina screens.
         assign ih = strip_h | times: 2.5 | round
+        # Whole photo fetches each photo at its own shape and fits it inside
+        # its frame; Fill the frame is the earlier cropped look. image_url with
+        # a height always crops (crop=center), so whole photos are asked for by
+        # width only, sized so the height still covers ih.
+        assign strip_fit = section.settings.strip_fit | default: 'whole'
+        assign slot_count = 2
+        if strip_cols == '1fr'
+          assign slot_count = 1
+        endif
+        # With one image the frame takes the photographs' own shape (the first
+        # landscape one, 3:2 for every Sabdia shoot), so a landscape photo fills
+        # it edge to edge and an upright one sits whole in the middle.
+        assign strip_ratio = 1.5
+        for b in section.blocks
+          if b.type == 'image' and b.settings.image and b.settings.image.aspect_ratio >= 1
+            assign strip_ratio = b.settings.image.aspect_ratio
+            break
+          endif
+        endfor
       -%}
-      {%- comment -%} Two photo slots. With "Rotate" on and more than two Strip
-          images, each slot carousels through the whole set - always two photos
-          showing, always changing. {%- endcomment -%}
+      {%- comment -%} One or two photo slots. With more Strip images than slots,
+          each slot holds the whole set: the arrows step through it, and with
+          "Rotate" on it also carousels by itself - the slots always full.
+          {%- endcomment -%}
       {%- assign strip_imgs = section.blocks | where: 'type', 'image' -%}
       {%- assign rotate = false -%}
-      {%- if section.settings.strip_rotate and strip_imgs.size > 2 and strip_cols != '1fr' -%}{%- assign rotate = true -%}{%- endif -%}
-      <div class="about-img-strip reveal-wipe d2{% if rotate %} about-strip-rotate{% endif %}{% if strip_cols == '1fr' %} about-strip-single{% endif %}" style="--strip-h:{{ strip_h }}px;--strip-h-m:{{ strip_hm }}px;--strip-gap:{{ strip_gap }}px;--strip-cols:{{ strip_cols }}"{% if rotate %} data-about-rotate data-every="{{ strip_every }}"{% endif %}>
+      {%- if strip_imgs.size > slot_count -%}{%- assign rotate = true -%}{%- endif -%}
+      {%- assign last_slot = slot_count | minus: 1 -%}
+      <div class="about-img-strip reveal-wipe d2 about-fit-{{ strip_fit }}{% if rotate %} about-strip-rotate{% endif %}{% if strip_cols == '1fr' %} about-strip-single{% endif %}" style="--strip-h:{{ strip_h }}px;--strip-h-m:{{ strip_hm }}px;--strip-gap:{{ strip_gap }}px;--strip-ratio:{{ strip_ratio }};--strip-cols:{{ strip_cols }}"{% if rotate %} data-about-rotate{% if section.settings.strip_rotate %} data-every="{{ strip_every }}"{% endif %}{% endif %}{% if section.settings.strip_lightbox %} data-lightbox{% endif %}{% if section.settings.strip_skip_used %} data-skip-used{% endif %}>
         {%- if rotate -%}
-          {%- for slot in (0..1) -%}
+          {%- for slot in (0..last_slot) -%}
             {%- if slot == 0 -%}{%- assign iw = w1 -%}{%- else -%}{%- assign iw = w2 -%}{%- endif -%}
             <div class="about-slot" data-slot="{{ slot }}">
               {%- for block in strip_imgs -%}
@@ -81,13 +113,27 @@
                   endif
                 -%}
                 {%- if block.settings.image -%}
-                  <img class="about-slide{% if on %} is-on{% endif %}" src="{{ block.settings.image | image_url: width: iw, height: ih, crop: focus }}" alt="{{ block.settings.alt | escape }}" {{ load }} decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {% if slot == 0 %}{{ block.shopify_attributes }}{% endif %}>
+                  {%- if strip_fit == 'fill' -%}
+                  <img class="about-slide{% if on %} is-on{% endif %}" data-full="{% if block.settings.image %}{{ block.settings.image | image_url: width: 2400 }}{% else %}{% render 'ext-variant', src: block.settings.ext, w: 2400, h: 1600 %}{% endif %}" data-block-id="{{ block.id }}" src="{{ block.settings.image | image_url: width: iw, height: ih, crop: focus }}" alt="{{ block.settings.alt | escape }}" {{ load }} decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {% if slot == 0 %}{{ block.shopify_attributes }}{% endif %}>
+                  {%- else -%}
+                  {%- liquid
+                    assign fw = ih | times: block.settings.image.aspect_ratio | round
+                    if fw > iw
+                      assign fw = iw
+                    endif
+                  -%}
+                  <img class="about-slide{% if on %} is-on{% endif %}" data-full="{% if block.settings.image %}{{ block.settings.image | image_url: width: 2400 }}{% else %}{% render 'ext-variant', src: block.settings.ext, w: 2400, h: 1600 %}{% endif %}" data-block-id="{{ block.id }}" src="{{ block.settings.image | image_url: width: fw }}" alt="{{ block.settings.alt | escape }}" {{ load }} decoding="async" width="{{ fw }}" height="{{ fw | divided_by: block.settings.image.aspect_ratio | round }}" {% if slot == 0 %}{{ block.shopify_attributes }}{% endif %}>
+                  {%- endif -%}
                 {%- elsif block.settings.ext != blank -%}
-                  <img class="about-slide{% if on %} is-on{% endif %}" src="{% render 'ext-variant', src: block.settings.ext, w: iw, h: ih %}" alt="{{ block.settings.alt | escape }}" {{ load }} decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {% if slot == 0 %}{{ block.shopify_attributes }}{% endif %}>
+                  <img class="about-slide{% if on %} is-on{% endif %}" data-full="{% if block.settings.image %}{{ block.settings.image | image_url: width: 2400 }}{% else %}{% render 'ext-variant', src: block.settings.ext, w: 2400, h: 1600 %}{% endif %}" data-block-id="{{ block.id }}" src="{% render 'ext-variant', src: block.settings.ext, w: iw, h: ih %}" alt="{{ block.settings.alt | escape }}" {{ load }} decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {% if slot == 0 %}{{ block.shopify_attributes }}{% endif %}>
                 {%- endif -%}
               {%- endfor -%}
             </div>
           {%- endfor -%}
+          {%- if section.settings.strip_arrows -%}
+          <button class="about-arrow about-arrow-prev" type="button" aria-label="Previous photo" data-about-prev>&larr;</button>
+          <button class="about-arrow about-arrow-next" type="button" aria-label="Next photo" data-about-next>&rarr;</button>
+          {%- endif -%}
         {%- else -%}
         {%- assign img_i = 0 -%}
         {%- for block in section.blocks -%}
@@ -102,9 +148,19 @@
               assign focus = block.settings.focus | default: 'center'
             -%}
             {%- if block.settings.image -%}
-              <img src="{{ block.settings.image | image_url: width: iw, height: ih, crop: focus }}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {{ block.shopify_attributes }}>
+              {%- if strip_fit == 'fill' -%}
+              <img data-full="{% if block.settings.image %}{{ block.settings.image | image_url: width: 2400 }}{% else %}{% render 'ext-variant', src: block.settings.ext, w: 2400, h: 1600 %}{% endif %}" data-block-id="{{ block.id }}" src="{{ block.settings.image | image_url: width: iw, height: ih, crop: focus }}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {{ block.shopify_attributes }}>
+              {%- else -%}
+              {%- liquid
+                assign fw = ih | times: block.settings.image.aspect_ratio | round
+                if fw > iw
+                  assign fw = iw
+                endif
+              -%}
+              <img data-full="{% if block.settings.image %}{{ block.settings.image | image_url: width: 2400 }}{% else %}{% render 'ext-variant', src: block.settings.ext, w: 2400, h: 1600 %}{% endif %}" data-block-id="{{ block.id }}" src="{{ block.settings.image | image_url: width: fw }}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="{{ fw }}" height="{{ fw | divided_by: block.settings.image.aspect_ratio | round }}" {{ block.shopify_attributes }}>
+              {%- endif -%}
             {%- elsif block.settings.ext != blank -%}
-              <img src="{% render 'ext-variant', src: block.settings.ext, w: iw, h: ih %}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {{ block.shopify_attributes }}>
+              <img data-full="{% if block.settings.image %}{{ block.settings.image | image_url: width: 2400 }}{% else %}{% render 'ext-variant', src: block.settings.ext, w: 2400, h: 1600 %}{% endif %}" data-block-id="{{ block.id }}" src="{% render 'ext-variant', src: block.settings.ext, w: iw, h: ih %}" alt="{{ block.settings.alt | escape }}" loading="lazy" decoding="async" width="{{ iw }}" height="{{ ih }}" style="object-position:{{ focus }}" {{ block.shopify_attributes }}>
             {%- endif -%}
           {%- endif -%}
         {%- endfor -%}
@@ -148,6 +204,15 @@
       {%- endif -%}
     </div>
   </div>
+  {%- if section.settings.strip_lightbox and ha_strip != 'none' -%}
+  <div class="lb about-lb" id="about-lb-{{ section.id }}" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+    <img alt="" decoding="async">
+    <button class="lb-btn lb-prev" type="button" aria-label="Previous photo">&larr;</button>
+    <button class="lb-btn lb-next" type="button" aria-label="Next photo">&rarr;</button>
+    <button class="lb-close" type="button" aria-label="Close">&#10005;</button>
+    <div class="lb-meta"><span class="lb-cap"></span><span class="lb-count"></span></div>
+  </div>
+  {%- endif -%}
 </section>
 
 <style>
@@ -156,6 +221,20 @@
      "1fr 2fr". Only the single layout (marked .about-strip-single) should
      hide them; the other layouts get their images back here. */
   .about-grid .about-img-strip:not(.about-strip-single) img:not(:first-child){display:block}
+  /* The same style.css rule would hide every rotating slide but the first in
+     One image, full width, freezing it on one photo; the slides stack in
+     their slot and the script fades them in turn. */
+  .about-grid .about-img-strip.about-strip-rotate .about-slide{display:block}
+  /* style.css also sizes every strip img to the strip height (200px on
+     phones); a rotating slide always fills its own slot instead, which with
+     one image takes the photos' shape rather than a fixed height. */
+  .about-img-strip.about-strip-rotate .about-slide{height:100%}
+  /* Whole photo: fitted inside the frame, never cropped or stretched. The
+     frame has no fill, so any space beside an upright photo is the page. */
+  .about-img-strip.about-fit-whole img{object-fit:contain}
+  .about-img-strip.about-fit-whole .about-slot{background:transparent}
+  .about-img-strip.about-fit-whole.about-strip-single .about-slot,
+  .about-img-strip.about-fit-whole.about-strip-single > img{height:auto;aspect-ratio:var(--strip-ratio,1.5)}
   @media(min-width:1201px){
     .ha-above .about-grid{grid-template-columns:1fr;gap:40px}
     .ha-split-equal .about-grid{grid-template-columns:1fr 1fr}
@@ -184,54 +263,223 @@
     .about-strip-rotate .about-slide,
     .about-strip-rotate .about-slide.is-out{transition:none;transform:none}
   }
+  /* Arrows: the photo gallery carousel's round buttons, over the strip's
+     edges. A backward step drifts in from the left. */
+  .about-img-strip{position:relative}
+  .about-arrow{position:absolute;top:50%;z-index:3;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:1px solid rgba(var(--gold2-rgb),.5);background:rgba(var(--dark-rgb),.55);color:var(--gold2);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;font-family:var(--font-u);opacity:.85;transition:background .3s,opacity .3s}
+  .about-img-strip:hover .about-arrow,.about-arrow:focus-visible{opacity:1}
+  .about-arrow:hover{background:rgba(var(--dark-rgb),.82)}
+  .about-arrow:focus-visible,.about-img-strip [role="button"]:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
+  .about-arrow-prev{left:10px}
+  .about-arrow-next{right:10px}
+  .about-arrow[hidden]{display:none}
+  @media(max-width:768px){.about-arrow{width:36px;height:36px;font-size:14px}.about-arrow-prev{left:8px}.about-arrow-next{right:8px}}
+  .about-img-strip[data-lightbox] img{cursor:zoom-in}
+  .about-strip-rotate.is-back .about-slide{transform:translateX(-8px)}
+  .about-strip-rotate.is-back .about-slide.is-on,.about-strip-rotate.is-back .about-slide.is-out{transform:none}
+  /* The full-screen viewer uses the gallery's .lb styles from style.css. */
+  .about-lb[hidden],.about-lb [hidden]{display:none}
+  .about-lb .lb-count{opacity:.7}
 </style>
 
 <script>
   (function () {
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    document.querySelectorAll('[data-about-rotate]').forEach(function (strip) {
+    function list(nodes) { return Array.prototype.slice.call(nodes); }
+    // A photo's file name without the CDN folder, size or version, so the same
+    // photograph matches whatever width another section asked for.
+    function fileName(u) {
+      u = String(u || '').trim().split(/\s+/)[0].split('#')[0].split('?')[0];
+      var f = u.slice(u.lastIndexOf('/') + 1);
+      try { f = decodeURIComponent(f); } catch (e) {}
+      return f.toLowerCase().replace(/(_\d+x\d*|_x\d+|@\dx)(?=\.\w+$)/, '');
+    }
+    // Every photograph the sections above this one already show.
+    function shownAbove(wrap) {
+      var seen = {};
+      function add(u) { var f = fileName(u); if (/\.\w+$/.test(f)) seen[f] = true; }
+      for (var el = wrap && wrap.previousElementSibling; el; el = el.previousElementSibling) {
+        list(el.querySelectorAll('img,source,video')).forEach(function (m) {
+          add(m.getAttribute('src')); add(m.getAttribute('poster')); add(m.getAttribute('data-src'));
+          (m.getAttribute('srcset') || '').split(',').forEach(add);
+        });
+        list(el.querySelectorAll('[style*="url("]')).forEach(function (m) {
+          (m.getAttribute('style').match(/url\([^)]+\)/g) || []).forEach(function (x) { add(x.slice(4, -1).replace(/["']/g, '')); });
+        });
+      }
+      return seen;
+    }
+
+    list(document.querySelectorAll('.about-img-strip')).forEach(function (strip) {
       if (strip.dataset.init) return;
       strip.dataset.init = '1';
-      var slots = Array.prototype.slice.call(strip.querySelectorAll('.about-slot'));
-      var n = slots[0] ? slots[0].querySelectorAll('.about-slide').length : 0;
-      if (n < 3) return;
+      var wrap = strip.closest('.shopify-section') || strip.closest('section');
+      var slots = list(strip.querySelectorAll('.about-slot'));
+      var lists = slots.length
+        ? slots.map(function (slot) { return list(slot.querySelectorAll('.about-slide')); })
+        : [list(strip.querySelectorAll(':scope > img'))];
+
+      // Leave out any photograph a section above already shows (the Featured
+      // residence photo, say), as long as enough remain to fill the slots.
+      if (strip.hasAttribute('data-skip-used')) {
+        var seen = shownAbove(wrap);
+        var keep = lists[0].map(function (img) { return !seen[fileName(img.getAttribute('src'))]; });
+        var kept = keep.filter(Boolean).length;
+        if (kept < keep.length && kept >= Math.max(1, slots.length)) {
+          lists = lists.map(function (imgs, k) {
+            imgs = imgs.filter(function (img, i) { if (!keep[i]) img.remove(); return keep[i]; });
+            imgs.forEach(function (img, i) {
+              img.classList.toggle('is-on', i === k);
+              if (i === k) img.setAttribute('loading', 'eager');
+            });
+            return imgs;
+          });
+        }
+      }
+
+      var n = lists[0].length;
+      var carousel = slots.length > 0 && n > slots.length;
+      var auto = carousel && strip.hasAttribute('data-every');
       // data-every is seconds, possibly fractional ("2.5"); never faster than 1 s.
       var every = Math.max(1, parseFloat(strip.dataset.every) || 2.5) * 1000;
-      var offset = 0, timer = null, hover = false, seen = true, hidden = !!document.hidden;
+      var offset = 0, timer = null, hover = false, inView = true, hidden = !!document.hidden, viewing = false, pinned = false;
+      var prev = strip.querySelector('[data-about-prev]'), next = strip.querySelector('[data-about-next]');
+      if (!carousel) { if (prev) prev.hidden = true; if (next) next.hidden = true; }
 
-      function slides(slot) { return slot.querySelectorAll('.about-slide'); }
-      // One tick ahead: make sure the photo about to enter each slot is fetching.
-      function warm() {
+      function wrapIndex(i) { return ((i % n) + n) % n; }
+      // A step ahead: make sure the photo about to enter each slot is fetching.
+      function warm(dir) {
         slots.forEach(function (slot, k) {
-          var img = slides(slot)[(offset + 1 + k) % n];
+          var img = lists[k][wrapIndex(offset + dir + k)];
           if (img && !img.complete && img.getAttribute('loading') === 'lazy') img.setAttribute('loading', 'eager');
         });
       }
-      // Slot k shows image (offset + k) mod n, so the right-hand photo moves
-      // into the left-hand slot on the next tick.
-      function show() {
-        slots.forEach(function (slot, k) {
-          var imgs = slides(slot), want = (offset + k) % n;
-          for (var i = 0; i < imgs.length; i++) {
-            var was = imgs[i].classList.contains('is-on'), on = i === want;
-            imgs[i].classList.toggle('is-out', was && !on && !reduce);
-            imgs[i].classList.toggle('is-on', on);
-          }
+      // Slot k shows photo (offset + k) mod n, so going forward the right-hand
+      // photo moves into the left-hand slot.
+      function show(back) {
+        strip.classList.toggle('is-back', !!back);
+        lists.forEach(function (imgs, k) {
+          var want = wrapIndex(offset + k);
+          imgs.forEach(function (img, i) {
+            var was = img.classList.contains('is-on'), on = i === want;
+            img.classList.toggle('is-out', was && !on && !reduce);
+            img.classList.toggle('is-on', on);
+          });
         });
       }
-      function tick() { offset = (offset + 1) % n; show(); warm(); }
-      function start() { if (!timer) { warm(); timer = setInterval(tick, every); } }
+      function go(dir) { if (!carousel) return; offset = wrapIndex(offset + dir); show(dir < 0); warm(dir < 0 ? -1 : 1); }
+      function start() { if (auto && !timer) { warm(1); timer = setInterval(function () { go(1); }, every); } }
       function stop() { clearInterval(timer); timer = null; }
-      // Runs only while pointed away from, on screen, and in a visible tab.
-      function sync() { (hover || hidden || !seen) ? stop() : start(); }
+      // Runs only while pointed away from, on screen, in a visible tab, with the
+      // viewer closed and no Strip image block selected in the editor.
+      function sync() { if (!strip.isConnected) return stop(); (hover || hidden || !inView || viewing || pinned) ? stop() : start(); }
+      // A step by hand restarts the wait, so the next photo gets its full time.
+      function step(dir) { go(dir); stop(); sync(); }
+
+      if (prev) prev.addEventListener('click', function () { step(-1); });
+      if (next) next.addEventListener('click', function () { step(1); });
+      // A swipe steps too. Only a click in the moment straight after a swipe is
+      // ignored (so the swipe never opens the viewer); the next tap always works.
+      var tx = null, ty = 0, swipedAt = 0;
+      strip.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].clientX; ty = e.changedTouches[0].clientY; }, { passive: true });
+      strip.addEventListener('touchend', function (e) {
+        if (tx === null) return;
+        var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; tx = null;
+        if (carousel && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) { swipedAt = Date.now(); step(dx < 0 ? 1 : -1); }
+      }, { passive: true });
+
+      var lb = strip.hasAttribute('data-lightbox') && wrap ? wrap.querySelector('.about-lb') : null;
+      if (lb) {
+        // The viewer lives on <body>, clear of the reveal clip and the sticky
+        // column; one left there by an earlier editor re-render is replaced.
+        list(document.querySelectorAll('.about-lb')).forEach(function (other) { if (other !== lb && other.id === lb.id) other.remove(); });
+        document.body.appendChild(lb);
+        var lbImg = lb.querySelector('img'), cap = lb.querySelector('.lb-cap'), count = lb.querySelector('.lb-count');
+        var at = 0, lastFocus = null, closing = null;
+        var full = function (i) { var img = lists[0][wrapIndex(i)]; return img.getAttribute('data-full') || img.currentSrc || img.src; };
+        function view(i) {
+          at = wrapIndex(i);
+          var img = lists[0][at];
+          lbImg.src = full(at); lbImg.alt = img.alt; cap.textContent = img.alt; count.textContent = (at + 1) + ' / ' + n;
+          if (n > 1) { new Image().src = full(at + 1); new Image().src = full(at - 1); }
+        }
+        function open(i) {
+          clearTimeout(closing);
+          lastFocus = document.activeElement;
+          view(i);
+          lb.hidden = false; void lb.offsetWidth; lb.classList.add('open');
+          document.documentElement.style.overflow = 'hidden';
+          viewing = true; sync();
+          lb.querySelector('.lb-close').focus({ preventScroll: true });
+        }
+        function close() {
+          if (!viewing) return;
+          viewing = false;
+          lb.classList.remove('open');
+          document.documentElement.style.overflow = '';
+          // The strip carries on from the photo last looked at.
+          if (carousel && at !== offset) { offset = at; show(false); warm(1); }
+          closing = setTimeout(function () { lb.hidden = true; }, 350);
+          if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+          sync();
+        }
+        function openFrom(target) {
+          var slot = target.closest('.about-slot');
+          var img = target.closest('img') || (slot && slot.querySelector('.about-slide.is-on'));
+          if (!img) return;
+          for (var k = 0; k < lists.length; k++) { var i = lists[k].indexOf(img); if (i !== -1) return open(i); }
+        }
+        strip.addEventListener('click', function (e) {
+          if (Date.now() - swipedAt < 350) return;
+          if (e.target.closest('.about-arrow')) return;
+          openFrom(e.target);
+        });
+        (slots.length ? slots : lists[0]).forEach(function (el) {
+          el.tabIndex = 0; el.setAttribute('role', 'button'); el.setAttribute('aria-label', 'View this photo full screen');
+        });
+        strip.addEventListener('keydown', function (e) {
+          if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('.about-arrow')) { e.preventDefault(); openFrom(e.target); }
+        });
+        lb.querySelector('.lb-prev').addEventListener('click', function () { view(at - 1); });
+        lb.querySelector('.lb-next').addEventListener('click', function () { view(at + 1); });
+        lb.querySelector('.lb-close').addEventListener('click', close);
+        lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+        if (n < 2) { lb.querySelector('.lb-prev').hidden = true; lb.querySelector('.lb-next').hidden = true; }
+        document.addEventListener('keydown', function (e) {
+          if (!viewing) return;
+          if (e.key === 'Escape') close();
+          else if (e.key === 'ArrowRight') view(at + 1);
+          else if (e.key === 'ArrowLeft') view(at - 1);
+        });
+        var lx = null;
+        lb.addEventListener('touchstart', function (e) { lx = e.changedTouches[0].clientX; }, { passive: true });
+        lb.addEventListener('touchend', function (e) {
+          if (lx === null) return;
+          var dx = e.changedTouches[0].clientX - lx; lx = null;
+          if (n > 1 && Math.abs(dx) > 40) view(at + (dx < 0 ? 1 : -1));
+        }, { passive: true });
+      }
 
       strip.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'touch') { hover = true; sync(); } });
       strip.addEventListener('pointerleave', function (e) { if (e.pointerType !== 'touch') { hover = false; sync(); } });
       document.addEventListener('visibilitychange', function () { hidden = !!document.hidden; sync(); });
-      document.addEventListener('shopify:section:unload', function (e) { if (e.target && e.target.contains(strip)) stop(); });
+      document.addEventListener('shopify:section:unload', function (e) {
+        if (!e.target || !e.target.contains(strip)) return;
+        stop();
+        if (lb) { viewing = false; document.documentElement.style.overflow = ''; lb.remove(); }
+      });
+      // In the editor, selecting a Strip image block brings its photo forward
+      // and holds it there until the block is deselected.
+      document.addEventListener('shopify:block:select', function (e) {
+        if (!carousel || !strip.isConnected || !e.detail) return;
+        for (var i = 0; i < n; i++) {
+          if (lists[0][i].getAttribute('data-block-id') === e.detail.blockId) { offset = i; show(false); pinned = true; sync(); return; }
+        }
+      });
+      document.addEventListener('shopify:block:deselect', function () { if (pinned) { pinned = false; sync(); } });
       if ('IntersectionObserver' in window) {
         new IntersectionObserver(function (entries) {
-          seen = entries[entries.length - 1].isIntersecting;
+          inView = entries[entries.length - 1].isIntersecting;
           sync();
         }, { rootMargin: '80px 0px' }).observe(strip);
       }
@@ -278,14 +526,25 @@
         { "value": "single", "label": "One image, full width" }
       ],
       "default": "landscape-portrait",
-      "info": "Landscape + portrait (11 Sep 2026) pairs a wide slot with an upright one at the 300px height. With one image selected, only the first Strip image block shows."
+      "info": "Landscape + portrait (11 Sep 2026) pairs a wide slot with an upright one at the 300px height. One image, full width shows one photo at a time and rotates through every Strip image (15 Sep 2026)."
+    },
+    {
+      "type": "select",
+      "id": "strip_fit",
+      "label": "Photo fit",
+      "options": [
+        { "value": "whole", "label": "Whole photo, never cropped" },
+        { "value": "fill", "label": "Fill the frame (crops the edges)" }
+      ],
+      "default": "whole",
+      "info": "Whole photo (15 Sep 2026) shows every photograph complete and unstretched. With One image, full width the frame takes the photos' own shape; in the two-photo layouts a landscape photo sits smaller in an upright slot. Fill the frame crops to the height below, using each block's Crop focus."
     },
     {
       "type": "checkbox",
       "id": "strip_rotate",
       "label": "Rotate through every Strip image",
       "default": true,
-      "info": "Two photos always show; with three or more Strip image blocks they carousel through the set, the right-hand photo moving to the left slot on each change (Tamsin, 10 Sep 2026: more images, carousel feel). Off = the first two stay put."
+      "info": "Carousels through the whole set: one photo at a time in One image, full width (two or more Strip images), two at a time in the other layouts (three or more), the right-hand photo moving to the left slot on each change (Tamsin, 10 Sep 2026: more images, carousel feel). Off = the first photo, or the first two, stay put."
     },
     {
       "type": "range",
@@ -297,6 +556,27 @@
       "unit": "s",
       "default": 2.5,
       "info": "Pauses while the pointer is over the strip and while the strip is off screen."
+    },
+    {
+      "type": "checkbox",
+      "id": "strip_arrows",
+      "label": "Arrows to step through the photos",
+      "default": true,
+      "info": "Left and right arrows over the strip (15 Sep 2026), and a swipe on phones. A step by hand restarts the wait before the next change."
+    },
+    {
+      "type": "checkbox",
+      "id": "strip_lightbox",
+      "label": "Open a photo full screen when clicked",
+      "default": true,
+      "info": "The same full-screen viewer as the photo galleries: arrows, the keyboard or a swipe move through every photo, with the alt text as its caption and a count."
+    },
+    {
+      "type": "checkbox",
+      "id": "strip_skip_used",
+      "label": "Leave out photos a section above already shows",
+      "default": true,
+      "info": "A Strip image that a section higher on the page already shows, such as the Featured residence photo, is skipped here, so the same photograph never appears twice down the page."
     },
     {
       "type": "range",
@@ -447,7 +727,7 @@
             { "value": "right", "label": "Right" }
           ],
           "default": "center",
-          "info": "Which part of the photo to keep when it is cropped to the strip height."
+          "info": "Which part of the photo to keep when Photo fit is Fill the frame. Whole photo never crops."
         }
       ]
     },

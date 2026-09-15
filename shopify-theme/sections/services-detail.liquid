@@ -17,14 +17,20 @@
       </div>
     {%- endif -%}
     {%- for block in section.blocks -%}
-      <div class="svc-detail-grid" {{ block.shopify_attributes }}>
-        <div class="svc-detail-img {% cycle 'reveal-x', 'reveal-r' %}">
+      {%- capture sdt_reveal -%}{% cycle 'reveal-x', 'reveal-r' %}{%- endcapture -%}
+      {%- comment -%} A stage whose photo is removed drops the empty frame and its words take the row (15 Sep 2026). {%- endcomment -%}
+      {%- assign sdt_has_img = false -%}
+      {%- if block.settings.image or block.settings.image_ext != blank -%}{%- assign sdt_has_img = true -%}{%- endif -%}
+      <div class="svc-detail-grid{% unless sdt_has_img %} sdt-noimg{% endunless %}" {{ block.shopify_attributes }}>
+        {%- if sdt_has_img -%}
+        <div class="svc-detail-img {{ sdt_reveal }}">
           {%- if block.settings.image -%}
             <img src="{{ block.settings.image | image_url: width: 1200, height: 906, crop: 'center' }}" alt="{{ block.settings.image_alt | default: block.settings.title | escape }}" loading="lazy" width="1200" height="906">
           {%- elsif block.settings.image_ext != blank -%}
             <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 1200, h: 906 %}" alt="{{ block.settings.image_alt | default: block.settings.title | escape }}" loading="lazy" width="1200" height="906">
           {%- endif -%}
         </div>
+        {%- endif -%}
         <div class="reveal">
           {%- if section.settings.show_numbers and block.settings.number != blank -%}<span class="svc-num">{{ block.settings.number }}</span>{%- endif -%}
           {%- if section.settings.show_labels and block.settings.label != blank -%}<div class="slabel">{{ block.settings.label }}</div>{%- endif -%}
@@ -59,6 +65,7 @@
   .sdt-b-plain .svc-detail-list li::before{display:none}.sdt-b-plain .svc-detail-list li{border-bottom:0;padding:4px 0}.sdt-b-plain .svc-detail-list{border-top:0;padding-top:0}
   .sdt-nozoom .svc-detail-grid:hover .svc-detail-img img{transform:none}
   .svc-detail-img{overflow:hidden;aspect-ratio:var(--sdt-ar,4/3)}
+  .sdt .svc-detail-grid.sdt-noimg{grid-template-columns:1fr;direction:ltr}.sdt-noimg>div{max-width:860px}
   .svc-detail-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.85);transition:transform .8s var(--ease)}
   .svc-detail-grid:hover .svc-detail-img img{transform:scale(1.04)}
   .svc-num{font-family:var(--font-d);font-size:calc(var(--t-display)*var(--s-h,1));font-weight:300;font-style:italic;color:rgba(var(--gold-rgb),.1);line-height:1;margin-bottom:-20px;display:block}

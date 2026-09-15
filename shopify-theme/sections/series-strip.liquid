@@ -43,12 +43,19 @@
   assign visible = 0
   for item in posts
     unless item.hidden == true
-      assign visible = visible | plus: 1
+      if item.thumb != blank or item.video != blank or item.slides.first != blank
+        assign visible = visible | plus: 1
+      endif
     endunless
   endfor
+  # A Post block left in place with its photo and film removed adds no tile,
+  # so it must not keep an empty band on the page (15 Sep 2026). In the
+  # editor it still counts, to show its "add a photo" card.
   for block in section.blocks
     if block.type == 'post' and block.settings.hidden == false
-      assign visible = visible | plus: 1
+      if request.design_mode or block.settings.image != blank or block.settings.photo_url != blank or block.settings.video != blank or block.settings.video_url != blank
+        assign visible = visible | plus: 1
+      endif
     endif
   endfor
 -%}
@@ -148,7 +155,8 @@
             -%}
             {%- if slot -%}
               {%- if ss_limit > 0 and ss_shown >= ss_limit -%}{%- break -%}{%- endif -%}
-              {%- assign ss_shown = ss_shown | plus: 1 -%}
+              {%- comment -%} Only a block that makes a tile counts toward Most posts shown (15 Sep 2026). {%- endcomment -%}
+              {%- if block.settings.image != blank or block.settings.photo_url != blank or block.settings.video != blank or block.settings.video_url != blank -%}{%- assign ss_shown = ss_shown | plus: 1 -%}{%- endif -%}
               {%- render 'series-tile-block', block: block, section: section, ig_home: ig_home, brand_from: brand_from, brand_to: brand_to -%}
             {%- endif -%}
           {%- endfor -%}
@@ -180,6 +188,8 @@
               endif
               if block.settings.image != blank
                 assign t_thumb = block.settings.image | image_url: width: 810
+              elsif block.settings.photo_url != blank
+                assign t_thumb = block.settings.photo_url
               endif
               if block.settings.video != blank
                 assign mp4 = block.settings.video.sources | where: 'format', 'mp4' | first
@@ -211,6 +221,8 @@
             endif
           endif
         -%}
+        {%- comment -%} No photo, slide or film left on a post (its block's photo removed, nothing synced beneath): series-tile prints no tile, so it takes no slot (15 Sep 2026). {%- endcomment -%}
+        {%- if t_thumb == blank and t_video == blank and t_slides.first == blank -%}{%- assign t_hidden = true -%}{%- endif -%}
         {%- unless t_hidden -%}
           {%- assign ss_shown = ss_shown | plus: 1 -%}
           {%- render 'series-tile', thumb: t_thumb, video: t_video, slides: t_slides, url: item.url, link: t_link, caption: t_caption, date: t_date, kind: t_kind, alt: series_name, on_site: on_site, attrs: t_attrs, synced: true, section: section, brand_from: brand_from, brand_to: brand_to -%}
@@ -253,7 +265,7 @@
             endif
           -%}
           {%- if slot -%}
-            {%- assign ss_shown = ss_shown | plus: 1 -%}
+            {%- if block.settings.image != blank or block.settings.photo_url != blank or block.settings.video != blank or block.settings.video_url != blank -%}{%- assign ss_shown = ss_shown | plus: 1 -%}{%- endif -%}
             {%- render 'series-tile-block', block: block, section: section, ig_home: ig_home, brand_from: brand_from, brand_to: brand_to -%}
           {%- endif -%}
         {%- endfor -%}
@@ -305,9 +317,10 @@
 
 <script>
   (function () {
-    document.addEventListener('keydown', function (e) {
-      // Films play silently while the pointer rests on a tile; on touch
+    // Films play silently while the pointer rests on a tile; on touch
     // screens the tile that is mostly in view plays. Clicks are untouched.
+    // (15 Sep 2026: this sat inside the keydown listener below, so hover
+    // play only began after the first key press.)
     var vids = document.querySelectorAll('[data-series] .series-card .series-vid');
     if (vids.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -347,7 +360,9 @@
       }
     }
 
-    var lbv = document.getElementById('lbv');
+    // The film viewer answers Escape and the arrow keys while it is open.
+    document.addEventListener('keydown', function (e) {
+      var lbv = document.getElementById('lbv');
       if (!lbv || !lbv.classList.contains('open')) return;
       if (e.key === 'Escape') closeSeriesFilm(lbv);
       if (e.key === 'ArrowLeft') lbv.dispatchEvent(new CustomEvent('lbv:step', { detail: -1 }));
@@ -403,6 +418,8 @@
         slideImg.src = list[idx];
         prevBtn.disabled = idx === 0;
         nextBtn.disabled = idx === list.length - 1;
+        // a single slide has nothing to step to: no arrows, no dots (15 Sep 2026)
+        prevBtn.hidden = nextBtn.hidden = dots.hidden = list.length < 2;
         dots.innerHTML = '';
         list.forEach(function (_, n) {
           var d = document.createElement('i');
@@ -415,7 +432,10 @@
 
       function open(card) {
         var src = card.dataset.video;
-        list = card.dataset.slides ? card.dataset.slides.split('|') : [];
+        // empty slide addresses are dropped, so no blank slide or dead dot;
+        // nothing left to play opens the post instead of an empty viewer (15 Sep 2026)
+        list = card.dataset.slides ? card.dataset.slides.split('|').filter(Boolean) : [];
+        if (!src && !list.length) { if (card.dataset.url) window.open(card.dataset.url, '_blank', 'noopener'); return; }
         capText.textContent = card.dataset.caption || '';
         if (card.dataset.url) { igLink.href = card.dataset.url; igLink.hidden = false; } else { igLink.hidden = true; }
         video.hidden = !src;
@@ -531,6 +551,7 @@
         { "type": "url", "id": "url", "label": "Instagram post link" },
         { "type": "url", "id": "link", "label": "Send clicks to", "info": "Leave empty to open the Instagram post." },
         { "type": "image_picker", "id": "image", "label": "Photo", "info": "The tile. Real photographs and renders only." },
+        { "type": "text", "id": "photo_url", "label": "Photo URL", "info": "The post's stored photo, used when no photo is picked above." },
         { "type": "video", "id": "video", "label": "Film (upload)", "info": "Plays silently while the pointer rests on the tile. Portrait 9:16, under 10 MB keeps the page fast." },
         { "type": "text", "id": "video_url", "label": "Film URL (.mp4)", "info": "Used when no film is uploaded above." },
         { "type": "textarea", "id": "caption", "label": "Caption" },

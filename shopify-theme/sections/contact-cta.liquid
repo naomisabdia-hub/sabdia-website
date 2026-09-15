@@ -1,7 +1,9 @@
 {%- comment -%}
   Port of the homepage contact section - details column + the enquiry
-  form. The form posts into the Sabdia leads inbox via the forms
-  endpoint; main.js handles submission and the status line.
+  form. The form is the shared enquiry-form snippet, the same one the
+  Contact page renders, so both ask the same questions from one Interest
+  list (Theme settings › Contact › Enquiry options); main.js handles
+  submission and the status line.
 {%- endcomment -%}
 {% render 'section-look', section: section %}
 <section class="sp cc-band cc-{{ section.settings.layout | default: 'beside' }}{% if section.settings.form_style == 'card' %} cc-card{% endif %}" id="contact" style="background:var(--bg2);{% if section.settings.show_rule %}border-top:1px solid var(--border){% endif %}">
@@ -22,99 +24,7 @@
       {%- endif -%}
     </div>
     <div>
-      {%- if settings.form_backend == 'vercel' -%}
-      <form class="cform reveal d1" id="cform" name="contact" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
-        <input type="hidden" name="form-name" value="contact">
-        <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
-        <div class="frow">
-          <div class="fg"><label class="fl" for="cf-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="{{ section.settings.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
-          <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
-        </div>
-        <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email*" }}</label><input type="email" id="cf-email" name="email" class="fi" placeholder="{{ section.settings.f_email_ph | default: "Email address" }}" autocomplete="email" required></div>
-        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="cf-phone" name="phone" class="fi" required placeholder="{{ section.settings.f_phone_ph | default: "Phone number" }}" autocomplete="tel"></div>
-        <div class="fg">
-          <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "Interest" }}</label>
-          <select class="fsel" id="cf-interest" name="enquiry-type" required>
-            <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
-            {%- assign interests = section.settings.interests | newline_to_br | split: '<br />' -%}
-            {%- for opt in interests -%}
-              {%- assign parts = opt | split: '|' -%}
-              {%- assign o = parts[0] | strip -%}
-              {%- if settings.agent_access_enabled != true and o contains 'Agent' -%}{%- assign o = '' -%}{%- endif -%}
-              {%- if o != blank -%}<option>{{ o }}</option>{%- endif -%}
-              {%- if forloop.first -%}
-                {%- comment -%} The residences for sale, same as the Contact page, so both forms behave alike. {%- endcomment -%}
-                {%- for product in collections.all.products -%}
-                  {%- unless product.tags contains 'property' -%}{%- continue -%}{%- endunless -%}
-                  {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
-                  {%- if pstatus contains 'Sold' -%}{%- continue -%}{%- endif -%}
-                  <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
-                {%- endfor -%}
-              {%- endif -%}
-            {%- endfor -%}
-          </select>
-          {%- for opt in interests -%}
-            {%- assign parts = opt | split: '|' -%}
-            {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | escape }}">{{ parts[1] | strip }}</span>{%- endif -%}
-          {%- endfor -%}
-        </div>
-        {% render 'prequal-fields', mode: 'vercel', s: section.settings %}
-        <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Message*" }}</label><textarea class="fta" id="cf-message" name="message" placeholder="{{ section.settings.f_message_ph | default: "Tell us about your interest..." }}" required></textarea></div>
-        <button type="submit" class="fsub" id="fsub">{{ section.settings.f_submit | default: "Submit" }} &rarr;</button>
-        <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
-        <p class="form-note">{{ section.settings.note }}</p>
-      </form>
-      {%- else -%}
-      {%- comment -%} Shopify-native: emails the store's sender address and files the enquirer under Customers. {%- endcomment -%}
-      {% form 'contact', id: 'cform', class: 'cform reveal d1' %}
-        <span hidden data-thanks>{{ section.settings.success_text | default: "Thank you - we will be in touch within a business day." }}</span>
-        {%- if form.posted_successfully? -%}
-          {% render 'form-thanks', text: section.settings.success_text %}
-        {%- else -%}
-        {%- if form.errors -%}
-          <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
-        {%- endif -%}
-        <div class="frow">
-          <div class="fg"><label class="fl" for="cf-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="contact[First name]" class="fi" placeholder="{{ section.settings.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
-          <div class="fg"><label class="fl" for="cf-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="contact[Last name]" class="fi" placeholder="{{ section.settings.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
-        </div>
-        <div class="fg"><label class="fl" for="cf-email">{{ section.settings.f_email | default: "Email*" }}</label><input type="email" id="cf-email" name="contact[email]" class="fi" placeholder="{{ section.settings.f_email_ph | default: "Email address" }}" autocomplete="email" required></div>
-        <div class="fg"><label class="fl" for="cf-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" required placeholder="{{ section.settings.f_phone_ph | default: "Phone number" }}" autocomplete="tel"></div>
-        <div class="fg">
-          <label class="fl" for="cf-interest">{{ section.settings.f_interest | default: "Interest" }}</label>
-          <select class="fsel" id="cf-interest" name="contact[Interest]" required>
-            <option value="">{{ section.settings.f_interest_ph | default: "Select an enquiry type…" }}</option>
-            {%- assign interests = section.settings.interests | newline_to_br | split: '<br />' -%}
-            {%- for opt in interests -%}
-              {%- assign parts = opt | split: '|' -%}
-              {%- assign o = parts[0] | strip -%}
-              {%- if settings.agent_access_enabled != true and o contains 'Agent' -%}{%- assign o = '' -%}{%- endif -%}
-              {%- if o != blank -%}<option>{{ o }}</option>{%- endif -%}
-              {%- if forloop.first -%}
-                {%- comment -%} The residences for sale, same as the Contact page, so both forms behave alike. {%- endcomment -%}
-                {%- for product in collections.all.products -%}
-                  {%- unless product.tags contains 'property' -%}{%- continue -%}{%- endunless -%}
-                  {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
-                  {%- if pstatus contains 'Sold' -%}{%- continue -%}{%- endif -%}
-                  <option>{{ product.title }} - {{ product.metafields.custom.suburb.value }}</option>
-                {%- endfor -%}
-              {%- endif -%}
-            {%- endfor -%}
-          </select>
-          {%- for opt in interests -%}
-            {%- assign parts = opt | split: '|' -%}
-            {%- if parts.size > 1 -%}<span hidden data-thanks-for="{{ parts[0] | strip | escape }}">{{ parts[1] | strip }}</span>{%- endif -%}
-          {%- endfor -%}
-        </div>
-        {% render 'prequal-fields', mode: 'shopify', s: section.settings %}
-        <div class="fg"><label class="fl" for="cf-message">{{ section.settings.f_message | default: "Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="{{ section.settings.f_message_ph | default: "Tell us about your interest..." }}" required></textarea></div>
-        {% render 'form-optin', label: section.settings.optin_label %}
-        <button type="submit" class="fsub" id="fsub">{{ section.settings.f_submit | default: "Submit" }} &rarr;</button>
-        <p class="form-note">{{ section.settings.note }}</p>
-      {%- endif -%}
-        {% endform %}
-        {%- assign cm_uid = 'cm-' | append: section.id -%}{% render 'customer-mirror', uid: cm_uid, residence: '' %}
-      {%- endif -%}
+      {% render 'enquiry-form', s: section.settings, section_id: section.id, look: 'band' %}
     </div>
   </div>
 </section>
@@ -125,54 +35,6 @@
   .cc-flip .contact-grid>div:first-child{order:2}
   .cc-card .cform{padding:clamp(22px,3vw,36px);background:var(--white);border:1px solid var(--border);border-top:2px solid var(--gold)}
 </style>
-
-<script>
-  /* Links such as /?interest=Agent%20Access#contact arrive with this form already
-     chosen, the same way the Contact page works.
-     ?interest=<Interest label>  chooses that enquiry type (added to the list if it is not there).
-     ?property=<residence title> chooses that residence from the same list when no interest is
-                                 given; otherwise the message opens with "Regarding <property>: ".
-     ?message=<text>             starts the message (only when the message is still empty).
-     Values are URL-decoded by the browser (Agent%20Access, SOLACE, Hello%20there). */
-  (function () {
-    var root = document.getElementById('shopify-section-{{ section.id }}') || document;
-    var sel = root.querySelector('#cf-interest');
-    var msg = root.querySelector('#cf-message');
-    if (!sel || sel.dataset.prefill) return;
-    sel.dataset.prefill = '1';
-    var q = new URLSearchParams(location.search);
-    var interest = (q.get('interest') || '').trim();
-    var property = (q.get('property') || '').trim();
-    var message = (q.get('message') || '').trim();
-    if (!interest && !property && !message) return;
-    var option = function (test) {
-      for (var i = 0; i < sel.options.length; i++) {
-        var v = sel.options[i].value;
-        if (v && test(v.toLowerCase())) return sel.options[i];
-      }
-      return null;
-    };
-    var pick = null, residencePicked = false;
-    if (interest) {
-      var wantI = interest.toLowerCase();
-      pick = option(function (v) { return v === wantI; });
-      if (!pick) { pick = new Option(interest, interest); sel.add(pick, 1); }
-    } else if (property) {
-      /* The residences for sale sit in this list as "SOLACE - Camp Hill". */
-      var wantP = property.toLowerCase();
-      pick = option(function (v) { return v === wantP || v.indexOf(wantP + ' - ') === 0; });
-      residencePicked = !!pick;
-    }
-    if (pick) {
-      sel.value = pick.value;
-      sel.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-    if (msg && !msg.value.trim()) {
-      var lead = property && !residencePicked ? 'Regarding ' + property + ': ' : '';
-      if (lead || message) msg.value = lead + message;
-    }
-  })();
-</script>
 
 {% schema %}
 {
@@ -194,13 +56,7 @@
       "id": "text",
       "label": "Paragraph"
     },
-    {
-      "type": "textarea",
-      "id": "interests",
-      "label": "Interest options",
-      "default": "For Sale - Current Residences\nRequest a Viewing\nUpcoming Releases\nAgent Access\nGeneral Enquiry",
-      "info": "One option per line. Add a tailored thank-you after a | on the same line, e.g. Custom home design | Thank you. Everything at Sabdia is designed and built in-house, so we do not take on custom commissions - we will be in touch about our releases."
-    },
+    { "type": "paragraph", "content": "Interest options: one list shared with the Contact page form, at Theme settings › Contact › Enquiry options." },
     {
       "type": "text",
       "id": "note",

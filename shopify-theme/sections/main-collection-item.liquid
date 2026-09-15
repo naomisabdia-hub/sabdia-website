@@ -1,4 +1,10 @@
 {%- comment -%}
+  SUPERSEDED 15 Sep 2026 - the Collection residence page is now its own
+  sections (collection-item-header, -about, -gallery, -film, series-strip,
+  collection-item-closing, collection-similar); shopify-app/
+  arrange-collection-item-page.py moves any template still on this section
+  over. Kept only so an unarranged store-side template still renders.
+
   Collection residence page - a completed Sabdia home, laid out like the
   residences for sale but with no enquiry flow. In order: the hero (the
   residence's film playing silently behind the name when it has one,
@@ -525,7 +531,7 @@
   {%- endif -%}
 
   <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
-    <img id="lbImg" src="" alt="" width="2000" height="1400">
+    <img id="lbImg" alt="" width="2000" height="1400">
     <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&larr;</button>
     <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&rarr;</button>
     <button class="lb-close" id="lbClose" aria-label="Close">&#10005;</button>
@@ -544,6 +550,8 @@
       var lbImg = document.getElementById('lbImg'), lbCap = document.getElementById('lbCap'), lbCount = document.getElementById('lbCount');
       var i = 0, on = 0, li = 0, lastFocus = null;
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      /* One photo: nothing to page through, so no arrows, counter or strip, here or in the viewer (15 Sep 2026). */
+      if (data.length < 2) { ['pgPrev', 'pgNext', 'lbPrev', 'lbNext'].forEach(function (id) { var b = document.getElementById(id); if (b) b.style.display = 'none'; }); count.style.display = 'none'; lbCount.style.display = 'none'; strip.style.display = 'none'; }
       function srcOf(n) { return data[n].getAttribute('data-src'); }
       function capOf(n) { return data[n].getAttribute('data-alt') || house; }
       function preload(n) { [n + 1, n - 1].forEach(function (k) { var p = new Image(); p.src = srcOf((k + data.length) % data.length); }); }

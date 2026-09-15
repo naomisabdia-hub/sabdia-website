@@ -542,33 +542,43 @@ function nativeFormInit() {
       } else {
         mirrorEnquiry(form);
         let tt = thanksText(form);
-        if (form.dataset.cvFailed === '1') tt = (tt || '') + ' Our upload did not go through this time, so please email your CV to sales@sabdia.com.au.';
+        if (form.dataset.cvFailed === '1') tt = (tt || '') + ' Not every document uploaded this time, so please email your CV to sales@sabdia.com.au.';
         showThanks(form, thanksHeading(form), tt);
       }
     };
-    /* Careers: the CV goes to the private careers folder first; the form
-       then carries its file name. Only the public key is used, and it can
-       only add files to that folder. */
+    /* Careers: every document (one at least; careersFilesInit keeps the
+       list) goes to the private careers folder first; the form then carries
+       their file names. Only the public key is used, and it can only add
+       files to that folder. Returns the names that did not upload. */
     const uploadCv = async () => {
       const cf = form.querySelector('[data-careers-file]'), cp = form.querySelector('[data-careers-path]');
-      if (!cf || cf.disabled || !cf.files || !cf.files[0]) return;
-      const f = cf.files[0];
-      if (f.size > 10 * 1024 * 1024) throw new Error('Please keep the CV under 10 MB.');
+      if (!cf || cf.disabled) return [];
+      const files = cf._cvFiles && cf._cvFiles.length ? cf._cvFiles : Array.from(cf.files || []);
+      if (!files.length) return [];
       const host = form.closest('[data-careers-upload]') || form;
       const base = host.getAttribute('data-careers-upload'), key = host.getAttribute('data-careers-key');
       if (!base || !key) throw new Error('CV uploads are not set up yet. Please email your CV to sales@sabdia.com.au.');
-      const safe = f.name.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'cv';
-      const name = new Date().toISOString().slice(0, 10) + '-' + Math.random().toString(36).slice(2, 8) + '-' + safe;
-      const res = await fetch(base + '/' + name, { method: 'POST', headers: { 'apikey': key, 'Authorization': 'Bearer ' + key, 'Content-Type': f.type || 'application/octet-stream', 'x-upsert': 'false' }, body: f });
-      if (!res.ok) throw new Error('Your CV could not be uploaded. Please try again, or email it to sales@sabdia.com.au.');
-      if (cp) cp.value = name;
+      const stamp = new Date().toISOString().slice(0, 10) + '-' + Math.random().toString(36).slice(2, 8);
+      const results = await Promise.all(files.map(async (f, i) => {
+        if (f.size > CV_MAX_BYTES) return { failed: f.name };
+        const safe = f.name.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'cv';
+        const name = stamp + '-' + (i + 1) + '-' + safe;
+        try {
+          const res = await fetch(base + '/' + name, { method: 'POST', headers: { 'apikey': key, 'Authorization': 'Bearer ' + key, 'Content-Type': f.type || 'application/octet-stream', 'x-upsert': 'false' }, body: f });
+          return res.ok ? { name } : { failed: f.name };
+        } catch (e) { return { failed: f.name }; }
+      }));
+      const names = results.filter((r) => r.name).map((r) => r.name);
+      const failed = results.filter((r) => r.failed).map((r) => r.failed);
+      if (cp) cp.value = names.join(', ') + (failed.length ? (names.length ? ' | ' : '') + 'UPLOAD FAILED: ' + failed.join(', ') + ' - please ask the applicant to email these' : '');
+      return failed;
     };
     const send = async () => {
       try {
-        /* If the CV upload fails the enquiry still goes, flagged, and the
+        /* If an upload fails the enquiry still goes, flagged, and the
            thank-you asks for the CV by email - a blocked form loses the
            applicant altogether. */
-        try { await uploadCv(); form.dataset.cvFailed = ''; }
+        try { form.dataset.cvFailed = (await uploadCv()).length ? '1' : ''; }
         catch (err) { const cp = form.querySelector('[data-careers-path]'); if (cp) cp.value = 'UPLOAD FAILED - please ask the applicant to email their CV'; form.dataset.cvFailed = '1'; }
         const res = await fetch(form.getAttribute('action').split('#')[0], {
           method: 'POST',
@@ -604,6 +614,59 @@ function nativeFormInit() {
   });
 }
 
+
+/* Careers documents (Naomi, 15 Sep 2026: more than one PDF, at least one
+   required). Each pick adds to the list instead of replacing it, every
+   document shows with a Remove button, and the file field stays required,
+   so the form cannot send without one. Browsers that cannot hold a list
+   keep the native field (several files chosen at once still work). */
+const CV_MAX_BYTES = 10 * 1024 * 1024, CV_MAX_FILES = 10;
+function careersFilesInit() {
+  document.querySelectorAll('[data-careers-file]').forEach((input) => {
+    if (input.dataset.cvInit) return;
+    input.dataset.cvInit = '1';
+    const list = input.parentNode.querySelector('[data-careers-list]');
+    const kept = [];
+    input._cvFiles = kept;
+    let canKeep = true;
+    try { new DataTransfer().items.add(new File([''], 'x.pdf')); } catch (e) { canKeep = false; }
+    const sizeOf = (b) => b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
+    const render = (note) => {
+      if (canKeep) { const dt = new DataTransfer(); kept.forEach((f) => dt.items.add(f)); input.files = dt.files; }
+      if (!list) return;
+      list.textContent = '';
+      kept.forEach((f, i) => {
+        const li = document.createElement('li');
+        const name = document.createElement('span'); name.textContent = f.name;
+        const size = document.createElement('small'); size.textContent = sizeOf(f.size);
+        li.append(name, size);
+        if (canKeep) {
+          const rm = document.createElement('button');
+          rm.type = 'button'; rm.className = 'cv-remove'; rm.textContent = 'Remove';
+          rm.setAttribute('aria-label', 'Remove ' + f.name);
+          rm.addEventListener('click', () => { kept.splice(i, 1); render(); input.focus(); });
+          li.appendChild(rm);
+        }
+        list.appendChild(li);
+      });
+      if (note) { const li = document.createElement('li'); li.className = 'cv-skip'; li.setAttribute('role', 'alert'); li.textContent = note; list.appendChild(li); }
+      list.hidden = !list.children.length;
+    };
+    input.addEventListener('change', () => {
+      const picked = Array.from(input.files || []);
+      if (!canKeep) { kept.splice(0, kept.length, ...picked); render(); return; }
+      const skipped = [];
+      picked.forEach((f) => {
+        if (kept.some((k) => k.name === f.name && k.size === f.size)) return;
+        if (!/\.(pdf|docx?)$/i.test(f.name)) skipped.push(f.name + ' is not a PDF or Word file');
+        else if (f.size > CV_MAX_BYTES) skipped.push(f.name + ' is over 10 MB');
+        else if (kept.length >= CV_MAX_FILES) skipped.push(f.name + ' (' + CV_MAX_FILES + ' documents at most)');
+        else kept.push(f);
+      });
+      render(skipped.length ? 'Left out: ' + skipped.join('; ') + '.' : '');
+    });
+  });
+}
 
 /* Pre-qualification. The Interest choice decides what else is asked:
    a residence (QASR - Coorparoo) or For Sale opens budget, timeline and
@@ -734,7 +797,7 @@ function conciergeInit() {
   const words = (t) => norm(t).split(' ').filter((w) => w.length > 2 && !STOP.has(w));
   /* Residence answer, built live from the product data (no price field is passed). */
   const residenceText = (r) => {
-    const facts = [r.beds && r.beds + ' bedrooms', r.baths && r.baths + ' bathrooms', r.cars && r.cars + '-car garage', r.land && r.land + ' sqm'].filter(Boolean).join(', ');
+    const facts = [r.beds && r.beds + ' bedrooms', r.baths && r.baths + ' bathrooms', r.cars && r.cars + '-car garage', r.build && r.build + ' sqm build', r.land && r.land + ' sqm land'].filter(Boolean).join(', ');
     const feats = (r.features || '').split(',').map((x) => x.trim()).filter(Boolean).slice(0, 6).join(', ');
     const status = /sold/i.test(r.status || '') ? ' (' + r.status + ')' : '';
     return r.title + ' in ' + r.suburb + status + '. ' + (r.headline ? r.headline.replace(/\s+/g, ' ').replace(/\s+([.,;:!?])/g, '$1').trim() + ' ' : '') + (facts ? facts + '. ' : '') + (feats ? 'Highlights: ' + feats + '. ' : '') + 'See ' + r.url + ' or tell me if you would like to enquire.';
@@ -930,6 +993,7 @@ if (/[?&]contact_posted=true/.test(location.search)) { try { history.scrollResto
 function initPage() {
   nativeFormInit();
   prequalInit();
+  careersFilesInit();
   conciergeInit();
   if (window.SabdiaForms) window.SabdiaForms.preview = { thanksText, thanksHeading }; // lets staff test replies from the console
   /* After Shopify accepts an enquiry it reloads the page with
@@ -1040,11 +1104,31 @@ function initPage() {
   }
 
   // ── HERO SLIDESHOW + STRIP INDICATOR ──────────────────────
-  const slides = document.querySelectorAll('.h-slide');
+  // A slide whose photo was removed in Customize renders empty (15 Sep
+  // 2026): it and its dot sit out, so the hero never cycles to a blank
+  // frame, and the dots only show for two photos or more.
+  const allSlides = [...document.querySelectorAll('.h-slide')];
+  const slideOk = allSlides.map((s) => !!s.querySelector('img'));
+  const slides = allSlides.filter((s, i) => slideOk[i]);
   const hSlidesEl = document.getElementById('hSlides');
   const heroEvery = (hSlidesEl && Number(hSlidesEl.dataset.every)) || 6200;
-  const hDots = document.querySelectorAll('#hDots .h-dot');
+  const allDots = [...document.querySelectorAll('#hDots .h-dot')];
+  const hDots = allDots.filter((d, i) => slideOk[i]);
   const hScrollNum = document.querySelector('.h-scroll-num');
+  if (slides.length < allSlides.length) {
+    allSlides.forEach((s, i) => { if (!slideOk[i]) s.classList.remove('active'); });
+    allDots.forEach((d, i) => { if (!slideOk[i]) { d.style.display = 'none'; d.classList.remove('active'); } });
+    if (slides.length && !slides.some((s) => s.classList.contains('active'))) {
+      slides[0].classList.add('active');
+      if (hDots[0]) hDots[0].classList.add('active');
+    }
+    if (hScrollNum) {
+      if (slides.length) hScrollNum.textContent = `01 / ${String(slides.length).padStart(2, '0')}`;
+      else hScrollNum.style.display = 'none';
+    }
+  }
+  const hDotsEl = document.getElementById('hDots');
+  if (hDotsEl && slides.length < 2) hDotsEl.style.display = 'none';
   if (slides.length > 1) {
     let si = 0;
     const total = slides.length;
@@ -1154,6 +1238,24 @@ function initPage() {
     };
     ['shopify:section:load', 'shopify:section:select', 'shopify:section:reorder', 'shopify:block:select']
       .forEach((ev) => document.addEventListener(ev, (e) => showAll(e.target)));
+
+    /* The editor never re-runs a re-rendered section's own scripts either
+       (shopify.dev: "any associated JavaScript that runs when the page loads
+       won't run again"), so every carousel, film, gallery and the About strip
+       froze after any setting change until a refresh (Naomi, 15 Sep 2026).
+       Run a fresh copy of each inline script for the new markup; every
+       section script guards its own elements, so nothing starts twice. */
+    const rerun = (root) => {
+      if (!root || root.nodeType !== 1) return;
+      root.querySelectorAll('script:not([src])').forEach((old) => {
+        if (old.type && !/^(text\/javascript|module)$/i.test(old.type)) return;
+        const s = document.createElement('script');
+        if (old.type) s.type = old.type;
+        s.textContent = old.textContent;
+        old.replaceWith(s);
+      });
+    };
+    document.addEventListener('shopify:section:load', (e) => rerun(e.target));
     new MutationObserver((muts) => muts.forEach((m) => m.addedNodes.forEach(showAll)))
       .observe(document.body, { childList: true, subtree: true });
   }

@@ -13,6 +13,13 @@
 {%- endcomment -%}
 {%- liquid
   assign base = settings.forms_endpoint
+  # The old site's /images/ photos live in Supabase media/images/ since
+  # 15 Sep 2026: the Vercel copies sit behind Deployment Protection and never
+  # load, so a leftover "Current photo (URL)" behind a removed photo broke.
+  assign images_prefix = src | slice: 0, 8
+  if images_prefix == '/images/'
+    assign src = src | replace_first: '/images/', 'https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/images/'
+  endif
   assign is_svg = false
   if src contains '.svg'
     assign is_svg = true

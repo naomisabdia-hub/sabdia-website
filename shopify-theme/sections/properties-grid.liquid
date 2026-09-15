@@ -50,7 +50,7 @@
   endif
 -%}
 {% render 'section-look', section: section %}
-<section id="properties" class="sp pgrid pgrid-{{ pg_layout }}" style="--proj-gap:{{ section.settings.gap | default: 10 }}px;--pg-hero-min:{{ section.settings.hero_height | default: 680 }}px;--pg-row-ar:{{ section.settings.row_shape | default: '16/10' }}">
+<section id="properties" class="sp pgrid pgrid-{{ pg_layout }}" style="--proj-gap:{{ section.settings.gap | default: 10 }}px;--pg-hero-min:{{ section.settings.hero_height | default: 680 }}px;--pg-row-ar:{{ section.settings.row_shape | default: '16/10' }};--pc-status:{{ section.settings.card_status_size | default: 100 | divided_by: 100.0 }};--pc-name-scale:{{ section.settings.card_name_size | default: 100 | divided_by: 100.0 }};--pc-chip:{{ section.settings.card_chip_size | default: 100 | divided_by: 100.0 }}">
   {%- if section.settings.show_label or section.settings.show_heading or section.settings.show_button -%}
   {%- comment -%} Side padding lives on the section (.sp) like every other band, so the heading and the cards line up with the sections above and below. {%- endcomment -%}
   <div class="inner">
@@ -162,7 +162,8 @@
     {"type": "checkbox", "id": "show_button", "label": "Show the button", "default": true},
     {"type": "checkbox", "id": "show_cars", "label": "Garage count on the large card", "default": true},
     {"type": "checkbox", "id": "show_cars_small", "label": "Garage count on the smaller cards", "default": false},
-    {"type": "checkbox", "id": "show_land", "label": "Land size on the cards", "default": true},
+    {"type": "checkbox", "id": "show_build", "label": "Build size on the cards", "default": true, "info": "The house icon. Products › the residence › Metafields › Build size (m²)."},
+    {"type": "checkbox", "id": "show_land", "label": "Land size on the cards", "default": true, "info": "The lot icon. Products › the residence › Metafields › Land size (m²)."},
     {"type": "checkbox", "id": "include_sold", "label": "Sold residences after the live ones", "default": true, "info": "Off = live residences only."},
     {"type": "checkbox", "id": "sold_suburb", "label": "Suburb on sold cards", "default": false},
     {"type": "header", "content": "Layout"},
@@ -170,6 +171,10 @@
     {"type": "range", "id": "hero_height", "label": "Large card height", "min": 360, "max": 800, "step": 20, "default": 680, "unit": "px", "info": "Editorial layout. 680 = as designed (the card grows with the window up to 680px); lower caps it. The two small cards share it."},
     {"type": "select", "id": "row_shape", "label": "Shape of the row cards", "options": [{"value": "16/10", "label": "Landscape 16:10"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "1/1", "label": "Square"}, {"value": "4/5", "label": "Portrait 4:5"}], "default": "16/10"},
     {"type": "range", "id": "gap", "label": "Gap between cards", "min": 0, "max": 40, "step": 2, "default": 10, "unit": "px"},
+    {"type": "header", "content": "Card words"},
+    {"type": "range", "id": "card_status_size", "label": "Status chip size", "min": 60, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "The For Sale / Sold chip. 100% = as designed."},
+    {"type": "range", "id": "card_name_size", "label": "Name size", "min": 60, "max": 180, "step": 5, "unit": "%", "default": 100, "info": "The residence name on every card (brochure faces follow it)."},
+    {"type": "range", "id": "card_chip_size", "label": "Spec chip size", "min": 60, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "The bed, bath, garage and size chips."},
     {"type": "header", "content": "Look"},
     {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
     {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},

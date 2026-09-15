@@ -1,0 +1,115 @@
+{%- comment -%}
+  Now selling - the closing band of a Collection residence page
+
+  A completed residence has no enquiry flow: this band points people to
+  what is for sale now, with the share row under it. Moved out of Similar
+  residences on 15 Sep 2026 so it is its own section (Naomi: "… the
+  series, cta and more from the collection"), in the page order The Series,
+  Now selling, More from the Collection - the light row separates this
+  dark band from the dark footer (Naomi, 11 Sep 2026).
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign mf = page.metafields.custom
+  assign res_title = page.title
+  assign res_url = page.url
+  assign loc = mf.loc.value
+  assign name_token = '{' | append: 'name' | append: '}'
+  assign suburb = loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+  assign share_url = shop.url | append: res_url
+  assign share_title = res_title | append: ' - ' | append: suburb | append: ' | Sabdia Constructions'
+  assign eu = share_url | url_encode
+  assign et = share_title | url_encode
+-%}
+{% render 'section-look', section: section, designed: 'dark' %}
+<section class="cd-close cd-close-{{ s.close_style | default: 'obsidian' }}" id="{{ s.look_anchor | default: 'now-selling' }}">
+  <div class="inner-sm">
+    {%- if s.cta_label != blank -%}<div class="slabel slabel-dark reveal" style="justify-content:center;margin-bottom:20px">{{ s.cta_label }}</div>{%- endif -%}
+    <h2 class="cd-close-h reveal d1">{{ s.cta_heading_html | replace: name_token, res_title }}</h2>
+    {%- if s.cta_text != blank -%}<p class="cd-close-p reveal d2">{{ s.cta_text | replace: name_token, res_title }}</p>{%- endif -%}
+    <div class="reveal d3" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      {%- if s.cta1_label != blank -%}<a href="{{ s.cta1_link | default: '/collections/for-sale' }}" class="btn-p">{{ s.cta1_label }}</a>{%- endif -%}
+      {%- if s.cta2_label != blank -%}<a href="{{ s.cta2_link | default: '/pages/collection' }}" class="btn-g btn-g-light">{{ s.cta2_label }}</a>{%- endif -%}
+    </div>
+    {%- if s.show_share -%}
+    <div class="share-row cd-share reveal d4" aria-label="Share this page">
+      <span class="share-l">{{ s.share_label | default: "Share" }}</span>
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{ eu }}" target="_blank" rel="noopener" class="share-a">Facebook</a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ eu }}" target="_blank" rel="noopener" class="share-a">LinkedIn</a>
+      <a href="mailto:?subject={{ et }}&body={{ et }}%0A{{ eu }}" class="share-a">Email</a>
+      <button type="button" class="share-a share-copy" data-share-url="{{ share_url }}">{{ s.copy_link_label | default: "Copy link" }}</button>
+    </div>
+    {%- endif -%}
+  </div>
+</section>
+<style>
+  .cd-close{padding:calc(clamp(72px,9vw,132px) * var(--sp-scale) * var(--sp-top,1)) var(--page-pad) calc(clamp(72px,9vw,132px) * var(--sp-scale) * var(--sp-bot,1));background:var(--dark);text-align:center}
+  .cd-close-h{font-family:var(--font-d);font-size:calc(clamp(34px,5vw,64px)*var(--s-h,1));font-weight:300;color:var(--white);letter-spacing:-.02em;margin-bottom:22px}
+  .cd-close-h em{font-style:italic;color:var(--gold2)}
+  .cd-close-p{font-size:calc(13px*var(--s-t,1));font-weight:300;color:rgba(var(--white-rgb),.5);max-width:440px;margin:0 auto 38px;line-height:1.85}
+  .cd-close-stone{background:var(--bg2)}.cd-close-stone .cd-close-h,.cd-close-stone .cd-close-h em{color:var(--ink)}.cd-close-stone .cd-close-p{color:var(--ink3)}
+  .cd-close-stone .slabel-dark{color:var(--ink)}.cd-close-stone .slabel-dark::before{background:var(--gold)}
+  .cd-close-stone .btn-g-light{border-color:var(--border);color:var(--ink2)}.cd-close-stone .btn-g-light:hover{border-color:var(--ink);color:var(--ink)}
+  .cd-close-stone .cd-share{border-top-color:var(--border)}.cd-close-stone .share-l{color:var(--ink3)}.cd-close-stone .share-a{color:var(--ink2);border-bottom-color:rgba(var(--gold-rgb),.35)}.cd-close-stone .share-a:hover{color:var(--ink);border-color:var(--gold)}
+  .cd-share{justify-content:center;margin-top:52px;padding-top:32px;border-top:1px solid rgba(var(--white-rgb),.08)}
+  .cd-share .share-l{color:rgba(var(--white-rgb),.45)}
+  .cd-share .share-a{color:rgba(var(--white-rgb),.7);border-bottom-color:rgba(var(--gold2-rgb),.35)}
+  .cd-share .share-a:hover{color:var(--white);border-color:var(--gold2)}
+  .share-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .share-l{font-size:10px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;color:var(--ink3)}
+  .share-a{background:none;border:none;cursor:pointer;padding:4px 0;font-family:var(--font-u);font-size:11px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid rgba(var(--gold-rgb),.35);transition:color .25s,border-color .25s;text-decoration:none}
+</style>
+<script>
+  (function () {
+    document.querySelectorAll('.cd-share .share-copy').forEach(function (b) {
+      if (b.dataset.init) return; b.dataset.init = '1';
+      b.addEventListener('click', function () {
+        var u = b.getAttribute('data-share-url'), t = b.textContent;
+        if (navigator.clipboard) navigator.clipboard.writeText(u).then(function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = t; }, 1600); });
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Now selling",
+  "settings": [
+    { "type": "paragraph", "content": "The closing band of a completed residence's page: no enquiry form, a push to what is for sale now, and the share row. Write {name} wherever the residence's name should appear." },
+    { "type": "text", "id": "cta_label", "label": "Small label", "default": "Now Selling" },
+    { "type": "html", "id": "cta_heading_html", "label": "Heading (HTML - {name})", "default": "See what is <em>for sale</em> now." },
+    { "type": "textarea", "id": "cta_text", "label": "Text", "default": "Every Sabdia residence is designed and built in-house, to the standard you see in {name}." },
+    { "type": "text", "id": "cta1_label", "label": "Primary button", "default": "View Current Properties" },
+    { "type": "url", "id": "cta1_link", "label": "Primary link", "info": "Empty = the For Sale page." },
+    { "type": "text", "id": "cta2_label", "label": "Secondary button", "default": "Back to the Collection" },
+    { "type": "url", "id": "cta2_link", "label": "Secondary link", "info": "Empty = the Collection page." },
+    { "type": "header", "content": "Share row" },
+    { "type": "checkbox", "id": "show_share", "label": "Show the share row", "default": true },
+    { "type": "text", "id": "share_label", "label": "Share row label", "default": "Share" },
+    { "type": "text", "id": "copy_link_label", "label": "Copy link button", "default": "Copy link" },
+    { "type": "header", "content": "Layout" },
+    { "type": "select", "id": "close_style", "label": "Band", "options": [{"value": "obsidian", "label": "Obsidian (as designed)"}, {"value": "stone", "label": "Stone"}], "default": "obsidian" },
+    { "type": "header", "content": "Look" },
+    { "type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable." },
+    { "type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface." },
+    { "type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE", "visible_if": "{{ section.settings.look_surface == 'custom' }}" },
+    { "type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light", "visible_if": "{{ section.settings.look_surface == 'custom' }}" },
+    { "type": "header", "content": "Space" },
+    { "type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only." },
+    { "type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100 },
+    { "type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme" },
+    { "type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges." },
+    { "type": "header", "content": "Type" },
+    { "type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section." },
+    { "type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts." },
+    { "type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)." },
+    { "type": "header", "content": "Finishing" },
+    { "type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance." },
+    { "type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false },
+    { "type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false },
+    { "type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word now-selling, a link to /pages/collection-milos#now-selling lands on this section." }
+  ],
+  "templates": ["page"],
+  "presets": [{ "name": "Now selling" }]
+}
+{% endschema %}

@@ -17,7 +17,7 @@ grep -q "^config/settings_data.json" shopify-theme/.shopifyignore || echo "confi
 for h in qasr solace sierra caspian aether capri milos petra kirra hermosa encanto haven spectre ammos alhambra eden; do
   grep -q "^templates/product.$h.json" shopify-theme/.shopifyignore || echo "templates/product.$h.json" >> shopify-theme/.shopifyignore
 done
-for h in milos petra kirra hermosa encanto haven spectre ammos alhambra eden; do
+for h in milos petra kirra hermosa encanto haven spectre ammos alhambra eden calle elysium nero; do
   grep -q "^templates/page.collection-$h.json" shopify-theme/.shopifyignore || echo "templates/page.collection-$h.json" >> shopify-theme/.shopifyignore
 done
 # DISABLED 14 Sep 2026 (Naomi lost her home page edits - the dusk facade and
@@ -53,6 +53,19 @@ python3 shopify-app/arrange-residence-page.py $THEME
 # all-in-one Collection grid section, every setting intact.
 echo "== The For Sale page split into its own sections"
 python3 shopify-app/arrange-collection-page.py $THEME
+# The Collection residence page (the completed homes) as its own sections
+# (15 Sep 2026): Header, About (two Photo blocks), The residence (Photo
+# blocks), The film (a reel), The Series, Now selling, More from the
+# Collection. Moves every page.collection-*.json still on the all-in-one
+# Collection residence section over, every setting and block intact.
+echo "== The Collection residence page arranged into its sections"
+python3 shopify-app/arrange-collection-item-page.py $THEME
+# Every card on the For Sale page its own Residence block (15 Sep 2026), so
+# a card can be clicked and its photo, name, status word, location, numbers
+# or link changed for that card only. Adds blocks only where the grid or
+# the Sold band has none; hand edits survive.
+echo "== Residence blocks on the For Sale page cards"
+python3 shopify-app/add-collection-card-blocks.py $THEME
 # One editable Post block per synced post in The Series (14 Sep 2026), so a
 # tile can be clicked in the editor and its link changed. Adds only what is
 # missing; hand edits survive.
@@ -70,7 +83,12 @@ python3 shopify-app/add-gallery-photo-blocks.py $THEME
 # The home film band stays real photographs (14 Sep 2026): any render in its
 # photo blocks is swapped for an AETHER photograph. Idempotent.
 echo "== Real photographs only in the home film band"
-python3 shopify-app/real-only-film-band.py $THEME
+python3 shopify-app/real-only-film-band.py $THEME --film https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/completed-reel-v2.mp4 --poster https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/completed-reel-v2-poster.jpg
+# The home About image strip shows the 20 best photographs across every
+# residence (15 Sep 2026), real photography only, no renders. Replaces only
+# the Strip image blocks; the paragraphs, values and settings stay.
+echo "== The 20 best photographs in the home About strip"
+python3 shopify-app/about-strip-best-photos.py $THEME
 # The completed residences' photographs and films live in Products › Media
 # since 14 Sep 2026 (MILOS, PETRA, KIRRA, HERMOSA, ENCANTO, HAVEN, SPECTRE:
 # Status Completed, a group every For Sale, Sold and home list skips; the
@@ -84,4 +102,28 @@ echo "== Each completed residence's page on its own Collection template"
 python3 shopify-app/assign-collection-templates.py
 echo "== Collection page cards showing the photographs from Shopify"
 python3 shopify-app/convert-collection-blocks.py $THEME
+# The home and Contact page enquiry forms share one Interest list (15 Sep
+# 2026): Theme settings › Contact › Enquiry options. Takes the old per-page
+# lists out of the two templates, only where the shared list already has
+# every option; anything else is kept and printed.
+echo "== One enquiry list for the home and Contact forms"
+python3 shopify-app/share-enquiry-options.py $THEME
+# The home page backgrounds alternate (15 Sep 2026): Featured residence warm
+# grey, About white, Current residences warm grey, How we work white, the
+# film its own dark, Testimonials warm grey, Contact white. Sets only Look >
+# Background on those sections; idempotent.
+echo "== Alternating backgrounds on the home page"
+python3 shopify-app/home-alternate-backgrounds.py $THEME
+# The About page's Now selling band moves to the Process page, where it takes
+# the place of The Process steps, and the stages there (Architecture & Design
+# and the rest) get a label and heading (15 Sep 2026). The band keeps every
+# setting it had; idempotent.
+echo "== Now selling band from About to Process"
+python3 shopify-app/move-now-selling-to-process.py $THEME
+# Every client review on the home page its own photograph (15 Sep 2026):
+# real photography of the completed residences, none already shown elsewhere
+# on the home page, never two reviews the same. Sets only the Review blocks'
+# photo and description; idempotent.
+echo "== One photograph per testimonial"
+python3 shopify-app/testimonial-photos.py $THEME
 echo "Done."

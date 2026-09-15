@@ -23,6 +23,20 @@
     render 'residence-handles', col: collections['sold'], group: 'sold'
   endcapture
   assign sold_handles = sold_csv | split: ','
+  # Hand-picked sold residences (Residence blocks) replace the automatic
+  # list, in block order (15 Sep 2026); each block can reword its card.
+  assign picked = false
+  if section.blocks.size > 0
+    assign picked = true
+    assign sold_csv = ''
+    for block in section.blocks
+      if block.settings.product == blank
+        continue
+      endif
+      assign sold_csv = sold_csv | append: block.settings.product.handle | append: ','
+    endfor
+    assign sold_handles = sold_csv | split: ','
+  endif
 -%}
 {% render 'section-look', section: section %}
 {%- if show_rich and section.settings.show_sold_band and sold_handles.size > 0 -%}
@@ -30,6 +44,18 @@
     <div class="inner">
       <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.sold_label }}</div>
       <div class="proj-grid-sold" style="margin-top:0">
+        {%- if picked -%}
+        {%- assign si = 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.settings.product == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign sdelay = si | modulo: 2 -%}{%- assign si = si | plus: 1 -%}
+          {%- if sdelay == 1 -%}
+            {% render 'sold-card', product: block.settings.product, class: 'reveal d1', img_w: 900, img_h: 560, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
+          {%- else -%}
+            {% render 'sold-card', product: block.settings.product, class: 'reveal', img_w: 900, img_h: 560, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- else -%}
         {%- for h in sold_handles -%}
           {%- assign sdelay = forloop.index0 | modulo: 2 -%}
           {%- for product in collections.all.products -%}
@@ -42,6 +68,7 @@
             {%- break -%}
           {%- endfor -%}
         {%- endfor -%}
+        {%- endif -%}
       </div>
     </div>
   </section>
@@ -53,7 +80,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "The band of sold residences under the grid on the For Sale page. Which residences appear is set by each residence's Status (Products › the residence › Status) and the Sold collection's order. Not shown on the Sold page itself."
+      "content": "The band of sold residences under the grid on the For Sale page. One Residence block per card (⊕ Add block) - click a card in the preview to change its photo, name, status word, location, numbers or link for this card only. With no blocks the band is automatic: every residence whose Status contains Sold, in the Sold collection's order. Not shown on the Sold page itself."
     },
     {
       "type": "header",
@@ -376,6 +403,45 @@
       "info": "Lets a link jump straight here: with the word story, a link to /#story lands on this section."
     }
   ],
+  "blocks": [
+    {
+      "type": "residence",
+      "name": "Residence",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Residence",
+          "info": "A residence from Products. Its numbers, suburb and Status come from the product; Anything typed below replaces that line on this card only."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Card photo",
+          "info": "Empty = the residence's main photo. Real photographs only, never generated."
+        },
+        {
+          "type": "select",
+          "id": "focus",
+          "label": "Crop focus",
+          "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}],
+          "default": "center"
+        },
+        { "type": "header", "content": "Words on the card" },
+        { "type": "paragraph", "content": "Each box replaces that line on this card only; empty = the residence's own (Products › the residence). The residence page itself is unchanged." },
+        { "type": "text", "id": "name", "label": "Name" },
+        { "type": "text", "id": "status", "label": "Status word", "info": "The chip, e.g. For Sale, Under Offer, Coming Soon. A word containing Sold turns the card into a sold card." },
+        { "type": "text", "id": "suburb", "label": "Location line", "info": "Written as it should read, e.g. Camp Hill, QLD." },
+        { "type": "text", "id": "beds", "label": "Bedrooms" },
+        { "type": "text", "id": "baths", "label": "Bathrooms" },
+        { "type": "text", "id": "cars", "label": "Garages" },
+        { "type": "text", "id": "build", "label": "Build size (m²)" },
+        { "type": "text", "id": "land", "label": "Land size (m²)" },
+        { "type": "url", "id": "link", "label": "Link", "info": "Empty = the residence's page." }
+      ]
+    }
+  ],
+  "max_blocks": 12,
   "presets": [
     {
       "name": "Sold band"

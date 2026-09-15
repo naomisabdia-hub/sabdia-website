@@ -16,9 +16,15 @@
       assign is_video = vmp4.url
     endif
   endif
+  # With no film, photo or photo URL left, the photo frame is left out and
+  # the words take the whole width, never an empty panel (15 Sep 2026).
+  assign is_has_media = false
+  if is_video != blank or section.settings.image or section.settings.image_ext != blank
+    assign is_has_media = true
+  endif
 -%}
 {% render 'section-look', section: section %}
-<section class="sp is is-{{ is_side }}{% if section.settings.align == 'centre' %} is-vcentre{% endif %}" style="--is-ar:{{ is_shape }};--is-split:{{ section.settings.split | default: '6-6' | replace: '-', 'fr ' }}fr">
+<section class="sp is is-{{ is_side }}{% if section.settings.align == 'centre' %} is-vcentre{% endif %}{% unless is_has_media %} is-nomedia{% endunless %}" style="--is-ar:{{ is_shape }};--is-split:{{ section.settings.split | default: '6-6' | replace: '-', 'fr ' }}fr">
   <div class="inner is-grid">
     <div class="is-words">
       {%- if section.settings.show_label and section.settings.label != blank -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
@@ -29,6 +35,7 @@
         <div class="reveal d3" style="margin-top:34px"><a href="{{ section.settings.cta_link | default: '/pages/about' }}" class="{% if section.settings.button_style == 'solid' %}btn-p{% else %}btn-g{% endif %}">{{ section.settings.cta_label }} &rarr;</a></div>
       {%- endif -%}
     </div>
+    {%- if is_has_media -%}
     <div class="is-media reveal-wipe d1">
       {%- if is_video != blank -%}
         <video src="{{ is_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if section.settings.image %} poster="{{ section.settings.image | image_url: width: 1200 }}"{% endif %}></video>
@@ -39,10 +46,12 @@
       {%- endif -%}
       {%- if section.settings.caption != blank -%}<div class="is-cap">{{ section.settings.caption }}</div>{%- endif -%}
     </div>
+    {%- endif -%}
   </div>
 </section>
 <style>
   .is-grid{display:grid;grid-template-columns:var(--is-split,6fr 6fr);gap:clamp(40px,6vw,96px);align-items:start}
+  .is-nomedia .is-grid{grid-template-columns:1fr}
   .is-vcentre .is-grid{align-items:center}
   .is-right .is-words{order:1}.is-right .is-media{order:2}
   .is-left .is-words{order:2}.is-left .is-media{order:1}

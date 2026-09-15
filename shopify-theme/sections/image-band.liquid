@@ -42,12 +42,14 @@
     {%- capture imgs -%}
       {%- assign delays = ',d1,d2' | split: ',' -%}
       {%- for block in blocks -%}
+        {%- comment -%} An Image block with its photo removed is left out, so it never leaves an empty frame (15 Sep 2026). {%- endcomment -%}
+        {%- unless block.settings.image or block.settings.image_ext != blank -%}{%- continue -%}{%- endunless -%}
         {%- assign di = forloop.index0 | modulo: 3 -%}
         {%- assign focus = block.settings.focus | default: 'center' -%}
         {%- assign zoom = block.settings.zoom | default: 100 -%}
         <figure class="imgband-item reveal-wipe {{ delays[di] }}" {{ block.shopify_attributes }}>
           {%- if block.settings.image -%}
-            {%- assign ibh = 1400 | divided_by: block.settings.image.aspect_ratio | round -%}<img src="{{ block.settings.image | image_url: width: 1400 }}" alt="{{ block.settings.alt | escape }}" width="1400" height="{{ ibh }}" loading="lazy" decoding="async" style="object-position:{{ focus }};--ib-zoom:{{ zoom | divided_by: 100.0 }}">
+            {%- assign ibh = 1000 -%}{%- if block.settings.image.aspect_ratio > 0 -%}{%- assign ibh = 1400 | divided_by: block.settings.image.aspect_ratio | round -%}{%- endif -%}<img src="{{ block.settings.image | image_url: width: 1400 }}" alt="{{ block.settings.alt | escape }}" width="1400" height="{{ ibh }}" loading="lazy" decoding="async" style="object-position:{{ focus }};--ib-zoom:{{ zoom | divided_by: 100.0 }}">
           {%- elsif block.settings.image_ext != blank -%}
             <img src="{% render 'ext-variant', src: block.settings.image_ext, w: 1400, h: 1000 %}" alt="{{ block.settings.alt | escape }}" width="1400" height="1000" loading="lazy" decoding="async" style="object-position:{{ focus }};--ib-zoom:{{ zoom | divided_by: 100.0 }}">
           {%- endif -%}
@@ -56,9 +58,11 @@
       {%- endfor -%}
     {%- endcapture -%}
 
+    {%- assign imgs_left = imgs | strip -%}
     {%- if layout == 'split' -%}
-      <div class="imgband-split">
-        <div class="imgband-grid">{{ imgs }}</div>
+      {%- comment -%} No photo left: the words take the band on their own rather than sitting beside an empty column. {%- endcomment -%}
+      <div class="imgband-split"{% if imgs_left == blank %} style="grid-template-columns:1fr"{% endif %}>
+        {%- if imgs_left != blank -%}<div class="imgband-grid">{{ imgs }}</div>{%- endif -%}
         <div class="imgband-copy reveal d1">
           {%- if section.settings.text != blank -%}<p class="about-p" style="margin-top:0">{{ section.settings.text }}</p>{%- endif -%}
           {%- if section.settings.cta_label != blank -%}<a href="{{ section.settings.cta_link }}" class="btn-g" style="margin-top:20px">{{ section.settings.cta_label }} &rarr;</a>{%- endif -%}

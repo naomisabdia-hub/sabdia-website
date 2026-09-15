@@ -1,0 +1,1365 @@
+{
+  "sections": {
+    "hero": {
+      "type": "home-hero",
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "disabled": true,
+          "settings": {
+            "image": "shopify://shop_images/sierra-exterior-front-dusk-01.jpg",
+            "ext": "/images/home-hero-1.jpg",
+            "alt": "Sabdia luxury home"
+          }
+        },
+        "slide-2": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/solace-exterior-front-dusk-01.jpg",
+            "ext": "/images/home-hero-2.jpg",
+            "alt": "Sabdia luxury home"
+          }
+        },
+        "slide-3": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/sierra-living-view-01.jpg",
+            "ext": "/images/solace-hero.jpg",
+            "alt": "Sabdia luxury home"
+          }
+        }
+      },
+      "block_order": [
+        "slide-1",
+        "slide-2",
+        "slide-3"
+      ],
+      "settings": {
+        "media": "video",
+        "video": "shopify://files/videos/Sienna Sabdia normal crop.mp4",
+        "video_url": "",
+        "video_poster": "shopify://shop_images/sierra-exterior-front-dusk-01.jpg",
+        "overlay": 55,
+        "words_delay": 18,
+        "show_wordmark": true,
+        "wordmark_delay": 18,
+        "words_loop": true,
+        "words_fade_lead": 9.5,
+        "wordmark_size": 40,
+        "words_position": "centre",
+        "show_words": false,
+        "words": "Design, Develop, Construct",
+        "eyebrow": "Boutique Luxury Home Builder and Developer, Brisbane",
+        "eyebrow_size": 11,
+        "show_description": false,
+        "description": "Luxury residences designed, developed and built in Brisbane since 2013.",
+        "award": "Award-Winning Residences.",
+        "cta1_label": "View Residences",
+        "cta1_link": "/collections/for-sale",
+        "cta2_label": "Begin a Conversation",
+        "cta2_link": "/pages/contact",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": "",
+        "show_dots": true,
+        "show_scroll_cue": true,
+        "show_award": true,
+        "show_buttons": true,
+        "show_bottom_rule": true,
+        "slide_every": 6.2,
+        "ken_burns": true,
+        "height": "full",
+        "title_font": "caps",
+        "words_size": 30,
+        "words_tracking": 28
+      }
+    },
+    "featured": {
+      "type": "featured-residence",
+      "settings": {
+        "residence": "",
+        "label": "Featured Residence",
+        "show_status": true,
+        "heading_html": "",
+        "text_source": "description",
+        "text": "A curvilinear residence in Brisbane's inner north, designed around light and the pool at its heart.",
+        "show_label": true,
+        "show_text": true,
+        "show_facts": true,
+        "show_buttons": true,
+        "cta1_label": "Explore {name}",
+        "cta2_label": "Arrange an Inspection",
+        "cta2_link": "",
+        "image": "shopify://shop_images/aether-exterior-front-dusk-01.jpg",
+        "video_url": "",
+        "use_product_film": false,
+        "focus": "center",
+        "dim": 45,
+        "layout": "editorial",
+        "show_reel": true,
+        "reel": "shopify://files/videos/Sabdia Coming soon reel v2 (1).mp4",
+        "reel_url": "",
+        "reel_poster_url": "",
+        "reel_caption": "{name}, on film",
+        "side": "right",
+        "shape": "4/3",
+        "height": "standard",
+        "words": "base-left",
+        "scrim": "corner",
+        "look_surface": "design",
+        "look_color": "#e5e2df",
+        "look_tone": "light",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "about": {
+      "type": "home-about",
+      "blocks": {
+        "image-1": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/sierra-living-kitchen-01.jpg",
+            "ext": "/images/home-hero-1.jpg",
+            "alt": "SIERRA, living room and kitchen",
+            "focus": "center"
+          }
+        },
+        "image-2": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/solace-kitchen-01.jpg",
+            "ext": "/images/home-hero-2.jpg",
+            "alt": "SOLACE, kitchen island",
+            "focus": "center"
+          }
+        },
+        "image-11": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/caspian-render-living-fireplace-01.jpg",
+            "ext": "",
+            "alt": "CASPIAN, living room, render",
+            "focus": "center"
+          }
+        },
+        "image-12": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-formal-living-02.jpg",
+            "ext": "",
+            "alt": "QASR, formal living room, render",
+            "focus": "center"
+          }
+        },
+        "image-9": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/sierra-living-view-01.jpg",
+            "ext": "",
+            "alt": "SIERRA, living room with a city view",
+            "focus": "center"
+          }
+        },
+        "image-13": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/solace-staircase-02.jpg",
+            "ext": "",
+            "alt": "SOLACE, curved staircase",
+            "focus": "center"
+          }
+        },
+        "image-14": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-pool-night-01.jpg",
+            "ext": "",
+            "alt": "QASR, pool at night, render",
+            "focus": "center"
+          }
+        },
+        "image-15": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/caspian-render-facade-detail-01.jpg",
+            "ext": "",
+            "alt": "CASPIAN, facade detail, render",
+            "focus": "center"
+          }
+        },
+        "image-10": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/sierra-aerial-dusk-01.jpg",
+            "ext": "",
+            "alt": "SIERRA at dusk, from above",
+            "focus": "center"
+          }
+        },
+        "image-16": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/solace-living-fireplace-01.jpg",
+            "ext": "",
+            "alt": "SOLACE, living room fireplace",
+            "focus": "center"
+          }
+        },
+        "image-17": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/caspian-render-exterior-front-dusk-01.jpg",
+            "ext": "",
+            "alt": "CASPIAN, front elevation at dusk, render",
+            "focus": "center"
+          }
+        },
+        "image-18": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/sierra-master-bedroom-sunset-01.jpg",
+            "ext": "",
+            "alt": "SIERRA, main bedroom at sunset",
+            "focus": "center"
+          }
+        },
+        "image-19": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/solace-kitchen-detail-01.jpg",
+            "ext": "",
+            "alt": "SOLACE, kitchen detail",
+            "focus": "center"
+          }
+        },
+        "image-20": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/qasr-render-kitchen-01.jpg",
+            "ext": "",
+            "alt": "QASR, kitchen, render",
+            "focus": "center"
+          }
+        },
+        "paragraph-3": {
+          "type": "paragraph",
+          "settings": {
+            "text": "Since 2013, Sabdia Constructions has designed, developed and built luxury residences across Brisbane's inner suburbs. Design-led and delivered in-house, each home is drawn, approved, constructed and finished by the one team."
+          }
+        },
+        "paragraph-4": {
+          "type": "paragraph",
+          "settings": {
+            "text": "More than 100 custom residences and multiple HIA awards on, the standard has not moved. Founder Muhammad Sabdia and Construction Manager Stephen Orazio lead every project from the first sketch to handover."
+          }
+        },
+        "paragraph-5": {
+          "type": "paragraph",
+          "settings": {
+            "text": "Materials are chosen for the house alone, natural stone, warm timber and honed travertine among them, and applied with the attention that makes a home both timeless and enduring."
+          }
+        },
+        "value-6": {
+          "type": "value",
+          "settings": {
+            "n": "i.",
+            "title": "Design-Led",
+            "desc": "Every residence is drawn in-house, for its site and the way it will be lived in."
+          }
+        },
+        "value-7": {
+          "type": "value",
+          "settings": {
+            "n": "ii.",
+            "title": "Meticulous Craftsmanship",
+            "desc": "Custom joinery, hand-laid stone and considered detailing in every room."
+          }
+        },
+        "value-8": {
+          "type": "value",
+          "settings": {
+            "n": "iii.",
+            "title": "Timeless and Enduring",
+            "desc": "Premium materials, carefully selected, so the home is as right in twenty years as on handover day."
+          }
+        }
+      },
+      "block_order": [
+        "image-1",
+        "image-2",
+        "image-11",
+        "image-12",
+        "image-9",
+        "image-13",
+        "image-14",
+        "image-15",
+        "image-10",
+        "image-16",
+        "image-17",
+        "image-18",
+        "image-19",
+        "image-20",
+        "paragraph-3",
+        "paragraph-4",
+        "paragraph-5",
+        "value-6",
+        "value-7",
+        "value-8"
+      ],
+      "settings": {
+        "label": "About Sabdia",
+        "heading_html": "True luxury lies<br>in the details.",
+        "vals_caps": true,
+        "strip_split": "landscape-portrait",
+        "strip_rotate": true,
+        "strip_every": 2.5,
+        "strip_height": 300,
+        "strip_height_mobile": 200,
+        "strip_gap": 8,
+        "sig_name": "Muhammad Sabdia",
+        "sig_title": "Founder",
+        "sig_size": 14,
+        "cta_label": "Our Full Story",
+        "cta_link": "/pages/about",
+        "show_label": true,
+        "show_heading": true,
+        "show_strip": true,
+        "show_paragraphs": true,
+        "show_sig": true,
+        "show_values": true,
+        "show_numbers": true,
+        "show_button": true,
+        "first_lead": true,
+        "layout": "beside",
+        "sticky": true,
+        "split": "5-7",
+        "strip_position": "heading",
+        "values_layout": "list",
+        "serif_text": false,
+        "drop_cap": false,
+        "button_style": "ghost",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "properties": {
+      "type": "properties-grid",
+      "blocks": {
+        "card_sierra": {
+          "type": "card",
+          "settings": {
+            "residence": "sierra",
+            "image": "shopify://shop_images/sierra-hero.jpg",
+            "link": "",
+            "focus": "center"
+          }
+        },
+        "card_solace": {
+          "type": "card",
+          "settings": {
+            "residence": "solace",
+            "image": "shopify://shop_images/solace-hero.jpg",
+            "link": "",
+            "focus": "center"
+          }
+        },
+        "card_caspian": {
+          "type": "card",
+          "settings": {
+            "residence": "caspian",
+            "image": "shopify://shop_images/caspian-hero.jpg",
+            "link": "",
+            "focus": "center"
+          }
+        },
+        "card_qasr": {
+          "type": "card",
+          "settings": {
+            "residence": "qasr",
+            "image": "shopify://shop_images/qasr-hero.jpg",
+            "link": "",
+            "focus": "center"
+          }
+        },
+        "card_capri": {
+          "type": "card",
+          "settings": {
+            "residence": "capri",
+            "image": "shopify://shop_images/capri-hero.jpg",
+            "link": "",
+            "focus": "center"
+          }
+        }
+      },
+      "block_order": [
+        "card_sierra",
+        "card_solace",
+        "card_caspian",
+        "card_qasr",
+        "card_capri"
+      ],
+      "settings": {
+        "label": "For Sale",
+        "heading_html": "<em>Current</em> Residences",
+        "cta_label": "View All",
+        "cta_link": "/collections/for-sale",
+        "max_cards": 12,
+        "exclude": "aether",
+        "for_sale_collection": "for-sale",
+        "sold_collection": "for-sale",
+        "show_label": true,
+        "show_heading": true,
+        "show_button": true,
+        "show_cars": true,
+        "show_cars_small": false,
+        "show_land": true,
+        "include_sold": true,
+        "sold_suburb": false,
+        "layout": "editorial",
+        "hero_height": 680,
+        "row_shape": "16/10",
+        "gap": 10,
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "rail": {
+      "type": "residence-rail",
+      "disabled": true,
+      "settings": {
+        "featured": "aether",
+        "label": "Featured Residence",
+        "show_label": true,
+        "heading_html": "AETHER, Hendra",
+        "text": "Light and air: a five-bedroom residence in a sought-after pocket of Hendra, now selling.",
+        "link_label": "View all residences",
+        "link": "",
+        "show_status": true,
+        "show_headline": true,
+        "show_facts": true,
+        "card_cta": "View residence",
+        "max_cards": 4,
+        "card_width": 300,
+        "featured_scale": 150,
+        "shape": "3/4",
+        "gap": 12,
+        "show_rule": true,
+        "look_surface": "design",
+        "look_color": "#e5e2df",
+        "look_tone": "light",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "intro": {
+      "type": "intro-split",
+      "disabled": true,
+      "settings": {
+        "label": "Sabdia",
+        "show_label": true,
+        "heading_html": "Homes designed, developed and built by one team, in inner Brisbane, since 2013.",
+        "text": "Sabdia is a boutique developer. Every residence is drawn, approved, built and finished in-house, so the decisions made on paper are the decisions that get built.",
+        "text2": "Each home begins with its site and the way a family will live in it. From there the work is patient: proportion, light, and a palette of natural materials chosen for that house alone.",
+        "cta_label": "About Sabdia",
+        "cta_link": "/pages/about",
+        "button_style": "ghost",
+        "image": "shopify://shop_images/solace-exterior-front-dusk-01.jpg",
+        "image_ext": "",
+        "image_alt": "SOLACE, Camp Hill, the street elevation at dusk",
+        "video_url": "",
+        "caption": "",
+        "focus": "center",
+        "side": "right",
+        "split": "5-7",
+        "shape": "4/5",
+        "align": "top",
+        "look_surface": "design",
+        "look_color": "#e5e2df",
+        "look_tone": "light",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "stats": {
+      "type": "stats-band",
+      "blocks": {
+        "stat-1": {
+          "type": "stat",
+          "settings": {
+            "target": "10",
+            "suffix": "+",
+            "label": "Years in Brisbane",
+            "count": true
+          }
+        },
+        "stat-2": {
+          "type": "stat",
+          "settings": {
+            "target": "100",
+            "suffix": "+",
+            "label": "Residences Delivered",
+            "count": true
+          }
+        },
+        "stat-3": {
+          "type": "stat",
+          "settings": {
+            "target": "5",
+            "suffix": "★",
+            "label": "Multi-Award Winning",
+            "count": true
+          }
+        },
+        "stat-4": {
+          "type": "stat",
+          "settings": {
+            "target": "100",
+            "suffix": "%",
+            "label": "In-House Delivery",
+            "count": false
+          }
+        }
+      },
+      "block_order": [
+        "stat-1",
+        "stat-2",
+        "stat-3",
+        "stat-4"
+      ],
+      "disabled": true,
+      "settings": {
+        "size": "compact",
+        "label": "",
+        "heading_html": "",
+        "columns": "auto",
+        "align": "centre",
+        "dividers": true,
+        "rules": true,
+        "suffix_size": ".7em",
+        "label_size": 10.5,
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "marquee": {
+      "type": "marquee",
+      "blocks": {
+        "item-1": {
+          "type": "item",
+          "settings": {
+            "text": "Multi-Award Winning"
+          }
+        },
+        "item-2": {
+          "type": "item",
+          "disabled": true,
+          "settings": {
+            "text": "Design · Develop · Construct"
+          }
+        },
+        "item-3": {
+          "type": "item",
+          "settings": {
+            "text": "Inner Brisbane Specialist"
+          }
+        },
+        "item-4": {
+          "type": "item",
+          "settings": {
+            "text": "100+ Residences Since 2013"
+          }
+        },
+        "item-5": {
+          "type": "item",
+          "settings": {
+            "text": "Boutique Luxury Developer"
+          }
+        }
+      },
+      "block_order": [
+        "item-1",
+        "item-2",
+        "item-3",
+        "item-4",
+        "item-5"
+      ],
+      "disabled": true,
+      "settings": {
+        "speed": 28,
+        "direction": "left",
+        "pause_hover": false,
+        "icon": "star",
+        "separator": "rule",
+        "gap": 60,
+        "text_size": 10.5,
+        "tracking": 26,
+        "band_pad": 18,
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "process": {
+      "type": "process-steps",
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Design",
+            "description": "The site, its light and its outlook set the plan. Architecture and interiors are drawn together, in-house."
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Develop",
+            "description": "Approvals, engineering and program are resolved by the same team, before the first trade is on site."
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Construct",
+            "description": "Built by Sabdia's own team and long-standing trades, to the drawings and the finishes specified."
+          }
+        },
+        "step-4": {
+          "type": "step",
+          "settings": {
+            "title": "Deliver",
+            "description": "Handover with every detail checked, and a team that stays within reach long after the keys."
+          }
+        }
+      },
+      "block_order": [
+        "step-1",
+        "step-2",
+        "step-3",
+        "step-4"
+      ],
+      "settings": {
+        "label": "How We Work",
+        "show_label": true,
+        "show_numbers": true,
+        "show_line": true,
+        "heading_html": "Design. Develop. Construct.",
+        "text": "One team carries each residence from site to handover, so nothing is lost between the drawing and the built home.",
+        "columns": "auto",
+        "align": "centre",
+        "number_style": "ring",
+        "number_format": "plain",
+        "number_size": 48,
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "services": {
+      "type": "services-dark",
+      "blocks": {
+        "service-1": {
+          "type": "service",
+          "settings": {
+            "number": "01",
+            "title": "Architecture & Design",
+            "description": "Single residences and boutique developments, drawn in-house from the first concept to the finished detail.",
+            "icon": "home"
+          }
+        },
+        "service-2": {
+          "type": "service",
+          "settings": {
+            "number": "02",
+            "title": "Development Management",
+            "description": "Site, approvals, engineering and program, managed by the same team that designs and builds.",
+            "icon": "case"
+          }
+        },
+        "service-3": {
+          "type": "service",
+          "settings": {
+            "number": "03",
+            "title": "Interior Architecture",
+            "description": "Interiors planned with the architecture, so material, light and proportion carry through every room.",
+            "icon": "clock"
+          }
+        },
+        "service-4": {
+          "type": "service",
+          "settings": {
+            "number": "04",
+            "title": "Construction",
+            "description": "Built by Sabdia's own team and long-standing trades, checked at every stage.",
+            "icon": "grid"
+          }
+        }
+      },
+      "block_order": [
+        "service-1",
+        "service-2",
+        "service-3",
+        "service-4"
+      ],
+      "disabled": true,
+      "settings": {
+        "label": "How We Work",
+        "heading_html": "Every discipline,<br><em>under one roof</em>.",
+        "text": "Sabdia designs, develops and constructs every residence in-house. One team carries the project from site to handover, so nothing is lost between disciplines and the standard holds.",
+        "cta_label": "Our Process",
+        "cta_link": "/pages/services",
+        "show_label": true,
+        "show_heading": true,
+        "show_text": true,
+        "show_button": true,
+        "show_numbers": true,
+        "show_icons": true,
+        "dividers": true,
+        "hover_shift": true,
+        "layout": "beside",
+        "sticky": true,
+        "number_style": "serif",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "film": {
+      "type": "film-band",
+      "blocks": {
+        "fc-1": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-exterior-front-dusk-01.jpg",
+            "ext": "",
+            "alt": "SOLACE, Camp Hill, the street elevation at dusk",
+            "caption": "",
+            "focus": "center"
+          }
+        },
+        "fc-2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-staircase-01.jpg",
+            "ext": "",
+            "alt": "The staircase at SOLACE",
+            "caption": "",
+            "focus": "center"
+          }
+        },
+        "fc-3": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-exterior-front-dusk-01.jpg",
+            "ext": "",
+            "alt": "AETHER, Hendra, the street elevation at dusk",
+            "caption": "",
+            "focus": "center"
+          }
+        },
+        "fc-4": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/sierra-kitchen-01.jpg",
+            "ext": "",
+            "alt": "Walnut joinery and stone in the SIERRA kitchen",
+            "caption": "",
+            "focus": "center"
+          }
+        },
+        "fc-5": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/sierra-exterior-front-01.jpg",
+            "ext": "",
+            "alt": "SIERRA, Holland Park West, the street elevation",
+            "caption": "",
+            "focus": "center"
+          }
+        },
+        "fc-6": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-living-fireplace-01.jpg",
+            "ext": "",
+            "alt": "The living room fireplace at SOLACE",
+            "caption": "",
+            "focus": "center"
+          }
+        },
+        "fc-7": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/sierra-living-view-01.jpg",
+            "ext": "",
+            "alt": "The living room at SIERRA, Holland Park West",
+            "caption": "",
+            "focus": "center"
+          }
+        },
+        "fc-8": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/solace-kitchen-detail-01.jpg",
+            "ext": "",
+            "alt": "Kitchen detail at SOLACE",
+            "caption": "",
+            "focus": "center"
+          }
+        },
+        "fc-9": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-alfresco-pool-dusk-01.jpg",
+            "ext": "",
+            "alt": "The alfresco and pool at AETHER at dusk",
+            "caption": "",
+            "focus": "center"
+          }
+        },
+        "fc-10": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/aether-kitchen-dining-01.jpg",
+            "ext": "",
+            "alt": "The kitchen and dining at AETHER",
+            "caption": "",
+            "focus": "center"
+          }
+        }
+      },
+      "block_order": [
+        "fc-1",
+        "fc-2",
+        "fc-3",
+        "fc-4",
+        "fc-5",
+        "fc-6",
+        "fc-7",
+        "fc-8",
+        "fc-9",
+        "fc-10"
+      ],
+      "settings": {
+        "layout": "carousel-reel-words",
+        "carousel_columns": "2",
+        "carousel_speed": 45,
+        "carousel_gap": 10,
+        "carousel_height": 560,
+        "anchor": "story",
+        "label": "The Residences",
+        "heading_html": "Our homes, <em>on film</em>.",
+        "text": "Completed Sabdia residences across inner Brisbane, on film.",
+        "video_url": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/completed-reel-v1.mp4",
+        "poster_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/completed-reel-v1-poster.jpg",
+        "caption_left": "Sabdia - The Residences",
+        "caption_right": "Brisbane, QLD",
+        "cta_label": "Explore the Collection",
+        "cta_link": "/pages/collection",
+        "sound_label": "Sound On",
+        "show_label": true,
+        "show_heading": true,
+        "show_text": true,
+        "show_button": true,
+        "show_captions": true,
+        "show_sound": true,
+        "autoplay": true,
+        "reel_shape": "9/16",
+        "reel_height": 680,
+        "frame_style": "framed",
+        "copy_align": "left",
+        "carousel_direction": "mixed",
+        "carousel_pause": true,
+        "carousel_fade": true,
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "testimonial": {
+      "type": "testimonial",
+      "blocks": {
+        "review-1": {
+          "type": "review",
+          "settings": {
+            "quote": "From start to finish they were amazing. We had such an incredible experience that we have engaged them again to build our dream Home. I would definitely recommend Sabdia Constructions to all my friends.",
+            "name": "Nuno",
+            "source": "Google review",
+            "stars": 5,
+            "photo_alt": ""
+          }
+        },
+        "review-2": {
+          "type": "review",
+          "settings": {
+            "quote": "In addition to constructing a beautiful house, the quality of the build was impressive. Everyone in the Sabdia team is a pleasure to deal with - they are responsive, professional, helpful and truly take pride in their work.",
+            "name": "Melinda R",
+            "source": "Google review",
+            "stars": 5,
+            "photo_alt": ""
+          }
+        },
+        "review-3": {
+          "type": "review",
+          "settings": {
+            "quote": "No stone is left unturned and each aspect of a Sabdia home is thought out and well executed. After recommending many others to select Sabdia as their forever home builders, we’re thrilled to be taking the same advice.",
+            "name": "Savva K",
+            "source": "Google review",
+            "stars": 5,
+            "photo_alt": ""
+          }
+        },
+        "review-4": {
+          "type": "review",
+          "settings": {
+            "quote": "The final product was delivered on time and with great attention to detail. In the last couple of months I had two independent assessors checking the quality of my home, both recognising my home as one of the better builds they have seen this year.",
+            "name": "Mattia P",
+            "source": "Google review",
+            "stars": 5,
+            "photo_alt": ""
+          }
+        },
+        "review-5": {
+          "type": "review",
+          "settings": {
+            "quote": "I’ve never met a more honest builder, who is so timely, and whose staff is a pleasure to deal with. Even now if I have a small question, my call is always answered.",
+            "name": "Amanda N",
+            "source": "Google review",
+            "stars": 5,
+            "photo_alt": ""
+          }
+        },
+        "review-6": {
+          "type": "review",
+          "settings": {
+            "quote": "I bought a brand new house from Sabdia 1 year ago - would absolutely buy / build with them if an opportunity arises. I have found the communication and post handover to be great, all emails always responded.",
+            "name": "Craig",
+            "source": "Google review",
+            "stars": 5,
+            "photo_alt": ""
+          }
+        },
+        "review-7": {
+          "type": "review",
+          "settings": {
+            "quote": "My family couldn't be happier with our high quality built home. It ticks every box that we could imagine and sometimes it is like residing in our own resort!",
+            "name": "Jarrod F",
+            "source": "Google review",
+            "stars": 5,
+            "photo_alt": ""
+          }
+        },
+        "review-8": {
+          "type": "review",
+          "settings": {
+            "quote": "The team did a great handover with us and showed us everything we need to know about the house. Muhammad and his team are exceptional builders and people.",
+            "name": "Kimberley T",
+            "source": "Google review",
+            "stars": 5,
+            "photo_alt": ""
+          }
+        },
+        "review-9": {
+          "type": "review",
+          "settings": {
+            "quote": "Sabdia Constructions was a pleasure to deal with. Quick delivery timeline and quality craftsmanship.",
+            "name": "Afraan N",
+            "source": "Google review",
+            "stars": 5,
+            "photo_alt": ""
+          }
+        }
+      },
+      "block_order": [
+        "review-1",
+        "review-2",
+        "review-3",
+        "review-4",
+        "review-5",
+        "review-6",
+        "review-7",
+        "review-8",
+        "review-9"
+      ],
+      "settings": {
+        "label": "In Their Words",
+        "heading_html": "What our clients <em>say</em>.",
+        "every": 7,
+        "show_stars": true,
+        "google_url": "https://share.google/NWRoUuHtM8r61wzSS",
+        "google_label": "Read all reviews on Google",
+        "photo_1": "shopify://shop_images/sierra-living-kitchen-01.jpg",
+        "photo_2": "shopify://shop_images/solace-alfresco-pool-01.jpg",
+        "photo_3": "shopify://shop_images/sierra-master-bedroom-sunset-01.jpg",
+        "photo_focus": "center",
+        "show_rating": true,
+        "rating": "4.4",
+        "review_count": "28",
+        "rating_label": "on Google",
+        "quote": "In addition to constructing a beautiful house, the quality of the build was impressive. Everyone in the Sabdia team is a pleasure to deal with.",
+        "attribution": "Melinda R, Google review",
+        "auto": true,
+        "show_arrows": true,
+        "show_dots": true,
+        "show_google_link": true,
+        "show_source": true,
+        "show_quote_mark": true,
+        "photo_side": "left",
+        "photo_shape": "4/5",
+        "split": "5-7",
+        "quote_style": "italic",
+        "transition": "rise",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "agent": {
+      "type": "agent-access",
+      "blocks": {
+        "feature-1": {
+          "type": "feature",
+          "settings": {
+            "text": "Pre-release access to upcoming developments"
+          }
+        },
+        "feature-2": {
+          "type": "feature",
+          "settings": {
+            "text": "Pre-launch pricing and floor plan information"
+          }
+        },
+        "feature-3": {
+          "type": "feature",
+          "settings": {
+            "text": "First word on new releases"
+          }
+        },
+        "feature-4": {
+          "type": "feature",
+          "settings": {
+            "text": "Agent commission structures"
+          }
+        },
+        "feature-5": {
+          "type": "feature",
+          "settings": {
+            "text": "Invitations to private project previews"
+          }
+        },
+        "feature-6": {
+          "type": "feature",
+          "settings": {
+            "text": "A direct line to the Sabdia team"
+          }
+        }
+      },
+      "block_order": [
+        "feature-1",
+        "feature-2",
+        "feature-3",
+        "feature-4",
+        "feature-5",
+        "feature-6"
+      ],
+      "disabled": true,
+      "settings": {
+        "image_ext": "/images/agent-portrait.jpg",
+        "image_alt": "Agent Access",
+        "badge": "Exclusive Access",
+        "label": "For Real Estate Professionals",
+        "heading_html": "Exclusive <em>Agent</em><br>Access.",
+        "text": "Agents on our list hear about new releases first, with plans and pricing before launch.",
+        "cta1_label": "Apply for Access",
+        "cta1_link": "/pages/agent-access",
+        "cta2_label": "Start a Conversation",
+        "cta2_link": "/pages/contact?interest=Agent%20Access",
+        "show_badge": true,
+        "show_label": true,
+        "show_heading": true,
+        "show_text": true,
+        "show_features": true,
+        "show_buttons": true,
+        "image_side": "left",
+        "frame": true,
+        "min_height": 640,
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    },
+    "contact": {
+      "type": "contact-cta",
+      "settings": {
+        "label": "Begin a Conversation",
+        "heading_html": "Let's begin<br>a <em>conversation</em>.",
+        "text": "Leave your details and a member of the Sabdia team will be in touch within one business day.",
+        "interests": "For Sale - Current Residences\nRequest a Viewing\nUpcoming Releases\nAgent Access\nGeneral Enquiry",
+        "note": "We respond within one business day.",
+        "success_text": "Thank you - we will be in touch within a business day.",
+        "f_interest_ph": "Select an enquiry type…",
+        "prequal_budget_label": "Budget range",
+        "prequal_budget": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say",
+        "prequal_timeline_label": "Timeline to purchase",
+        "prequal_timeline": "Ready now\n1 - 3 months\n3 - 6 months\n6 - 12 months\nJust researching",
+        "prequal_flex_label": "Flexibility",
+        "prequal_flex": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases",
+        "prequal_ask": "Thank you for your interest. So we can send the most relevant information, could you share your approximate budget range and your timeline for purchase? We will follow up with further details on the residence.",
+        "prequal_loc_label": "Preferred locations",
+        "prequal_loc_label_other": "Other locations you would also consider (optional)",
+        "prequal_locations": "",
+        "optin_label": "Keep me updated on new Sabdia releases",
+        "f_first": "First Name*",
+        "f_first_ph": "First name",
+        "f_last": "Last Name*",
+        "f_last_ph": "Last name",
+        "f_email": "Email*",
+        "f_email_ph": "Email address",
+        "f_phone": "Phone",
+        "f_phone_ph": "Phone number",
+        "f_interest": "Interest",
+        "f_message": "Message*",
+        "f_message_ph": "Tell us which residence, or what you are looking for",
+        "f_submit": "Submit",
+        "d_location": "Location",
+        "d_instagram": "Instagram",
+        "d_facebook": "Facebook",
+        "d_facebook_v": "Sabdia Constructions",
+        "d_linkedin": "LinkedIn",
+        "d_linkedin_v": "Sabdia Constructions",
+        "show_label": true,
+        "show_heading": true,
+        "show_text": true,
+        "show_details": true,
+        "d_show_location": true,
+        "d_show_phone": false,
+        "d_show_email": false,
+        "d_show_instagram": true,
+        "d_show_facebook": true,
+        "d_show_linkedin": true,
+        "show_rule": true,
+        "d_phone": "Phone",
+        "d_email": "Email",
+        "layout": "beside",
+        "form_style": "plain",
+        "look_surface": "design",
+        "look_color": "#f0eade",
+        "look_tone": "light",
+        "look_media_link": false,
+        "look_video_url": "",
+        "look_dim": 55,
+        "look_focus": "center",
+        "look_media_tone": "dark",
+        "look_space_top": 100,
+        "look_space_bottom": 100,
+        "look_width": "theme",
+        "look_margins": 100,
+        "look_heading": 100,
+        "look_text": 100,
+        "look_label": 0,
+        "look_animate": true,
+        "look_rule_top": false,
+        "look_rule_bottom": false,
+        "look_anchor": ""
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "featured",
+    "about",
+    "properties",
+    "rail",
+    "intro",
+    "stats",
+    "marquee",
+    "process",
+    "services",
+    "film",
+    "testimonial",
+    "agent",
+    "contact"
+  ]
+}

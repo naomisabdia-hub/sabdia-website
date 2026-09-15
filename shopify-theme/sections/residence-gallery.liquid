@@ -49,7 +49,24 @@
   assign use_blocks = false
   if section.blocks.size > 0
     assign use_blocks = true
-    assign all_count = section.blocks.size
+    # Only blocks that still hold a photo or a film count (15 Sep 2026): a
+    # block left in place after its photo is removed is skipped below, so it
+    # adds no tile, no grid slot and nothing to "View all photos".
+    assign all_count = 0
+    for block in section.blocks
+      if block.type == 'video'
+        if block.settings.video != blank
+          assign bmp4 = block.settings.video.sources | where: 'format', 'mp4' | first
+          if bmp4 or block.settings.video.preview_image or block.settings.poster != blank
+            assign all_count = all_count | plus: 1
+          endif
+        elsif block.settings.video_url != blank or block.settings.poster != blank
+          assign all_count = all_count | plus: 1
+        endif
+      elsif block.settings.image != blank
+        assign all_count = all_count | plus: 1
+      endif
+    endfor
   else
     assign all_count = product.images.size | minus: 1
   endif
@@ -67,10 +84,8 @@
     <div class="prop-gallery-grid gn-{{ gallery_count }}" id="galleryGrid">
       {%- assign gdelays = ',d1,d2' | split: ',' -%}
       {%- if use_blocks -%}
+        {%- assign g_n = 0 -%}
         {%- for block in section.blocks -%}
-          {%- assign i = forloop.index0 | modulo: 3 -%}
-          {%- assign in_grid = true -%}
-          {%- if forloop.index > tiles -%}{%- assign in_grid = false -%}{%- endif -%}
           {%- liquid
             assign cap = block.settings.caption
             assign vid = ''
@@ -99,8 +114,13 @@
             endif
           -%}
           {%- if pic == blank and vid == blank -%}{%- continue -%}{%- endif -%}
+          {%- comment -%} Counted among the blocks that still hold a photo or film, so an emptied block leaves no gap (15 Sep 2026). {%- endcomment -%}
+          {%- assign g_n = g_n | plus: 1 -%}
+          {%- assign i = g_n | minus: 1 | modulo: 3 -%}
+          {%- assign in_grid = true -%}
+          {%- if g_n > tiles -%}{%- assign in_grid = false -%}{%- endif -%}
           {%- if in_grid -%}
-            <div class="gallery-item gallery-tile reveal-wipe {{ gdelays[i] }}{% if vid != blank %} gallery-video{% endif %}" data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 1800, height: 1350, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}" role="button" tabindex="0" aria-label="{% if vid != blank %}Play video{% else %}View photo{% endif %}: {{ cap | escape }}" {{ block.shopify_attributes }}>
+            <div class="gallery-item gallery-tile reveal-wipe {{ gdelays[i] }}{% if vid != blank %} gallery-video{% endif %}" data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} {% if pic != blank %}data-src="{{ pic | image_url: width: 1800, height: 1350, crop: 'center' }}"{% endif %} data-alt="{{ cap | escape }}" role="button" tabindex="0" aria-label="{% if vid != blank %}Play video{% else %}View photo{% endif %}: {{ cap | escape }}" {{ block.shopify_attributes }}>
               {%- if pic != blank -%}
                 <img class="gallery-img" src="{{ pic | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ cap | escape }}" width="900" height="675" loading="lazy" decoding="async">
               {%- else -%}
@@ -108,7 +128,7 @@
               {%- endif -%}
             </div>
           {%- else -%}
-            <span hidden data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}"></span>
+            <span hidden data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} {% if pic != blank %}data-src="{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}"{% endif %} data-alt="{{ cap | escape }}"></span>
           {%- endif -%}
         {%- endfor -%}
       {%- else -%}
@@ -168,7 +188,7 @@
             endif
           -%}
           {%- if pic == blank and vid == blank -%}{%- continue -%}{%- endif -%}
-          <span data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} data-src="{% if pic != blank %}{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}{% endif %}" data-stage="{% if pic != blank %}{{ pic | image_url: width: 1800 }}{% endif %}" data-thumb="{% if pic != blank %}{{ pic | image_url: width: 320, height: 240, crop: 'center' }}{% endif %}" data-alt="{{ cap | escape }}" {{ block.shopify_attributes }}></span>
+          <span data-lb-item {% if vid != blank %}data-video="{{ vid }}"{% endif %} {% if pic != blank %}data-src="{{ pic | image_url: width: 2000, height: 1400, crop: 'center' }}" data-stage="{{ pic | image_url: width: 1800 }}" data-thumb="{{ pic | image_url: width: 320, height: 240, crop: 'center' }}"{% endif %} data-alt="{{ cap | escape }}" {{ block.shopify_attributes }}></span>
         {%- endfor -%}
       {%- else -%}
         {%- for image in product.images offset: 1 -%}
@@ -196,7 +216,7 @@
 {%- endif -%}
 
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
-  <img id="lbImg" src="" alt="">
+  <img id="lbImg" alt="">
   <video id="lbVideo" controls playsinline hidden></video>
   <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&larr;</button>
   <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&rarr;</button>
@@ -210,6 +230,8 @@
     lb.dataset.lbInit = '1';
     var items = Array.prototype.slice.call(document.querySelectorAll('[data-lb-item]')).filter(function (el) { return !el.closest('[id^="pg-"]'); });
     if (!items.length) return;
+    /* One photo: nothing to page through, so no arrows (15 Sep 2026). */
+    if (items.length < 2) { document.getElementById('lbPrev').style.display = 'none'; document.getElementById('lbNext').style.display = 'none'; }
     var img = document.getElementById('lbImg'), cap = document.getElementById('lbCap'), count = document.getElementById('lbCount');
     var i = 0, lastFocus = null;
     var house = {{ product.handle | json }};
@@ -296,13 +318,16 @@
     var i = 0, on = 0, reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function capOf(n) { var a = data[n].getAttribute('data-alt') || ''; return (lb && lb.__caption) ? lb.__caption(a) : a; }
     function roomOf(n) { return capOf(n).replace(/\s*·.*$/, ''); }
+    /* One photo: no arrows or filmstrip to step through (15 Sep 2026). */
+    if (data.length < 2) { document.getElementById('pgPrev').style.display = 'none'; document.getElementById('pgNext').style.display = 'none'; strip.style.display = 'none'; }
     /* Filmstrip */
     data.forEach(function (el, n) {
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'pg-thumb' + (el.getAttribute('data-video') ? ' pg-thumb-video' : '');
       b.setAttribute('role', 'tab'); b.setAttribute('aria-label', capOf(n));
-      var im = document.createElement('img'); im.loading = 'lazy'; im.decoding = 'async'; im.alt = '';
-      im.src = el.getAttribute('data-thumb') || el.getAttribute('data-src'); b.appendChild(im);
+      /* A film with no poster has no still: its thumb is the play mark alone, never an empty img (15 Sep 2026). */
+      var tsrc = el.getAttribute('data-thumb') || el.getAttribute('data-src');
+      if (tsrc) { var im = document.createElement('img'); im.loading = 'lazy'; im.decoding = 'async'; im.alt = ''; im.src = tsrc; b.appendChild(im); }
       b.addEventListener('click', function () { show(n); });
       strip.appendChild(b);
     });

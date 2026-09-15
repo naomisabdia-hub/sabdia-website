@@ -112,16 +112,28 @@
   assign mc_dim = section.settings.hero_dim | default: 52 | divided_by: 100.0
   assign mc_featured = section.settings.show_featured
   assign mc_style = 'aspect-ratio:' | append: section.settings.card_shape | default: '16/10'
+  # No film, no chosen photo and no residence photo to fall back on (15 Sep
+  # 2026): the hero stands on the dark ground so its light words still read.
+  assign mc_bare = true
+  if hero_video != blank or use_chosen or hero_auto
+    assign mc_bare = false
+  endif
 -%}
-<section class="page-hero ph-sized ph-pos-{{ section.settings.hero_words | default: 'base-left' }} ph-scrim-{{ section.settings.hero_scrim | default: 'corner' }}" style="--ph-h:{{ mc_h }};--ph-hm:{{ mc_hm }};--ph-dim:{{ mc_dim }}">
+<section class="page-hero ph-sized ph-pos-{{ section.settings.hero_words | default: 'base-left' }} ph-scrim-{{ section.settings.hero_scrim | default: 'corner' }}" style="--ph-h:{{ mc_h }};--ph-hm:{{ mc_hm }};--ph-dim:{{ mc_dim }}{% if mc_bare %};background:var(--dark){% endif %}">
   {%- if hero_video != blank -%}
     <video class="page-hero-video" src="{{ hero_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if section.settings.image %} poster="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}"{% endif %}></video>
   {%- elsif use_chosen and section.settings.image -%}
-    <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
+    <picture>
+      <source media="(max-width: 768px)" srcset="{{ section.settings.image | image_url: width: 900, height: 1600, crop: 'center' }} 900w, {{ section.settings.image | image_url: width: 1300, height: 2311, crop: 'center' }} 1300w" sizes="100vw">
+      <img src="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
+    </picture>
   {%- elsif use_chosen and section.settings.image_ext != blank -%}
     <img src="{% render 'ext-variant', src: section.settings.image_ext, w: 1920, h: 1080 %}" alt="" loading="eager" width="1920" height="1080">
   {%- elsif hero_auto -%}
-    <img src="{{ hero_auto | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
+    <picture>
+      <source media="(max-width: 768px)" srcset="{{ hero_auto | image_url: width: 900, height: 1600, crop: 'center' }} 900w, {{ hero_auto | image_url: width: 1300, height: 2311, crop: 'center' }} 1300w" sizes="100vw">
+      <img src="{{ hero_auto | image_url: width: 1920, height: 1080, crop: 'center' }}" alt="" loading="eager" width="1920" height="1080">
+    </picture>
   {%- endif -%}
   <div class="page-hero-ov"></div>
   <div class="page-hero-content inner">

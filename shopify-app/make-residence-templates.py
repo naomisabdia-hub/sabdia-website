@@ -6,17 +6,20 @@ residence section belong to that residence alone.
 
     python3 shopify-app/make-residence-templates.py <theme id> [--force] [handles...]
 
-Starts from the store's page.collection-item.json (Naomi's dials), then:
-Collection residence - Media folder = the residence's product (its
-photographs and film in Products › Media), hero photo and film poster =
-the main photo, film = the film in that folder, one Photo block per
-photograph; Similar residences - the cards of residences with a folder
-show its main photo (from Shopify, not Supabase) and link to their pages,
-HAVEN and SPECTRE join the list. A template already on disk is rewritten
+Starts from the store's page.collection-item.json (Naomi's dials), arranged
+into the 15 Sep 2026 sections if it is not already, then: Header - Media
+folder = the residence's product (its photographs and film in Products ›
+Media), hero photo = the main photo, film = the film in that folder;
+About - the second and third photographs as its two Photo blocks; The
+residence - one Photo block per photograph; The film - the folder's film,
+the main photo as poster, landscape shape when the film is; More from the
+Collection - the cards of residences with a folder show its main photo
+(from Shopify, not Supabase) and link to their pages, every completed
+residence joins the list. A template already on disk is rewritten
 only with --force. First push ships them; push-live.sh then lists them in
 .shopifyignore so the store copy leads.
 """
-import json, os, re, shutil, subprocess, sys, tempfile, urllib.request
+import importlib.util, json, os, re, shutil, subprocess, sys, tempfile, urllib.request
 
 STORE = "b91p0j-f4.myshopify.com"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -55,6 +58,14 @@ def media(handle):
             w = max((s["width"] for s in srcs), default=0); h = max((s["height"] for s in srcs), default=0)
             films.append({"name": n.get("filename") or "", "landscape": w > h})
     return p["title"], photos, films
+
+
+def arrange():
+    """The template arrangement (Header, About, The residence, The film, The Series, Now selling, More from the Collection), borrowed from arrange-collection-item-page.py."""
+    spec = importlib.util.spec_from_file_location("arrange_collection_item_page", os.path.join(ROOT, "shopify-app", "arrange-collection-item-page.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.convert
 
 
 def similar_blocks(sec, heroes):
@@ -107,14 +118,22 @@ def main():
         film = films[0] if films else None
         film_ref = f"shopify://files/videos/{film['name']}" if film and film["name"] else ""
         t = json.loads(json.dumps(base))
+        arrange()(t)
+        shape = ("16/9" if film["landscape"] else "9/16") if film else None
         for key, sec in t["sections"].items():
             st = sec.setdefault("settings", {})
             typ = sec.get("type")
-            if typ == "main-collection-item":
-                st.update({"media_product": h, "hero_image": f"shopify://shop_images/{hero}", "film": film_ref,
-                           "film_poster": f"shopify://shop_images/{hero}", "film_2": "", "film_2_poster": "", "side_photo_1": "", "side_photo_2": ""})
-                if film:
-                    st["film_shape"] = "16/9" if film["landscape"] else "9/16"
+            if typ == "collection-item-header":
+                st.update({"media_product": h, "hero_image": f"shopify://shop_images/{hero}", "film": film_ref})
+            elif typ == "collection-item-about":
+                st["media_product"] = h
+                blocks, order = {}, []
+                for i, f in enumerate(rest[1:3], 1):  # the second and third photographs stand beside the story
+                    blocks[f"photo_{i}"] = {"type": "photo", "settings": {"image": f"shopify://shop_images/{f}"}}
+                    order.append(f"photo_{i}")
+                sec["blocks"], sec["block_order"] = blocks, order
+            elif typ == "collection-item-gallery":
+                st["media_product"] = h
                 blocks, order = {}, []
                 for i, f in enumerate(rest[:MAX_BLOCKS], 1):
                     blocks[f"photo_{i}"] = {"type": "photo", "settings": {"image": f"shopify://shop_images/{f}"}}
@@ -122,6 +141,11 @@ def main():
                 sec["blocks"], sec["block_order"] = blocks, order
                 if len(rest) > MAX_BLOCKS:
                     print(f"  {h}: {len(rest)} photos, only the first {MAX_BLOCKS} get blocks (Shopify's limit); delete the blocks and the gallery shows them all from the Media folder")
+            elif typ == "collection-item-film":
+                st.update({"media_product": h, "film": film_ref, "poster": f"shopify://shop_images/{hero}"})
+                if shape:
+                    st["shape"] = shape
+                sec.pop("disabled", None)
             elif typ == "collection-similar":
                 similar_blocks(sec, heroes)
         open(out, "w").write(json.dumps(t, indent=2, ensure_ascii=False) + "\n")

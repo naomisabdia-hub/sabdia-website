@@ -1,21 +1,208 @@
 {
   "sections": {
-    "main": {
-      "type": "main-collection-item",
+    "series": {
+      "type": "series-strip",
+      "settings": {}
+    },
+    "similar": {
+      "type": "collection-similar",
+      "settings": {},
+      "blocks": {
+        "residence-1": {
+          "type": "residence",
+          "settings": {
+            "name": "MILOS",
+            "loc": "Camp Hill QLD, Australia",
+            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos-poster.jpg",
+            "link": "/pages/collection-milos",
+            "page": "collection-milos",
+            "image": "shopify://shop_images/milos-hero.jpg"
+          }
+        },
+        "residence-2": {
+          "type": "residence",
+          "settings": {
+            "name": "AMMOS",
+            "loc": "Taringa QLD, Australia",
+            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos-poster.jpg",
+            "link": "/pages/collection-ammos",
+            "page": "collection-ammos",
+            "image": "shopify://shop_images/ammos-hero.jpg"
+          }
+        },
+        "residence-3": {
+          "type": "residence",
+          "settings": {
+            "name": "CALLE",
+            "loc": "Camp Hill QLD, Australia",
+            "image_ext": "/images/collection-calle.jpg",
+            "link": "/pages/collection-calle",
+            "page": "collection-calle"
+          }
+        },
+        "residence-4": {
+          "type": "residence",
+          "settings": {
+            "name": "ELYSIUM",
+            "loc": "Holland Park QLD, Australia",
+            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium-poster.jpg",
+            "link": "/pages/collection-elysium",
+            "page": "collection-elysium"
+          }
+        },
+        "residence-5": {
+          "type": "residence",
+          "settings": {
+            "name": "ALHAMBRA",
+            "loc": "Brisbane QLD, Australia",
+            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra-poster.jpg",
+            "link": "/pages/collection-alhambra",
+            "page": "collection-alhambra",
+            "image": "shopify://shop_images/alhambra-hero.jpg"
+          }
+        },
+        "residence-6": {
+          "type": "residence",
+          "settings": {
+            "name": "ENCANTO",
+            "loc": "Camp Hill QLD, Australia",
+            "image_ext": "/images/collection-encanto.jpg",
+            "link": "/pages/collection-encanto",
+            "page": "collection-encanto",
+            "image": "shopify://shop_images/encanto-hero.jpg"
+          }
+        },
+        "residence-7": {
+          "type": "residence",
+          "settings": {
+            "name": "NERO",
+            "loc": "Rochedale QLD, Australia",
+            "image_ext": "/images/collection-nero.jpg",
+            "link": "/pages/collection-nero",
+            "page": "collection-nero"
+          }
+        },
+        "residence-8": {
+          "type": "residence",
+          "settings": {
+            "name": "HERMOSA",
+            "loc": "Camp Hill QLD, Australia",
+            "image_ext": "/images/collection-hermosa.jpg",
+            "link": "/pages/collection-hermosa",
+            "page": "collection-hermosa",
+            "image": "shopify://shop_images/hermosa-hero.jpg"
+          }
+        },
+        "residence-9": {
+          "type": "residence",
+          "settings": {
+            "name": "FRASER",
+            "loc": "Graceville QLD, Australia",
+            "image_ext": "/images/collection-fraser.jpg",
+            "link": "/pages/collection-fraser",
+            "page": "collection-fraser"
+          }
+        },
+        "residence-10": {
+          "type": "residence",
+          "settings": {
+            "name": "PETRA",
+            "loc": "Taringa QLD, Australia",
+            "image_ext": "/images/collection-petra.jpg",
+            "link": "/pages/collection-petra",
+            "page": "collection-petra",
+            "image": "shopify://shop_images/petra-hero.jpg"
+          }
+        },
+        "residence-11": {
+          "type": "residence",
+          "settings": {
+            "name": "KIRRA",
+            "loc": "Brisbane QLD, Australia",
+            "image_ext": "/images/caspian-hero.jpg",
+            "link": "/pages/collection-kirra",
+            "page": "collection-kirra",
+            "image": "shopify://shop_images/kirra-hero.jpg"
+          }
+        },
+        "residence_haven": {
+          "type": "residence",
+          "settings": {
+            "page": "collection-haven",
+            "image": "shopify://shop_images/haven-hero.jpg"
+          }
+        },
+        "residence_spectre": {
+          "type": "residence",
+          "settings": {
+            "page": "collection-spectre",
+            "image": "shopify://shop_images/spectre-hero.jpg"
+          }
+        },
+        "residence_eden": {
+          "type": "residence",
+          "settings": {
+            "page": "collection-eden",
+            "image": "shopify://shop_images/eden-hero.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "residence-1",
+        "residence-2",
+        "residence-3",
+        "residence-4",
+        "residence-5",
+        "residence-6",
+        "residence-7",
+        "residence-8",
+        "residence-9",
+        "residence-10",
+        "residence-11",
+        "residence_haven",
+        "residence_spectre",
+        "residence_eden"
+      ]
+    },
+    "header": {
+      "type": "collection-item-header",
       "settings": {
-        "hero_media": "film",
-        "show_side_photos": true,
-        "body_film": "same",
-        "show_mosaic": false,
         "media_product": "milos",
         "hero_image": "shopify://shop_images/milos-hero.jpg",
         "film": "shopify://files/videos/milos-film.mp4",
-        "film_poster": "shopify://shop_images/milos-hero.jpg",
-        "film_2": "",
-        "film_2_poster": "",
-        "side_photo_1": "",
-        "side_photo_2": "",
-        "film_shape": "9/16"
+        "hero_media": "film"
+      }
+    },
+    "about": {
+      "type": "collection-item-about",
+      "settings": {
+        "media_product": "milos",
+        "show_side_photos": true
+      },
+      "blocks": {
+        "photo_1": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/milos-living-01.jpg"
+          }
+        },
+        "photo_2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/milos-facade-detail-01.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "photo_1",
+        "photo_2"
+      ]
+    },
+    "gallery": {
+      "type": "collection-item-gallery",
+      "settings": {
+        "media_product": "milos",
+        "show_mosaic": false
       },
       "blocks": {
         "photo_1": {
@@ -190,174 +377,27 @@
         "photo_24"
       ]
     },
-    "series": {
-      "type": "series-strip",
-      "settings": {}
+    "film": {
+      "type": "collection-item-film",
+      "settings": {
+        "media_product": "milos",
+        "shape": "9/16",
+        "film": "shopify://files/videos/milos-film.mp4",
+        "poster": "shopify://shop_images/milos-hero.jpg"
+      }
     },
-    "similar": {
-      "type": "collection-similar",
-      "settings": {},
-      "blocks": {
-        "residence-1": {
-          "type": "residence",
-          "settings": {
-            "name": "MILOS",
-            "loc": "Camp Hill QLD, Australia",
-            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/milos-poster.jpg",
-            "link": "/pages/collection-milos",
-            "page": "collection-milos",
-            "image": "shopify://shop_images/milos-hero.jpg"
-          }
-        },
-        "residence-2": {
-          "type": "residence",
-          "settings": {
-            "name": "AMMOS",
-            "loc": "Taringa QLD, Australia",
-            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/ammos-poster.jpg",
-            "link": "/pages/collection-ammos",
-            "page": "collection-ammos",
-            "image": "shopify://shop_images/ammos-hero.jpg"
-          }
-        },
-        "residence-3": {
-          "type": "residence",
-          "settings": {
-            "name": "CALLE",
-            "loc": "Camp Hill QLD, Australia",
-            "image_ext": "/images/collection-calle.jpg",
-            "link": "/pages/collection-calle",
-            "page": "collection-calle"
-          }
-        },
-        "residence-4": {
-          "type": "residence",
-          "settings": {
-            "name": "ELYSIUM",
-            "loc": "Holland Park QLD, Australia",
-            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/elysium-poster.jpg",
-            "link": "/pages/collection-elysium",
-            "page": "collection-elysium"
-          }
-        },
-        "residence-5": {
-          "type": "residence",
-          "settings": {
-            "name": "ALHAMBRA",
-            "loc": "Brisbane QLD, Australia",
-            "image_ext": "https://fvczsjcrvwzqtcbforgo.supabase.co/storage/v1/object/public/media/films/alhambra-poster.jpg",
-            "link": "/pages/collection-alhambra",
-            "page": "collection-alhambra",
-            "image": "shopify://shop_images/alhambra-hero.jpg"
-          }
-        },
-        "residence-6": {
-          "type": "residence",
-          "settings": {
-            "name": "ENCANTO",
-            "loc": "Camp Hill QLD, Australia",
-            "image_ext": "/images/collection-encanto.jpg",
-            "link": "/pages/collection-encanto",
-            "page": "collection-encanto",
-            "image": "shopify://shop_images/encanto-hero.jpg"
-          }
-        },
-        "residence-7": {
-          "type": "residence",
-          "settings": {
-            "name": "NERO",
-            "loc": "Rochedale QLD, Australia",
-            "image_ext": "/images/collection-nero.jpg",
-            "link": "/pages/collection-nero",
-            "page": "collection-nero"
-          }
-        },
-        "residence-8": {
-          "type": "residence",
-          "settings": {
-            "name": "HERMOSA",
-            "loc": "Camp Hill QLD, Australia",
-            "image_ext": "/images/collection-hermosa.jpg",
-            "link": "/pages/collection-hermosa",
-            "page": "collection-hermosa",
-            "image": "shopify://shop_images/hermosa-hero.jpg"
-          }
-        },
-        "residence-9": {
-          "type": "residence",
-          "settings": {
-            "name": "FRASER",
-            "loc": "Graceville QLD, Australia",
-            "image_ext": "/images/collection-fraser.jpg",
-            "link": "/pages/collection-fraser",
-            "page": "collection-fraser"
-          }
-        },
-        "residence-10": {
-          "type": "residence",
-          "settings": {
-            "name": "PETRA",
-            "loc": "Taringa QLD, Australia",
-            "image_ext": "/images/collection-petra.jpg",
-            "link": "/pages/collection-petra",
-            "page": "collection-petra",
-            "image": "shopify://shop_images/petra-hero.jpg"
-          }
-        },
-        "residence-11": {
-          "type": "residence",
-          "settings": {
-            "name": "KIRRA",
-            "loc": "Brisbane QLD, Australia",
-            "image_ext": "/images/caspian-hero.jpg",
-            "link": "/pages/collection-kirra",
-            "page": "collection-kirra",
-            "image": "shopify://shop_images/kirra-hero.jpg"
-          }
-        },
-        "residence_haven": {
-          "type": "residence",
-          "settings": {
-            "page": "collection-haven",
-            "image": "shopify://shop_images/haven-hero.jpg"
-          }
-        },
-        "residence_spectre": {
-          "type": "residence",
-          "settings": {
-            "page": "collection-spectre",
-            "image": "shopify://shop_images/spectre-hero.jpg"
-          }
-        },
-        "residence_eden": {
-          "type": "residence",
-          "settings": {
-            "page": "collection-eden",
-            "image": "shopify://shop_images/eden-hero.jpg"
-          }
-        }
-      },
-      "block_order": [
-        "residence-1",
-        "residence-2",
-        "residence-3",
-        "residence-4",
-        "residence-5",
-        "residence-6",
-        "residence-7",
-        "residence-8",
-        "residence-9",
-        "residence-10",
-        "residence-11",
-        "residence_haven",
-        "residence_spectre",
-        "residence_eden"
-      ]
+    "closing": {
+      "type": "collection-item-closing",
+      "settings": {}
     }
   },
   "order": [
-    "main",
+    "header",
+    "about",
+    "gallery",
+    "film",
     "series",
+    "closing",
     "similar"
   ]
 }

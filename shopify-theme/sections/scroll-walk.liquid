@@ -145,6 +145,7 @@
       img.crossOrigin = 'anonymous';
       img.decoding = 'async';
       img.onload = function () { frames[i] = img; if (i > loadedMax) loadedMax = i; cb && cb(); draw(); };
+      img.onerror = function () { cb && cb(); }; /* a missing frame must not stall the loading passes (15 Sep 2026) */
       img.src = url(i);
     }
 
@@ -167,9 +168,11 @@
       if (started) return;
       started = true;
       fetch(base + '/manifest.json')
-        .then(function (r) { return r.json(); })
-        .then(boot)
-        .catch(function () { /* manifest missing: the section stays a still */ });
+        .then(function (r) { if (!r.ok) throw new Error('manifest ' + r.status); return r.json(); })
+        .then(function (m) { if (!m || !(m.total > 0) || !m.chapters) throw new Error('manifest'); boot(m); })
+        /* Folder or manifest missing (15 Sep 2026): there is no still to show,
+           so the section folds away instead of leaving a blank stage. */
+        .catch(function () { section.style.display = 'none'; });
     }
 
     function nearestLoaded(i) {

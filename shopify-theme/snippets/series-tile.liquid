@@ -22,10 +22,22 @@
       assign t_kind = 'CAROUSEL'
     endif
   endif
+  # No cover photo (removed, or a synced post without one, 15 Sep 2026): a
+  # carousel shows its first slide, a reel its opening frame; a post with
+  # neither prints no tile rather than an empty panel.
+  assign t_thumb = thumb
+  if t_thumb == blank and has_slides
+    assign t_thumb = slides.first
+  endif
 -%}
+{%- if t_thumb != blank or video != blank -%}
 {%- capture card_inner -%}
-  <img src="{{ thumb }}" alt="{{ t_alt }}" loading="lazy" width="540" height="840">
-  {%- if video != blank -%}
+  {%- if t_thumb != blank -%}
+    <img src="{{ t_thumb }}" alt="{{ t_alt }}" loading="lazy" width="540" height="840">
+  {%- endif -%}
+  {%- if video != blank and t_thumb == blank -%}
+    <video class="series-vid" muted loop playsinline preload="metadata" src="{{ video }}#t=0.1" data-src="{{ video }}" aria-hidden="true" tabindex="-1" style="opacity:1"></video>
+  {%- elsif video != blank -%}
     <video class="series-vid" muted loop playsinline preload="none" data-src="{{ video }}" aria-hidden="true" tabindex="-1"></video>
   {%- endif -%}
   <div class="series-card-ov"></div>
@@ -64,4 +76,5 @@
   >{{ card_inner }}</div>
 {%- else -%}
   <a class="series-card" href="{{ link }}" target="_blank" rel="noopener" aria-label="{{ t_alt }} - view on Instagram" {{ attrs }}>{{ card_inner }}</a>
+{%- endif -%}
 {%- endif -%}

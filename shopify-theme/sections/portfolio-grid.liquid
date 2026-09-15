@@ -26,12 +26,18 @@
 {%- liquid
   assign sid = section.id
   assign pcount = 0
+  assign empty_blocks = 0
   capture styles_raw
     for block in section.blocks
       assign rp = block.settings.page
       if rp == blank and block.settings.link contains '/pages/'
         assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
         assign rp = pages[rp_handle]
+      endif
+      # A block with no residence, name or photo is left out of the grid,
+      # so it is not counted either (15 Sep 2026).
+      if block.settings.product == blank and rp.title == blank and block.settings.name == blank and block.settings.image == blank and block.settings.image_ext == blank
+        assign empty_blocks = empty_blocks | plus: 1
       endif
       if block.settings.product != blank
         assign r_style = block.settings.style | default: block.settings.product.metafields.custom.style.value | strip
@@ -83,7 +89,7 @@
     assign sold_handles = sold_csv | split: ','
     assign current_handles = current_handles | concat: sold_handles
   endif
-  assign total = section.blocks.size
+  assign total = section.blocks.size | minus: empty_blocks
   if show_current
     assign total = total | plus: current_handles.size
   endif
@@ -166,12 +172,12 @@
             {%- if pstatus contains 'Sold' -%}{%- assign grp = section.settings.filter_sold | default: 'Sold' -%}{%- endif -%}
             {%- assign pcount = pcount | plus: 1 -%}
             <a href="{{ product.url }}" class="pf-card reveal{% if more_after > 0 and pcount > more_after %} pf-more{% endif %}" data-port-card data-style="{{ grp | escape }}" data-suburb="{{ product.metafields.custom.suburb.value | escape }}">
+              {%- if product.featured_image -%}
               <div class="pf-media">
-                {%- if product.featured_image -%}
                   <img src="{{ product.featured_image | image_url: width: 1200, height: 900, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="900" loading="lazy" decoding="async">
-                {%- endif -%}
                 <span class="port-film-tag">{{ pstatus }}</span>
               </div>
+              {%- endif -%}
               <div class="pf-info">
                 <div class="pf-name">{% render 'residence-name', product: product %} <span aria-hidden="true">&rarr;</span></div>
                 <div class="pf-meta">{{ product.metafields.custom.suburb.value }}{% if product.metafields.custom.year.value != blank %} <i>&middot;</i> {{ product.metafields.custom.year.value }}{% endif %}</div>
@@ -246,7 +252,7 @@
           assign r_year = rp.metafields.custom.year.value
           assign r_image_ext = rp.metafields.custom.image.value | default: block.settings.image_ext
           if rp.metafields.custom.gallery.value.size > 0
-            if r_image_ext == blank or r_image_ext contains '/films/'
+            if r_image_ext == blank or r_image_ext contains '/films/' or r_image_ext contains '/images/'
               assign r_image_ext = rp.metafields.custom.gallery.value | first
             endif
           endif
@@ -291,7 +297,20 @@
           endif
         -%}
         {%- endif -%}
+        {%- liquid
+          # No photo anywhere (the block, the residence, its page): the card
+          # keeps its name and details without an empty frame, and a block
+          # with nothing chosen at all is left out (15 Sep 2026).
+          assign pf_photo = false
+          if block.settings.image or r_image_ext != blank
+            assign pf_photo = true
+          elsif rprod != blank and rprod.featured_image
+            assign pf_photo = true
+          endif
+        -%}
+        {%- if pf_photo == false and r_name == blank -%}{%- assign pcount = pcount | minus: 1 -%}{%- continue -%}{%- endif -%}
         {%- capture card_inner -%}
+          {%- if pf_photo -%}
           <div class="pf-media">
             {%- if block.settings.image -%}
               <img src="{{ block.settings.image | image_url: width: 1200, height: 900, crop: 'center' }}" alt="{{ r_name | escape }}{% if r_suburb != blank %}, {{ r_suburb | escape }}{% endif %}" width="1200" height="900" loading="lazy" decoding="async">
@@ -308,6 +327,7 @@
               <span class="pf-style">{{ r_style }}</span>
             {%- endif -%}
           </div>
+          {%- endif -%}
           <div class="pf-info">
             <div class="pf-name">{{ r_name }}{% if r_link != blank and section.settings.show_arrow %} <span aria-hidden="true">&rarr;</span>{% endif %}</div>
             {%- if section.settings.show_meta -%}<div class="pf-meta">{{ r_suburb }}{% if r_style != blank %} <i>&middot;</i> {{ r_style }}{% endif %}{% if r_year != blank %} <i>&middot;</i> {{ r_year }}{% endif %}</div>{%- endif -%}

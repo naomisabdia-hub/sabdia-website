@@ -35,7 +35,7 @@
       </div>
     {%- elsif bl_layout == 'editorial' -%}
       {%- assign lead = blog.articles | first -%}
-      <a href="{{ lead.url }}" class="jn-lead reveal">
+      <a href="{{ lead.url }}" class="jn-lead reveal"{% unless lead.image %} style="grid-template-columns:1fr"{% endunless %}>
         {%- if lead.image -%}
           {%- assign lh = 1200 | divided_by: lead.image.aspect_ratio | round -%}
           <img src="{{ lead.image | image_url: width: 1200 }}" alt="{{ lead.title | escape }}" width="1200" height="{{ lh }}" loading="eager">

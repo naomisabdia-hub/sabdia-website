@@ -11,7 +11,7 @@
   if st == 'For Sale' and settings.label_for_sale != blank
     assign chip = settings.label_for_sale
   endif
-  assign img = product.featured_image
+  assign img = product.featured_image | default: product.featured_media.preview_image
   if featured
     assign iw = 900
   else
@@ -62,7 +62,8 @@
         {%- if m.beds.value != blank -%}<li><b>{{ m.beds.value }}</b> Bed</li>{%- endif -%}
         {%- if m.baths.value != blank -%}<li><b>{{ m.baths.value }}</b> Bath</li>{%- endif -%}
         {%- if m.cars.value != blank -%}<li><b>{{ m.cars.value }}</b> Garage</li>{%- endif -%}
-        {%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>m&sup2;</li>{%- endif -%}
+        {%- if m.build_size.value != blank -%}<li><b>{{ m.build_size.value }}</b>m&sup2; build</li>{%- endif -%}
+        {%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>m&sup2; land</li>{%- endif -%}
       </ul>
       {%- endif -%}
       {%- if section.settings.card_cta != blank -%}<span class="rr-cta">{{ section.settings.card_cta }}</span>{%- endif -%}

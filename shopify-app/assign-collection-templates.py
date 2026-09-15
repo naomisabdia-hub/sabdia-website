@@ -3,15 +3,17 @@
 Content › Pages › MILOS gets theme template collection-milos, and so on,
 so the Photo blocks and pickers in its Collection residence section are
 its own. Creates the HAVEN and SPECTRE pages (they never had one) with
-their story, style and suburb. Run only once the theme carrying
-page.collection-<handle>.json is live (push-live.sh does).
+their story, style and suburb. CALLE, ELYSIUM and NERO (15 Sep 2026) move
+off the shared collection-item template so their Series Post blocks are
+their own (add-series-blocks.py creates those templates). Run only once the
+theme carrying page.collection-<handle>.json is live (push-live.sh does).
 
     python3 shopify-app/assign-collection-templates.py
 """
 import json, os, sys, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-EXISTING = ("milos", "petra", "kirra", "hermosa", "encanto", "ammos", "alhambra")
+EXISTING = ("milos", "petra", "kirra", "hermosa", "encanto", "ammos", "alhambra", "calle", "elysium", "nero")
 NEW = {
     "haven": dict(title="HAVEN", loc="Camp Hill QLD, Australia", style="Hamptons", year=None,
                   headline="Weatherboard and arches, <em>in Camp Hill</em>.",

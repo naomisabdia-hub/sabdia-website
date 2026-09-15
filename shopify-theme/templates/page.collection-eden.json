@@ -1,68 +1,5 @@
 {
   "sections": {
-    "main": {
-      "type": "main-collection-item",
-      "settings": {
-        "hero_media": "film",
-        "show_side_photos": true,
-        "body_film": "same",
-        "show_mosaic": false,
-        "media_product": "eden",
-        "hero_image": "shopify://shop_images/eden-hero.jpg",
-        "film": "",
-        "film_poster": "shopify://shop_images/eden-hero.jpg",
-        "film_2": "",
-        "film_2_poster": "",
-        "side_photo_1": "",
-        "side_photo_2": ""
-      },
-      "blocks": {
-        "photo_1": {
-          "type": "photo",
-          "settings": {
-            "image": "shopify://shop_images/eden-bedroom-01.jpg"
-          }
-        },
-        "photo_2": {
-          "type": "photo",
-          "settings": {
-            "image": "shopify://shop_images/eden-kitchen-detail-01.jpg"
-          }
-        },
-        "photo_3": {
-          "type": "photo",
-          "settings": {
-            "image": "shopify://shop_images/eden-kitchen-01.jpg"
-          }
-        },
-        "photo_4": {
-          "type": "photo",
-          "settings": {
-            "image": "shopify://shop_images/eden-kitchen-detail-02.jpg"
-          }
-        },
-        "photo_5": {
-          "type": "photo",
-          "settings": {
-            "image": "shopify://shop_images/eden-kitchen-02.jpg"
-          }
-        },
-        "photo_6": {
-          "type": "photo",
-          "settings": {
-            "image": "shopify://shop_images/eden-bathroom-01.jpg"
-          }
-        }
-      },
-      "block_order": [
-        "photo_1",
-        "photo_2",
-        "photo_3",
-        "photo_4",
-        "photo_5",
-        "photo_6"
-      ]
-    },
     "series": {
       "type": "series-strip",
       "settings": {}
@@ -226,11 +163,113 @@
         "residence_spectre",
         "residence_eden"
       ]
+    },
+    "header": {
+      "type": "collection-item-header",
+      "settings": {
+        "media_product": "eden",
+        "hero_image": "shopify://shop_images/eden-hero.jpg",
+        "film": "",
+        "hero_media": "film"
+      }
+    },
+    "about": {
+      "type": "collection-item-about",
+      "settings": {
+        "media_product": "eden",
+        "show_side_photos": true
+      },
+      "blocks": {
+        "photo_1": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/eden-kitchen-detail-01.jpg"
+          }
+        },
+        "photo_2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/eden-kitchen-01.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "photo_1",
+        "photo_2"
+      ]
+    },
+    "gallery": {
+      "type": "collection-item-gallery",
+      "settings": {
+        "media_product": "eden",
+        "show_mosaic": false
+      },
+      "blocks": {
+        "photo_1": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/eden-bedroom-01.jpg"
+          }
+        },
+        "photo_2": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/eden-kitchen-detail-01.jpg"
+          }
+        },
+        "photo_3": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/eden-kitchen-01.jpg"
+          }
+        },
+        "photo_4": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/eden-kitchen-detail-02.jpg"
+          }
+        },
+        "photo_5": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/eden-kitchen-02.jpg"
+          }
+        },
+        "photo_6": {
+          "type": "photo",
+          "settings": {
+            "image": "shopify://shop_images/eden-bathroom-01.jpg"
+          }
+        }
+      },
+      "block_order": [
+        "photo_1",
+        "photo_2",
+        "photo_3",
+        "photo_4",
+        "photo_5",
+        "photo_6"
+      ]
+    },
+    "film": {
+      "type": "collection-item-film",
+      "settings": {
+        "media_product": "eden",
+        "poster": "shopify://shop_images/eden-hero.jpg"
+      }
+    },
+    "closing": {
+      "type": "collection-item-closing",
+      "settings": {}
     }
   },
   "order": [
-    "main",
+    "header",
+    "about",
+    "gallery",
+    "film",
     "series",
+    "closing",
     "similar"
   ]
 }

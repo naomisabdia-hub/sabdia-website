@@ -1,0 +1,272 @@
+{%- comment -%}
+  Header - the top of a Collection residence page (a completed Sabdia home)
+
+  The hero: the residence's real film playing silently behind the name when
+  it has one, else the photograph; the badge, the name, suburb · style ·
+  year; then the specs bar (location, style, completed, bedrooms …) from
+  the page's metafields.
+
+  Split out of the all-in-one Collection residence section on 15 Sep 2026
+  (Naomi: the Collection template should be Header, About, The residence,
+  The film, The Series, Now selling, More from the Collection - each with
+  only its own settings, and every photograph a block under its section).
+
+  Where the photo and film come from, in order: picked here; the residence's
+  folder in Products (Media folder - its first picture and its film); the
+  page's Hero image / Film metafields for the older residences still fed
+  by Supabase (CALLE, ELYSIUM, FRASER, NERO).
+
+  ⛔ Real photographs and real footage only. Never generated.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign mf = page.metafields.custom
+  assign res_title = page.title
+  assign loc = mf.loc.value
+  assign media_res = s.media_product
+  assign suburb = loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+  assign style_name = mf.style.value | strip
+  assign year = mf.year.value
+
+  # The hero photograph: picked here, else the folder's first picture, else
+  # the page's Hero image (a film poster is not a hero: the first Gallery
+  # photo leads instead).
+  assign hero_pick = false
+  assign hero = ''
+  if s.hero_image
+    assign hero_pick = s.hero_image
+  elsif media_res != blank and media_res.featured_image
+    assign hero_pick = media_res.featured_image
+  else
+    assign hero = mf.image.value
+    assign gal = mf.gallery.value
+    if gal.size > 0
+      if hero == blank or hero contains '/films/'
+        assign hero = gal[0]
+      endif
+    endif
+  endif
+
+  # The film: uploaded here, a link typed here, the first film in the
+  # folder, else the page's Film metafield.
+  assign film_src = ''
+  if s.film
+    assign fmp4 = s.film.sources | where: 'format', 'mp4' | first
+    if fmp4
+      assign film_src = fmp4.url
+    endif
+  endif
+  if film_src == blank and s.use_links
+    assign film_src = s.film_url
+  endif
+  if film_src == blank and media_res != blank
+    for m in media_res.media
+      if m.media_type == 'video'
+        assign own_mp4s = m.sources | where: 'format', 'mp4' | sort: 'height'
+        assign own_mp4 = own_mp4s | last
+        if own_mp4
+          assign film_src = own_mp4.url
+        endif
+        break
+      endif
+    endfor
+  endif
+  if film_src == blank
+    assign film_src = mf.video.value
+  endif
+  assign hero_film = false
+  if film_src != blank and s.hero_media != 'photo'
+    assign hero_film = true
+  endif
+
+  assign has_specs = false
+  if mf.beds.value != blank or mf.baths.value != blank or mf.cars.value != blank or mf.land.value != blank or year != blank or style_name != blank or suburb != blank
+    assign has_specs = true
+  endif
+
+  assign cd_dim = s.hero_dim | default: 90 | divided_by: 100.0
+  case s.hero_height
+    when 'full'
+      assign cd_h = '100svh'
+    when 'standard'
+      assign cd_h = '70svh'
+    when 'short'
+      assign cd_h = '56svh'
+    else
+      assign cd_h = '88svh'
+  endcase
+  assign cd_focus = s.hero_focus | default: 'center'
+-%}
+{% render 'section-look', section: section, mode: 'hero' %}
+{%- capture hero_poster -%}
+  {%- if hero_pick -%}{{ hero_pick | image_url: width: 1920, height: 1080, crop: cd_focus }}{%- elsif hero != blank -%}{% render 'ext-variant', src: hero, w: 1920, h: 1080 %}{%- endif -%}
+{%- endcapture -%}
+{%- assign hero_poster = hero_poster | strip -%}
+{%- comment -%} A portrait crop for phones, so the tall hero is never an upscaled landscape file (15 Sep 2026). {%- endcomment -%}
+{%- capture hero_portrait -%}
+  {%- if hero_pick -%}{{ hero_pick | image_url: width: 900, height: 1600, crop: cd_focus }} 900w, {{ hero_pick | image_url: width: 1300, height: 2311, crop: cd_focus }} 1300w{%- elsif hero != blank -%}{% render 'ext-variant', src: hero, w: 900, h: 1600 %} 900w{%- endif -%}
+{%- endcapture -%}
+{%- assign hero_portrait = hero_portrait | strip -%}
+<section class="cd-hero{% if s.hero_words == 'centre' %} cd-hero-centre{% endif %}{% if hero_film %} cd-hero-film cd-hero-fit-{{ s.hero_film_fit | default: 'cover' }}{% endif %}" id="{{ s.look_anchor | default: 'top' }}" style="--cd-h:{{ cd_h }};--cd-dim:{{ cd_dim }};--cd-focus:{{ cd_focus }}">
+  {%- if hero_poster != blank -%}
+    <picture>
+      {%- if hero_portrait != blank -%}<source media="(max-width: 768px)" srcset="{{ hero_portrait }}" sizes="100vw">{%- endif -%}
+      <img src="{{ hero_poster }}" alt="{{ res_title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="eager" fetchpriority="high" width="1920" height="1080">
+    </picture>
+  {%- endif -%}
+  {%- if hero_film -%}
+  {%- comment -%} The residence's real film, silent, on a loop. The photo
+      above is its poster and the whole picture when motion is reduced. {%- endcomment -%}
+  <div class="cd-hero-video" aria-hidden="true">
+    <video src="{{ film_src }}"{% if hero_poster != blank %} poster="{{ hero_poster }}"{% endif %} autoplay muted loop playsinline preload="metadata" tabindex="-1"></video>
+  </div>
+  {%- endif -%}
+  <div class="cd-hero-ov"></div>
+  <div class="cd-hero-content">
+    {%- if s.show_badge and s.badge != blank -%}<div class="cd-badge reveal">{{ s.badge }}</div>{%- endif -%}
+    <h1 class="cd-name reveal d1">{{ res_title }}</h1>
+    {%- if s.show_meta -%}
+    <div class="cd-meta reveal d2">
+      {%- if suburb != blank -%}<span>{{ suburb }}</span>{%- endif -%}
+      {%- if style_name != blank -%}<span class="cd-meta-dot" aria-hidden="true">&middot;</span><span>{{ style_name }}</span>{%- endif -%}
+      {%- if year != blank -%}<span class="cd-meta-dot" aria-hidden="true">&middot;</span><span>{{ s.completed_word | default: "Completed" }} {{ year }}</span>{%- endif -%}
+    </div>
+    {%- endif -%}
+  </div>
+</section>
+{%- if hero_film -%}
+<script>
+  (function () {
+    var wrap = document.querySelector('.cd-hero-video'), v = wrap && wrap.querySelector('video');
+    if (!v || v.dataset.init) return;
+    v.dataset.init = '1';
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.removeAttribute('autoplay'); v.pause(); return;
+    }
+    var want = true;
+    var attempt = function () { if (!want || !v.paused) return; var p = v.play(); if (p && p.catch) p.catch(function () {}); };
+    attempt();
+    v.addEventListener('canplay', attempt);
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (en) { want = en.isIntersecting; if (want) attempt(); else v.pause(); });
+      }, { threshold: 0 }).observe(wrap);
+    }
+  })();
+</script>
+{%- endif -%}
+
+{%- if has_specs and s.show_specs -%}
+<div class="prop-specs-bar cd-specs">
+  <div class="prop-specs-inner">
+    {%- if suburb != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ s.spec_location | default: "Location" }}</div>
+      <div class="prop-spec-v" style="font-size:16px">{{ suburb }}</div>
+    </div>
+    {%- endif -%}
+    {%- if style_name != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ s.spec_style | default: "Style" }}</div>
+      <div class="prop-spec-v" style="font-size:16px">{{ style_name }}</div>
+    </div>
+    {%- endif -%}
+    {%- if year != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ s.spec_year | default: "Completed" }}</div>
+      <div class="prop-spec-v">{{ year }}</div>
+    </div>
+    {%- endif -%}
+    {%- if mf.beds.value != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ s.spec_beds | default: "Bedrooms" }}</div>
+      <div class="prop-spec-v">{{ mf.beds.value }}</div>
+    </div>
+    {%- endif -%}
+    {%- if mf.baths.value != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ s.spec_baths | default: "Bathrooms" }}</div>
+      <div class="prop-spec-v">{{ mf.baths.value }}</div>
+    </div>
+    {%- endif -%}
+    {%- if mf.cars.value != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ s.spec_cars | default: "Garages" }}</div>
+      <div class="prop-spec-v">{{ mf.cars.value }}</div>
+    </div>
+    {%- endif -%}
+    {%- if mf.land.value != blank -%}
+    <div class="prop-spec-item">
+      <div class="prop-spec-l">{{ s.spec_land | default: "Land Size" }}</div>
+      <div class="prop-spec-v">{{ mf.land.value }}<em>m&sup2;</em></div>
+    </div>
+    {%- endif -%}
+  </div>
+</div>
+{%- endif -%}
+
+<style>
+  .cd-hero{min-height:var(--cd-h,88svh)}
+  .cd-hero img{object-position:var(--cd-focus,center);filter:brightness(calc(1 - var(--cd-dim,.9) * .5)) saturate(.85)}
+  .cd-hero-ov{opacity:calc(var(--cd-dim,.9) / .9)}
+  .cd-hero-video{position:absolute;inset:0}
+  .cd-hero-video video{width:100%;height:100%;object-fit:cover;object-position:var(--cd-focus,center);filter:brightness(calc(1 - var(--cd-dim,.9) * .5)) saturate(.85);display:block}
+  .cd-hero-fit-contain .cd-hero-video video{object-fit:contain}
+  @media(prefers-reduced-motion:reduce){.cd-hero-video{display:none}}
+  .cd-hero-centre{align-items:center}.cd-hero-centre .cd-hero-content{text-align:center}.cd-hero-centre .cd-meta{justify-content:center}
+  .cd-meta{display:flex;flex-wrap:wrap;align-items:center;gap:0 12px;margin-top:20px;font-size:var(--t-label);font-weight:300;letter-spacing:.24em;text-transform:uppercase;color:rgba(var(--white-rgb),.6)}
+  .cd-meta-dot{color:var(--gold2)}
+  .cd-specs .prop-spec-item{min-width:0}
+</style>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    { "type": "paragraph", "content": "The top of a completed residence's page: the photograph or film behind the name, the badge, suburb · style · year, and the specs bar. Real photographs and real footage only, never generated." },
+    { "type": "header", "content": "Photo and film" },
+    { "type": "product", "id": "media_product", "label": "Media folder", "info": "The residence's folder in Products (its photographs and film live in Products › the residence › Media). Empty pickers below fall back to it: its first picture as the hero, its film behind the name." },
+    { "type": "image_picker", "id": "hero_image", "label": "Hero photo", "info": "Empty = the first picture of the Media folder, else the page's Hero image metafield." },
+    { "type": "video", "id": "film", "label": "Film (upload)", "info": "Plays silently behind the name. Empty = the film in the Media folder, else the page's Film metafield. The film with sound has its own section, The film." },
+    { "type": "checkbox", "id": "use_links", "label": "Use a film link instead of an upload", "default": false },
+    { "type": "text", "id": "film_url", "label": "Film (URL)", "info": "A direct .mp4 link, used when nothing is uploaded above.", "visible_if": "{{ section.settings.use_links }}" },
+    { "type": "header", "content": "Hero" },
+    { "type": "select", "id": "hero_media", "label": "Behind the name", "options": [{"value": "film", "label": "The film, when the residence has one (as designed)"}, {"value": "photo", "label": "The photo"}], "default": "film", "info": "The residence's real film plays silently on a loop behind the name; the hero photo is its poster and stands in when motion is reduced. A residence without a film shows the photo." },
+    { "type": "select", "id": "hero_film_fit", "label": "Film fit", "options": [{"value": "cover", "label": "Fill the hero, cropped (as designed)"}, {"value": "contain", "label": "The whole frame, on the photo"}], "default": "cover", "info": "The residence films are portrait reels: filled, a wide screen shows their middle band; whole, the reel stands in the middle of the darkened photo." },
+    { "type": "range", "id": "hero_dim", "label": "Darken the hero photo or film", "min": 0, "max": 100, "step": 5, "default": 90, "unit": "%", "info": "Lower = brighter." },
+    { "type": "select", "id": "hero_height", "label": "Hero height", "options": [{"value": "tall", "label": "Tall (as designed)"}, {"value": "full", "label": "Full screen"}, {"value": "standard", "label": "Standard"}, {"value": "short", "label": "Short"}], "default": "tall" },
+    { "type": "select", "id": "hero_focus", "label": "Crop focus", "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}], "default": "center" },
+    { "type": "select", "id": "hero_words", "label": "Where the words sit", "options": [{"value": "base-left", "label": "Base, left (as designed)"}, {"value": "centre", "label": "Centre"}], "default": "base-left" },
+    { "type": "checkbox", "id": "show_badge", "label": "Show the badge", "default": true },
+    { "type": "text", "id": "badge", "label": "Badge", "default": "The Sabdia Collection" },
+    { "type": "checkbox", "id": "show_meta", "label": "Suburb · style · year under the name", "default": true },
+    { "type": "text", "id": "completed_word", "label": "Word before the year", "default": "Completed" },
+    { "type": "header", "content": "Specs bar" },
+    { "type": "paragraph", "content": "Location, style, year completed, bedrooms, bathrooms, garages and land come from the page: Content › Pages › the residence › Metafields. Only the labels live here." },
+    { "type": "checkbox", "id": "show_specs", "label": "Show the specs bar", "default": true },
+    { "type": "text", "id": "spec_location", "label": "Location label", "default": "Location" },
+    { "type": "text", "id": "spec_style", "label": "Style label", "default": "Style" },
+    { "type": "text", "id": "spec_year", "label": "Completed label", "default": "Completed" },
+    { "type": "text", "id": "spec_beds", "label": "Bedrooms label", "default": "Bedrooms" },
+    { "type": "text", "id": "spec_baths", "label": "Bathrooms label", "default": "Bathrooms" },
+    { "type": "text", "id": "spec_cars", "label": "Garages label", "default": "Garages" },
+    { "type": "text", "id": "spec_land", "label": "Land size label", "default": "Land Size" },
+    { "type": "header", "content": "Space" },
+    { "type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only." },
+    { "type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100 },
+    { "type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme" },
+    { "type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges." },
+    { "type": "header", "content": "Type" },
+    { "type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section." },
+    { "type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts." },
+    { "type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)." },
+    { "type": "header", "content": "Finishing" },
+    { "type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance." },
+    { "type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false },
+    { "type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false },
+    { "type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word top, a link to /pages/collection-milos#top lands on this section." }
+  ],
+  "templates": ["page"],
+  "presets": [{ "name": "Header" }]
+}
+{% endschema %}

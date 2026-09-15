@@ -1,14 +1,5 @@
 {
   "sections": {
-    "main": {
-      "type": "main-collection-item",
-      "settings": {
-        "hero_media": "film",
-        "show_side_photos": true,
-        "body_film": "same",
-        "show_mosaic": false
-      }
-    },
     "series": {
       "type": "series-strip",
       "settings": {}
@@ -141,11 +132,41 @@
         "residence-10",
         "residence-11"
       ]
+    },
+    "header": {
+      "type": "collection-item-header",
+      "settings": {
+        "hero_media": "film"
+      }
+    },
+    "about": {
+      "type": "collection-item-about",
+      "settings": {
+        "show_side_photos": true
+      }
+    },
+    "gallery": {
+      "type": "collection-item-gallery",
+      "settings": {
+        "show_mosaic": false
+      }
+    },
+    "film": {
+      "type": "collection-item-film",
+      "settings": {}
+    },
+    "closing": {
+      "type": "collection-item-closing",
+      "settings": {}
     }
   },
   "order": [
-    "main",
+    "header",
+    "about",
+    "gallery",
+    "film",
     "series",
+    "closing",
     "similar"
   ]
 }

@@ -74,19 +74,42 @@ architecture, layout, interiors, or finishes. No exceptions.**
 - For Sale page (Shopify, since 14 Sep 2026): its own sections, in page
   order - Header (`collection-header`), Refine toolbar
   (`collection-toolbar`), Now selling (`collection-intro`), The residences
-  (`collection-grid`: Residence blocks with a card photo hand-pick the grid,
-  first block = featured banner; no blocks = automatic status-driven list;
-  the filter script lives here), Sold band (`collection-sold`), How it
+  (`collection-grid`: one Residence block per card since 15 Sep 2026 -
+  photo, crop, name, status word, location, numbers, link each editable
+  per card, first block = featured banner; no blocks = automatic
+  status-driven list; blocks step aside on /collections/sold; the filter
+  script lives here), Sold band (`collection-sold`, the same Residence
+  blocks), How it
   works (`collection-how`), Private inspections (`collection-closing`).
   Shared snippets `collection-handles` (the list) and `collection-card`
   (one grid cell). `main-collection.liquid` is the older all-in-one,
   hidden from ⊕ Add section; `shopify-app/arrange-collection-page.py
-  <theme>` moves the store-side collection template over (push-live.sh
-  runs it). The same template serves /collections/sold: toolbar, Now
+  <theme>` moves the store-side collection template over and
+  `add-collection-card-blocks.py <theme>` adds the card blocks where a
+  grid has none (push-live.sh runs both). Size chips and filter (15 Sep 2026): every card shows
+  Build size (house icon) then Land size (lot icon) from custom.build_size /
+  custom.land; the Refine toolbar's Size filter and sort read Build size only. The same template serves /collections/sold: toolbar, Now
   selling, featured banner, sold band, how strip skip themselves there. Every
   section's Look "backdrop" dials (photo/film behind the words) are named
   Backdrop … and only show when Background = a photo or film; The film
   section has no backdrop dials at all.
+- Collection residence page (Shopify, since 15 Sep 2026): its own sections
+  in page order - Header (`collection-item-header`: hero photo/film
+  pickers, Media folder, badge, specs bar), About (`collection-item-about`:
+  the story + two Photo blocks, tall then wide), The residence
+  (`collection-item-gallery`: one Photo block per photograph), The film
+  (`collection-item-film`: a 9:16 reel, film + poster pickers), The
+  Series (one filled-in Post block per post: Instagram link, photo and
+  film URLs, caption, date, icon, so the strip survives without the
+  synced list; `add-series-blocks.py <theme>`, in push-live.sh), Now selling (`collection-item-closing`: the CTA band + share
+  row), More from the Collection (`collection-similar`: Residence blocks).
+  Every section reads the page (page.title, custom.* metafields) and falls
+  back to the Media folder product, then the page's Supabase metafields.
+  `main-collection-item.liquid` is the superseded all-in-one;
+  `shopify-app/arrange-collection-item-page.py <theme>` (or `--local` for
+  the repo copies) moves any store-side page.collection-*.json over
+  (push-live.sh runs it); `make-residence-templates.py` writes new
+  templates in this shape.
 - Completed residences stay Collection PAGES (Content › Pages, template
   collection-item). Since 14 Sep 2026 MILOS, PETRA, KIRRA, HERMOSA,
   ENCANTO, HAVEN, SPECTRE, AMMOS, ALHAMBRA, EDEN each have their own copy of that template
@@ -104,6 +127,27 @@ architecture, layout, interiors, or finishes. No exceptions.**
   <folder> [--film …]`, `make-residence-templates.py <theme> --force`;
   push-live.sh assigns the templates and refreshes the Collection cards.
   Old-page residences still on Supabase: CALLE, ELYSIUM, FRASER, NERO.
+  CALLE, ELYSIUM and NERO get their own page.collection-<house>.json (for
+  their Series blocks) and move onto it in push-live.sh; FRASER has no
+  posts and stays on collection-item.
+- Enquiry forms (Shopify, since 15 Sep 2026): the home page Contact band
+  (`contact-cta`) and the Contact page (`main-contact`) both render
+  `snippets/enquiry-form.liquid`, so they ask the same questions in the
+  same order. The Interest list is ONE theme setting, Theme settings ›
+  Contact › Enquiry options ("Option | thank-you" per line; the residences
+  for sale follow the first line from their Status). The old per-page lists
+  (Contact body Enquiry option blocks, home Interest options) are inert;
+  `shopify-app/share-enquiry-options.py <theme>` removes them from the
+  store templates (push-live.sh runs it). Residence page forms keep their
+  own residence-specific types.
+  Careers asks for one or more PDF or Word documents (at least one, 10 MB
+  each, 10 at most; `careersFilesInit` in main.js keeps the list).
+- Home page backgrounds alternate (15 Sep 2026): Featured residence warm
+  grey, About white, Current residences warm grey, How we work white, the
+  film dark, Testimonials warm grey, Contact white - set as Look ›
+  Background (Stone / Cream) by `shopify-app/home-alternate-backgrounds.py
+  <theme>` (push-live.sh runs it). A chosen Background lifts the section's
+  designed top/bottom hairlines; the colour edge replaces them.
 - The public QASR cut is deliberately curated — mud room, sauna, guest
   suites, powder, dining, cellar etc. are held back pre-sale. Do not add
   rooms without Naomi's sign-off. The full private tour lives on Naomi's

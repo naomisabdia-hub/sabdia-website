@@ -254,6 +254,17 @@
         "id": "contact_phone",
         "label": "Phone",
         "info": "Leave empty to hide."
+      },
+      {
+        "type": "header",
+        "content": "Enquiry forms"
+      },
+      {
+        "type": "textarea",
+        "id": "enquiry_options",
+        "label": "Enquiry options",
+        "default": "For Sale - Current Residences\nRequest a Viewing\nUpcoming Releases\nAgent Access\nGeneral Enquiry | Thank you for your enquiry. A member of the Sabdia team will be in touch shortly.\nCustom build or renovation | Thank you so much for reaching out and for thinking of us for your project. At the moment we aren't taking on client builds or renovations - our focus is solely on designing and building our own development projects. We really appreciate your interest and support, and hopefully our paths cross in the future.\nCareers | Thank you for your interest in working with Sabdia. We have your CV and will be in touch if there is a fit.",
+        "info": "One list for every enquiry form: the home page and the Contact page show exactly these, in this order. One option per line. The residences for sale follow the first line on their own (from each residence's Status). Add a tailored thank-you after a | on the same line. A Careers line asks for a CV instead of the buyer questions; Agent lines stay hidden while Features › Agent Access is off."
       }
     ]
   },

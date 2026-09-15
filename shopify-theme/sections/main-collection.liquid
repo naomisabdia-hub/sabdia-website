@@ -283,7 +283,19 @@
   assign mc_featured = section.settings.show_featured
   assign mc_style = 'aspect-ratio:' | append: section.settings.card_shape | default: '16/10'
 -%}
-<section class="page-hero ph-sized ph-pos-{{ section.settings.hero_words | default: 'base-left' }} ph-scrim-{{ section.settings.hero_scrim | default: 'corner' }}" style="--ph-h:{{ mc_h }};--ph-hm:{{ mc_hm }};--ph-dim:{{ mc_dim }}">
+{%- liquid
+  # No film, no chosen photo and no residence photo to borrow (15 Sep 2026):
+  # the hero keeps a dark ground so its light words still read.
+  assign mc_hero_media = false
+  if hero_video != blank or hero_auto
+    assign mc_hero_media = true
+  elsif use_chosen and section.settings.image
+    assign mc_hero_media = true
+  elsif use_chosen and section.settings.image_ext != blank
+    assign mc_hero_media = true
+  endif
+-%}
+<section class="page-hero ph-sized ph-pos-{{ section.settings.hero_words | default: 'base-left' }} ph-scrim-{{ section.settings.hero_scrim | default: 'corner' }}" style="--ph-h:{{ mc_h }};--ph-hm:{{ mc_hm }};--ph-dim:{{ mc_dim }}{% unless mc_hero_media %};background:var(--dark){% endunless %}">
   {%- if hero_video != blank -%}
     <video class="page-hero-video" src="{{ hero_video }}" autoplay muted loop playsinline preload="metadata" aria-hidden="true"{% if section.settings.image %} poster="{{ section.settings.image | image_url: width: 1920, height: 1080, crop: 'center' }}"{% endif %}></video>
   {%- elsif use_chosen and section.settings.image -%}
@@ -446,7 +458,7 @@
   {%- if fstatus == 'For Sale' and settings.label_for_sale != blank -%}{%- assign fstatus = settings.label_for_sale -%}{%- endif -%}
   <section style="padding:clamp(40px,5vw,64px) var(--page-pad) 0;background:var(--bg)" id="featuredWrap">
     <div class="inner">
-      <a href="{{ featured.url }}" class="reveal" style="display:block;position:relative;overflow:hidden;height:min({{ section.settings.featured_height | default: 680 }}px,clamp(400px,52vw,680px));cursor:pointer;text-decoration:none">
+      <a href="{{ featured.url }}" class="reveal" style="display:block;position:relative;overflow:hidden;height:min({{ section.settings.featured_height | default: 680 }}px,clamp(400px,52vw,680px));cursor:pointer;text-decoration:none{% unless featured.featured_image %};background:var(--dark){% endunless %}">
         {%- if featured.featured_image -%}
           <img src="{{ featured.featured_image | image_url: width: 1600, height: 900, crop: 'center' }}" alt="{{ featured.title | escape }}" width="1600" height="900" loading="eager" fetchpriority="high"
                style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.98) saturate(.96);transition:filter .7s,transform .7s">

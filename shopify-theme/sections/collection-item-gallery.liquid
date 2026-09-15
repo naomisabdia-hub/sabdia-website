@@ -1,0 +1,308 @@
+{%- comment -%}
+  The residence - the photographs of a Collection residence
+
+  The stage + filmstrip gallery with the full-screen viewer, and an optional
+  details mosaic. One Photo block per photograph (⊕ Add block › Photo, drag
+  to reorder, delete to drop one); with no blocks the residence's folder in
+  Products (Media folder) fills it in order, or the page's Gallery links for
+  the older residences still fed by Supabase.
+
+  Split out of the all-in-one Collection residence section on 15 Sep 2026
+  (Naomi: "the residence, with blocks and the photo picker and any other
+  setting").
+
+  ⛔ Real photographs only. Never generated.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign mf = page.metafields.custom
+  assign res_title = page.title
+  assign loc = mf.loc.value
+  assign media_res = s.media_product
+  assign name_token = '{' | append: 'name' | append: '}'
+  assign suburb = loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+
+  # The photographs: Photo blocks, else the folder after its first picture
+  # (the hero), else the page's Gallery links. Joined with ¦ so the mosaic
+  # can count and index them.
+  assign photo_blocks = section.blocks | where: 'type', 'photo'
+  # Captions travel beside the pictures ('-' = none) for the viewer.
+  capture caps_raw
+    for block in photo_blocks
+      if block.settings.image
+        echo block.settings.caption | strip | default: '-'
+        echo '¦'
+      endif
+    endfor
+  endcapture
+  assign caps = caps_raw | split: '¦'
+  # A Photo block with its photo removed does not count (15 Sep 2026): with
+  # no photo in any block the folder fills the gallery, as with no blocks.
+  assign filled_blocks = 0
+  for block in photo_blocks
+    if block.settings.image
+      assign filled_blocks = filled_blocks | plus: 1
+    endif
+  endfor
+  capture gal_raw
+    assign sep = ''
+    if filled_blocks > 0
+      for block in photo_blocks
+        if block.settings.image
+          echo sep
+          echo block.settings.image | image_url: width: 2000
+          assign sep = '¦'
+        endif
+      endfor
+    elsif media_res != blank
+      for image in media_res.images offset: 1
+        echo sep
+        echo image | image_url: width: 2000
+        assign sep = '¦'
+      endfor
+    endif
+  endcapture
+  assign gal_raw = gal_raw | strip
+  if gal_raw != blank
+    assign gallery = gal_raw | split: '¦'
+  else
+    assign gallery = mf.gallery.value
+  endif
+  assign gcount = gallery.size
+
+  assign mosaic = false
+  if gcount >= 10
+    assign mosaic = true
+    assign m_start = gcount | minus: 6
+  endif
+-%}
+{%- if gcount > 0 and s.show_gallery -%}
+{% render 'section-look', section: section %}
+  <section class="cd-gallery s-surface{% if s.show_thumbs == false %} pg-nothumbs{% endif %}{% if s.show_expand == false %} pg-noexpand{% endif %}" id="{{ s.look_anchor | default: 'gallery' }}" style="--pgs-ar:{{ s.stage_shape | default: '16/9' }}">
+    <div class="prop-gallery inner">
+      {%- if s.gallery_label != blank -%}<div class="slabel reveal">{{ s.gallery_label }}</div>{%- endif -%}
+      <h2 class="prop-gallery-h reveal d1">{{ s.gallery_heading_html | replace: name_token, res_title }}</h2>
+      <div hidden id="pgData">
+        {%- for u in gallery -%}
+          {%- assign t = u | replace: '/media/collection/', '/media/collection-thumbs/' | replace: 'width=2000', 'width=320' -%}
+          {%- assign c = caps[forloop.index0] | default: '-' -%}
+          <span data-lb-item data-src="{{ u }}" data-stage="{{ u }}" data-thumb="{{ t }}" data-alt="{% if c != '-' %}{{ c | escape }}{% else %}{{ res_title | escape }}{% if suburb != blank %} &middot; {{ suburb | escape }}{% endif %}{% endif %}"></span>
+        {%- endfor -%}
+      </div>
+      <div class="pg reveal d1" id="pg" data-house="{{ res_title | escape }}">
+        <div class="pg-stage" id="pgStage" tabindex="0" aria-roledescription="carousel" aria-label="{{ res_title | escape }} photos">
+          <img class="pg-img" id="pgImgA" alt="" decoding="async" width="1800" height="1013">
+          <img class="pg-img" id="pgImgB" alt="" decoding="async" width="1800" height="1013">
+          <div class="pg-veil" aria-hidden="true"></div>
+          <div class="pg-top"><span class="pg-house">{{ res_title }}{% if suburb != blank %} &middot; {{ suburb }}{% endif %}</span><span class="pg-count" id="pgCount"></span></div>
+          <button type="button" class="pg-arrow pg-prev" id="pgPrev" aria-label="Previous photo">&larr;</button>
+          <button type="button" class="pg-arrow pg-next" id="pgNext" aria-label="Next photo">&rarr;</button>
+          <button type="button" class="pg-expand" id="pgExpand"><span aria-hidden="true">&#x2922;</span> {{ s.gallery_all_label | default: "View all photos" }} ({{ gcount }})</button>
+        </div>
+        <div class="pg-strip" id="pgStrip" role="tablist" aria-label="Photo thumbnails"></div>
+      </div>
+    </div>
+  </section>
+
+  {%- if mosaic and s.show_mosaic -%}
+  <section class="cd-mosaic-wrap">
+    <div class="inner">
+      <div class="cd-mosaic">
+        {%- for i in (0..4) -%}
+          {%- assign gi = m_start | plus: i -%}
+          {%- assign u = gallery[gi] -%}
+          {%- if u == blank -%}{%- continue -%}{%- endif -%}
+          {%- case i -%}
+            {%- when 0 -%}{%- assign mw = 1200 -%}{%- assign mh = 900 -%}
+            {%- when 1 -%}{%- assign mw = 700 -%}{%- assign mh = 900 -%}
+            {%- else -%}{%- assign mw = 800 -%}{%- assign mh = 450 -%}
+          {%- endcase -%}
+          <button type="button" class="cd-mosaic-item cd-m{{ i }} reveal-wipe{% if i > 0 %} d{{ i }}{% endif %}" data-cd-open="{{ gi }}" aria-label="View photo {{ gi | plus: 1 }} of {{ gcount }}">
+            <img src="{% render 'ext-variant', src: u, w: mw, h: mh %}" alt="{{ res_title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="{{ mw }}" height="{{ mh }}">
+          </button>
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+  {%- endif -%}
+
+  <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+    <img id="lbImg" alt="" width="2000" height="1400">
+    <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&larr;</button>
+    <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&rarr;</button>
+    <button class="lb-close" id="lbClose" aria-label="Close">&#10005;</button>
+    <div class="lb-meta"><span class="lb-cap" id="lbCap"></span><span id="lbCount"></span></div>
+  </div>
+  <script>
+    (function () {
+      var pg = document.getElementById('pg'), lb = document.getElementById('lb');
+      if (!pg || !lb || pg.dataset.init) return;
+      pg.dataset.init = '1';
+      var data = Array.prototype.slice.call(document.querySelectorAll('#pgData [data-lb-item]'));
+      if (!data.length) { pg.hidden = true; return; }
+      var house = pg.getAttribute('data-house') || '';
+      var imgs = [document.getElementById('pgImgA'), document.getElementById('pgImgB')];
+      var count = document.getElementById('pgCount'), strip = document.getElementById('pgStrip'), stage = document.getElementById('pgStage');
+      var lbImg = document.getElementById('lbImg'), lbCap = document.getElementById('lbCap'), lbCount = document.getElementById('lbCount');
+      var i = 0, on = 0, li = 0, lastFocus = null;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      /* One photograph left (15 Sep 2026): no arrows, filmstrip or counter to step through nothing. */
+      if (data.length < 2) {
+        [document.getElementById('pgPrev'), document.getElementById('pgNext'), document.getElementById('lbPrev'), document.getElementById('lbNext'), strip, count, lbCount].forEach(function (el) { if (el) el.style.display = 'none'; });
+      }
+      function srcOf(n) { return data[n].getAttribute('data-src'); }
+      function capOf(n) { return data[n].getAttribute('data-alt') || house; }
+      function preload(n) { [n + 1, n - 1].forEach(function (k) { var p = new Image(); p.src = srcOf((k + data.length) % data.length); }); }
+      data.forEach(function (el, n) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'pg-thumb'; b.setAttribute('role', 'tab'); b.setAttribute('aria-label', house + ' photo ' + (n + 1));
+        var im = document.createElement('img'); im.loading = 'lazy'; im.decoding = 'async'; im.alt = '';
+        im.src = el.getAttribute('data-thumb') || el.getAttribute('data-src');
+        im.addEventListener('error', function () { if (im.src !== el.getAttribute('data-src')) im.src = el.getAttribute('data-src'); }, { once: true });
+        b.appendChild(im); b.addEventListener('click', function () { show(n); });
+        strip.appendChild(b);
+      });
+      function show(n, instant) {
+        i = (n + data.length) % data.length;
+        var nxt = imgs[1 - on], src = srcOf(i);
+        var swap = function () { imgs[on].classList.remove('is-on'); nxt.classList.add('is-on'); on = 1 - on; nxt.onload = null; };
+        nxt.alt = house + ' photo ' + (i + 1);
+        if (nxt.getAttribute('src') === src && nxt.complete) swap(); else { nxt.onload = swap; nxt.src = src; }
+        count.textContent = (i + 1) + ' / ' + data.length;
+        var th = strip.children;
+        for (var k = 0; k < th.length; k++) { th[k].classList.toggle('is-on', k === i); th[k].setAttribute('aria-selected', k === i ? 'true' : 'false'); }
+        if (th[i]) strip.scrollTo({ left: th[i].offsetLeft - strip.clientWidth / 2 + th[i].offsetWidth / 2, behavior: (instant || reduce) ? 'auto' : 'smooth' });
+        preload(i);
+      }
+      function lbShow(n) {
+        li = (n + data.length) % data.length;
+        lbImg.src = srcOf(li); lbImg.alt = house + ' photo ' + (li + 1);
+        lbCap.textContent = capOf(li); lbCount.textContent = (li + 1) + ' / ' + data.length;
+        preload(li);
+      }
+      function openAt(n, e) {
+        if (e) e.stopPropagation();
+        lastFocus = document.activeElement;
+        lb.hidden = false; requestAnimationFrame(function () { lb.classList.add('open'); });
+        document.documentElement.style.overflow = 'hidden';
+        lbShow(typeof n === 'number' ? n : i); document.getElementById('lbClose').focus();
+      }
+      function openFull(e) { openAt(i, e); }
+      function close() {
+        lb.classList.remove('open'); document.documentElement.style.overflow = '';
+        setTimeout(function () { lb.hidden = true; }, 350);
+        show(li, true);
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+      }
+      document.getElementById('pgPrev').addEventListener('click', function (e) { e.stopPropagation(); show(i - 1); });
+      document.getElementById('pgNext').addEventListener('click', function (e) { e.stopPropagation(); show(i + 1); });
+      document.getElementById('pgExpand').addEventListener('click', openFull);
+      stage.addEventListener('click', function (e) { if (e.target.closest('button')) return; openFull(); });
+      stage.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { e.preventDefault(); show(i + 1); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); show(i - 1); }
+        else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openFull(); }
+      });
+      document.querySelectorAll('[data-cd-open]').forEach(function (b) {
+        b.addEventListener('click', function (e) { openAt(Number(b.getAttribute('data-cd-open')) || 0, e); });
+      });
+      document.getElementById('lbPrev').addEventListener('click', function () { lbShow(li - 1); });
+      document.getElementById('lbNext').addEventListener('click', function () { lbShow(li + 1); });
+      document.getElementById('lbClose').addEventListener('click', close);
+      lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+      document.addEventListener('keydown', function (e) {
+        if (lb.hidden) return;
+        if (e.key === 'Escape') close();
+        else if (e.key === 'ArrowRight') lbShow(li + 1);
+        else if (e.key === 'ArrowLeft') lbShow(li - 1);
+      });
+      [stage, lb].forEach(function (el, which) {
+        var tx = null;
+        el.addEventListener('touchstart', function (e) { tx = e.changedTouches[0].clientX; }, { passive: true });
+        el.addEventListener('touchend', function (e) {
+          if (tx === null) return; var dx = e.changedTouches[0].clientX - tx; tx = null;
+          if (Math.abs(dx) > 40) { if (which) lbShow(dx < 0 ? li + 1 : li - 1); else show(dx < 0 ? i + 1 : i - 1); }
+        }, { passive: true });
+      });
+      show(0, true);
+    })();
+  </script>
+  <style>
+    .pg-nothumbs .pg-strip{display:none}
+    .pg-noexpand .pg-expand{display:none}
+    .cd-gallery{padding-top:0}
+    .cd-gallery .pg{margin-top:32px}
+    .cd-gallery .pg-stage{aspect-ratio:var(--pgs-ar,16/9)}
+    .cd-mosaic-wrap{padding:0 var(--page-pad) clamp(64px,9vw,130px)}
+    .cd-mosaic{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:auto;gap:8px}
+    .cd-mosaic-item{display:block;padding:0;border:0;background:var(--bg3);cursor:zoom-in;overflow:hidden;position:relative}
+    .cd-mosaic-item img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.95);transition:transform 1.1s var(--ease),filter .5s}
+    .cd-mosaic-item:hover img{transform:scale(1.03);filter:saturate(1)}
+    .cd-mosaic-item:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+    .cd-m0{grid-column:1/8;aspect-ratio:4/3}
+    .cd-m1{grid-column:8/13;aspect-ratio:7/9}
+    .cd-m2,.cd-m3,.cd-m4{grid-column:span 4;aspect-ratio:16/10}
+    @media(max-width:900px){
+      .cd-m0{grid-column:1/13;aspect-ratio:16/10}
+      .cd-m1{grid-column:1/7;aspect-ratio:4/5}
+      .cd-m2{grid-column:7/13;aspect-ratio:4/5}
+      .cd-m3,.cd-m4{grid-column:span 6;aspect-ratio:4/3}
+    }
+  </style>
+{%- elsif request.design_mode -%}
+<section class="cd-gallery" style="padding:48px var(--page-pad)">
+  <p class="editor-note" style="max-width:640px;margin:0 auto;text-align:center">The residence - no photographs yet. Add Photo blocks (⊕ Add block › Photo), or pick the residence's Media folder in this section's panel. Shoppers do not see this note.</p>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "The residence",
+  "settings": [
+    { "type": "paragraph", "content": "The residence in pictures: one Photo block per photograph (⊕ Add block › Photo), in the order they should play - drag to reorder, delete to drop one. With no blocks the residence's Media folder fills the gallery in order. Real photographs only, never generated." },
+    { "type": "product", "id": "media_product", "label": "Media folder", "info": "The residence's folder in Products (its photographs live in Products › the residence › Media). Used when there are no Photo blocks." },
+    { "type": "checkbox", "id": "show_gallery", "label": "Show the gallery", "default": true },
+    { "type": "header", "content": "Words" },
+    { "type": "text", "id": "gallery_label", "label": "Small label", "default": "The Residence" },
+    { "type": "html", "id": "gallery_heading_html", "label": "Heading (HTML - {name})", "default": "Inside <em>{name}</em>." },
+    { "type": "text", "id": "gallery_all_label", "label": "View all button", "default": "View all photos" },
+    { "type": "header", "content": "Layout" },
+    { "type": "checkbox", "id": "show_thumbs", "label": "Filmstrip of thumbnails", "default": true },
+    { "type": "checkbox", "id": "show_expand", "label": "\"View all photos\" button on the stage", "default": true },
+    { "type": "select", "id": "stage_shape", "label": "Stage shape", "options": [{"value": "16/9", "label": "Wide 16:9 (as designed)"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "21/9", "label": "Cinematic 21:9"}], "default": "16/9" },
+    { "type": "checkbox", "id": "show_mosaic", "label": "Details mosaic under the gallery (ten or more photos)", "default": false, "info": "Off since 11 Sep 2026 (Naomi): the gallery already shows every photo, so the mosaic repeated them." },
+    { "type": "header", "content": "Look" },
+    { "type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable." },
+    { "type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface." },
+    { "type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE", "visible_if": "{{ section.settings.look_surface == 'custom' }}" },
+    { "type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light", "visible_if": "{{ section.settings.look_surface == 'custom' }}" },
+    { "type": "header", "content": "Space" },
+    { "type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only." },
+    { "type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100 },
+    { "type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme" },
+    { "type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges." },
+    { "type": "header", "content": "Type" },
+    { "type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section." },
+    { "type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts." },
+    { "type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)." },
+    { "type": "header", "content": "Finishing" },
+    { "type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance." },
+    { "type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false },
+    { "type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false },
+    { "type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here. As designed the word is gallery: the Photos button in About lands here." }
+  ],
+  "blocks": [
+    {
+      "type": "photo",
+      "name": "Photo",
+      "settings": [
+        { "type": "paragraph", "content": "One photograph of the gallery. Add one block per picture, in the order they should play; delete every Photo block and the gallery fills itself from the Media folder again." },
+        { "type": "image_picker", "id": "image", "label": "Photo" },
+        { "type": "text", "id": "caption", "label": "Caption", "info": "Shown in the full-screen viewer. Empty = the residence's name and suburb." }
+      ]
+    }
+  ],
+  "templates": ["page"],
+  "presets": [{ "name": "The residence" }]
+}
+{% endschema %}

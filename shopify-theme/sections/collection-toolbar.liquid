@@ -22,13 +22,6 @@
   endif
 -%}
 {%- liquid
-  assign has_build = false
-  for p in collections.all.products
-    if p.metafields.custom.build_size.value != blank
-      assign has_build = true
-      break
-    endif
-  endfor
   # A filter is only offered when it can change the list: two or more
   # distinct values (Naomi, 13 Sep 2026: "so many and conflicting"; every
   # home has five bedrooms, so Bedrooms and Bathrooms drop out on their own).
@@ -45,7 +38,7 @@
   assign bed_vals = ''
   assign bath_vals = ''
   assign car_vals = ''
-  assign land_vals = ''
+  assign build_vals = ''
   assign statuses = ''
   assign feats_all = ''
   assign has_year = false
@@ -78,9 +71,9 @@
       if pc > 0
         assign car_vals = car_vals | append: pc | append: '¦'
       endif
-      assign pl = pm.land.value | plus: 0
-      if pl > 0
-        assign land_vals = land_vals | append: pl | append: '¦'
+      assign pbs = pm.build_size.value | plus: 0
+      if pbs > 0
+        assign build_vals = build_vals | append: pbs | append: '¦'
       endif
       capture pst
         render 'residence-status', product: p
@@ -113,29 +106,32 @@
   assign bed_list = bed_vals | split: '¦' | uniq | sort_natural
   assign bath_list = bath_vals | split: '¦' | uniq | sort_natural
   assign car_list = car_vals | split: '¦' | uniq | sort_natural
-  assign land_nums = land_vals | split: '¦'
-  assign land_small = false
-  assign land_mid = false
-  assign land_big = false
-  for lv in land_nums
-    assign lvn = lv | plus: 0
-    if lvn < 600
-      assign land_small = true
-    elsif lvn < 800
-      assign land_mid = true
+  # The Size filter reads Build size only (Naomi, 15 Sep 2026: "the filter
+  # will only have build size"); land size prints on the cards instead.
+  # A bracket is offered only when a listed residence falls in it.
+  assign build_nums = build_vals | split: '¦'
+  assign build_small = false
+  assign build_mid = false
+  assign build_big = false
+  for bv in build_nums
+    assign bvn = bv | plus: 0
+    if bvn < 600
+      assign build_small = true
+    elsif bvn < 800
+      assign build_mid = true
     else
-      assign land_big = true
+      assign build_big = true
     endif
   endfor
-  assign land_brackets = 0
-  if land_small
-    assign land_brackets = land_brackets | plus: 1
+  assign build_brackets = 0
+  if build_small
+    assign build_brackets = build_brackets | plus: 1
   endif
-  if land_mid
-    assign land_brackets = land_brackets | plus: 1
+  if build_mid
+    assign build_brackets = build_brackets | plus: 1
   endif
-  if land_big
-    assign land_brackets = land_brackets | plus: 1
+  if build_big
+    assign build_brackets = build_brackets | plus: 1
   endif
   assign gfont_list = gfonts | split: '||' | uniq
   assign ffile_list = ffiles | split: '||' | uniq
@@ -172,27 +168,13 @@
       {%- for v in car_list -%}<option value="{{ v }}">{{ v }}+ Cars</option>{%- endfor -%}
     </select>
     {%- endif -%}
-    {%- comment -%} One Size control (Naomi, 14 Sep 2026): land brackets, and floor-area
-        brackets when any residence carries a build size. {%- endcomment -%}
-    {%- assign size_land = false -%}{%- if section.settings.show_filter_land != false and land_brackets > 1 -%}{%- assign size_land = true -%}{%- endif -%}
-    {%- assign size_build = false -%}{%- if section.settings.show_filter_build != false and has_build -%}{%- assign size_build = true -%}{%- endif -%}
-    {%- if size_land or size_build -%}
-    <select class="ptool-sel" id="fSize" aria-label="Size">
-      <option value="">{{ section.settings.filter_any_land | default: "Any Size" }}</option>
-      {%- if size_land -%}
-      <optgroup label="Land">
-        {%- if land_small -%}<option value="land:0-600">Land under 600m&sup2;</option>{%- endif -%}
-        {%- if land_mid -%}<option value="land:600-800">Land 600&ndash;800m&sup2;</option>{%- endif -%}
-        {%- if land_big -%}<option value="land:800-">Land 800m&sup2; and over</option>{%- endif -%}
-      </optgroup>
-      {%- endif -%}
-      {%- if size_build -%}
-      <optgroup label="Floor area">
-        <option value="build:0-450">Floor area under 450m&sup2;</option>
-        <option value="build:450-600">Floor area 450&ndash;600m&sup2;</option>
-        <option value="build:600-">Floor area 600m&sup2; and over</option>
-      </optgroup>
-      {%- endif -%}
+    {%- comment -%} One Size control, Build size only (Naomi, 15 Sep 2026), offered once two brackets have a residence. {%- endcomment -%}
+    {%- if section.settings.show_filter_build != false and build_brackets > 1 -%}
+    <select class="ptool-sel" id="fSize" aria-label="Build size">
+      <option value="">{{ section.settings.filter_any_size | default: "Any Build Size" }}</option>
+      {%- if build_small -%}<option value="build:0-600">Build under 600m&sup2;</option>{%- endif -%}
+      {%- if build_mid -%}<option value="build:600-800">Build 600&ndash;800m&sup2;</option>{%- endif -%}
+      {%- if build_big -%}<option value="build:800-">Build 800m&sup2; and over</option>{%- endif -%}
     </select>
     {%- endif -%}
     {%- if section.settings.show_filter_status != false and status_list.size > 1 -%}
@@ -208,7 +190,7 @@
     {%- if section.settings.show_sort != false -%}
     <select class="ptool-sel" id="fSort" aria-label="Sort properties">
       <option value="featured">{{ section.settings.sort_featured_label | default: "Sort - Featured" }}</option>
-      <option value="land">{{ section.settings.filter_land_label | default: "Land size, largest first" }}</option>
+      {%- if build_brackets > 0 -%}<option value="build">{{ section.settings.sort_build_label | default: "Build size, largest first" }}</option>{%- endif -%}
       <option value="beds">{{ section.settings.sort_beds_label | default: "Bedrooms, most first" }}</option>
       <option value="cars">{{ section.settings.filter_garage_label | default: "Garage, most first" }}</option>
       {%- if has_year -%}<option value="year">{{ section.settings.sort_newest_label | default: "Newest first" }}</option>{%- endif -%}
@@ -316,14 +298,16 @@
     {
       "type": "checkbox",
       "id": "show_filter_land",
-      "label": "Show the Land size filter",
-      "default": true
+      "label": "Land size filter (retired)",
+      "default": true,
+      "info": "Not used since 15 Sep 2026: the Size filter reads Build size only, and land size prints on the cards."
     },
     {
       "type": "checkbox",
       "id": "show_filter_build",
       "label": "Show the Build size filter",
-      "default": true
+      "default": true,
+      "info": "Offers the build size brackets a listed residence falls in (under 600, 600 to 800, 800 and over), once there are two. Products › the residence › Metafields › Build size (m²)."
     },
     {
       "type": "checkbox",
@@ -381,15 +365,22 @@
     {
       "type": "text",
       "id": "filter_any_land",
-      "label": "Land: any",
-      "default": "Any Land Size"
+      "label": "Land: any (retired)",
+      "default": "Any Land Size",
+      "info": "Not shown since 15 Sep 2026."
     },
     {
       "type": "text",
       "id": "filter_any_build",
-      "label": "Build size: any",
+      "label": "Floor area: any (retired)",
       "default": "Any Build Size",
-      "info": "The Build size filter appears once at least one residence has a Build size (m²) in its Metafields."
+      "info": "Not shown since 15 Sep 2026; the wording below is used."
+    },
+    {
+      "type": "text",
+      "id": "filter_any_size",
+      "label": "Build size: any",
+      "default": "Any Build Size"
     },
     {
       "type": "text",
@@ -424,8 +415,15 @@
     {
       "type": "text",
       "id": "filter_land_label",
-      "label": "Land size filter label",
-      "default": "Land Size"
+      "label": "Sort by land (retired)",
+      "default": "Land size, largest first",
+      "info": "Not shown since 15 Sep 2026; the menu sorts by build size."
+    },
+    {
+      "type": "text",
+      "id": "sort_build_label",
+      "label": "Sort: build size",
+      "default": "Build size, largest first"
     },
     {
       "type": "text",

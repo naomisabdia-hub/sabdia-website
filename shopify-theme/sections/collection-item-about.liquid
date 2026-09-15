@@ -1,0 +1,261 @@
+{%- comment -%}
+  About - the story of a Collection residence with two photographs beside it
+
+  The label, the headline, the story (one paragraph per line), the key
+  features and the buttons to the photos and the film, with the tall and
+  the wide photograph overlapping beside them. The two photographs are
+  Photo blocks (⊕ Add block › Photo): the first is the tall one, the
+  second the wide one, so either can be replaced or removed. With no
+  blocks, the second and third pictures of the residence's folder in
+  Products (or of the page's Gallery links) stand in.
+
+  Split out of the all-in-one Collection residence section on 15 Sep 2026
+  (Naomi: "about will have the two photo blocks").
+
+  ⛔ Real photographs only. Never generated.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign mf = page.metafields.custom
+  assign res_title = page.title
+  assign loc = mf.loc.value
+  assign media_res = s.media_product
+  assign posts = mf.series_posts.value
+  assign name_token = '{' | append: 'name' | append: '}'
+  assign suburb = loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+  assign style_name = mf.style.value | strip
+
+  # Story: the page's Story field, one paragraph per line; else the
+  # strongest Instagram captions (over 60 characters), first three.
+  assign story = '' | split: '¦'
+  if mf.story.value != blank
+    assign story = mf.story.value | strip | newline_to_br | split: '<br />'
+  elsif posts.size > 0
+    capture story_raw
+      for p in posts
+        if p.caption.size > 60 and p.hidden != true
+          echo p.caption | strip | append: '¦'
+        endif
+      endfor
+    endcapture
+    assign story = story_raw | split: '¦' | uniq
+  endif
+
+  assign headline = mf.headline.value
+  if headline == blank
+    if style_name != blank and suburb != blank
+      assign headline = 'A ' | append: style_name | append: ' residence, <em>in ' | append: suburb | append: '</em>.'
+    elsif suburb != blank
+      assign headline = 'Designed and built, <em>in ' | append: suburb | append: '</em>.'
+    else
+      assign headline = 'Designed and built <em>by Sabdia</em>.'
+    endif
+  endif
+
+  # The two photographs beside the story: the Photo blocks (first tall,
+  # second wide), else the folder's second and third pictures after the
+  # hero, else the page's second and third Gallery links.
+  assign side_a = blank
+  assign side_b = blank
+  assign side_a_ext = ''
+  assign side_b_ext = ''
+  assign side_a_attrs = ''
+  assign side_b_attrs = ''
+  assign photo_blocks = section.blocks | where: 'type', 'photo'
+  # A Photo block left with its photo removed does not count (15 Sep 2026):
+  # with no photo in any block the folder, then the Gallery links, stand in
+  # as they do with no blocks at all.
+  assign filled_blocks = 0
+  for block in photo_blocks
+    if block.settings.image != blank
+      assign filled_blocks = filled_blocks | plus: 1
+    endif
+  endfor
+  if s.show_side_photos
+    if filled_blocks > 0
+      for block in photo_blocks
+        if block.settings.image == blank
+          continue
+        endif
+        if side_a == blank
+          assign side_a = block.settings.image
+          assign side_a_attrs = block.shopify_attributes
+        elsif side_b == blank
+          assign side_b = block.settings.image
+          assign side_b_attrs = block.shopify_attributes
+          break
+        endif
+      endfor
+    elsif media_res != blank and media_res.images.size > 2
+      assign side_a = media_res.images[2]
+      if media_res.images.size > 3
+        assign side_b = media_res.images[3]
+      endif
+    elsif mf.gallery.value.size > 1
+      assign gal = mf.gallery.value
+      assign side_a_ext = gal[1]
+      if gal.size > 2
+        assign side_b_ext = gal[2]
+      endif
+    endif
+  endif
+  assign show_side = false
+  if side_a != blank or side_a_ext != blank
+    assign show_side = true
+  endif
+  assign has_b = false
+  if side_b != blank or side_b_ext != blank
+    assign has_b = true
+  endif
+
+  assign cd_split = '7fr 5fr'
+  if s.story_split == 'equal'
+    assign cd_split = '1fr 1fr'
+  elsif s.story_split == '8-4'
+    assign cd_split = '8fr 4fr'
+  endif
+-%}
+{% render 'section-look', section: section %}
+<div class="prop-body cd-body s-surface{% if show_side %} cd-side-{{ s.side_layout | default: 'offset' }}{% else %} cd-solo cd-solo-{{ s.story_align | default: 'left' }}{% endif %}" id="{{ s.look_anchor | default: 'about' }}" style="--cd-split:{{ cd_split }}">
+  <div class="cd-layout inner">
+    <div class="{% if s.sticky_story and show_side %}prop-desc {% endif %}cd-desc">
+      {%- if s.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ s.about_label | replace: name_token, res_title }}</div>{%- endif -%}
+      {%- if s.show_headline -%}<h2 class="prop-body-h reveal d1">{{ headline }}</h2>{%- endif -%}
+      {%- if story.size > 0 -%}
+        {%- for p in story limit: 4 -%}
+          {%- assign pt = p | strip -%}
+          {%- if pt == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign last = pt | slice: -1, 1 -%}
+          <p class="prop-body-p reveal d2">{{ pt }}{% unless last == '.' or last == '!' or last == '?' %}.{% endunless %}</p>
+        {%- endfor -%}
+      {%- elsif s.fallback_text != blank -%}
+        <p class="prop-body-p reveal d2">{{ s.fallback_text | replace: name_token, res_title }}</p>
+      {%- endif -%}
+      {%- if mf.features.value.size > 0 and s.show_features -%}
+        <div class="prop-features reveal d3">
+          <div class="prop-features-h">{{ s.features_heading }}</div>
+          <div class="prop-feat-grid">
+            {%- for f in mf.features.value -%}
+              <div class="prop-feat">{{ f }}</div>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+      {%- if s.show_links -%}
+      <div class="cd-desc-links reveal d3">
+        {%- if s.gallery_button != blank -%}<a href="#gallery" class="btn-g btn-g-gold">{{ s.gallery_button }}</a>{%- endif -%}
+        {%- if s.film_button != blank -%}<a href="#film" class="btn-g">{{ s.film_button }}</a>{%- endif -%}
+      </div>
+      {%- endif -%}
+    </div>
+
+    {%- if show_side -%}
+    <aside class="cd-side" aria-label="{{ res_title | escape }} photos">
+      <figure class="cd-side-a reveal-wipe d1" {{ side_a_attrs }}>
+        {%- if side_a != blank -%}
+        <img src="{{ side_a | image_url: width: 900, height: 1125, crop: 'center' }}" alt="{{ side_a.alt | default: res_title | escape }}" loading="lazy" decoding="async" width="900" height="1125">
+        {%- else -%}
+        <img src="{% render 'ext-variant', src: side_a_ext, w: 900, h: 1125 %}" alt="{{ res_title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="1125">
+        {%- endif -%}
+      </figure>
+      {%- if has_b -%}
+      <figure class="cd-side-b reveal-wipe d3" {{ side_b_attrs }}>
+        {%- if side_b != blank -%}
+        <img src="{{ side_b | image_url: width: 900, height: 675, crop: 'center' }}" alt="{{ side_b.alt | default: res_title | escape }}" loading="lazy" decoding="async" width="900" height="675">
+        {%- else -%}
+        <img src="{% render 'ext-variant', src: side_b_ext, w: 900, h: 675 %}" alt="{{ res_title | escape }}{% if suburb != blank %}, {{ suburb | escape }}{% endif %}" loading="lazy" decoding="async" width="900" height="675">
+        {%- endif -%}
+      </figure>
+      {%- endif -%}
+      {%- if s.show_side_caption -%}<div class="cd-side-cap reveal d4"><b>{{ res_title }}</b>{% if loc != blank %}<span>{{ loc }}</span>{% endif %}</div>{%- endif -%}
+    </aside>
+    {%- elsif request.design_mode and s.show_side_photos -%}
+    <aside class="cd-side"><p class="editor-note">About - no photographs yet. Add two Photo blocks (⊕ Add block › Photo): the first is the tall one, the second the wide one. Shoppers do not see this note.</p></aside>
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+  @media(min-width:901px){.cd-body .cd-layout{grid-template-columns:var(--cd-split,7fr 5fr)}}
+  .cd-solo .cd-layout{grid-template-columns:minmax(0,1fr);gap:0}
+  .cd-solo .cd-desc{max-width:min(100%,820px)}
+  .cd-solo .prop-body-p{max-width:68ch}
+  .cd-solo-centre .cd-desc{margin:0 auto}
+  .cd-side-stack .cd-side-a,.cd-side-stack .cd-side-b{width:100%;margin:0 0 16px!important;border:0;box-shadow:none}
+  .cd-side-single .cd-side-b{display:none}.cd-side-single .cd-side-a{width:100%}
+  .cd-layout{display:grid;grid-template-columns:7fr 5fr;gap:clamp(48px,7vw,110px);max-width:var(--page-max);margin:0 auto;align-items:start}
+  .cd-desc-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:40px}
+  .cd-side{position:relative;padding-top:clamp(0px,2vw,24px)}
+  .cd-side figure{margin:0;overflow:hidden;background:var(--bg3)}
+  .cd-side img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.96);transition:transform 1.2s var(--ease)}
+  .cd-side figure:hover img{transform:scale(1.03)}
+  .cd-side-a{aspect-ratio:4/5;width:78%}
+  .cd-side-b{aspect-ratio:4/3;width:62%;margin-left:auto!important;margin-top:-18%!important;box-shadow:0 30px 60px -30px rgba(var(--dark-rgb),.45);border:6px solid var(--bg)}
+  .cd-side-cap{display:flex;justify-content:space-between;gap:16px;margin-top:22px;font-size:var(--t-label);font-weight:300;letter-spacing:.26em;text-transform:uppercase;color:var(--taupe-d)}
+  .cd-side-cap b{font-weight:400;color:var(--ink)}
+  @media(max-width:900px){
+    .cd-layout{grid-template-columns:1fr;gap:44px}
+    .cd-desc{position:static}
+    .cd-side-a{width:86%}
+    .cd-side-b{width:64%;margin-top:-16%!important}
+  }
+</style>
+
+{% schema %}
+{
+  "name": "About",
+  "settings": [
+    { "type": "paragraph", "content": "The story of the residence with two photographs beside it. The headline, story and key features come from the page (Content › Pages › the residence › Metafields); the photographs are the Photo blocks below - the first tall, the second wide - so either can be swapped or removed. Write {name} wherever the residence's name should appear. Real photographs only, never generated." },
+    { "type": "product", "id": "media_product", "label": "Media folder", "info": "The residence's folder in Products. With no Photo blocks, its second and third pictures stand beside the story." },
+    { "type": "header", "content": "Words" },
+    { "type": "checkbox", "id": "show_about_label", "label": "Show the small label", "default": true },
+    { "type": "text", "id": "about_label", "label": "Small label", "default": "About {name}" },
+    { "type": "checkbox", "id": "show_headline", "label": "Show the headline", "default": true, "info": "The page's Headline metafield; empty = A <style> residence, in <suburb>." },
+    { "type": "textarea", "id": "fallback_text", "label": "Story when the page has none", "default": "{name} was designed, developed and built entirely in-house by Sabdia - one team from the first sketch to handover.", "info": "Shown only when the page has no Story and no Instagram captions yet." },
+    { "type": "checkbox", "id": "show_features", "label": "Show the key features", "default": true },
+    { "type": "text", "id": "features_heading", "label": "Features heading", "default": "Key Features" },
+    { "type": "checkbox", "id": "show_links", "label": "Photos and film buttons under the story", "default": true },
+    { "type": "text", "id": "gallery_button", "label": "Photos button", "default": "View the photos", "info": "Jumps to The residence. Empty = no button." },
+    { "type": "text", "id": "film_button", "label": "Film button", "default": "Watch the film", "info": "Jumps to The film. Empty = no button." },
+    { "type": "header", "content": "Layout" },
+    { "type": "checkbox", "id": "show_side_photos", "label": "Show the two photos beside the story", "default": true, "info": "The tall photo with the wide one overlapping it, beside the story (Naomi, 11 Sep 2026). Off = the story runs a reading measure alone." },
+    { "type": "select", "id": "side_layout", "label": "Side photos", "options": [{"value": "offset", "label": "Overlapping, offset (as designed)"}, {"value": "stack", "label": "Stacked, full width"}, {"value": "single", "label": "One photo"}], "default": "offset" },
+    { "type": "checkbox", "id": "show_side_caption", "label": "Caption under the side photos", "default": true },
+    { "type": "checkbox", "id": "sticky_story", "label": "Story holds while the photos scroll", "default": true, "info": "Only with the side photos on." },
+    { "type": "select", "id": "story_split", "label": "Column split", "options": [{"value": "7-5", "label": "Story 7 : photos 5 (as designed)"}, {"value": "equal", "label": "Equal halves"}, {"value": "8-4", "label": "Story 8 : photos 4"}], "default": "7-5" },
+    { "type": "select", "id": "story_align", "label": "Story column", "options": [{"value": "left", "label": "Left (as designed)"}, {"value": "centre", "label": "Centred on the page"}], "default": "left", "info": "Applies while the side photos are off." },
+    { "type": "header", "content": "Look" },
+    { "type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable." },
+    { "type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface." },
+    { "type": "color", "id": "look_color", "label": "Your colour", "default": "#F0EADE", "visible_if": "{{ section.settings.look_surface == 'custom' }}" },
+    { "type": "select", "id": "look_tone", "label": "Words on your colour", "options": [{"value": "light", "label": "Dark words (for a light colour)"}, {"value": "dark", "label": "Light words (for a dark colour)"}], "default": "light", "visible_if": "{{ section.settings.look_surface == 'custom' }}" },
+    { "type": "header", "content": "Space" },
+    { "type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only." },
+    { "type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100 },
+    { "type": "select", "id": "look_width", "label": "Content width", "options": [{"value": "theme", "label": "Theme setting (Layout › Content width)"}, {"value": "720", "label": "Narrow (720px)"}, {"value": "900", "label": "Reading (900px)"}, {"value": "1100", "label": "Medium (1100px)"}, {"value": "1300", "label": "Wide (1300px)"}, {"value": "1600", "label": "Very wide (1600px)"}, {"value": "edge", "label": "Edge to edge"}], "default": "theme" },
+    { "type": "range", "id": "look_margins", "label": "Side margins", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "A share of the site's side margins (Theme settings › Layout). 0 runs to the edges." },
+    { "type": "header", "content": "Type" },
+    { "type": "range", "id": "look_heading", "label": "Heading size", "min": 50, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "Scales the serif headings and titles in this section." },
+    { "type": "range", "id": "look_text", "label": "Text size", "min": 70, "max": 140, "step": 5, "unit": "%", "default": 100, "info": "Paragraphs, captions and standfirsts." },
+    { "type": "range", "id": "look_label", "label": "Small label size", "min": 0, "max": 20, "step": 0.5, "unit": "px", "default": 0, "info": "0 = the site-wide size (Theme settings › Layout › Section label size)." },
+    { "type": "header", "content": "Finishing" },
+    { "type": "checkbox", "id": "look_animate", "label": "Fade in as it scrolls into view", "default": true, "info": "Off = the section is simply there, no entrance." },
+    { "type": "checkbox", "id": "look_rule_top", "label": "Hairline above", "default": false },
+    { "type": "checkbox", "id": "look_rule_bottom", "label": "Hairline below", "default": false },
+    { "type": "text", "id": "look_anchor", "label": "Anchor name", "info": "Lets a link jump straight here: with the word about, a link to /pages/collection-milos#about lands on this section." }
+  ],
+  "blocks": [
+    {
+      "type": "photo",
+      "name": "Photo",
+      "limit": 2,
+      "settings": [
+        { "type": "paragraph", "content": "One of the two photographs beside the story: the first block is the tall one, the second the wide one. Drag to swap them." },
+        { "type": "image_picker", "id": "image", "label": "Photo" }
+      ]
+    }
+  ],
+  "templates": ["page"],
+  "presets": [{ "name": "About", "blocks": [{ "type": "photo" }, { "type": "photo" }] }]
+}
+{% endschema %}

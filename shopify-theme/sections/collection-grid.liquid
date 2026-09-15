@@ -24,8 +24,10 @@
 {%- liquid
   # Hand-picked residences (Residence blocks) replace the automatic list, in
   # block order. Each residence's own Status still decides how its card reads.
+  # The same template serves /collections/sold: there the blocks (the For
+  # Sale cards) step aside and the sold list stays automatic.
   assign picked = false
-  if section.blocks.size > 0
+  if section.blocks.size > 0 and show_rich
     assign picked = true
     assign list_csv = ''
     for block in section.blocks
@@ -73,6 +75,18 @@
   assign ffile_list = ffiles | split: '||' | uniq
   assign mc_featured = section.settings.show_featured
   assign mc_style = 'aspect-ratio:' | append: section.settings.card_shape | default: '16/10'
+  # The first Residence block's own words and photo lead the featured
+  # banner too (15 Sep 2026): anything typed on the block replaces the
+  # residence's line there as on its card.
+  assign fb = false
+  if picked
+    for block in section.blocks
+      if block.settings.product != blank
+        assign fb = block.settings
+        break
+      endif
+    endfor
+  endif
 -%}
 
 {%- if gfont_list.size > 0 -%}
@@ -106,12 +120,60 @@
 {%- if featured and mc_featured -%}
   {%- assign fmf = featured.metafields.custom -%}
   {%- capture fstatus -%}{% render 'residence-status', product: featured %}{%- endcapture -%}
+  {%- liquid
+    if fb and fb.status != blank
+      assign fstatus = fb.status | strip
+    endif
+    assign f_img = featured.featured_image
+    assign f_url = featured.url
+    assign f_focus = 'center'
+    assign f_suburb = fmf.suburb.value | append: ', ' | append: fmf.state.value | default: 'QLD'
+    if fmf.state.value == blank
+      assign f_suburb = fmf.suburb.value | append: ', QLD'
+    endif
+    assign f_beds = fmf.beds.value
+    assign f_baths = fmf.baths.value
+    assign f_cars = fmf.cars.value
+    assign f_build = fmf.build_size.value
+    assign f_land = fmf.land.value | append: 'm²'
+    if fmf.land_over.value
+      assign f_land = f_land | append: '+'
+    endif
+    if fb
+      if fb.image
+        assign f_img = fb.image
+      endif
+      if fb.link != blank
+        assign f_url = fb.link
+      endif
+      assign f_focus = fb.focus | default: 'center'
+      if fb.suburb != blank
+        assign f_suburb = fb.suburb
+      endif
+      if fb.beds != blank
+        assign f_beds = fb.beds
+      endif
+      if fb.baths != blank
+        assign f_baths = fb.baths
+      endif
+      if fb.cars != blank
+        assign f_cars = fb.cars
+      endif
+      if fb.build != blank
+        assign f_build = fb.build
+      endif
+      if fb.land != blank
+        assign f_land = fb.land | append: 'm²'
+      endif
+    endif
+  -%}
   {%- if fstatus == 'For Sale' and settings.label_for_sale != blank -%}{%- assign fstatus = settings.label_for_sale -%}{%- endif -%}
   <section style="padding:clamp(40px,5vw,64px) var(--page-pad) 0;background:var(--bg)" id="featuredWrap">
     <div class="inner">
-      <a href="{{ featured.url }}" class="reveal" style="display:block;position:relative;overflow:hidden;height:min({{ section.settings.featured_height | default: 680 }}px,clamp(400px,52vw,680px));cursor:pointer;text-decoration:none">
-        {%- if featured.featured_image -%}
-          <img src="{{ featured.featured_image | image_url: width: 1600, height: 900, crop: 'center' }}" alt="{{ featured.title | escape }}" width="1600" height="900" loading="eager" fetchpriority="high"
+      <a href="{{ f_url }}" class="reveal" style="display:block;position:relative;overflow:hidden;height:min({{ section.settings.featured_height | default: 680 }}px,clamp(400px,52vw,680px));cursor:pointer;text-decoration:none{% unless f_img %};background:var(--dark){% endunless %}">
+        {%- comment -%} No photo on the block or the residence (15 Sep 2026): the banner stands on the dark ground, never a pale empty frame under white words. {%- endcomment -%}
+        {%- if f_img -%}
+          <img src="{{ f_img | image_url: width: 1600, height: 900, crop: f_focus }}" alt="{{ featured.title | escape }}" width="1600" height="900" loading="eager" fetchpriority="high"
                style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.98) saturate(.96);transition:filter .7s,transform .7s">
         {%- endif -%}
         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(var(--dark-rgb),.88) 0%,rgba(var(--dark-rgb),.1) 50%,transparent 100%);transition:opacity .4s"></div>
@@ -141,19 +203,21 @@
                 assign fb_name = featured.title | downcase | capitalize
               endif
             endif
+            if fb and fb.name != blank
+              assign fb_name = fb.name
+            endif
           -%}
           <div style="font-family:{{ fb_font }};font-size:calc(var(--t-display)*var(--s-h,1)*{{ fb_scale | default: 1 | strip }});font-weight:{{ fmf.name_font_weight.value | default: 300 }};line-height:.95;letter-spacing:0;color:var(--white);margin-bottom:10px{{ fb_caps }}">{{ fb_name }}</div>
-          <div style="font-size:11.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--white-rgb),.78);margin-bottom:18px">{{ fmf.suburb.value }}, {{ fmf.state.value | default: 'QLD' }}</div>
+          <div style="font-size:11.5px;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:rgba(var(--white-rgb),.78);margin-bottom:18px">{{ f_suburb }}</div>
           {%- if section.settings.featured_specs -%}
-          <div style="display:flex;gap:18px;flex-wrap:wrap">
-            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.beds.value }} Bed</span>
-            <span style="font-size:11px;color:rgba(var(--white-rgb),.45)">&middot;</span>
-            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.baths.value }} Bath</span>
-            <span style="font-size:11px;color:rgba(var(--white-rgb),.45)">&middot;</span>
-            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.cars.value }} Garage</span>
-            <span style="font-size:11px;color:rgba(var(--white-rgb),.45)">&middot;</span>
-            <span style="font-size:11px;font-weight:400;letter-spacing:.08em;color:rgba(var(--white-rgb),.82)">{{ fmf.land.value }}m&sup2;{% if fmf.land_over.value %}+{% endif %}</span>
-          </div>
+          {%- comment -%} The same chips as the cards below, so the featured residence matches (Naomi, 15 Sep 2026). {%- endcomment -%}
+          <ul class="pc-specs" style="margin-top:0">
+            {%- if f_beds != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'beds' %}<span>{{ f_beds }} Bed</span></li>{%- endif -%}
+            {%- if f_baths != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'baths' %}<span>{{ f_baths }} Bath</span></li>{%- endif -%}
+            {%- if f_cars != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'cars' %}<span>{{ f_cars }} Garage</span></li>{%- endif -%}
+            {%- if f_build != blank -%}<li class="pc-spec" title="Build size">{% render 'spec-icon', icon: 'house' %}<span>{{ f_build }}m&sup2;<span class="pc-spec-k"> build</span></span></li>{%- endif -%}
+            {%- if f_land != 'm²' -%}<li class="pc-spec" title="Land size">{% render 'spec-icon', icon: 'land' %}<span>{{ f_land }}<span class="pc-spec-k"> land</span></span></li>{%- endif -%}
+          </ul>
           {%- endif -%}
         </div>
         <div style="position:absolute;top:clamp(18px,3vw,32px);right:clamp(18px,3vw,32px);width:44px;height:44px;border:1px solid rgba(var(--gold2-rgb),.45);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);font-size:16px">&rarr;</div>
@@ -163,7 +227,7 @@
 {%- endif -%}
 {%- endif -%}
 
-<section style="padding:clamp(8px,1vw,10px) var(--page-pad) 0;background:var(--bg);--pgc-cols:{{ section.settings.columns | default: '3' }};--pgc-gap:{{ section.settings.gap | default: 10 }}px">
+<section style="padding:clamp(8px,1vw,10px) var(--page-pad) 0;background:var(--bg);--pgc-cols:{{ section.settings.columns | default: '3' }};--pgc-gap:{{ section.settings.gap | default: 10 }}px;--pc-status:{{ section.settings.card_status_size | default: 100 | divided_by: 100.0 }};--pc-name-scale:{{ section.settings.card_name_size | default: 100 | divided_by: 100.0 }};--pc-chip:{{ section.settings.card_chip_size | default: 100 | divided_by: 100.0 }}">
   <div class="inner">
     <div class="proj-grid-3 mc-grid" id="propGrid" {% unless show_rich and mc_featured %}style="padding-top:clamp(32px,4vw,56px)"{% endunless %}>
       {%- if picked -%}
@@ -172,14 +236,14 @@
           {%- if block.settings.product == blank -%}{%- continue -%}{%- endif -%}
           {%- assign gi = gi | plus: 1 -%}
           {%- assign lead = false -%}{%- if show_rich and mc_featured -%}{%- assign lead = true -%}{%- endif -%}
-          {% render 'collection-card', product: block.settings.product, index: gi, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, image: block.settings.image, attrs: block.shopify_attributes %}
+          {% render 'collection-card', product: block.settings.product, index: gi, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
         {%- endfor -%}
       {%- else -%}
       {%- for h in handles -%}
         {%- for product in collections.all.products -%}
         {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
           {%- assign lead = false -%}{%- if show_rich and mc_featured -%}{%- assign lead = true -%}{%- endif -%}
-          {% render 'collection-card', product: product, index: forloop.parentloop.index, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}
+          {% render 'collection-card', product: product, index: forloop.parentloop.index, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
         {%- break -%}
         {%- endfor -%}
       {%- endfor -%}
@@ -268,7 +332,8 @@
 
       var sorted = cards.slice().sort(function (a, b) {
         var d = 0;
-        if (sortVal === 'land') d = Number(b.dataset.land) - Number(a.dataset.land);
+        if (sortVal === 'build') d = Number(b.dataset.build || 0) - Number(a.dataset.build || 0);
+        else if (sortVal === 'land') d = Number(b.dataset.land) - Number(a.dataset.land);
         else if (sortVal === 'beds') d = Number(b.dataset.beds) - Number(a.dataset.beds);
         else if (sortVal === 'cars') d = Number(b.dataset.cars) - Number(a.dataset.cars);
         else if (sortVal === 'year') d = Number(b.dataset.year || 0) - Number(a.dataset.year || 0);
@@ -319,7 +384,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "The residences on the For Sale page: the featured banner and the grid of cards. Add Residence blocks (⊕ Add block) to hand-pick which residences show and in what order - the first leads as the featured banner; each block can carry its own card photo. With no blocks the grid is automatic: every residence whose Status is live, in the For Sale collection's order. Whether a card reads For Sale, Under Offer or Sold, and its numbers, come from Products › the residence."
+      "content": "The residences on the For Sale page: the featured banner and the grid of cards. One Residence block per card (⊕ Add block) - drag to reorder, the first leads as the featured banner. Click a card in the preview to open its block: its photo, crop, name, status word, location, numbers and link can each be changed there for this card only. With no blocks the grid is automatic: every residence whose Status is live, in the For Sale collection's order, with the numbers from Products › the residence."
     },
     {
       "type": "header",
@@ -335,7 +400,7 @@
     {
       "type": "checkbox",
       "id": "featured_specs",
-      "label": "Bed · bath · garage · land on the banner",
+      "label": "Bed · bath · garage · build · land on the banner",
       "default": true
     },
     {
@@ -422,9 +487,17 @@
     },
     {
       "type": "checkbox",
+      "id": "show_build",
+      "label": "Build size on the cards",
+      "default": true,
+      "info": "The house icon. Products › the residence › Metafields › Build size (m²)."
+    },
+    {
+      "type": "checkbox",
       "id": "show_land",
       "label": "Land size on the cards",
-      "default": true
+      "default": true,
+      "info": "The lot icon. Products › the residence › Metafields › Land size (m²)."
     },
     {
       "type": "text",
@@ -432,6 +505,10 @@
       "label": "No-matches text",
       "default": "Nothing matches those filters. Try widening them."
     },
+    {"type": "header", "content": "Card words"},
+    {"type": "range", "id": "card_status_size", "label": "Status chip size", "min": 60, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "The For Sale / Sold chip. 100% = as designed."},
+    {"type": "range", "id": "card_name_size", "label": "Name size", "min": 60, "max": 180, "step": 5, "unit": "%", "default": 100, "info": "The residence name on every card (brochure faces follow it)."},
+    {"type": "range", "id": "card_chip_size", "label": "Spec chip size", "min": 60, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "The bed, bath, garage and size chips."},
     {
       "type": "header",
       "content": "Look"
@@ -741,14 +818,32 @@
           "type": "product",
           "id": "product",
           "label": "Residence",
-          "info": "A residence from Products. Its numbers, suburb and Status come from the product; the first block leads as the featured banner."
+          "info": "A residence from Products. Its numbers, suburb and Status come from the product; the first block leads as the featured banner. Anything typed below replaces that line on this card only."
         },
         {
           "type": "image_picker",
           "id": "image",
           "label": "Card photo",
           "info": "Empty = the residence's main photo. Real photographs only, never generated."
-        }
+        },
+        {
+          "type": "select",
+          "id": "focus",
+          "label": "Crop focus",
+          "options": [{"value": "center", "label": "Centre"}, {"value": "top", "label": "Top"}, {"value": "bottom", "label": "Bottom"}, {"value": "left", "label": "Left"}, {"value": "right", "label": "Right"}],
+          "default": "center"
+        },
+        { "type": "header", "content": "Words on the card" },
+        { "type": "paragraph", "content": "Each box replaces that line on this card only; empty = the residence's own (Products › the residence). The residence page itself is unchanged." },
+        { "type": "text", "id": "name", "label": "Name" },
+        { "type": "text", "id": "status", "label": "Status word", "info": "The chip, e.g. For Sale, Under Offer, Coming Soon. A word containing Sold turns the card into a sold card." },
+        { "type": "text", "id": "suburb", "label": "Location line", "info": "Written as it should read, e.g. Camp Hill, QLD." },
+        { "type": "text", "id": "beds", "label": "Bedrooms" },
+        { "type": "text", "id": "baths", "label": "Bathrooms" },
+        { "type": "text", "id": "cars", "label": "Garages" },
+        { "type": "text", "id": "build", "label": "Build size (m²)" },
+        { "type": "text", "id": "land", "label": "Land size (m²)" },
+        { "type": "url", "id": "link", "label": "Link", "info": "Empty = the residence's page." }
       ]
     }
   ],

@@ -65,6 +65,17 @@
     if first_review.settings.photo != blank
       assign first_key = first_review.settings.photo.src
     endif
+    # No fallback photo and none on the first review: the first photo any
+    # review still carries, so the panel never opens on an empty frame
+    # (15 Sep 2026).
+    if first_key == blank
+      for block in reviews
+        if block.settings.photo != blank
+          assign first_key = block.settings.photo.src
+          break
+        endif
+      endfor
+    endif
   endunless
 
   # Google chip: five stars, filled to the real rating (4.4 fills four

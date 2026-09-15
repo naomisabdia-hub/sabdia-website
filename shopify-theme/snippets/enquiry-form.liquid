@@ -1,0 +1,223 @@
+{%- comment -%}
+  The one enquiry form. The Contact page (main-contact, look: 'page') and
+  the home page Contact band (contact-cta, look: 'band') both render it,
+  so the two ask the same questions in the same order and behave alike:
+  the Interest list, the residences for sale, the buyer questions, the
+  Careers CV, the tailored thank-yous and the filing under Customers.
+
+  Interest list: Theme settings › Contact › Enquiry options, one list for
+  every page. The residences for sale (Status field, For Sale drag-order)
+  follow its first line. Agent options hide while Agent Access is off.
+  Wording and layout stay each section's own settings.
+
+  Usage: {% render 'enquiry-form', s: section.settings, section_id: section.id, look: 'page' %}
+{%- endcomment -%}
+{%- liquid
+  assign page_look = false
+  if look == 'page'
+    assign page_look = true
+  endif
+
+  assign fs = collections['for-sale']
+  if s.listings_collection != blank
+    assign fs = s.listings_collection
+  endif
+  capture live_h
+    render 'residence-handles', col: fs, group: 'live'
+  endcapture
+  assign live = live_h | split: ','
+
+  if settings.enquiry_options != blank
+    assign lines = settings.enquiry_options | newline_to_br | split: '<br />'
+  else
+    assign lines = 'For Sale - Current Residences,Request a Viewing,General Enquiry' | split: ','
+  endif
+
+  assign careers_bucket = settings.careers_bucket | default: 'careers'
+  assign careers_upload = settings.supabase_url | default: 'https://fvczsjcrvwzqtcbforgo.supabase.co' | append: '/storage/v1/object/' | append: careers_bucket
+
+  if page_look
+    assign ph_email = 'your@email.com'
+    assign ph_phone = '+61 4xx xxx xxx'
+    assign ph_message = 'Tell us about your interest, timeline, or any questions you have…'
+    assign submit = s.submit_label | default: 'Submit Enquiry'
+    assign note = s.form_note
+    assign form_style = 'margin-top:12px'
+  else
+    assign ph_email = s.f_email_ph | default: 'Email address'
+    assign ph_phone = s.f_phone_ph | default: 'Phone number'
+    assign ph_message = s.f_message_ph | default: 'Tell us about your interest...'
+    assign submit = s.f_submit | default: 'Submit'
+    assign note = s.note
+    assign form_style = ''
+  endif
+  assign cm_uid = 'cm-' | append: section_id
+-%}
+{%- capture options_html -%}
+  <option value="">{{ s.f_interest_ph | default: "Select an enquiry type…" }}</option>
+  {%- assign residences_done = false -%}
+  {%- for line in lines -%}
+    {%- assign parts = line | split: '|' -%}
+    {%- assign o = parts[0] | strip -%}
+    {%- if o == blank -%}{%- continue -%}{%- endif -%}
+    {%- if settings.agent_access_enabled != true and o contains 'Agent' -%}{%- continue -%}{%- endif -%}
+    <option>{{ o | escape }}</option>
+    {%- unless residences_done -%}
+      {%- assign residences_done = true -%}
+      {%- for h in live -%}
+        {%- for p in collections.all.products -%}
+          {%- if p.handle == h and p.tags contains 'property' -%}
+            {%- assign sub = p.metafields.custom.suburb.value -%}
+            <option>{{ p.title | escape }}{% if sub != blank %} - {{ sub | escape }}{% endif %}</option>
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endfor -%}
+    {%- endunless -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- capture thanks_html -%}
+  {%- for line in lines -%}
+    {%- assign parts = line | split: '|' -%}
+    {%- if parts.size > 1 -%}
+      {%- assign o = parts[0] | strip -%}
+      {%- assign t = line | remove_first: parts[0] | remove_first: '|' | strip -%}
+      {%- if o != blank and t != blank -%}<span hidden data-thanks-for="{{ o | escape }}">{{ t }}</span>{%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+<div class="enq-form" data-careers-upload="{{ careers_upload }}" data-careers-key="{{ settings.supabase_anon_key }}">
+{%- if settings.form_backend == 'vercel' -%}
+  <form class="cform reveal d1" id="cform"{% if form_style != blank %} style="{{ form_style }}"{% endif %} name="contact" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
+    <input type="hidden" name="form-name" value="contact">
+    <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+    <div class="frow">
+      <div class="fg"><label class="fl" for="cf-first">{{ s.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="first-name" class="fi" placeholder="{{ s.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
+      <div class="fg"><label class="fl" for="cf-last">{{ s.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="last-name" class="fi" placeholder="{{ s.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
+    </div>
+    <div class="fg"><label class="fl" for="cf-email">{{ s.f_email | default: "Email*" }}</label><input type="email" id="cf-email" name="email" class="fi" placeholder="{{ ph_email }}" autocomplete="email" required></div>
+    <div class="fg"><label class="fl" for="cf-phone">{{ s.f_phone | default: "Phone" }}</label><input type="tel" id="cf-phone" name="phone" class="fi" required placeholder="{{ ph_phone }}" autocomplete="tel"></div>
+    <div class="fg">
+      <label class="fl" for="cf-interest">{{ s.f_interest | default: "Interest" }}</label>
+      <select class="fsel" id="cf-interest" name="enquiry-type" required>{{ options_html }}</select>
+      {{ thanks_html }}
+    </div>
+    {% render 'prequal-fields', mode: 'vercel', s: s %}
+    <div class="fg" data-careers-wrap hidden>
+      <label class="fl" for="cf-cv-v">{{ s.careers_label | default: "CV or resume*" }}</label>
+      <input type="file" id="cf-cv-v" class="fi fi-file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple data-careers-file disabled>
+      <ul class="cv-files" data-careers-list hidden></ul>
+      <p class="form-note" style="margin:0">{{ s.careers_note | default: "PDF or Word, up to 10 MB each. Add as many as you need: CV, cover letter, portfolio." }}</p>
+      <input type="hidden" name="cv" value="" data-careers-path>
+    </div>
+    <div class="fg"><label class="fl" for="cf-message">{{ s.f_message | default: "Message*" }}</label><textarea class="fta" id="cf-message" name="message" placeholder="{{ ph_message }}"{% if page_look %} style="min-height:140px"{% endif %} required></textarea></div>
+    {%- if page_look -%}
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <button type="submit" class="fsub" id="fsub">{{ submit }} &rarr;</button>
+      <p class="form-note" style="margin:0">{% render 'privacy-link', note: note %}</p>
+    </div>
+    <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+    {%- else -%}
+    <button type="submit" class="fsub" id="fsub">{{ submit }} &rarr;</button>
+    <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
+    <p class="form-note">{% render 'privacy-link', note: note %}</p>
+    {%- endif -%}
+  </form>
+{%- else -%}
+  {%- comment -%} Shopify-native: emails the store's sender address; the
+      hidden signup beside it files the enquirer under Customers. The
+      signup must stay inside this wrapper, next to the form (main.js
+      looks for it in the form's parent). {%- endcomment -%}
+  {% form 'contact', id: 'cform', class: 'cform reveal d1', style: form_style %}
+    <span hidden data-thanks>{{ s.success_text | default: "Thank you - we will be in touch within a business day." }}</span>
+    {%- if form.posted_successfully? -%}
+      {% render 'form-thanks', text: s.success_text %}
+    {%- else -%}
+    {%- if form.errors -%}
+      <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
+    {%- endif -%}
+    <div class="frow">
+      <div class="fg"><label class="fl" for="cf-first">{{ s.f_first | default: "First Name*" }}</label><input type="text" id="cf-first" name="contact[First name]" class="fi" placeholder="{{ s.f_first_ph | default: "First name" }}" autocomplete="given-name" required></div>
+      <div class="fg"><label class="fl" for="cf-last">{{ s.f_last | default: "Last Name*" }}</label><input type="text" id="cf-last" name="contact[Last name]" class="fi" placeholder="{{ s.f_last_ph | default: "Last name" }}" autocomplete="family-name" required></div>
+    </div>
+    <div class="fg"><label class="fl" for="cf-email">{{ s.f_email | default: "Email*" }}</label><input type="email" id="cf-email" name="contact[email]" class="fi" placeholder="{{ ph_email }}" autocomplete="email" required></div>
+    <div class="fg"><label class="fl" for="cf-phone">{{ s.f_phone | default: "Phone" }}</label><input type="tel" id="cf-phone" name="contact[Phone]" class="fi" required placeholder="{{ ph_phone }}" autocomplete="tel"></div>
+    <div class="fg">
+      <label class="fl" for="cf-interest">{{ s.f_interest | default: "Interest" }}</label>
+      <select class="fsel" id="cf-interest" name="contact[Enquiry type]" required>{{ options_html }}</select>
+      {{ thanks_html }}
+    </div>
+    {% render 'prequal-fields', mode: 'shopify', s: s %}
+    {%- comment -%} Careers: a CV is required and uploads to the careers folder before the form sends (main.js). {%- endcomment -%}
+    <div class="fg" data-careers-wrap hidden>
+      <label class="fl" for="cf-cv">{{ s.careers_label | default: "CV or resume*" }}</label>
+      <input type="file" id="cf-cv" class="fi fi-file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple data-careers-file disabled>
+      <ul class="cv-files" data-careers-list hidden></ul>
+      <p class="form-note" style="margin:0">{{ s.careers_note | default: "PDF or Word, up to 10 MB each. Add as many as you need: CV, cover letter, portfolio." }}</p>
+      <input type="hidden" name="contact[CV]" value="" data-careers-path>
+    </div>
+    <div class="fg"><label class="fl" for="cf-message">{{ s.f_message | default: "Message*" }}</label><textarea class="fta" id="cf-message" name="contact[body]" placeholder="{{ ph_message }}"{% if page_look %} style="min-height:140px"{% endif %} required></textarea></div>
+    {%- if page_look -%}
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      {% render 'form-optin', label: s.optin_label %}
+      <button type="submit" class="fsub" id="fsub">{{ submit }} &rarr;</button>
+      <p class="form-note" style="margin:0">{% render 'privacy-link', note: note %}</p>
+    </div>
+    {%- else -%}
+    {% render 'form-optin', label: s.optin_label %}
+    <button type="submit" class="fsub" id="fsub">{{ submit }} &rarr;</button>
+    <p class="form-note">{% render 'privacy-link', note: note %}</p>
+    {%- endif -%}
+    {%- endif -%}
+  {% endform %}
+  {% render 'customer-mirror', uid: cm_uid, residence: '' %}
+{%- endif -%}
+</div>
+
+<script>
+  /* Links such as /pages/contact?interest=Request%20a%20Viewing or
+     /?interest=Careers#contact arrive with the form already chosen.
+     ?interest=<Interest label>  chooses that enquiry type (added to the list if it is not there).
+     ?property=<residence title> chooses that residence from the same list when no interest is
+                                 given; otherwise the message opens with "Regarding <property>: ".
+     ?message=<text>             starts the message (only when the message is still empty).
+     Values are URL-decoded by the browser (Agent%20Access, SOLACE, Hello%20there). */
+  (function () {
+    var root = document.getElementById('shopify-section-{{ section_id }}') || document;
+    var sel = root.querySelector('#cf-interest');
+    var msg = root.querySelector('#cf-message');
+    if (!sel || sel.dataset.prefill) return;
+    sel.dataset.prefill = '1';
+    var q = new URLSearchParams(location.search);
+    var interest = (q.get('interest') || '').trim();
+    var property = (q.get('property') || '').trim();
+    var message = (q.get('message') || '').trim();
+    if (!interest && !property && !message) return;
+    var option = function (test) {
+      for (var i = 0; i < sel.options.length; i++) {
+        var v = sel.options[i].value;
+        if (v && test(v.toLowerCase())) return sel.options[i];
+      }
+      return null;
+    };
+    var pick = null, residencePicked = false;
+    if (interest) {
+      var wantI = interest.toLowerCase();
+      pick = option(function (v) { return v === wantI; });
+      if (!pick) { pick = new Option(interest, interest); sel.add(pick, 1); }
+    } else if (property) {
+      /* The residences for sale sit in this list as "SOLACE - Camp Hill". */
+      var wantP = property.toLowerCase();
+      pick = option(function (v) { return v === wantP || v.indexOf(wantP + ' - ') === 0; });
+      residencePicked = !!pick;
+    }
+    if (pick) {
+      sel.value = pick.value;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    if (msg && !msg.value.trim()) {
+      var lead = property && !residencePicked ? 'Regarding ' + property + ': ' : '';
+      if (lead || message) msg.value = lead + message;
+    }
+  })();
+</script>

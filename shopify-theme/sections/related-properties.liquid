@@ -38,7 +38,7 @@
       {%- assign delay = '' -%}
       {%- if shown == 2 -%}{%- assign delay = ' d1' -%}{%- elsif shown > 2 -%}{%- assign delay = ' d2' -%}{%- endif -%}
       {%- assign card_class = 'reveal' | append: delay -%}
-      <div class="prop-related-pick" {{ block.shopify_attributes }}>{% render 'property-card', product: p, class: card_class, style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}</div>
+      <div class="prop-related-pick" {{ block.shopify_attributes }}>{% render 'property-card', product: p, class: card_class, style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}</div>
     {%- endfor -%}
   {%- else -%}
   {%- for h in live_handles -%}
@@ -47,9 +47,9 @@
       {%- if p.handle != h or p.id == product.id -%}{%- continue -%}{%- endif -%}
       {%- assign shown = shown | plus: 1 -%}
       {%- case shown -%}
-        {%- when 1 -%}{% render 'property-card', product: p, class: 'reveal', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}
-        {%- when 2 -%}{% render 'property-card', product: p, class: 'reveal d1', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}
-        {%- else -%}{% render 'property-card', product: p, class: 'reveal d2', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land %}
+        {%- when 1 -%}{% render 'property-card', product: p, class: 'reveal', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
+        {%- when 2 -%}{% render 'property-card', product: p, class: 'reveal d1', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
+        {%- else -%}{% render 'property-card', product: p, class: 'reveal d2', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
       {%- endcase -%}
       {%- break -%}
     {%- endfor -%}
@@ -110,6 +110,7 @@
     {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},
     {"type": "text", "id": "label", "label": "Small label above the heading (optional)"},
     {"type": "checkbox", "id": "show_cars", "label": "Garage count on the cards", "default": true},
+    {"type": "checkbox", "id": "show_build", "label": "Build size on the cards", "default": false},
     {"type": "checkbox", "id": "show_land", "label": "Land size on the cards", "default": false},
     {"type": "header", "content": "Layout"},
     {"type": "range", "id": "count", "label": "Residences shown (automatic row)", "min": 1, "max": 6, "step": 1, "default": 3, "info": "Hand-picked Residence blocks all show."},

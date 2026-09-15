@@ -37,7 +37,7 @@
   endcapture
 -%}
 {%- if pstatus contains 'Sold' and slot == 'row' -%}
-  {% render 'sold-card', product: product, class: cls, img_w: w, img_h: h, show_suburb: s.sold_suburb, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, attrs: block.shopify_attributes %}
+  {% render 'sold-card', product: product, class: cls, img_w: w, img_h: h, show_suburb: s.sold_suburb, show_build: s.show_build, show_land: s.show_land, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, attrs: block.shopify_attributes %}
 {%- else -%}
-  {% render 'property-card', product: product, class: cls, img_w: w, img_h: h, show_cars: cars, show_land: s.show_land, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, attrs: block.shopify_attributes %}
+  {% render 'property-card', product: product, class: cls, img_w: w, img_h: h, show_cars: cars, show_land: s.show_land, show_build: s.show_build, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, attrs: block.shopify_attributes %}
 {%- endif -%}
