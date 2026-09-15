@@ -22,56 +22,21 @@
   are still deduplicated from every block, and "Show more" (off by
   default) keeps the first N tiles on the page and reveals the rest on a
   button, no reload; filters always search the whole set.
+  Filters (15 Sep 2026): Style and Suburb sit side by side at the left of
+  the bar, each a dropdown with a tick box beside every choice (the For
+  Sale Features menu, in this bar's own type), so several can be chosen. A
+  residence shows when its style is one of the ticked styles (or none is
+  ticked) and its suburb one of the ticked suburbs (or none is). Both lists
+  hold every style and suburb of the cards on the page, once each, A to Z.
 {%- endcomment -%}
 {%- liquid
   assign sid = section.id
   assign pcount = 0
   assign empty_blocks = 0
-  capture styles_raw
-    for block in section.blocks
-      assign rp = block.settings.page
-      if rp == blank and block.settings.link contains '/pages/'
-        assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
-        assign rp = pages[rp_handle]
-      endif
-      # A block with no residence, name or photo is left out of the grid,
-      # so it is not counted either (15 Sep 2026).
-      if block.settings.product == blank and rp.title == blank and block.settings.name == blank and block.settings.image == blank and block.settings.image_ext == blank
-        assign empty_blocks = empty_blocks | plus: 1
-      endif
-      if block.settings.product != blank
-        assign r_style = block.settings.style | default: block.settings.product.metafields.custom.style.value | strip
-      else
-        assign r_style = block.settings.style | default: rp.metafields.custom.style.value | strip
-      endif
-      if r_style != blank
-        echo r_style | append: '¦'
-      endif
-    endfor
-  endcapture
-  assign styles = styles_raw | strip | split: '¦' | uniq | sort
-  capture suburbs_raw
-    for block in section.blocks
-      assign rp = block.settings.page
-      if rp == blank and block.settings.link contains '/pages/'
-        assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
-        assign rp = pages[rp_handle]
-      endif
-      if block.settings.product != blank
-        assign r_loc = block.settings.loc | default: block.settings.product.metafields.custom.suburb.value
-      else
-        assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
-      endif
-      assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
-      if r_suburb != blank
-        echo r_suburb | append: '¦'
-      endif
-    endfor
-  endcapture
-  assign suburbs = suburbs_raw | strip | split: '¦' | uniq | sort
+  assign count_token = '{' | append: 'count' | append: '}'
   # Switched off for launch (10 Sep 2026): For Sale has its own page. Turn
   # "Include residences from Products" on and the current homes lead the
-  # grid again, tagged For Sale / Sold, with matching filter chips.
+  # grid again, tagged For Sale / Sold, with matching filter choices.
   assign show_current = section.settings.show_current
   assign scope = section.settings.current_scope | default: 'all'
   assign current_handles = '' | split: ','
@@ -89,15 +54,122 @@
     assign sold_handles = sold_csv | split: ','
     assign current_handles = current_handles | concat: sold_handles
   endif
-  assign total = section.blocks.size | minus: empty_blocks
-  if show_current
-    assign total = total | plus: current_handles.size
-  endif
-  assign count_token = '{' | append: 'count' | append: '}'
   assign tile_media = section.settings.tile_media | default: 'photo'
   assign more_after = 0
   if section.settings.show_more
     assign more_after = section.settings.show_more_after | default: 12
+  endif
+  assign live_word = section.settings.filter_live | default: 'For Sale'
+  assign sold_word = section.settings.filter_sold | default: 'Sold'
+  assign has_live = false
+  assign has_sold = false
+  assign suburbs_raw = ''
+-%}
+{%- comment -%}
+  The homes from Products lead the grid, so their cards are written here,
+  ahead of the filter bar, and printed at the top of the grid below: that
+  way their suburbs and For Sale / Sold groups reach the filter lists.
+{%- endcomment -%}
+{%- capture current_cards -%}
+  {%- if show_current -%}
+    {%- for h in current_handles -%}
+      {%- for product in collections.all.products -%}
+        {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
+        {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
+        {%- liquid
+          assign grp = live_word
+          if pstatus contains 'Sold'
+            assign grp = sold_word
+            assign has_sold = true
+          else
+            assign has_live = true
+          endif
+          assign p_suburb = product.metafields.custom.suburb.value | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+          if p_suburb != blank
+            assign suburbs_raw = suburbs_raw | append: p_suburb | append: '¦'
+          endif
+          assign pcount = pcount | plus: 1
+        -%}
+            <a href="{{ product.url }}" class="pf-card reveal{% if more_after > 0 and pcount > more_after %} pf-more{% endif %}" data-port-card data-style="{{ grp | escape }}" data-suburb="{{ p_suburb | escape }}">
+              {%- if product.featured_image -%}
+              <div class="pf-media">
+                  <img src="{{ product.featured_image | image_url: width: 1200, height: 900, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="900" loading="lazy" decoding="async">
+                <span class="port-film-tag">{{ pstatus }}</span>
+              </div>
+              {%- endif -%}
+              <div class="pf-info">
+                <div class="pf-name">{% render 'residence-name', product: product %} <span aria-hidden="true">&rarr;</span></div>
+                <div class="pf-meta">{{ product.metafields.custom.suburb.value }}{% if product.metafields.custom.year.value != blank %} <i>&middot;</i> {{ product.metafields.custom.year.value }}{% endif %}</div>
+              </div>
+            </a>
+        {%- break -%}
+      {%- endfor -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
+{%- liquid
+  # Every Style and Suburb choice comes from a card that is on the page
+  # (Naomi, 15 Sep 2026: "ensure that all of the styles and suburbs are
+  # placed"). Each block is read through the same fields its card reads;
+  # a block with no residence, name or photo is left out of the grid, so
+  # it is neither counted nor listed.
+  assign styles_raw = ''
+  for block in section.blocks
+    assign rp = block.settings.page
+    if rp == blank and block.settings.link contains '/pages/'
+      assign rp_handle = block.settings.link | split: '/pages/' | last | split: '?' | first | split: '#' | first
+      assign rp = pages[rp_handle]
+    endif
+    if block.settings.product == blank and rp.title == blank and block.settings.name == blank and block.settings.image == blank and block.settings.image_ext == blank
+      assign empty_blocks = empty_blocks | plus: 1
+      continue
+    endif
+    if block.settings.product != blank
+      assign r_style = block.settings.style | default: block.settings.product.metafields.custom.style.value | strip
+      assign r_loc = block.settings.loc | default: block.settings.product.metafields.custom.suburb.value
+    else
+      assign r_style = block.settings.style | default: rp.metafields.custom.style.value | strip
+      assign r_loc = block.settings.loc | default: rp.metafields.custom.loc.value
+    endif
+    assign r_suburb = r_loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
+    if r_style != blank
+      assign styles_raw = styles_raw | append: r_style | append: '¦'
+    endif
+    if r_suburb != blank
+      assign suburbs_raw = suburbs_raw | append: r_suburb | append: '¦'
+    endif
+  endfor
+  # One entry per value whatever its capitals or spacing ("Camp Hill" and
+  # "camp  hill" are one suburb; the first spelling met is shown), A to Z.
+  assign seen = '¦'
+  assign kept = ''
+  assign list_in = styles_raw | split: '¦'
+  for v in list_in
+    assign vv = v | split: ' ' | join: ' '
+    assign v_key = vv | downcase | prepend: '¦' | append: '¦'
+    if vv == blank or seen contains v_key
+      continue
+    endif
+    assign seen = seen | append: v_key
+    assign kept = kept | append: vv | append: '¦'
+  endfor
+  assign styles = kept | split: '¦' | sort_natural
+  assign seen = '¦'
+  assign kept = ''
+  assign list_in = suburbs_raw | split: '¦'
+  for v in list_in
+    assign vv = v | split: ' ' | join: ' '
+    assign v_key = vv | downcase | prepend: '¦' | append: '¦'
+    if vv == blank or seen contains v_key
+      continue
+    endif
+    assign seen = seen | append: v_key
+    assign kept = kept | append: vv | append: '¦'
+  endfor
+  assign suburbs = kept | split: '¦' | sort_natural
+  assign total = section.blocks.size | minus: empty_blocks
+  if show_current
+    assign total = total | plus: current_handles.size
   endif
   assign show_lead = true
   if section.settings.show_lead == false
@@ -131,27 +203,53 @@
 </section>
 {%- endif -%}
 {%- if section.settings.show_filter and section.blocks.size > 3 -%}
+{%- liquid
+  assign style_n = styles.size
+  if has_live
+    assign style_n = style_n | plus: 1
+  endif
+  if has_sold
+    assign style_n = style_n | plus: 1
+  endif
+  assign style_word = section.settings.filter_label | default: 'Style'
+  assign all_styles = section.settings.filter_all | default: 'All'
+  assign all_suburbs = section.settings.all_suburbs | default: 'All Suburbs'
+  assign many_fallback = count_token | append: ' Styles'
+  assign many_styles = section.settings.filter_many_styles | default: many_fallback
+  assign many_fallback = count_token | append: ' Suburbs'
+  assign many_suburbs = section.settings.filter_many_suburbs | default: many_fallback
+-%}
 <div class="pf-bar s-surface{% if section.settings.filter_sticky == false %} pf-static{% endif %}" data-pf-bar="{{ sid }}">
   <div class="inner pf-bar-inner">
-    {%- comment -%} A dropdown, like the suburb one beside it and the For Sale
-        toolbar, rather than a row of chips (Naomi, 11 Sep 2026). {%- endcomment -%}
-    <div class="pf-chips">
-      <span class="pf-bar-l">{{ section.settings.filter_label }}</span>
-      <select class="pf-sel" id="pfStyle-{{ sid }}" aria-label="Filter by style">
-        <option value="">{{ section.settings.filter_all }}</option>
-        {%- if show_current -%}
-          {%- if scope == 'all' -%}<option value="{{ section.settings.filter_live | default: 'For Sale' | escape }}">{{ section.settings.filter_live | default: "For Sale" }}</option>{%- endif -%}
-          <option value="{{ section.settings.filter_sold | default: 'Sold' | escape }}">{{ section.settings.filter_sold | default: "Sold" }}</option>
-        {%- endif -%}
-        {%- for s in styles -%}<option value="{{ s | escape }}">{{ s }}</option>{%- endfor -%}
-      </select>
+    {%- comment -%} Style and Suburb side by side, each a dropdown with a box
+        beside every choice so several can be ticked, the way Features works
+        on For Sale (Naomi, 15 Sep 2026). {%- endcomment -%}
+    <div class="pf-chips pf-filters">
+      {%- if style_n > 0 -%}
+      <div class="pf-f">
+        {%- if section.settings.filter_label != blank -%}<span class="pf-bar-l" aria-hidden="true">{{ section.settings.filter_label }}</span>{%- endif -%}
+        <details class="pf-drop" id="pfStyle-{{ sid }}" data-pf-drop>
+          <summary class="pf-sel pf-sel-drop"><span class="sr-only">{{ style_word }}: </span><span class="pf-sum" data-pf-summary data-pf-any="{{ all_styles | escape }}" data-pf-many="{{ many_styles | escape }}">{{ all_styles }}</span></summary>
+          <div class="pf-menu" role="group" aria-label="{{ style_word | escape }}">
+            {%- if has_live -%}<label class="pf-opt"><input type="checkbox" value="{{ live_word | escape }}" data-pf-opt="style" autocomplete="off"><span>{{ live_word }}</span></label>{%- endif -%}
+            {%- if has_sold -%}<label class="pf-opt"><input type="checkbox" value="{{ sold_word | escape }}" data-pf-opt="style" autocomplete="off"><span>{{ sold_word }}</span></label>{%- endif -%}
+            {%- for s in styles -%}<label class="pf-opt"><input type="checkbox" value="{{ s | escape }}" data-pf-opt="style" autocomplete="off"><span>{{ s }}</span></label>{%- endfor -%}
+          </div>
+        </details>
+      </div>
+      {%- endif -%}
+      {%- if suburbs.size > 1 -%}
+      <div class="pf-f">
+        {%- if section.settings.suburb_label != blank -%}<span class="pf-bar-l" aria-hidden="true">{{ section.settings.suburb_label }}</span>{%- endif -%}
+        <details class="pf-drop" id="pfSuburb-{{ sid }}" data-pf-drop>
+          <summary class="pf-sel pf-sel-drop"><span class="sr-only">{{ section.settings.suburb_label | default: 'Suburb' }}: </span><span class="pf-sum" data-pf-summary data-pf-any="{{ all_suburbs | escape }}" data-pf-many="{{ many_suburbs | escape }}">{{ all_suburbs }}</span></summary>
+          <div class="pf-menu" role="group" aria-label="{{ section.settings.suburb_label | default: 'Suburb' | escape }}">
+            {%- for s in suburbs -%}<label class="pf-opt"><input type="checkbox" value="{{ s | escape }}" data-pf-opt="suburb" autocomplete="off"><span>{{ s }}</span></label>{%- endfor -%}
+          </div>
+        </details>
+      </div>
+      {%- endif -%}
     </div>
-    {%- if suburbs.size > 1 -%}
-    <select class="pf-sel" id="pfSuburb-{{ sid }}" aria-label="Filter by suburb">
-      <option value="">{{ section.settings.all_suburbs | default: "All Suburbs" }}</option>
-      {%- for s in suburbs -%}<option value="{{ s | escape }}">{{ s }}</option>{%- endfor -%}
-    </select>
-    {%- endif -%}
     <span class="pf-count" id="pfCount-{{ sid }}" aria-live="polite"></span>
   </div>
 </div>
@@ -163,30 +261,7 @@
       <p class="pf-intro reveal">{{ section.settings.intro | replace: count_token, total }}</p>
     {%- endif -%}
     <div class="pf-grid" id="pfGrid-{{ sid }}"{% if more_after > 0 %} data-pf-limit="{{ more_after }}"{% endif %}>
-      {%- if show_current -%}
-        {%- for h in current_handles -%}
-          {%- for product in collections.all.products -%}
-            {%- if product.handle != h -%}{%- continue -%}{%- endif -%}
-            {%- capture pstatus -%}{% render 'residence-status', product: product %}{%- endcapture -%}
-            {%- assign grp = section.settings.filter_live | default: 'For Sale' -%}
-            {%- if pstatus contains 'Sold' -%}{%- assign grp = section.settings.filter_sold | default: 'Sold' -%}{%- endif -%}
-            {%- assign pcount = pcount | plus: 1 -%}
-            <a href="{{ product.url }}" class="pf-card reveal{% if more_after > 0 and pcount > more_after %} pf-more{% endif %}" data-port-card data-style="{{ grp | escape }}" data-suburb="{{ product.metafields.custom.suburb.value | escape }}">
-              {%- if product.featured_image -%}
-              <div class="pf-media">
-                  <img src="{{ product.featured_image | image_url: width: 1200, height: 900, crop: 'center' }}" alt="{{ product.title | escape }}" width="1200" height="900" loading="lazy" decoding="async">
-                <span class="port-film-tag">{{ pstatus }}</span>
-              </div>
-              {%- endif -%}
-              <div class="pf-info">
-                <div class="pf-name">{% render 'residence-name', product: product %} <span aria-hidden="true">&rarr;</span></div>
-                <div class="pf-meta">{{ product.metafields.custom.suburb.value }}{% if product.metafields.custom.year.value != blank %} <i>&middot;</i> {{ product.metafields.custom.year.value }}{% endif %}</div>
-              </div>
-            </a>
-            {%- break -%}
-          {%- endfor -%}
-        {%- endfor -%}
-      {%- endif -%}
+      {{- current_cards -}}
       {%- for block in section.blocks -%}
         {%- liquid
           assign rp = block.settings.page
@@ -378,10 +453,31 @@
      near-solid cream over blur so tiles never show through, one hairline
      below, and always beneath the nav (nav is z 1000). */
   #shopify-section-{{ sid }} .pf-bar{position:sticky;top:var(--pf-top,var(--nav-h));z-index:20;padding:16px var(--page-pad);background:rgba(var(--bg-rgb),.96)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
-  #shopify-section-{{ sid }} .pf-bar.pf-static{position:static}
+  #shopify-section-{{ sid }} .pf-bar.pf-static{position:relative;top:auto}
   .pf-bar-inner{gap:20px 28px}
-  .pf-chips{display:flex;align-items:center;gap:14px}
   .pf-count{white-space:nowrap}
+
+  /* Style and Suburb together at the left, a small gap between, the count
+     at the far right. Each is a dropdown with a tick box beside every
+     choice (the For Sale Features menu, in this bar's own type and
+     colours). The bar is positioned whenever it is not sticky (relative,
+     not static) so an open list always lies over the grid. */
+  #shopify-section-{{ sid }} .pf-filters{display:flex;align-items:center;flex-wrap:wrap;gap:14px clamp(26px,3vw,40px);min-width:0}
+  #shopify-section-{{ sid }} .pf-f{display:flex;align-items:center;gap:14px;min-width:0}
+  #shopify-section-{{ sid }} .pf-f .pf-bar-l{margin-right:0}
+  #shopify-section-{{ sid }} .pf-count{margin-left:auto}
+  #shopify-section-{{ sid }} .pf-drop{position:relative;min-width:0}
+  #shopify-section-{{ sid }} .pf-drop>summary{list-style:none;display:flex;align-items:center;margin-left:0;max-width:100%;white-space:nowrap;-webkit-user-select:none;user-select:none}
+  #shopify-section-{{ sid }} .pf-drop>summary::-webkit-details-marker{display:none}
+  #shopify-section-{{ sid }} .pf-drop>summary::marker{content:''}
+  #shopify-section-{{ sid }} .pf-drop>summary:focus{outline:none}
+  #shopify-section-{{ sid }} .pf-drop>summary:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
+  #shopify-section-{{ sid }} .pf-drop[open]>summary{border-bottom-color:var(--gold)}
+  #shopify-section-{{ sid }} .pf-sum{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  #shopify-section-{{ sid }} .pf-menu{position:absolute;top:calc(100% + 10px);left:0;z-index:30;min-width:232px;max-width:calc(100vw - 32px);max-height:62vh;overflow-y:auto;background:var(--bg);border:1px solid var(--border);box-shadow:0 20px 44px -20px rgba(var(--dark-rgb),.35);padding:6px 0}
+  #shopify-section-{{ sid }} .pf-opt{display:flex;align-items:center;gap:11px;padding:9px 16px;cursor:pointer;font-family:var(--font-u);font-size:11px;font-weight:300;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+  #shopify-section-{{ sid }} .pf-opt:hover{background:var(--bg2);color:var(--ink)}
+  #shopify-section-{{ sid }} .pf-opt input{width:13px;height:13px;accent-color:var(--gold);flex-shrink:0;margin:0}
 
   /* No stray space between the bar and the first row: the grid carries no
      top margin, the wrap keeps one small, constant breath under the bar
@@ -404,14 +500,18 @@
     .pf-lead-grid{grid-template-columns:1fr;gap:22px;align-items:start}
     .pf-lead-h{max-width:none}
     .pf-lead-where span{white-space:normal}
-    /* Many styles on a phone: one scrolling row of chips rather than a
-       stack of five; the bar itself stays in flow on phones (as designed). */
-    #shopify-section-{{ sid }} .pf-bar{position:static}
+    /* On phones and tablets the bar stays in flow (as designed). Style and
+       Suburb share one row where there is room (tablets) and stack, each
+       full width, on a phone. The second list opens from its right edge so
+       it never runs off screen. */
+    #shopify-section-{{ sid }} .pf-bar{position:relative;top:auto}
     .pf-bar-inner{gap:12px 16px}
-    .pf-chips{width:100%}
-    .pf-chips .pf-sel{flex:1}
-    .pf-sel{width:100%;margin-left:0}
-    .pf-count{min-width:0;text-align:left}
+    #shopify-section-{{ sid }} .pf-filters{width:100%;gap:12px 22px}
+    #shopify-section-{{ sid }} .pf-f{flex:1 1 150px}
+    #shopify-section-{{ sid }} .pf-f .pf-drop{flex:1 1 auto}
+    #shopify-section-{{ sid }} .pf-f .pf-drop>summary{width:100%}
+    #shopify-section-{{ sid }} .pf-f+.pf-f .pf-menu{left:auto;right:0}
+    #shopify-section-{{ sid }} .pf-count{margin-left:0;min-width:0;text-align:left}
     #port-{{ sid }}.pf-wrap{padding-top:clamp(24px,5vw,32px)}
   }
 </style>
@@ -424,27 +524,36 @@
     grid.dataset.init = '1';
     var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-port-card]'));
     var bar = document.querySelector('[data-pf-bar="' + sid + '"]');
-    var styleSel = document.getElementById('pfStyle-' + sid);
-    var suburb = document.getElementById('pfSuburb-' + sid);
+    var drops = bar ? Array.prototype.slice.call(bar.querySelectorAll('[data-pf-drop]')) : [];
+    var boxes = bar ? Array.prototype.slice.call(bar.querySelectorAll('input[data-pf-opt]')) : [];
     var count = document.getElementById('pfCount-' + sid);
     var empty = document.getElementById('pfEmpty-' + sid);
     var more = document.getElementById('pfMore-' + sid);
     var moreN = more ? more.querySelector('[data-pf-more-n]') : null;
     var limit = parseInt(grid.getAttribute('data-pf-limit') || '0', 10) || 0;
     var expanded = false;
-    var style = '';
 
-    /* One pass decides every tile: it matches the style chip and the
-       suburb, and it is inside the Show-more limit (or the limit is off,
-       or the visitor has opened the rest). Filters search the whole set,
-       so a chip that matches three houses shows all three. */
+    /* A choice and a card compare without capitals or doubled spaces, so
+       "Camp Hill" on one page and "camp hill" on another are one suburb. */
+    function norm(s) { return String(s || '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+    function ticked(kind) {
+      return boxes.filter(function (b) { return b.checked && b.getAttribute('data-pf-opt') === kind; })
+        .map(function (b) { return norm(b.value); });
+    }
+
+    /* One pass decides every tile: its style is one of the ticked styles
+       (or none is ticked), its suburb one of the ticked suburbs (or none
+       is), and it is inside the Show-more limit (or the limit is off, or
+       the visitor has opened the rest). Filters search the whole set, so
+       a choice that matches three houses shows all three. */
     function apply(initial) {
-      var sub = suburb ? suburb.value : '';
+      var styles = ticked('style');
+      var subs = ticked('suburb');
       var matched = 0, shown = 0;
       cards.forEach(function (c) {
         var ok = true;
-        if (style && c.dataset.style !== style) ok = false;
-        if (ok && sub && c.dataset.suburb !== sub) ok = false;
+        if (styles.length && styles.indexOf(norm(c.dataset.style)) === -1) ok = false;
+        if (ok && subs.length && subs.indexOf(norm(c.dataset.suburb)) === -1) ok = false;
         if (ok) matched++;
         var show = ok && (expanded || !limit || matched <= limit);
         if (show) shown++;
@@ -463,13 +572,51 @@
         if (moreN) moreN.textContent = rest;
       }
       if (count) {
-        if (style || sub) count.textContent = matched + (matched === 1 ? ' Residence' : ' Residences');
+        if (styles.length || subs.length) count.textContent = matched + (matched === 1 ? ' Residence' : ' Residences');
         else if (rest > 0) count.textContent = shown + ' of ' + matched;
         else count.textContent = '';
       }
     }
-    if (styleSel) styleSel.addEventListener('change', function () { style = styleSel.value || ''; apply(); });
-    if (suburb) suburb.addEventListener('change', function () { apply(); });
+
+    /* Each dropdown names what is ticked: nothing (All), the one choice,
+       or how many. */
+    function label(drop) {
+      var out = drop.querySelector('[data-pf-summary]');
+      if (!out) return;
+      var on = Array.prototype.filter.call(drop.querySelectorAll('input[data-pf-opt]'), function (b) { return b.checked; });
+      if (!on.length) out.textContent = out.getAttribute('data-pf-any') || '';
+      else if (on.length === 1) out.textContent = on[0].parentNode.textContent.trim();
+      else out.textContent = (out.getAttribute('data-pf-many') || '{count}').replace('{count}', on.length);
+    }
+    boxes.forEach(function (b) {
+      b.addEventListener('change', function () {
+        var d = b.closest('[data-pf-drop]');
+        if (d) label(d);
+        apply();
+      });
+    });
+    drops.forEach(function (d) {
+      label(d);
+      /* One list open at a time. */
+      d.addEventListener('toggle', function () {
+        if (d.open) drops.forEach(function (o) { if (o !== d) o.open = false; });
+      });
+    });
+    /* A list left open over the grid gets in the way: a click anywhere
+       else, or Escape, closes it. */
+    if (drops.length) {
+      document.addEventListener('click', function (e) {
+        drops.forEach(function (d) { if (d.open && !d.contains(e.target)) d.open = false; });
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        drops.forEach(function (d) {
+          if (!d.open) return;
+          d.open = false;
+          if (d.isConnected) d.querySelector('summary').focus();
+        });
+      });
+    }
     if (more) more.addEventListener('click', function () { expanded = true; apply(); });
     apply(true);
 
@@ -514,7 +661,7 @@
     { "type": "textarea", "id": "lead_text", "label": "One paragraph", "default": "Every residence here was drawn, developed and built by Sabdia, in inner Brisbane, and handed over complete." },
     { "type": "checkbox", "id": "show_lead_where", "label": "List the suburbs present", "default": true, "info": "Drawn from each residence page's Location line, one entry per suburb." },
     { "type": "header", "content": "Filter bar" },
-    { "type": "checkbox", "id": "show_filter", "label": "Show the filter bar", "default": true, "info": "Style chips come from each residence page's Style field; the suburb list from its Location line. Appears once there are four or more residences." },
+    { "type": "checkbox", "id": "show_filter", "label": "Show the filter bar", "default": true, "info": "Style and Suburb dropdowns side by side, each with a tick box beside every choice so visitors can pick several. Styles come from each residence page's Style field, suburbs from its Location line; every value on the page is listed once, A to Z. Appears once there are four or more residences." },
     { "type": "checkbox", "id": "style_on_card", "label": "Show the style on the photo on hover", "default": true },
     { "type": "header", "content": "A taste before the whole house" },
     { "type": "textarea", "id": "intro", "label": "Optional line above the grid", "info": "Sits between the filter bar and the first row. {count} becomes the number of residences. Empty (as designed) hides it; the intro band above carries the count." },
@@ -522,9 +669,12 @@
     { "type": "checkbox", "id": "show_facts", "label": "Bed · bath · land under the teaser", "default": true, "info": "Shows whatever the page has filled in." },
     { "type": "text", "id": "word_bed", "label": "Word after bedrooms", "default": "Bed" },
     { "type": "text", "id": "word_bath", "label": "Word after bathrooms", "default": "Bath" },
-    { "type": "text", "id": "filter_label", "label": "Filter label", "default": "Style" },
-    { "type": "text", "id": "filter_all", "label": "All chip", "default": "All" },
-    { "type": "text", "id": "all_suburbs", "label": "All-suburbs option", "default": "All Suburbs" },
+    { "type": "text", "id": "filter_label", "label": "Style label", "default": "Style", "info": "The small label before the style dropdown." },
+    { "type": "text", "id": "filter_all", "label": "Style dropdown, nothing ticked", "default": "All" },
+    { "type": "text", "id": "filter_many_styles", "label": "Style dropdown, several ticked", "default": "{count} Styles", "info": "{count} becomes the number of styles ticked. One ticked shows its name." },
+    { "type": "text", "id": "suburb_label", "label": "Suburb label (optional)", "info": "A small label before the suburb dropdown, like Style before the style one. Empty shows the wording below alone." },
+    { "type": "text", "id": "all_suburbs", "label": "Suburb dropdown, nothing ticked", "default": "All Suburbs" },
+    { "type": "text", "id": "filter_many_suburbs", "label": "Suburb dropdown, several ticked", "default": "{count} Suburbs", "info": "{count} becomes the number of suburbs ticked. One ticked shows its name." },
     { "type": "text", "id": "empty_text", "label": "No-matches text", "default": "Nothing matches those filters. Try widening them." },
     { "type": "text", "id": "film_tag", "label": "Film tag", "default": "Film" },
     { "type": "header", "content": "Many residences" },
