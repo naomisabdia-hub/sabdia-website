@@ -227,7 +227,7 @@
 {%- endif -%}
 {%- endif -%}
 
-<section style="padding:clamp(8px,1vw,10px) var(--page-pad) 0;background:var(--bg);--pgc-cols:{{ section.settings.columns | default: '3' }};--pgc-gap:{{ section.settings.gap | default: 10 }}px;--pc-status:{{ section.settings.card_status_size | default: 100 | divided_by: 100.0 }};--pc-name-scale:{{ section.settings.card_name_size | default: 100 | divided_by: 100.0 }};--pc-chip:{{ section.settings.card_chip_size | default: 100 | divided_by: 100.0 }}">
+<section class="mc-grid-sec" style="padding:clamp(8px,1vw,10px) var(--page-pad) var(--mcg-pb,0);background:var(--bg);--pgc-cols:{{ section.settings.columns | default: '3' }};--pgc-gap:{{ section.settings.gap | default: 10 }}px;--pc-status:{{ section.settings.card_status_size | default: 100 | divided_by: 100.0 }};--pc-name-scale:{{ section.settings.card_name_size | default: 100 | divided_by: 100.0 }};--pc-chip:{{ section.settings.card_chip_size | default: 100 | divided_by: 100.0 }}">
   <div class="inner">
     <div class="proj-grid-3 mc-grid" id="propGrid" {% unless show_rich and mc_featured %}style="padding-top:clamp(32px,4vw,56px)"{% endunless %}>
       {%- if picked -%}
@@ -254,6 +254,11 @@
 </section>
 <style>
   .proj-grid-3.mc-grid{grid-template-columns:repeat(var(--pgc-cols,3),1fr);gap:var(--pgc-gap,10px)}
+  /* The grid keeps its own space below (15 Sep 2026): the Sold band and How it works are off by default, so
+     the last row must never sit flush on the next band. Same rhythm as every section; Look > Space below scales it. */
+  .mc-grid-sec{--mcg-pb:calc(clamp(72px,9vw,132px)*var(--sp-scale,1)*var(--sp-bot,1))}
+  @media(max-width:768px){.mc-grid-sec{--mcg-pb:calc(clamp(52px,10vw,80px)*var(--sp-scale,1)*var(--sp-bot,1))}}
+  html.bk .mc-grid-sec{--mcg-pb:calc(clamp(52px,6.2vw,92px)*var(--sp-scale,1)*var(--sp-bot,1))}
   @media(max-width:1100px){.proj-grid-3.mc-grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:768px){.proj-grid-3.mc-grid{grid-template-columns:1fr}}
 </style>

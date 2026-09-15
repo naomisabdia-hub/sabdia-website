@@ -40,7 +40,9 @@
 -%}
 {% render 'section-look', section: section %}
 {%- if show_rich and section.settings.show_sold_band and sold_handles.size > 0 -%}
-  <section style="padding:clamp(64px,8vw,100px) var(--page-pad) clamp(80px,10vw,120px);background:var(--bg)">
+  {%- comment -%} Straight under The residences grid, whose own space below already separates them, the band drops its top space so the gap never doubles (15 Sep 2026). {%- endcomment -%}
+  <style>.shopify-section:has(.mc-grid-sec)+.shopify-section .mc-sold-sec{--mcs-pt:0px}</style>
+  <section class="mc-sold-sec" style="padding:var(--mcs-pt,clamp(64px,8vw,100px)) var(--page-pad) clamp(80px,10vw,120px);background:var(--bg)">
     <div class="inner">
       <div class="slabel reveal" style="margin-bottom:32px">{{ section.settings.sold_label }}</div>
       <div class="proj-grid-sold" style="margin-top:0">
