@@ -55,7 +55,7 @@ Yes. Each residence page carries its film, and some homes have a scroll-through 
 Every residence is shown by private appointment. Reply here with: 1. the residence 2. your phone number 3. approximate budget range 4. timeline to purchase 5. the days that suit you. A member of our team will arrange a time.
 
 **How do I inspect a residence?**
-Inspections are by private appointment rather than open homes. Reply here with: 1. the residence 2. your phone number 3. approximate budget range 4. timeline to purchase 5. preferred days. A member of our team will arrange a time.
+Open homes and auctions for each residence are listed at sabdia.com.au/pages/inspections. If none of the times suit, reply here with: 1. the residence 2. your phone number 3. approximate budget range 4. timeline to purchase 5. preferred days. A member of our team will arrange a private inspection.
 
 **What is the price?**
 We talk through pricing directly rather than publishing a guide. Reply here with: 1. the residence 2. your phone number 3. approximate budget range 4. timeline to purchase. A member of our team will be in touch.
