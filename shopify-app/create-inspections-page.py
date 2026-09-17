@@ -59,10 +59,39 @@ BODY = (
     + home('QASR', '119 Buena Vista Avenue, Coorparoo', [], None, None)
 )
 
+# Straight answers for the questions the agent was guessing at (17 Sep 2026: it
+# told a visitor a sold home could come back if "withdrawn or repriced").
+QUESTIONS_HEADING = '<h2>Common questions</h2>'
+QUESTIONS = (
+    QUESTIONS_HEADING + '\n'
+    '<h3>What does Sold mean?</h3>\n'
+    '<p>A sold residence has been bought and is no longer available. CAPRI in Holland Park West sold prior to completion.</p>\n'
+    '<h3>What is The Collection?</h3>\n'
+    '<p>The Collection shows completed Sabdia residences that have been sold and are now privately owned. They show our work. They are not for sale and cannot be inspected.</p>\n'
+    '<h3>Will a sold residence come back on the market?</h3>\n'
+    '<p>No. A sold residence belongs to its owner and is not offered by Sabdia again. If you would like a home like one in The Collection, leave your email and we will tell you first about our next releases.</p>\n'
+    '<h3>Is a residence still available?</h3>\n'
+    '<p>Only the residences listed under Available to buy on this page can be bought. For anything else, our team will confirm it directly.</p>\n'
+    '<h3>How much is a residence?</h3>\n'
+    "<p>We don't disclose pricing unless it has been discussed with our Director. Leave your name and phone number and our team will be in touch.</p>\n"
+    '<h3>Can I talk to a person?</h3>\n'
+    '<p>Yes. Ask here and a member of our team will reply as soon as possible, or send an enquiry at sabdia.com.au/pages/contact.</p>\n'
+)
+
 found = gql('query($q:String!){ pages(first:5, query:$q){ nodes{ id handle title isPublished body } } }', {"q": f"handle:{HANDLE}"})['pages']['nodes']
 found = [p for p in found if p['handle'] == HANDLE]
 if '--show' in sys.argv:
     print(found[0]['body'] if found else 'No page yet.')
+    sys.exit()
+if '--add-questions' in sys.argv:
+    # Fills a gap only: appends the questions when the heading is missing, leaves the rest of her page alone.
+    if not found: sys.exit('No page yet - run without flags first.')
+    if QUESTIONS_HEADING in found[0]['body']:
+        sys.exit('Common questions already on the page - left as it is.')
+    res = gql('mutation($id:ID!,$p:PageUpdateInput!){ pageUpdate(id:$id, page:$p){ page{ handle } userErrors{ field message } } }',
+              {"id": found[0]['id'], "p": {"body": found[0]['body'].rstrip() + '\n' + QUESTIONS}})['pageUpdate']
+    if res['userErrors']: sys.exit(res['userErrors'])
+    print(f"Common questions added to /pages/{res['page']['handle']}")
     sys.exit()
 if found:
     print(f"Already there ({found[0]['title']}, published={found[0]['isPublished']}) - left as it is.")
