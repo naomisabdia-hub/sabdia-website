@@ -415,7 +415,7 @@
             <div class="pf-facts">
               {%- if r_beds != blank -%}<span>{{ r_beds }} {{ section.settings.word_bed | default: "Bed" }}</span>{%- endif -%}
               {%- if r_baths != blank -%}<span>{{ r_baths }} {{ section.settings.word_bath | default: "Bath" }}</span>{%- endif -%}
-              {%- if r_land != blank -%}<span>{{ r_land }}m&sup2;</span>{%- endif -%}
+              {%- if r_land != blank -%}<span>{{ r_land }}{{ section.settings.unit_land }}</span>{%- endif -%}
             </div>
             {%- endif -%}
           {%- endif -%}
@@ -532,6 +532,7 @@
     var moreN = more ? more.querySelector('[data-pf-more-n]') : null;
     var limit = parseInt(grid.getAttribute('data-pf-limit') || '0', 10) || 0;
     var expanded = false;
+    var words = { one: {{ section.settings.count_one | default: 'Residence' | json }}, many: {{ section.settings.count_many | default: 'Residences' | json }}, of: {{ section.settings.count_of | default: 'of' | json }} };
 
     /* A choice and a card compare without capitals or doubled spaces, so
        "Camp Hill" on one page and "camp hill" on another are one suburb. */
@@ -572,8 +573,8 @@
         if (moreN) moreN.textContent = rest;
       }
       if (count) {
-        if (styles.length || subs.length) count.textContent = matched + (matched === 1 ? ' Residence' : ' Residences');
-        else if (rest > 0) count.textContent = shown + ' of ' + matched;
+        if (styles.length || subs.length) count.textContent = matched + ' ' + (matched === 1 ? words.one : words.many);
+        else if (rest > 0) count.textContent = shown + ' ' + words.of + ' ' + matched;
         else count.textContent = '';
       }
     }
@@ -669,6 +670,7 @@
     { "type": "checkbox", "id": "show_facts", "label": "Bed · bath · land under the teaser", "default": true, "info": "Shows whatever the page has filled in." },
     { "type": "text", "id": "word_bed", "label": "Word after bedrooms", "default": "Bed" },
     { "type": "text", "id": "word_bath", "label": "Word after bathrooms", "default": "Bath" },
+    { "type": "text", "id": "unit_land", "label": "Land size unit", "default": "m²", "info": "Straight after the land size, e.g. 405m²." },
     { "type": "text", "id": "filter_label", "label": "Style label", "default": "Style", "info": "The small label before the style dropdown." },
     { "type": "text", "id": "filter_all", "label": "Style dropdown, nothing ticked", "default": "All" },
     { "type": "text", "id": "filter_many_styles", "label": "Style dropdown, several ticked", "default": "{count} Styles", "info": "{count} becomes the number of styles ticked. One ticked shows its name." },
@@ -676,6 +678,9 @@
     { "type": "text", "id": "all_suburbs", "label": "Suburb dropdown, nothing ticked", "default": "All Suburbs" },
     { "type": "text", "id": "filter_many_suburbs", "label": "Suburb dropdown, several ticked", "default": "{count} Suburbs", "info": "{count} becomes the number of suburbs ticked. One ticked shows its name." },
     { "type": "text", "id": "empty_text", "label": "No-matches text", "default": "Nothing matches those filters. Try widening them." },
+    { "type": "text", "id": "count_one", "label": "Count while filtering - one residence", "default": "Residence", "info": "At the right of the filter bar once a filter is ticked, e.g. 1 Residence." },
+    { "type": "text", "id": "count_many", "label": "Count while filtering - several residences", "default": "Residences", "info": "e.g. 3 Residences." },
+    { "type": "text", "id": "count_of", "label": "Count with Show more - word between the numbers", "default": "of", "info": "e.g. 12 of 20, while some tiles wait behind the Show more button." },
     { "type": "text", "id": "film_tag", "label": "Film tag", "default": "Film" },
     { "type": "header", "content": "Many residences" },
     { "type": "checkbox", "id": "show_more", "label": "Show more button after the first tiles", "default": false, "info": "Keeps the page quick as the collection grows: the first tiles load, a button reveals the rest in place. Filters always search every residence." },

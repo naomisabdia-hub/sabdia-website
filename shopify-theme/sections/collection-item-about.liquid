@@ -22,13 +22,18 @@
   assign media_res = s.media_product
   assign posts = mf.series_posts.value
   assign name_token = '{' | append: 'name' | append: '}'
+  assign style_token = '{' | append: 'style' | append: '}'
+  assign suburb_token = '{' | append: 'suburb' | append: '}'
   assign suburb = loc | split: ',' | first | replace: ' QLD', '' | replace: ' Qld', '' | strip
   assign style_name = mf.style.value | strip
 
-  # Story: the page's Story field, one paragraph per line; else the
-  # strongest Instagram captions (over 60 characters), first three.
+  # Story: typed here, else the page's Story field, one paragraph per
+  # line; else the strongest Instagram captions (over 60 characters),
+  # first three.
   assign story = '' | split: '¦'
-  if mf.story.value != blank
+  if s.story_text != blank
+    assign story = s.story_text | strip | newline_to_br | split: '<br />'
+  elsif mf.story.value != blank
     assign story = mf.story.value | strip | newline_to_br | split: '<br />'
   elsif posts.size > 0
     capture story_raw
@@ -41,15 +46,26 @@
     assign story = story_raw | split: '¦' | uniq
   endif
 
-  assign headline = mf.headline.value
+  # Headline: typed here, else the page's Headline field, else the
+  # wording below with the residence's style and suburb filled in.
+  assign headline = s.headline_html | replace: name_token, res_title
+  if headline == blank
+    assign headline = mf.headline.value
+  endif
   if headline == blank
     if style_name != blank and suburb != blank
-      assign headline = 'A ' | append: style_name | append: ' residence, <em>in ' | append: suburb | append: '</em>.'
+      assign headline = s.headline_auto_html | replace: style_token, style_name | replace: suburb_token, suburb | replace: name_token, res_title
     elsif suburb != blank
-      assign headline = 'Designed and built, <em>in ' | append: suburb | append: '</em>.'
+      assign headline = s.headline_auto_suburb_html | replace: suburb_token, suburb | replace: name_token, res_title
     else
-      assign headline = 'Designed and built <em>by Sabdia</em>.'
+      assign headline = s.headline_auto_plain_html | replace: name_token, res_title
     endif
+  endif
+
+  # Key features: typed here (one per line), else the page's Key features.
+  assign features = mf.features.value
+  if s.features_text != blank
+    assign features = s.features_text | strip | newline_to_br | strip_newlines | split: '<br />'
   endif
 
   # The two photographs beside the story: the Photo blocks (first tall,
@@ -120,7 +136,7 @@
   <div class="cd-layout inner">
     <div class="{% if s.sticky_story and show_side %}prop-desc {% endif %}cd-desc">
       {%- if s.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ s.about_label | replace: name_token, res_title }}</div>{%- endif -%}
-      {%- if s.show_headline -%}<h2 class="prop-body-h reveal d1">{{ headline }}</h2>{%- endif -%}
+      {%- if s.show_headline and headline != blank -%}<h2 class="prop-body-h reveal d1">{{ headline }}</h2>{%- endif -%}
       {%- if story.size > 0 -%}
         {%- for p in story limit: 4 -%}
           {%- assign pt = p | strip -%}
@@ -131,12 +147,14 @@
       {%- elsif s.fallback_text != blank -%}
         <p class="prop-body-p reveal d2">{{ s.fallback_text | replace: name_token, res_title }}</p>
       {%- endif -%}
-      {%- if mf.features.value.size > 0 and s.show_features -%}
+      {%- if features.size > 0 and s.show_features -%}
         <div class="prop-features reveal d3">
           <div class="prop-features-h">{{ s.features_heading }}</div>
           <div class="prop-feat-grid">
-            {%- for f in mf.features.value -%}
-              <div class="prop-feat">{{ f }}</div>
+            {%- for f in features -%}
+              {%- assign ft = f | strip -%}
+              {%- if ft == blank -%}{%- continue -%}{%- endif -%}
+              <div class="prop-feat">{{ ft }}</div>
             {%- endfor -%}
           </div>
         </div>
@@ -211,9 +229,15 @@
     { "type": "checkbox", "id": "show_about_label", "label": "Show the small label", "default": true },
     { "type": "text", "id": "about_label", "label": "Small label", "default": "About {name}" },
     { "type": "checkbox", "id": "show_headline", "label": "Show the headline", "default": true, "info": "The page's Headline metafield; empty = A <style> residence, in <suburb>." },
+    { "type": "html", "id": "headline_html", "label": "Headline (HTML - leave empty to use the page's saved headline)", "info": "Wrap words in <em></em> for the italic. Write {name} for the residence's name.", "visible_if": "{{ section.settings.show_headline }}" },
+    { "type": "html", "id": "headline_auto_html", "label": "Headline when the page has none (HTML - {style}, {suburb})", "default": "A {style} residence, <em>in {suburb}</em>.", "info": "Used when neither box above nor the page has a headline. {style} and {suburb} fill in from the page.", "visible_if": "{{ section.settings.show_headline }}" },
+    { "type": "html", "id": "headline_auto_suburb_html", "label": "Headline when the page has none and no style (HTML - {suburb})", "default": "Designed and built, <em>in {suburb}</em>.", "visible_if": "{{ section.settings.show_headline }}" },
+    { "type": "html", "id": "headline_auto_plain_html", "label": "Headline when the page has none, no style and no suburb (HTML)", "default": "Designed and built <em>by Sabdia</em>.", "visible_if": "{{ section.settings.show_headline }}" },
+    { "type": "textarea", "id": "story_text", "label": "Story (leave empty to use the page's saved story)", "info": "One paragraph per line; up to four lines show." },
     { "type": "textarea", "id": "fallback_text", "label": "Story when the page has none", "default": "{name} was designed, developed and built entirely in-house by Sabdia - one team from the first sketch to handover.", "info": "Shown only when the page has no Story and no Instagram captions yet." },
     { "type": "checkbox", "id": "show_features", "label": "Show the key features", "default": true },
     { "type": "text", "id": "features_heading", "label": "Features heading", "default": "Key Features" },
+    { "type": "textarea", "id": "features_text", "label": "Key features (leave empty to use the page's saved features)", "info": "One feature per line.", "visible_if": "{{ section.settings.show_features }}" },
     { "type": "checkbox", "id": "show_links", "label": "Photos and film buttons under the story", "default": true },
     { "type": "text", "id": "gallery_button", "label": "Photos button", "default": "View the photos", "info": "Jumps to The residence. Empty = no button." },
     { "type": "text", "id": "film_button", "label": "Film button", "default": "Watch the film", "info": "Jumps to The film. Empty = no button." },

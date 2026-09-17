@@ -37,9 +37,9 @@
   assign careers_upload = settings.supabase_url | default: 'https://fvczsjcrvwzqtcbforgo.supabase.co' | append: '/storage/v1/object/' | append: careers_bucket
 
   if page_look
-    assign ph_email = 'your@email.com'
-    assign ph_phone = '+61 4xx xxx xxx'
-    assign ph_message = 'Tell us about your interest, timeline, or any questions you have…'
+    assign ph_email = s.f_email_ph | default: 'your@email.com'
+    assign ph_phone = s.f_phone_ph | default: '+61 4xx xxx xxx'
+    assign ph_message = s.f_message_ph | default: 'Tell us about your interest, timeline, or any questions you have…'
     assign submit = s.submit_label | default: 'Submit Enquiry'
     assign note = s.form_note
     assign form_style = 'margin-top:12px'
@@ -52,6 +52,12 @@
     assign form_style = ''
   endif
   assign cm_uid = 'cm-' | append: section_id
+  # Message opening when a link names a residence; {name} becomes its name.
+  assign ef_name_tok = '{' | append: 'name' | append: '}'
+  assign ef_regarding = 'Regarding ' | append: ef_name_tok | append: ':'
+  if s.f_regarding != blank
+    assign ef_regarding = s.f_regarding
+  endif
 -%}
 {%- capture options_html -%}
   <option value="">{{ s.f_interest_ph | default: "Select an enquiry type…" }}</option>
@@ -130,7 +136,7 @@
   {% form 'contact', id: 'cform', class: 'cform reveal d1', style: form_style %}
     <span hidden data-thanks>{{ s.success_text | default: "Thank you - we will be in touch within a business day." }}</span>
     {%- if form.posted_successfully? -%}
-      {% render 'form-thanks', text: s.success_text %}
+      {% render 'form-thanks', text: s.success_text, heading: s.thanks_heading %}
     {%- else -%}
     {%- if form.errors -%}
       <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
@@ -191,6 +197,7 @@
     var interest = (q.get('interest') || '').trim();
     var property = (q.get('property') || '').trim();
     var message = (q.get('message') || '').trim();
+    var regarding = {{ ef_regarding | json }};
     if (!interest && !property && !message) return;
     var option = function (test) {
       for (var i = 0; i < sel.options.length; i++) {
@@ -215,7 +222,7 @@
       sel.dispatchEvent(new Event('change', { bubbles: true }));
     }
     if (msg && !msg.value.trim()) {
-      var lead = property && !residencePicked ? 'Regarding ' + property + ': ' : '';
+      var lead = property && !residencePicked ? regarding.replace('{name}', function () { return property; }) + ' ' : '';
       if (lead || message) msg.value = lead + message;
     }
   })();

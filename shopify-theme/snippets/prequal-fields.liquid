@@ -45,7 +45,8 @@
         endunless
       endif
     endfor
-    assign l_opts = seen | append: 'Other inner Brisbane' | split: ','
+    assign pq_other = s.prequal_loc_other | default: 'Other inner Brisbane'
+    assign l_opts = seen | append: pq_other | split: ','
   endif
   if mode == 'vercel'
     assign n_b = 'budget'

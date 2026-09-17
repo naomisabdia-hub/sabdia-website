@@ -53,9 +53,9 @@
           {%- assign sb_res = block.settings.page | default: block.settings.product -%}{%- if sb_res == blank -%}{%- continue -%}{%- endif -%}
           {%- assign sdelay = si | modulo: 2 -%}{%- assign si = si | plus: 1 -%}
           {%- if sdelay == 1 -%}
-            {% render 'sold-card', product: sb_res, class: 'reveal d1', img_w: 900, img_h: 560, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
+            {% render 'sold-card', product: sb_res, class: 'reveal d1', img_w: 900, img_h: 560, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes, word_bed: section.settings.word_bed, word_bath: section.settings.word_bath, word_garage: section.settings.word_garage, unit_area: section.settings.unit_area, word_build: section.settings.word_build, word_land: section.settings.word_land, mark_land_over: section.settings.mark_land_over, tip_build: section.settings.tip_build, tip_land: section.settings.tip_land %}
           {%- else -%}
-            {% render 'sold-card', product: sb_res, class: 'reveal', img_w: 900, img_h: 560, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
+            {% render 'sold-card', product: sb_res, class: 'reveal', img_w: 900, img_h: 560, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes, word_bed: section.settings.word_bed, word_bath: section.settings.word_bath, word_garage: section.settings.word_garage, unit_area: section.settings.unit_area, word_build: section.settings.word_build, word_land: section.settings.word_land, mark_land_over: section.settings.mark_land_over, tip_build: section.settings.tip_build, tip_land: section.settings.tip_land %}
           {%- endif -%}
         {%- endfor -%}
         {%- else -%}
@@ -64,9 +64,9 @@
           {%- assign ss_res = pages[h] -%}{%- if ss_res == blank -%}{%- for cand in collections.all.products -%}{%- if cand.handle == h -%}{%- assign ss_res = cand -%}{%- break -%}{%- endif -%}{%- endfor -%}{%- endif -%}
           {%- if ss_res != blank -%}
             {%- if sdelay == 1 -%}
-              {% render 'sold-card', product: ss_res, class: 'reveal d1', img_w: 900, img_h: 560 %}
+              {% render 'sold-card', product: ss_res, class: 'reveal d1', img_w: 900, img_h: 560, word_bed: section.settings.word_bed, word_bath: section.settings.word_bath, word_garage: section.settings.word_garage, unit_area: section.settings.unit_area, word_build: section.settings.word_build, word_land: section.settings.word_land, mark_land_over: section.settings.mark_land_over, tip_build: section.settings.tip_build, tip_land: section.settings.tip_land %}
             {%- else -%}
-              {% render 'sold-card', product: ss_res, class: 'reveal', img_w: 900, img_h: 560 %}
+              {% render 'sold-card', product: ss_res, class: 'reveal', img_w: 900, img_h: 560, word_bed: section.settings.word_bed, word_bath: section.settings.word_bath, word_garage: section.settings.word_garage, unit_area: section.settings.unit_area, word_build: section.settings.word_build, word_land: section.settings.word_land, mark_land_over: section.settings.mark_land_over, tip_build: section.settings.tip_build, tip_land: section.settings.tip_land %}
             {%- endif -%}
           {%- endif -%}
         {%- endfor -%}
@@ -104,6 +104,67 @@
       "id": "sold_label",
       "label": "Sold band label",
       "default": "Sold Prior to Completion"
+    },
+    {
+      "type": "text",
+      "id": "word_bed",
+      "label": "Card bedrooms word",
+      "default": "Bed",
+      "info": "After the number on each sold card, e.g. 5 Bed."
+    },
+    {
+      "type": "text",
+      "id": "word_bath",
+      "label": "Card bathrooms word",
+      "default": "Bath"
+    },
+    {
+      "type": "text",
+      "id": "word_garage",
+      "label": "Card garage word",
+      "default": "Garage"
+    },
+    {
+      "type": "text",
+      "id": "unit_area",
+      "label": "Card size unit",
+      "default": "m²",
+      "info": "After the build size and land size numbers."
+    },
+    {
+      "type": "text",
+      "id": "word_build",
+      "label": "Card build size word",
+      "default": "build",
+      "info": "After the build size. Shows on phones, where the icons are hidden."
+    },
+    {
+      "type": "text",
+      "id": "word_land",
+      "label": "Card land size word",
+      "default": "land",
+      "info": "After the land size. Shows on phones, where the icons are hidden."
+    },
+    {
+      "type": "text",
+      "id": "mark_land_over",
+      "label": "Card land size - over mark",
+      "default": "+",
+      "info": "After the land size when the residence's land size is marked as over."
+    },
+    {
+      "type": "text",
+      "id": "tip_build",
+      "label": "Build size tooltip",
+      "default": "Build size",
+      "info": "Shows when the pointer rests on the house icon."
+    },
+    {
+      "type": "text",
+      "id": "tip_land",
+      "label": "Land size tooltip",
+      "default": "Land size",
+      "info": "Shows when the pointer rests on the lot icon."
     },
     {
       "type": "header",

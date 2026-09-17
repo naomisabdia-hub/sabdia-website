@@ -3,7 +3,9 @@
   Params: thumb, video, slides, url (the Instagram post), link (where a
   click goes), caption, date, kind, alt, on_site (play here instead of
   opening Instagram), attrs (theme-editor attributes for a block tile),
-  synced (came from the Instagram sync), section, brand_from, brand_to.
+  synced (came from the Instagram sync), section, brand_from, brand_to,
+  title_reel, title_carousel, title_post (the icons' hover words; empty =
+  Reel, Carousel, Instagram post).
   A film plays silently while the pointer rests on the tile (in view, on
   touch screens); the click still goes to the post.
 {%- endcomment -%}
@@ -42,15 +44,15 @@
   {%- endif -%}
   <div class="series-card-ov"></div>
   {%- if t_kind == 'REEL' -%}
-    <div class="series-play" aria-hidden="true" title="Reel">
+    <div class="series-play" aria-hidden="true" title="{{ title_reel | default: 'Reel' | escape }}">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
     </div>
   {%- elsif t_kind == 'CAROUSEL' -%}
-    <div class="series-play" aria-hidden="true" title="Carousel">
+    <div class="series-play" aria-hidden="true" title="{{ title_carousel | default: 'Carousel' | escape }}">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="14" height="14" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v11"/></svg>
     </div>
   {%- else -%}
-    <div class="series-play" aria-hidden="true" title="Instagram post">
+    <div class="series-play" aria-hidden="true" title="{{ title_post | default: 'Instagram post' | escape }}">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
     </div>
   {%- endif -%}

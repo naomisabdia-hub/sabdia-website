@@ -162,28 +162,28 @@
     {%- if section.settings.show_filter_beds != false and bed_list.size > 1 -%}
     <select class="ptool-sel" id="fBeds" aria-label="Minimum bedrooms">
       <option value="">{{ section.settings.filter_any_beds | default: "Any Bedrooms" }}</option>
-      {%- for v in bed_list -%}<option value="{{ v }}">{{ v }}+ Bed</option>{%- endfor -%}
+      {%- for v in bed_list -%}<option value="{{ v }}">{{ v }}{{ section.settings.step_beds | default: '+ Bed' }}</option>{%- endfor -%}
     </select>
     {%- endif -%}
     {%- if section.settings.show_filter_baths != false and bath_list.size > 1 -%}
     <select class="ptool-sel" id="fBaths" aria-label="Minimum bathrooms">
       <option value="">{{ section.settings.filter_any_baths | default: "Any Bathrooms" }}</option>
-      {%- for v in bath_list -%}<option value="{{ v }}">{{ v }}+ Bath</option>{%- endfor -%}
+      {%- for v in bath_list -%}<option value="{{ v }}">{{ v }}{{ section.settings.step_baths | default: '+ Bath' }}</option>{%- endfor -%}
     </select>
     {%- endif -%}
     {%- if section.settings.show_filter_garage != false and car_list.size > 1 -%}
     <select class="ptool-sel" id="fCars" aria-label="Minimum garage spaces">
       <option value="">{{ section.settings.filter_any_garage | default: "Any Garage" }}</option>
-      {%- for v in car_list -%}<option value="{{ v }}">{{ v }}+ Cars</option>{%- endfor -%}
+      {%- for v in car_list -%}<option value="{{ v }}">{{ v }}{{ section.settings.step_cars | default: '+ Cars' }}</option>{%- endfor -%}
     </select>
     {%- endif -%}
     {%- comment -%} One Size control, Land size (Naomi, 15 Sep 2026), offered once two brackets have a residence. {%- endcomment -%}
     {%- if section.settings.show_filter_land != false and land_brackets > 1 -%}
     <select class="ptool-sel" id="fSize" aria-label="Land size">
       <option value="">{{ section.settings.filter_any_size | default: "Any Land Size" }}</option>
-      {%- if land_small -%}<option value="land:0-600">Land under 600m&sup2;</option>{%- endif -%}
-      {%- if land_mid -%}<option value="land:600-800">Land 600&ndash;800m&sup2;</option>{%- endif -%}
-      {%- if land_big -%}<option value="land:800-">Land 800m&sup2; and over</option>{%- endif -%}
+      {%- if land_small -%}<option value="land:0-600">{{ section.settings.size_small_label | default: 'Land under 600m²' }}</option>{%- endif -%}
+      {%- if land_mid -%}<option value="land:600-800">{{ section.settings.size_mid_label | default: 'Land 600–800m²' }}</option>{%- endif -%}
+      {%- if land_big -%}<option value="land:800-">{{ section.settings.size_big_label | default: 'Land 800m² and over' }}</option>{%- endif -%}
     </select>
     {%- endif -%}
     {%- if section.settings.show_filter_status != false and status_list.size > 1 -%}
@@ -361,15 +361,36 @@
     },
     {
       "type": "text",
+      "id": "step_beds",
+      "label": "Bedrooms: after each number",
+      "default": "+ Bed",
+      "info": "The choices read 5+ Bed, 6+ Bed."
+    },
+    {
+      "type": "text",
       "id": "filter_any_baths",
       "label": "Bathrooms: any",
       "default": "Any Bathrooms"
     },
     {
       "type": "text",
+      "id": "step_baths",
+      "label": "Bathrooms: after each number",
+      "default": "+ Bath",
+      "info": "The choices read 3+ Bath, 4+ Bath."
+    },
+    {
+      "type": "text",
       "id": "filter_any_garage",
       "label": "Garage: any",
       "default": "Any Garage"
+    },
+    {
+      "type": "text",
+      "id": "step_cars",
+      "label": "Garage: after each number",
+      "default": "+ Cars",
+      "info": "The choices read 2+ Cars, 3+ Cars."
     },
     {
       "type": "text",
@@ -390,6 +411,27 @@
       "id": "filter_any_size",
       "label": "Land size: any",
       "default": "Any Land Size"
+    },
+    {
+      "type": "text",
+      "id": "size_small_label",
+      "label": "Land size: under 600",
+      "default": "Land under 600m²",
+      "info": "Offered when a listed residence has under 600m² of land."
+    },
+    {
+      "type": "text",
+      "id": "size_mid_label",
+      "label": "Land size: 600 to 800",
+      "default": "Land 600–800m²",
+      "info": "Offered when a listed residence has 600 to 800m² of land."
+    },
+    {
+      "type": "text",
+      "id": "size_big_label",
+      "label": "Land size: 800 and over",
+      "default": "Land 800m² and over",
+      "info": "Offered when a listed residence has 800m² of land or more."
     },
     {
       "type": "text",

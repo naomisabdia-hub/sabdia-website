@@ -43,7 +43,7 @@
       {%- assign delay = '' -%}
       {%- if shown == 2 -%}{%- assign delay = ' d1' -%}{%- elsif shown > 2 -%}{%- assign delay = ' d2' -%}{%- endif -%}
       {%- assign card_class = 'reveal' | append: delay -%}
-      <div class="prop-related-pick" {{ block.shopify_attributes }}>{% render 'property-card', product: p, class: card_class, style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}</div>
+      <div class="prop-related-pick" {{ block.shopify_attributes }}>{% render 'property-card', product: p, class: card_class, style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build, word_bed: section.settings.word_bed, word_bath: section.settings.word_bath, word_garage: section.settings.word_garage, unit_area: section.settings.unit_area, word_build: section.settings.word_build, word_land: section.settings.word_land, mark_land_over: section.settings.mark_land_over, tip_build: section.settings.tip_build, tip_land: section.settings.tip_land, loc_state: section.settings.loc_state %}</div>
     {%- endfor -%}
   {%- else -%}
   {%- for h in live_handles -%}
@@ -54,9 +54,9 @@
     {%- if rp_card == blank -%}{%- continue -%}{%- endif -%}
     {%- assign shown = shown | plus: 1 -%}
     {%- case shown -%}
-      {%- when 1 -%}{% render 'property-card', product: rp_card, class: 'reveal', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
-      {%- when 2 -%}{% render 'property-card', product: rp_card, class: 'reveal d1', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
-      {%- else -%}{% render 'property-card', product: rp_card, class: 'reveal d2', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
+      {%- when 1 -%}{% render 'property-card', product: rp_card, class: 'reveal', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build, word_bed: section.settings.word_bed, word_bath: section.settings.word_bath, word_garage: section.settings.word_garage, unit_area: section.settings.unit_area, word_build: section.settings.word_build, word_land: section.settings.word_land, mark_land_over: section.settings.mark_land_over, tip_build: section.settings.tip_build, tip_land: section.settings.tip_land, loc_state: section.settings.loc_state %}
+      {%- when 2 -%}{% render 'property-card', product: rp_card, class: 'reveal d1', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build, word_bed: section.settings.word_bed, word_bath: section.settings.word_bath, word_garage: section.settings.word_garage, unit_area: section.settings.unit_area, word_build: section.settings.word_build, word_land: section.settings.word_land, mark_land_over: section.settings.mark_land_over, tip_build: section.settings.tip_build, tip_land: section.settings.tip_land, loc_state: section.settings.loc_state %}
+      {%- else -%}{% render 'property-card', product: rp_card, class: 'reveal d2', style: rp_style, img_w: 600, img_h: 400, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build, word_bed: section.settings.word_bed, word_bath: section.settings.word_bath, word_garage: section.settings.word_garage, unit_area: section.settings.unit_area, word_build: section.settings.word_build, word_land: section.settings.word_land, mark_land_over: section.settings.mark_land_over, tip_build: section.settings.tip_build, tip_land: section.settings.tip_land, loc_state: section.settings.loc_state %}
     {%- endcase -%}
   {%- endfor -%}
   {%- endif -%}
@@ -78,7 +78,10 @@
 {%- liquid
   assign mf = rp_res.metafields.custom
   assign share_url = shop.url | append: rp_res.url
-  assign share_title = rp_res.title | append: ' - ' | append: mf.suburb.value | append: ' | Sabdia Constructions'
+  assign share_title = rp_res.title | append: ' - ' | append: mf.suburb.value
+  if section.settings.share_brand != blank
+    assign share_title = share_title | append: ' | ' | append: section.settings.share_brand
+  endif
   assign eu = share_url | url_encode
   assign et = share_title | url_encode
 -%}
@@ -86,10 +89,10 @@
   <div class="inner" style="display:flex;justify-content:center">
     <div class="share-row" aria-label="Share this page">
       <span class="share-l">{{ section.settings.share_label | default: "Share" }}</span>
-      <a href="https://www.facebook.com/sharer/sharer.php?u={{ eu }}" target="_blank" rel="noopener" class="share-a">Facebook</a>
-      <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ eu }}" target="_blank" rel="noopener" class="share-a">LinkedIn</a>
-      <a href="https://twitter.com/intent/tweet?url={{ eu }}&text={{ et }}" target="_blank" rel="noopener" class="share-a">X</a>
-      <a href="mailto:?subject={{ et }}&body={{ et }}%0A{{ eu }}" class="share-a">Email</a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{ eu }}" target="_blank" rel="noopener" class="share-a">{{ section.settings.share_facebook | default: "Facebook" }}</a>
+      <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ eu }}" target="_blank" rel="noopener" class="share-a">{{ section.settings.share_linkedin | default: "LinkedIn" }}</a>
+      <a href="https://twitter.com/intent/tweet?url={{ eu }}&text={{ et }}" target="_blank" rel="noopener" class="share-a">{{ section.settings.share_x | default: "X" }}</a>
+      <a href="mailto:?subject={{ et }}&body={{ et }}%0A{{ eu }}" class="share-a">{{ section.settings.share_email | default: "Email" }}</a>
       <button type="button" class="share-a share-copy" data-share-url="{{ share_url }}">{{ section.settings.copy_link_label | default: "Copy link" }}</button>
     </div>
   </div>
@@ -129,6 +132,22 @@
     {"type": "checkbox", "id": "show_share", "label": "Show the share row", "default": true},
     {"type": "text", "id": "share_label", "label": "Share label", "default": "Share"},
     {"type": "text", "id": "copy_link_label", "label": "Copy link button", "default": "Copy link"},
+    {"type": "text", "id": "share_facebook", "label": "Facebook link", "default": "Facebook"},
+    {"type": "text", "id": "share_linkedin", "label": "LinkedIn link", "default": "LinkedIn"},
+    {"type": "text", "id": "share_x", "label": "X link", "default": "X"},
+    {"type": "text", "id": "share_email", "label": "Email link", "default": "Email"},
+    {"type": "text", "id": "share_brand", "label": "Name at the end of a shared title", "default": "Sabdia Constructions", "info": "A post or email shared from here is titled: the residence - its suburb | this name. Leave empty to leave the name off."},
+    {"type": "header", "content": "Card words"},
+    {"type": "text", "id": "word_bed", "label": "Word after the bedrooms", "default": "Bed"},
+    {"type": "text", "id": "word_bath", "label": "Word after the bathrooms", "default": "Bath"},
+    {"type": "text", "id": "word_garage", "label": "Word after the garage count", "default": "Garage"},
+    {"type": "text", "id": "unit_area", "label": "Size unit", "default": "m²"},
+    {"type": "text", "id": "word_build", "label": "Word after the build size", "default": "build"},
+    {"type": "text", "id": "word_land", "label": "Word after the land size", "default": "land"},
+    {"type": "text", "id": "mark_land_over", "label": "Land size - or more mark", "default": "+"},
+    {"type": "text", "id": "tip_build", "label": "Build size tooltip", "default": "Build size"},
+    {"type": "text", "id": "tip_land", "label": "Land size tooltip", "default": "Land size"},
+    {"type": "text", "id": "loc_state", "label": "After the suburb", "default": ", QLD"},
     {"type": "header", "content": "Look"},
     {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
     {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},

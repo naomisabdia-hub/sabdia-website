@@ -49,7 +49,7 @@
             <div class="proj-card-info">
               {%- if section.settings.show_year_status -%}<div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}{{ pstatus }}</div>{%- endif -%}
               <div class="proj-card-name">{% render 'residence-name', product: product %}</div>
-              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD{% if section.settings.show_specs %} - {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}{% endif %}</div>
+              <div class="proj-card-loc">{{ mfp.suburb.value }}{{ section.settings.suburb_suffix }}{% if section.settings.show_specs %} - {{ mfp.beds.value }} {{ section.settings.word_bed }} · {{ mfp.baths.value }} {{ section.settings.word_bath }} · {{ mfp.cars.value }} {{ section.settings.word_garage }} · {{ mfp.land.value }}{{ section.settings.unit_land }}{% if mfp.land_over.value %}{{ section.settings.unit_land_over }}{% endif %}{% endif %}</div>
             </div>
             {%- if section.settings.show_arrow -%}<div class="pc-arrow">&rarr;</div>{%- endif -%}
           </a>
@@ -81,9 +81,9 @@
             <div class="proj-card-ov"></div>
             {%- if section.settings.show_sold_badge -%}<div class="sc-badge">{{ badge }}</div>{%- endif -%}
             <div class="proj-card-info">
-              {%- if section.settings.show_year_status -%}<div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}Sold</div>{%- endif -%}
+              {%- if section.settings.show_year_status -%}<div class="proj-card-year">{% if mfp.year.value %}{{ mfp.year.value }} · {% endif %}{{ section.settings.sold_word }}</div>{%- endif -%}
               <div class="proj-card-name">{% render 'residence-name', product: product %}</div>
-              <div class="proj-card-loc">{{ mfp.suburb.value }}, QLD{% if section.settings.show_specs %} - {{ mfp.beds.value }} Bed · {{ mfp.baths.value }} Bath · {{ mfp.cars.value }} Garage · {{ mfp.land.value }}m&sup2;{% if mfp.land_over.value %}+{% endif %}{% endif %}</div>
+              <div class="proj-card-loc">{{ mfp.suburb.value }}{{ section.settings.suburb_suffix }}{% if section.settings.show_specs %} - {{ mfp.beds.value }} {{ section.settings.word_bed }} · {{ mfp.baths.value }} {{ section.settings.word_bath }} · {{ mfp.cars.value }} {{ section.settings.word_garage }} · {{ mfp.land.value }}{{ section.settings.unit_land }}{% if mfp.land_over.value %}{{ section.settings.unit_land_over }}{% endif %}{% endif %}</div>
             </div>
           </a>
           {%- break -%}
@@ -133,6 +133,14 @@
     { "type": "text", "id": "current_label", "label": "Current group label", "default": "For Sale - Current" },
     { "type": "text", "id": "sold_label", "label": "Sold group label", "default": "Sold Prior to Completion" },
     { "type": "text", "id": "sold_badge", "label": "Sold card badge", "default": "Sold Prior to Completion", "info": "Wording for residences whose Status is Sold Prior to Completion. Other statuses print their own word." },
+    { "type": "header", "content": "Words" },
+    { "type": "text", "id": "sold_word", "label": "Sold cards - status word after the year", "default": "Sold", "visible_if": "{{ section.settings.show_year_status }}" },
+    { "type": "text", "id": "suburb_suffix", "label": "After the suburb", "default": ", QLD", "info": "Straight after the suburb on every card." },
+    { "type": "text", "id": "word_bed", "label": "Word after bedrooms", "default": "Bed", "visible_if": "{{ section.settings.show_specs }}" },
+    { "type": "text", "id": "word_bath", "label": "Word after bathrooms", "default": "Bath", "visible_if": "{{ section.settings.show_specs }}" },
+    { "type": "text", "id": "word_garage", "label": "Word after garage spaces", "default": "Garage", "visible_if": "{{ section.settings.show_specs }}" },
+    { "type": "text", "id": "unit_land", "label": "Land size unit", "default": "m²", "visible_if": "{{ section.settings.show_specs }}" },
+    { "type": "text", "id": "unit_land_over", "label": "Land size - mark for more than the figure", "default": "+", "info": "Shown after the unit when the residence's land is marked as more than the figure, e.g. 716m²+.", "visible_if": "{{ section.settings.show_specs }}" },
     {"type": "header", "content": "Show"},
     {"type": "checkbox", "id": "show_filter", "label": "Show the filter bar", "default": true},
     {"type": "checkbox", "id": "show_current", "label": "Show the current group", "default": true},

@@ -83,7 +83,7 @@
     endcapture
   endif
   if name_html == blank
-    assign name_html = 'Sabdia'
+    assign name_html = s.name_fallback | default: 'Sabdia'
   endif
 
   assign heading = s.heading_html
@@ -100,9 +100,12 @@
   endif
   assign cap_right = s.caption_right
   if cap_right == blank and on_product
-    assign cap_state = mf.state.value | default: 'QLD'
+    assign cap_state = mf.state.value | default: s.state_fallback
     if mf.suburb.value != blank
-      assign cap_right = mf.suburb.value | append: ', ' | append: cap_state
+      assign cap_right = mf.suburb.value
+      if cap_state != blank
+        assign cap_right = cap_right | append: ', ' | append: cap_state
+      endif
     endif
   endif
 -%}
@@ -200,12 +203,14 @@
       "type": "html",
       "id": "heading_html",
       "label": "Heading",
+      "default": "Experience <em>{name}</em>.",
       "info": "Write {name} where the residence's name goes. Default: Experience <em>{name}</em>."
     },
     {
       "type": "textarea",
       "id": "text",
       "label": "Line under the heading",
+      "default": "A walk through {name}, on film.",
       "info": "Default: A walk through {name}, on film."
     },
     {
@@ -216,8 +221,16 @@
     },
     {
       "type": "text",
+      "id": "name_fallback",
+      "label": "Name used when there is no residence",
+      "default": "Sabdia",
+      "info": "Only off a residence page, while Residence name is empty: {name} in the words becomes this."
+    },
+    {
+      "type": "text",
       "id": "caption_left",
       "label": "Caption - left",
+      "default": "{name} - On Film",
       "info": "Default: {name} - On Film"
     },
     {
@@ -225,6 +238,13 @@
       "id": "caption_right",
       "label": "Caption - right",
       "info": "Default on a residence page: its suburb and state."
+    },
+    {
+      "type": "text",
+      "id": "state_fallback",
+      "label": "State after the suburb (when the residence has none)",
+      "default": "QLD",
+      "info": "Used in the right caption while it is empty. The residence's own State comes first. Leave empty to show the suburb alone."
     },
     {
       "type": "text",

@@ -127,11 +127,11 @@
             <li><a href="{{ link.url }}">{{ link.title }}</a></li>
           {%- endfor -%}
         {%- else -%}
-          <li><a href="/pages/about">About Sabdia</a></li>
-          <li><a href="/pages/services">Process</a></li>
-          <li><a href="/pages/collection">Collection</a></li>
-          {%- if section.settings.show_agent_link and settings.agent_access_enabled -%}<li><a href="/pages/agent-access">Agent Access</a></li>{%- endif -%}
-          <li><a href="/blogs/journal">The Journal</a></li>
+          {%- if section.settings.company_about != blank -%}<li><a href="/pages/about">{{ section.settings.company_about }}</a></li>{%- endif -%}
+          {%- if section.settings.company_process != blank -%}<li><a href="/pages/services">{{ section.settings.company_process }}</a></li>{%- endif -%}
+          {%- if section.settings.company_collection != blank -%}<li><a href="/pages/collection">{{ section.settings.company_collection }}</a></li>{%- endif -%}
+          {%- if section.settings.show_agent_link and settings.agent_access_enabled -%}<li><a href="/pages/agent-access">{{ section.settings.company_agent | default: "Agent Access" }}</a></li>{%- endif -%}
+          {%- if section.settings.company_journal != blank -%}<li><a href="/blogs/journal">{{ section.settings.company_journal }}</a></li>{%- endif -%}
         {%- endif -%}
       </ul>
     </div>
@@ -147,9 +147,9 @@
         {%- if settings.contact_email != blank -%}
           <li><a href="mailto:{{ settings.contact_email }}">{{ settings.contact_email }}</a></li>
         {%- endif -%}
-        <li><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener">Instagram {{ settings.instagram_label }}</a></li>
-        <li><a href="{{ settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a></li>
-        <li><a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a></li>
+        {%- if section.settings.connect_instagram != blank -%}<li><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener">{{ section.settings.connect_instagram }} {{ settings.instagram_label }}</a></li>{%- endif -%}
+        {%- if section.settings.connect_facebook != blank -%}<li><a href="{{ settings.facebook_url }}" target="_blank" rel="noopener">{{ section.settings.connect_facebook }}</a></li>{%- endif -%}
+        {%- if section.settings.connect_linkedin != blank -%}<li><a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener">{{ section.settings.connect_linkedin }}</a></li>{%- endif -%}
         {%- if section.settings.show_domain and settings.domain_display != blank and settings.domain_url != blank -%}
           <li><a href="{{ settings.domain_url }}" target="_blank" rel="noopener">{{ settings.domain_display }}</a></li>
         {%- endif -%}
@@ -160,12 +160,12 @@
   {%- if section.settings.show_legal_row -%}
   <div class="fbot">
     <div class="fcopy">
-      &copy; {{ 'now' | date: '%Y' }} {{ settings.legal_name }}. All rights reserved.
+      &copy; {{ 'now' | date: '%Y' }} {{ settings.legal_name }}.{% if section.settings.rights_text != blank %} {{ section.settings.rights_text }}{% endif %}
       {%- if settings.qbcc_licence != blank or settings.abn != blank -%}
         <span class="flegal">
-          {%- if settings.qbcc_licence != blank -%}<span>QBCC Licence {{ settings.qbcc_licence }}</span>{%- endif -%}
+          {%- if settings.qbcc_licence != blank -%}<span>{% if section.settings.qbcc_label != blank %}{{ section.settings.qbcc_label }} {% endif %}{{ settings.qbcc_licence }}</span>{%- endif -%}
           {%- if settings.qbcc_licence != blank and settings.abn != blank -%}<span aria-hidden="true"> &middot; </span>{%- endif -%}
-          {%- if settings.abn != blank -%}<span>ABN {{ settings.abn }}</span>{%- endif -%}
+          {%- if settings.abn != blank -%}<span>{% if section.settings.abn_label != blank %}{{ section.settings.abn_label }} {% endif %}{{ settings.abn }}</span>{%- endif -%}
         </span>
       {%- endif -%}
     </div>
@@ -176,9 +176,9 @@
           <a href="{{ link.url }}">{{ link.title }}</a>
         {%- endfor -%}
       {%- else -%}
-        <a href="/pages/accessibility">Accessibility</a>
-        <a href="/pages/privacy">Privacy</a>
-        <a href="/pages/terms">Terms</a>
+        {%- if section.settings.legal_accessibility != blank -%}<a href="/pages/accessibility">{{ section.settings.legal_accessibility }}</a>{%- endif -%}
+        {%- if section.settings.legal_privacy != blank -%}<a href="/pages/privacy">{{ section.settings.legal_privacy }}</a>{%- endif -%}
+        {%- if section.settings.legal_terms != blank -%}<a href="/pages/terms">{{ section.settings.legal_terms }}</a>{%- endif -%}
       {%- endif -%}
     </div>
     {%- endif -%}
@@ -310,6 +310,94 @@
       "id": "col_company",
       "label": "Company column heading",
       "default": "Company"
+    },
+    {
+      "type": "text",
+      "id": "company_about",
+      "label": "Company column - About link",
+      "default": "About Sabdia",
+      "info": "The five Company links show when no Company menu is chosen above. Clear a label to drop that link."
+    },
+    {
+      "type": "text",
+      "id": "company_process",
+      "label": "Company column - Process link",
+      "default": "Process"
+    },
+    {
+      "type": "text",
+      "id": "company_collection",
+      "label": "Company column - Collection link",
+      "default": "Collection"
+    },
+    {
+      "type": "text",
+      "id": "company_agent",
+      "label": "Company column - Agent Access link",
+      "default": "Agent Access",
+      "visible_if": "{{ section.settings.show_agent_link }}"
+    },
+    {
+      "type": "text",
+      "id": "company_journal",
+      "label": "Company column - Journal link",
+      "default": "The Journal"
+    },
+    {
+      "type": "text",
+      "id": "connect_instagram",
+      "label": "Connect column - Instagram link",
+      "default": "Instagram",
+      "info": "The Instagram handle from Theme settings follows it. Clear a label to drop that link."
+    },
+    {
+      "type": "text",
+      "id": "connect_facebook",
+      "label": "Connect column - Facebook link",
+      "default": "Facebook"
+    },
+    {
+      "type": "text",
+      "id": "connect_linkedin",
+      "label": "Connect column - LinkedIn link",
+      "default": "LinkedIn"
+    },
+    {
+      "type": "text",
+      "id": "rights_text",
+      "label": "Copyright line - after the company name",
+      "default": "All rights reserved."
+    },
+    {
+      "type": "text",
+      "id": "qbcc_label",
+      "label": "Licence number - label",
+      "default": "QBCC Licence"
+    },
+    {
+      "type": "text",
+      "id": "abn_label",
+      "label": "ABN - label",
+      "default": "ABN"
+    },
+    {
+      "type": "text",
+      "id": "legal_accessibility",
+      "label": "Legal links - Accessibility",
+      "default": "Accessibility",
+      "info": "The three legal links show when no Legal menu is chosen above. Clear a label to drop that link."
+    },
+    {
+      "type": "text",
+      "id": "legal_privacy",
+      "label": "Legal links - Privacy",
+      "default": "Privacy"
+    },
+    {
+      "type": "text",
+      "id": "legal_terms",
+      "label": "Legal links - Terms",
+      "default": "Terms"
     },
     {"type": "header", "content": "Show"},
     {"type": "checkbox", "id": "show_newsletter", "label": "Show the Journal sign-up band", "default": true},

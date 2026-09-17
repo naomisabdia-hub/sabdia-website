@@ -7,6 +7,8 @@
 
   Params: product, slot ('hero' | 'a' | 'b' | 'row'), di (0-2, row delay),
           s (section.settings), block (optional)
+  The card words (Bed, Bath, m², , QLD …) come from s: the section's Card
+  words settings (17 Sep 2026).
 {%- endcomment -%}
 {%- liquid
   assign delays = ',d1,d2' | split: ','
@@ -37,7 +39,7 @@
   endcapture
 -%}
 {%- if pstatus contains 'Sold' and slot == 'row' -%}
-  {% render 'sold-card', product: product, class: cls, img_w: w, img_h: h, show_suburb: s.sold_suburb, show_build: s.show_build, show_land: s.show_land, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, attrs: block.shopify_attributes %}
+  {% render 'sold-card', product: product, class: cls, img_w: w, img_h: h, show_suburb: s.sold_suburb, show_build: s.show_build, show_land: s.show_land, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, attrs: block.shopify_attributes, word_bed: s.word_bed, word_bath: s.word_bath, word_garage: s.word_garage, unit_area: s.unit_area, word_build: s.word_build, word_land: s.word_land, mark_land_over: s.mark_land_over, tip_build: s.tip_build, tip_land: s.tip_land, loc_state: s.loc_state %}
 {%- else -%}
-  {% render 'property-card', product: product, class: cls, img_w: w, img_h: h, show_cars: cars, show_land: s.show_land, show_build: s.show_build, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, attrs: block.shopify_attributes %}
+  {% render 'property-card', product: product, class: cls, img_w: w, img_h: h, show_cars: cars, show_land: s.show_land, show_build: s.show_build, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, attrs: block.shopify_attributes, word_bed: s.word_bed, word_bath: s.word_bath, word_garage: s.word_garage, unit_area: s.unit_area, word_build: s.word_build, word_land: s.word_land, mark_land_over: s.mark_land_over, tip_build: s.tip_build, tip_land: s.tip_land, loc_state: s.loc_state %}
 {%- endif -%}

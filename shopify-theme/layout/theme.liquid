@@ -26,7 +26,7 @@
       assign title_text = 'Residences'
   endcase
 -%}
-<title>{{ title_text }}{% unless title_text contains 'Sabdia' or title_text == blank %} | Sabdia Constructions{% endunless %}</title>
+<title>{{ title_text }}{% unless title_text contains 'Sabdia' or title_text == blank or settings.title_suffix == blank %} | {{ settings.title_suffix }}{% endunless %}</title>
 {%- liquid
   # Customizer-driven logo size (Brand → Logo size); the stylesheet falls
   # back to the reviewed 38px/30px when the vars are absent.
@@ -218,7 +218,7 @@ try {
 <body class="{% if dark_top %}top-dark{% else %}top-light{% endif %}{% if locked %} pw-page{% endif %}">
 {%- unless locked %}
 
-<a href="#main" class="skip-link">Skip to content</a>
+<a href="#main" class="skip-link">{{ settings.skip_link | default: 'Skip to content' }}</a>
 
 {% sections 'header-group' %}
 {% endunless %}
@@ -262,13 +262,20 @@ try {
 {%- assign sf_list = settings.residence_pages | default: 'aether,sierra,solace,caspian,qasr,capri' | newline_to_br | strip_newlines | replace: '<br />', ',' | split: ',' -%}
 {%- capture res_handles -%}{%- for sf_h in sf_list -%}{%- assign sf_p = pages[sf_h] -%}{%- if sf_p -%}{{ sf_p.handle }},{%- endif -%}{%- endfor -%}{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{{ p.handle }},{%- endif -%}{%- endfor -%}{%- endcapture -%}
 {%- capture res_map -%}[{%- for sf_h in sf_list -%}{%- assign sf_p = pages[sf_h] -%}{%- if sf_p -%}{"handle":{{ sf_p.handle | json }},"title":{{ sf_p.title | json }},"suburb":{{ sf_p.metafields.custom.suburb.value | default: '' | json }}},{%- endif -%}{%- endfor -%}{%- for p in collections.all.products -%}{%- if p.tags contains 'property' -%}{"handle":{{ p.handle | json }},"title":{{ p.title | json }},"suburb":{{ p.metafields.custom.suburb.value | default: '' | json }}},{%- endif -%}{%- endfor -%}]{%- endcapture -%}
-<script>window.SabdiaForms={residences:{{ res_handles | split: ',' | compact | uniq | json }},residenceMap:{{ res_map | replace: ',]', ']' }},mode:{{ settings.form_backend | json }},mirror:{% if settings.forms_endpoint != blank %}{{ settings.forms_endpoint | append: '/api/contact' | json }}{% else %}null{% endif %},thanks:{"heading":"Thank you","text":"Thank you for your interest - we appreciate you reaching out. A member of our team will be in touch with you as soon as possible."},replies:[
-{"match":"renovat|custom|client build|build (my|our|a) |our block|my block|our land|my land|knock ?down|extension|quote","text":"Thank you so much for reaching out and for thinking of us for your project. At the moment we aren't taking on client builds or renovations - our focus is solely on designing and building our own development projects. We really appreciate your interest and support, and hopefully our paths cross in the future."},
-{"match":"agent|agency|licen","text":"Thank you for reaching out. We will review your details and be in touch about agent access as soon as possible."},
-{"match":"inspect|view|walk ?through|open home","text":"Thank you for your interest - we appreciate you reaching out. Inspections are by private appointment. To help us provide the most relevant information, could you please share your approximate budget range and your intended timeline for purchase? A member of our team will then be in touch to arrange a time."},
-{"match":"price|guide|cost|how much|budget","text":"Thank you for your interest - we appreciate you reaching out. We talk through pricing directly rather than publishing a guide. To help us provide the most relevant information, could you please share your approximate budget range and your intended timeline for purchase? A member of our team will then be in touch with you as soon as possible."},
-{"match":"about sabdia|tell me more|who (are|is) sabdia|your company|your team|history","text":"Thank you for reaching out. Sabdia is a boutique Brisbane developer, in-house from the first sketch to handover, with more than 100 homes since 2013. A member of our team will be in touch with you as soon as possible."}
-]};</script>
+<script>window.SabdiaForms={residences:{{ res_handles | split: ',' | compact | uniq | json }},residenceMap:{{ res_map | replace: ',]', ']' }},mode:{{ settings.form_backend | json }},mirror:{% if settings.forms_endpoint != blank %}{{ settings.forms_endpoint | append: '/api/contact' | json }}{% else %}null{% endif %},thanks:{"heading":{{ settings.thanks_heading | default: 'Thank you' | json }},"text":{{ settings.thanks_text | json }}},replies:[
+{"match":"renovat|custom|client build|build (my|our|a) |our block|my block|our land|my land|knock ?down|extension|quote","text":{{ settings.reply_build | json }}},
+{"match":"agent|agency|licen","text":{{ settings.reply_agent | json }}},
+{"match":"inspect|view|walk ?through|open home","text":{{ settings.reply_inspect | json }}},
+{"match":"price|guide|cost|how much|budget","text":{{ settings.reply_price | json }}},
+{"match":"about sabdia|tell me more|who (are|is) sabdia|your company|your team|history","text":{{ settings.reply_about | json }}}
+],words:{
+{%- comment -%} Theme settings › Messages: the words main.js writes (17 Sep 2026, every word editable). {%- endcomment -%}
+"sending":{{ settings.msg_sending | json }},"error":{{ settings.msg_error | json }},"spam":{{ settings.msg_spam | json }},"pickLocation":{{ settings.msg_pick_location | json }},
+"morning":{{ settings.greet_morning | json }},"afternoon":{{ settings.greet_afternoon | json }},"evening":{{ settings.greet_evening | json }},
+"thanksHeading":{{ settings.thanks_heading | json }},"thanksFyh":{{ settings.thanks_fyh | json }},"subscribed":{{ settings.msg_subscribed | json }},
+"cvRemove":{{ settings.cv_remove | json }},"cvLeftOut":{{ settings.cv_left_out | json }},"cvNotDoc":{{ settings.cv_not_doc | json }},"cvTooBig":{{ settings.cv_too_big | json }},"cvTooMany":{{ settings.cv_too_many | json }},"cvUploadFailed":{{ settings.cv_upload_failed | json }},
+"copied":{{ settings.msg_copied | json }},"copyPrompt":{{ settings.msg_copy_prompt | json }},"mute":{{ settings.msg_mute | json }}
+}};</script>
 <script src="{{ 'main.js' | asset_url }}"></script>
 {%- endif -%}
 </body>

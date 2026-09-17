@@ -63,6 +63,7 @@
       "label": "Note under the button"
     },
     { "type": "text", "id": "success_text", "label": "Thank you message (Shopify mode)", "default": "Thank you - we will be in touch within a business day." },
+    { "type": "text", "id": "thanks_heading", "label": "Thank you heading (Shopify mode)", "default": "Thank you", "info": "Shown above the message when the page reloads after a send." },
     { "type": "text", "id": "f_interest_ph", "label": "Interest placeholder", "default": "Select an enquiry type…" },
     { "type": "header", "content": "Pre-qualification (budget, timeline, locations)" },
     { "type": "paragraph", "content": "Appears when the Interest is a residence or For Sale. Budget and timeline are then required; locations are required for a For Sale enquiry and optional for a residence (its suburb is pre-selected). Same behaviour as the Contact page." },
@@ -76,6 +77,8 @@
     { "type": "text", "id": "prequal_loc_label", "label": "Locations label (For Sale enquiry)", "default": "Preferred locations" },
     { "type": "text", "id": "prequal_loc_label_other", "label": "Locations label (residence enquiry)", "default": "Other locations you would also consider (optional)" },
     { "type": "textarea", "id": "prequal_locations", "label": "Location options (one per line)", "info": "Leave empty to list the suburbs of the residences for sale plus Other inner Brisbane." },
+    { "type": "text", "id": "prequal_loc_other", "label": "Last location choice (when the list above is empty)", "default": "Other inner Brisbane", "info": "Follows the suburbs of the residences for sale." },
+    { "type": "text", "id": "prequal_select", "label": "Dropdown prompt (budget, timeline, flexibility)", "default": "Select…" },
     { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
     {
       "type": "header",
@@ -152,6 +155,25 @@
       "id": "f_submit",
       "label": "Button",
       "default": "Submit"
+    },
+    {
+      "type": "text",
+      "id": "f_regarding",
+      "label": "Message opening when a link names a residence",
+      "default": "Regarding {name}:",
+      "info": "{name} becomes the residence's name, e.g. a link ending ?property=SOLACE#contact."
+    },
+    {
+      "type": "text",
+      "id": "careers_label",
+      "label": "CV field label (Careers)",
+      "default": "CV or resume*"
+    },
+    {
+      "type": "text",
+      "id": "careers_note",
+      "label": "CV field note (Careers)",
+      "default": "PDF or Word, up to 10 MB each. Add as many as you need: CV, cover letter, portfolio."
     },
     {
       "type": "header",

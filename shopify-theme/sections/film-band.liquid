@@ -309,7 +309,7 @@ function sabdiaFilmInit() {
     if (btn) btn.addEventListener('click', function () {
       video.muted = !video.muted;
       if (!video.muted && video.paused) video.play().catch(function () {});
-      label.textContent = video.muted ? 'Sound On' : 'Mute';
+      label.textContent = video.muted ? {{ section.settings.sound_label | default: 'Sound On' | json }} : {{ section.settings.mute_label | default: 'Mute' | json }};
     });
     if (frame.dataset.noauto) {
       /* Autoplay off: the frame itself is the play button. */
@@ -510,6 +510,12 @@ sabdiaFilmInit();
       "id": "sound_label",
       "label": "Sound button",
       "default": "Sound On"
+    },
+    {
+      "type": "text",
+      "id": "mute_label",
+      "label": "Sound button while the sound is on",
+      "default": "Mute"
     },
     {"type": "header", "content": "Show"},
     {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},

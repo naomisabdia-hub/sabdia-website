@@ -143,11 +143,11 @@
       {%- if fr_text != blank and section.settings.show_text -%}<p class="about-p reveal d2">{{ fr_text }}</p>{%- endif -%}
       {%- if section.settings.show_facts -%}
       <dl class="fre-facts reveal d3">
-        {%- if m.beds.value != blank -%}<div><dt>Bedrooms</dt><dd>{{ m.beds.value }}</dd></div>{%- endif -%}
-        {%- if m.baths.value != blank -%}<div><dt>Bathrooms</dt><dd>{{ m.baths.value }}</dd></div>{%- endif -%}
-        {%- if m.cars.value != blank -%}<div><dt>Garage</dt><dd>{{ m.cars.value }}</dd></div>{%- endif -%}
-        {%- if m.build_size.value != blank -%}<div><dt>Build</dt><dd>{{ m.build_size.value }}<span>m&sup2;</span></dd></div>{%- endif -%}
-        {%- if m.land.value != blank -%}<div><dt>Land</dt><dd>{{ m.land.value }}<span>m&sup2;</span></dd></div>{%- endif -%}
+        {%- if m.beds.value != blank -%}<div>{% if section.settings.fact_beds != blank %}<dt>{{ section.settings.fact_beds }}</dt>{% endif %}<dd>{{ m.beds.value }}</dd></div>{%- endif -%}
+        {%- if m.baths.value != blank -%}<div>{% if section.settings.fact_baths != blank %}<dt>{{ section.settings.fact_baths }}</dt>{% endif %}<dd>{{ m.baths.value }}</dd></div>{%- endif -%}
+        {%- if m.cars.value != blank -%}<div>{% if section.settings.fact_cars != blank %}<dt>{{ section.settings.fact_cars }}</dt>{% endif %}<dd>{{ m.cars.value }}</dd></div>{%- endif -%}
+        {%- if m.build_size.value != blank -%}<div>{% if section.settings.fact_build != blank %}<dt>{{ section.settings.fact_build }}</dt>{% endif %}<dd>{{ m.build_size.value }}{% if section.settings.fact_unit != blank %}<span>{{ section.settings.fact_unit }}</span>{% endif %}</dd></div>{%- endif -%}
+        {%- if m.land.value != blank -%}<div>{% if section.settings.fact_land != blank %}<dt>{{ section.settings.fact_land }}</dt>{% endif %}<dd>{{ m.land.value }}{% if section.settings.fact_unit != blank %}<span>{{ section.settings.fact_unit }}</span>{% endif %}</dd></div>{%- endif -%}
       </dl>
       {%- endif -%}
       {%- if section.settings.show_buttons -%}
@@ -244,10 +244,10 @@
       {%- if fr_text != blank and section.settings.show_text -%}<p class="about-p reveal d2">{{ fr_text }}</p>{%- endif -%}
       {%- if section.settings.show_facts -%}
       <ul class="frs-facts reveal d2">
-        {%- if m.beds.value != blank -%}<li><b>{{ m.beds.value }}</b> Bed</li>{%- endif -%}
-        {%- if m.baths.value != blank -%}<li><b>{{ m.baths.value }}</b> Bath</li>{%- endif -%}
-        {%- if m.cars.value != blank -%}<li><b>{{ m.cars.value }}</b> Garage</li>{%- endif -%}
-        {%- if m.build_size.value != blank -%}<li><b>{{ m.build_size.value }}</b>m&sup2; build</li>{%- endif -%}{%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>m&sup2; land</li>{%- endif -%}
+        {%- if m.beds.value != blank -%}<li><b>{{ m.beds.value }}</b>{% if section.settings.unit_bed != blank %} {{ section.settings.unit_bed }}{% endif %}</li>{%- endif -%}
+        {%- if m.baths.value != blank -%}<li><b>{{ m.baths.value }}</b>{% if section.settings.unit_bath != blank %} {{ section.settings.unit_bath }}{% endif %}</li>{%- endif -%}
+        {%- if m.cars.value != blank -%}<li><b>{{ m.cars.value }}</b>{% if section.settings.unit_cars != blank %} {{ section.settings.unit_cars }}{% endif %}</li>{%- endif -%}
+        {%- if m.build_size.value != blank -%}<li><b>{{ m.build_size.value }}</b>{{ section.settings.unit_build }}</li>{%- endif -%}{%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>{{ section.settings.unit_land }}</li>{%- endif -%}
       </ul>
       {%- endif -%}
       {%- if section.settings.show_buttons -%}
@@ -296,10 +296,10 @@
     {%- if fr_text != blank and section.settings.show_text -%}<p class="page-hero-sub reveal d2">{{ fr_text }}</p>{%- endif -%}
     {%- if section.settings.show_facts -%}
     <ul class="fr-facts reveal d2">
-      {%- if m.beds.value != blank -%}<li><b>{{ m.beds.value }}</b> Bed</li>{%- endif -%}
-      {%- if m.baths.value != blank -%}<li><b>{{ m.baths.value }}</b> Bath</li>{%- endif -%}
-      {%- if m.cars.value != blank -%}<li><b>{{ m.cars.value }}</b> Garage</li>{%- endif -%}
-      {%- if m.build_size.value != blank -%}<li><b>{{ m.build_size.value }}</b>m&sup2; build</li>{%- endif -%}{%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>m&sup2; land</li>{%- endif -%}
+      {%- if m.beds.value != blank -%}<li><b>{{ m.beds.value }}</b>{% if section.settings.unit_bed != blank %} {{ section.settings.unit_bed }}{% endif %}</li>{%- endif -%}
+      {%- if m.baths.value != blank -%}<li><b>{{ m.baths.value }}</b>{% if section.settings.unit_bath != blank %} {{ section.settings.unit_bath }}{% endif %}</li>{%- endif -%}
+      {%- if m.cars.value != blank -%}<li><b>{{ m.cars.value }}</b>{% if section.settings.unit_cars != blank %} {{ section.settings.unit_cars }}{% endif %}</li>{%- endif -%}
+      {%- if m.build_size.value != blank -%}<li><b>{{ m.build_size.value }}</b>{{ section.settings.unit_build }}</li>{%- endif -%}{%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>{{ section.settings.unit_land }}</li>{%- endif -%}
     </ul>
     {%- endif -%}
     {%- if section.settings.show_buttons -%}
@@ -367,6 +367,18 @@
     {"type": "select", "id": "height", "label": "Height (full-width band)", "options": [{"value": "standard", "label": "Standard (as designed)"}, {"value": "short", "label": "Short"}, {"value": "full", "label": "Full screen"}], "default": "standard"},
     {"type": "select", "id": "words", "label": "Words sit", "options": [{"value": "base-left", "label": "Bottom left (as designed)"}, {"value": "base-centre", "label": "Bottom centre"}, {"value": "centre", "label": "Centre"}], "default": "base-left"},
     {"type": "select", "id": "scrim", "label": "Darkening shape", "options": [{"value": "corner", "label": "Corner (as designed)"}, {"value": "base", "label": "Bottom only"}, {"value": "even", "label": "Even"}, {"value": "none", "label": "None"}], "default": "corner"},
+    {"type": "header", "content": "Fact words", "visible_if": "{{ section.settings.show_facts }}"},
+    {"type": "text", "id": "fact_beds", "label": "Bedrooms label (editorial band)", "default": "Bedrooms", "visible_if": "{{ section.settings.show_facts and section.settings.layout == 'editorial' }}"},
+    {"type": "text", "id": "fact_baths", "label": "Bathrooms label (editorial band)", "default": "Bathrooms", "visible_if": "{{ section.settings.show_facts and section.settings.layout == 'editorial' }}"},
+    {"type": "text", "id": "fact_cars", "label": "Garage label (editorial band)", "default": "Garage", "visible_if": "{{ section.settings.show_facts and section.settings.layout == 'editorial' }}"},
+    {"type": "text", "id": "fact_build", "label": "Build size label (editorial band)", "default": "Build", "visible_if": "{{ section.settings.show_facts and section.settings.layout == 'editorial' }}"},
+    {"type": "text", "id": "fact_land", "label": "Land size label (editorial band)", "default": "Land", "visible_if": "{{ section.settings.show_facts and section.settings.layout == 'editorial' }}"},
+    {"type": "text", "id": "fact_unit", "label": "Size unit (editorial band)", "default": "m²", "visible_if": "{{ section.settings.show_facts and section.settings.layout == 'editorial' }}"},
+    {"type": "text", "id": "unit_bed", "label": "Word after the bedrooms (split card, full-width band)", "default": "Bed", "visible_if": "{{ section.settings.show_facts and section.settings.layout != 'editorial' }}"},
+    {"type": "text", "id": "unit_bath", "label": "Word after the bathrooms (split card, full-width band)", "default": "Bath", "visible_if": "{{ section.settings.show_facts and section.settings.layout != 'editorial' }}"},
+    {"type": "text", "id": "unit_cars", "label": "Word after the garage count (split card, full-width band)", "default": "Garage", "visible_if": "{{ section.settings.show_facts and section.settings.layout != 'editorial' }}"},
+    {"type": "text", "id": "unit_build", "label": "Build size unit (split card, full-width band)", "default": "m² build", "visible_if": "{{ section.settings.show_facts and section.settings.layout != 'editorial' }}"},
+    {"type": "text", "id": "unit_land", "label": "Land size unit (split card, full-width band)", "default": "m² land", "visible_if": "{{ section.settings.show_facts and section.settings.layout != 'editorial' }}"},
     {"type": "header", "content": "Look"},
     {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}], "default": "design"},
     {"type": "color", "id": "look_color", "label": "Your colour", "default": "#E5E2DF", "visible_if": "{{ section.settings.look_surface == 'custom' }}"},

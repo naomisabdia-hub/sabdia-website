@@ -89,13 +89,13 @@
     {%- if section.settings.spec_show_land -%}
     <div class="prop-spec-item">
       <div class="prop-spec-l">{{ section.settings.spec_land | default: "Land Size" }}</div>
-      <div class="prop-spec-v">{{ mf.land.value }}<em>m&sup2;{% if mf.land_over.value %}+{% endif %}</em></div>
+      <div class="prop-spec-v">{{ mf.land.value }}<em>{{ section.settings.unit_land }}{% if mf.land_over.value %}{{ section.settings.land_over_mark }}{% endif %}</em></div>
     </div>
     {%- endif -%}
     {%- if section.settings.spec_show_build and mf.build_size.value != blank -%}
     <div class="prop-spec-item">
       <div class="prop-spec-l">{{ section.settings.spec_build | default: "Build Size" }}</div>
-      <div class="prop-spec-v">{{ mf.build_size.value }}<em>m&sup2;</em></div>
+      <div class="prop-spec-v">{{ mf.build_size.value }}<em>{{ section.settings.unit_build }}</em></div>
     </div>
     {%- endif -%}
     {%- if section.settings.spec_show_status -%}
@@ -269,6 +269,28 @@
       "label": "Status label",
       "default": "Status",
       "visible_if": "{{ section.settings.hide_specs == false and section.settings.spec_show_status }}"
+    },
+    {
+      "type": "text",
+      "id": "unit_land",
+      "label": "Land size unit",
+      "default": "m²",
+      "visible_if": "{{ section.settings.hide_specs == false and section.settings.spec_show_land }}"
+    },
+    {
+      "type": "text",
+      "id": "land_over_mark",
+      "label": "Land size - or more mark",
+      "default": "+",
+      "info": "Shown after the unit when the box Land size is 'or more' is ticked on the residence.",
+      "visible_if": "{{ section.settings.hide_specs == false and section.settings.spec_show_land }}"
+    },
+    {
+      "type": "text",
+      "id": "unit_build",
+      "label": "Build size unit",
+      "default": "m²",
+      "visible_if": "{{ section.settings.hide_specs == false and section.settings.spec_show_build }}"
     },
     {
       "type": "header",

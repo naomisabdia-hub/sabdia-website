@@ -241,6 +241,7 @@
     var img = document.getElementById('lbImg'), cap = document.getElementById('lbCap'), count = document.getElementById('lbCount');
     var i = 0, lastFocus = null;
     var house = {{ res.handle | json }};
+    var renderNote = {{ s.render_note | json }};
     /* Photos are named house-room-NN; alt text arrives as "SOLACE - solace-kitchen-01"
        or "SOLACE - Kitchen 01". Show just the room, and say when it is a render. */
     function caption(alt) {
@@ -250,7 +251,7 @@
       s = s.replace(/(^|-)render(-|$)/, '$1').replace(/[-_]?\d+$/, '').replace(/[-_]+/g, ' ').trim();
       if (!s || s === house) s = {{ res.title | json }};
       s = s.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
-      return render ? s + ' \u00b7 Artist impression' : s;
+      return render && renderNote ? s + ' \u00b7 ' + renderNote : s;
     }
     function show(n) {
       i = (n + items.length) % items.length;
@@ -344,7 +345,40 @@
     /* One index entry per room. Photo names carry the room ("kitchen-01",
        "pool-night-03", "formal-living-fireplace-01"); this maps them onto a
        short list of rooms so the index reads like a floor plan. */
-    var ROOMS = [['walk in robe', 'Walk-in Robe'], ['robe', 'Walk-in Robe'], ['master', 'Master Suite'], ['ensuite', 'Ensuite'], ['bedroom', 'Bedrooms'], ['bed ', 'Bedrooms'], ['bathroom', 'Bathrooms'], ['bath', 'Bathrooms'], ['powder', 'Powder Room'], ['kitchen', 'Kitchen'], ['butler', 'Kitchen'], ['pantry', 'Kitchen'], ['dining', 'Dining'], ['living', 'Living'], ['lounge', 'Living'], ['family', 'Living'], ['games', 'Games Room'], ['media', 'Media Room'], ['cinema', 'Cinema'], ['study', 'Study'], ['office', 'Study'], ['gym', 'Gym'], ['sauna', 'Wellness'], ['spa', 'Wellness'], ['cellar', 'Cellar'], ['laundry', 'Laundry'], ['mud', 'Mud Room'], ['garage', 'Garage'], ['pool', 'Pool'], ['cabana', 'Pool'], ['alfresco', 'Alfresco'], ['terrace', 'Terrace'], ['balcony', 'Balcony'], ['rooftop', 'Rooftop'], ['courtyard', 'Courtyard'], ['garden', 'Garden'], ['entry', 'Entry'], ['foyer', 'Entry'], ['hall', 'Entry'], ['stair', 'Staircase'], ['facade', 'Exterior'], ['exterior', 'Exterior'], ['street', 'Exterior'], ['front', 'Exterior'], ['rear', 'Exterior'], ['aerial', 'Aerial'], ['interior', 'Interior']];
+    var RN = {
+      robe: {{ s.room_robe | default: 'Walk-in Robe' | json }},
+      master: {{ s.room_master | default: 'Master Suite' | json }},
+      ensuite: {{ s.room_ensuite | default: 'Ensuite' | json }},
+      bedrooms: {{ s.room_bedrooms | default: 'Bedrooms' | json }},
+      bathrooms: {{ s.room_bathrooms | default: 'Bathrooms' | json }},
+      powder: {{ s.room_powder | default: 'Powder Room' | json }},
+      kitchen: {{ s.room_kitchen | default: 'Kitchen' | json }},
+      dining: {{ s.room_dining | default: 'Dining' | json }},
+      living: {{ s.room_living | default: 'Living' | json }},
+      games: {{ s.room_games | default: 'Games Room' | json }},
+      media: {{ s.room_media | default: 'Media Room' | json }},
+      cinema: {{ s.room_cinema | default: 'Cinema' | json }},
+      study: {{ s.room_study | default: 'Study' | json }},
+      gym: {{ s.room_gym | default: 'Gym' | json }},
+      wellness: {{ s.room_wellness | default: 'Wellness' | json }},
+      cellar: {{ s.room_cellar | default: 'Cellar' | json }},
+      laundry: {{ s.room_laundry | default: 'Laundry' | json }},
+      mud: {{ s.room_mud | default: 'Mud Room' | json }},
+      garage: {{ s.room_garage | default: 'Garage' | json }},
+      pool: {{ s.room_pool | default: 'Pool' | json }},
+      alfresco: {{ s.room_alfresco | default: 'Alfresco' | json }},
+      terrace: {{ s.room_terrace | default: 'Terrace' | json }},
+      balcony: {{ s.room_balcony | default: 'Balcony' | json }},
+      rooftop: {{ s.room_rooftop | default: 'Rooftop' | json }},
+      courtyard: {{ s.room_courtyard | default: 'Courtyard' | json }},
+      garden: {{ s.room_garden | default: 'Garden' | json }},
+      entry: {{ s.room_entry | default: 'Entry' | json }},
+      stair: {{ s.room_stair | default: 'Staircase' | json }},
+      exterior: {{ s.room_exterior | default: 'Exterior' | json }},
+      aerial: {{ s.room_aerial | default: 'Aerial' | json }},
+      interior: {{ s.room_interior | default: 'Interior' | json }}
+    };
+    var ROOMS = [['walk in robe', RN.robe], ['robe', RN.robe], ['master', RN.master], ['ensuite', RN.ensuite], ['bedroom', RN.bedrooms], ['bed ', RN.bedrooms], ['bathroom', RN.bathrooms], ['bath', RN.bathrooms], ['powder', RN.powder], ['kitchen', RN.kitchen], ['butler', RN.kitchen], ['pantry', RN.kitchen], ['dining', RN.dining], ['living', RN.living], ['lounge', RN.living], ['family', RN.living], ['games', RN.games], ['media', RN.media], ['cinema', RN.cinema], ['study', RN.study], ['office', RN.study], ['gym', RN.gym], ['sauna', RN.wellness], ['spa', RN.wellness], ['cellar', RN.cellar], ['laundry', RN.laundry], ['mud', RN.mud], ['garage', RN.garage], ['pool', RN.pool], ['cabana', RN.pool], ['alfresco', RN.alfresco], ['terrace', RN.terrace], ['balcony', RN.balcony], ['rooftop', RN.rooftop], ['courtyard', RN.courtyard], ['garden', RN.garden], ['entry', RN.entry], ['foyer', RN.entry], ['hall', RN.entry], ['stair', RN.stair], ['facade', RN.exterior], ['exterior', RN.exterior], ['street', RN.exterior], ['front', RN.exterior], ['rear', RN.exterior], ['aerial', RN.aerial], ['interior', RN.interior]];
     var house = (pg.getAttribute('data-house') || '').toLowerCase();
     var roomKey = function (n) {
       var c = roomOf(n).toLowerCase();
@@ -568,6 +602,244 @@
       "default": "View all photos",
       "info": "The photo count is added automatically. Every photo on the residence (Products › the residence › Media) opens in the viewer; the grid shows the first six after the hero.",
       "visible_if": "{{ section.settings.show_gallery }}"
+    },
+    {
+      "type": "header",
+      "content": "Words"
+    },
+    {
+      "type": "text",
+      "id": "render_note",
+      "label": "Photo viewer - note on a render",
+      "default": "Artist impression",
+      "info": "Added after the room name in the photo viewer when a photo's file name says render, e.g. Kitchen · Artist impression. Leave empty to show the room name alone."
+    },
+    {
+      "type": "header",
+      "content": "Room names under the strip",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "paragraph",
+      "content": "The row of room names under the filmstrip groups the photos by the room in each photo's file name (kitchen-01, pool-night-03). Each box is the name shown for those photos. Leave a box empty to go back to the name as designed.",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_robe",
+      "label": "Room name - walk-in robe photos",
+      "default": "Walk-in Robe",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_master",
+      "label": "Room name - master photos",
+      "default": "Master Suite",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_ensuite",
+      "label": "Room name - ensuite photos",
+      "default": "Ensuite",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_bedrooms",
+      "label": "Room name - bedroom photos",
+      "default": "Bedrooms",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_bathrooms",
+      "label": "Room name - bathroom photos",
+      "default": "Bathrooms",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_powder",
+      "label": "Room name - powder room photos",
+      "default": "Powder Room",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_kitchen",
+      "label": "Room name - kitchen, butler, pantry photos",
+      "default": "Kitchen",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_dining",
+      "label": "Room name - dining photos",
+      "default": "Dining",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_living",
+      "label": "Room name - living, lounge, family photos",
+      "default": "Living",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_games",
+      "label": "Room name - games room photos",
+      "default": "Games Room",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_media",
+      "label": "Room name - media room photos",
+      "default": "Media Room",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_cinema",
+      "label": "Room name - cinema photos",
+      "default": "Cinema",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_study",
+      "label": "Room name - study, office photos",
+      "default": "Study",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_gym",
+      "label": "Room name - gym photos",
+      "default": "Gym",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_wellness",
+      "label": "Room name - sauna, spa photos",
+      "default": "Wellness",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_cellar",
+      "label": "Room name - cellar photos",
+      "default": "Cellar",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_laundry",
+      "label": "Room name - laundry photos",
+      "default": "Laundry",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_mud",
+      "label": "Room name - mud room photos",
+      "default": "Mud Room",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_garage",
+      "label": "Room name - garage photos",
+      "default": "Garage",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_pool",
+      "label": "Room name - pool, cabana photos",
+      "default": "Pool",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_alfresco",
+      "label": "Room name - alfresco photos",
+      "default": "Alfresco",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_terrace",
+      "label": "Room name - terrace photos",
+      "default": "Terrace",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_balcony",
+      "label": "Room name - balcony photos",
+      "default": "Balcony",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_rooftop",
+      "label": "Room name - rooftop photos",
+      "default": "Rooftop",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_courtyard",
+      "label": "Room name - courtyard photos",
+      "default": "Courtyard",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_garden",
+      "label": "Room name - garden photos",
+      "default": "Garden",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_entry",
+      "label": "Room name - entry, foyer, hall photos",
+      "default": "Entry",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_stair",
+      "label": "Room name - stair photos",
+      "default": "Staircase",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_exterior",
+      "label": "Room name - facade, exterior, street, front, rear photos",
+      "default": "Exterior",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_aerial",
+      "label": "Room name - aerial photos",
+      "default": "Aerial",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
+    },
+    {
+      "type": "text",
+      "id": "room_interior",
+      "label": "Room name - interior photos",
+      "default": "Interior",
+      "visible_if": "{{ section.settings.show_gallery and section.settings.gallery_layout == 'stage' and section.settings.show_rooms }}"
     },
     {
       "type": "header",

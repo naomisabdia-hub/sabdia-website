@@ -64,11 +64,19 @@
 {%- liquid
   assign ib_heading = section.settings.intro_band_heading | replace: count_token, count_word
   if ib_heading == blank
+    # The automatic heading's words (17 Sep 2026) are their own boxes.
     if count == 1
-      assign ib_heading = count_word | append: ' residence, <em>inner Brisbane</em>.'
+      assign ib_auto = section.settings.auto_heading_one
+      if ib_auto == blank
+        assign ib_auto = count_token | append: ' residence, <em>inner Brisbane</em>.'
+      endif
     else
-      assign ib_heading = count_word | append: ' residences, <em>inner Brisbane</em>.'
+      assign ib_auto = section.settings.auto_heading_many
+      if ib_auto == blank
+        assign ib_auto = count_token | append: ' residences, <em>inner Brisbane</em>.'
+      endif
     endif
+    assign ib_heading = ib_auto | replace: count_token, count_word
   endif
   assign ib_suburbs = suburb_list | join: ' · '
 -%}
@@ -138,6 +146,22 @@
       "id": "intro_band_heading",
       "label": "Heading (HTML)",
       "info": "Leave empty and the heading counts the residences for you: Five residences, inner Brisbane. Wrap a word in <em> for the italic accent; {count} becomes the number."
+    },
+    {
+      "type": "html",
+      "id": "auto_heading_many",
+      "label": "Automatic heading - several residences",
+      "default": "{count} residences, <em>inner Brisbane</em>.",
+      "info": "Used while Heading is empty. {count} becomes the number (Five).",
+      "visible_if": "{{ section.settings.intro_band_heading == blank }}"
+    },
+    {
+      "type": "html",
+      "id": "auto_heading_one",
+      "label": "Automatic heading - one residence",
+      "default": "{count} residence, <em>inner Brisbane</em>.",
+      "info": "Used while Heading is empty and one residence is listed.",
+      "visible_if": "{{ section.settings.intro_band_heading == blank }}"
     },
     {
       "type": "textarea",

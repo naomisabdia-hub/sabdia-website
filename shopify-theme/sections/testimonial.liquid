@@ -172,7 +172,7 @@
               <g class="testi-star-base">{% for x in (0..4) %}<use href="#testi-star-{{ sid }}" x="{{ x | times: 22 }}"/>{% endfor %}</g>
               <g class="testi-star-fill" clip-path="url(#testi-clip-{{ sid }})">{% for x in (0..4) %}<use href="#testi-star-{{ sid }}" x="{{ x | times: 22 }}"/>{% endfor %}</g>
             </svg>
-            <span class="testi-chip-text"><strong>{{ rating }}</strong><span class="sr-only"> out of 5</span>{% if review_count != blank %} <span class="testi-chip-sep">&middot;</span> {{ review_count }} reviews{% endif %} {{ rating_label }}</span>
+            <span class="testi-chip-text"><strong>{{ rating }}</strong><span class="sr-only"> out of 5</span>{% if review_count != blank %} <span class="testi-chip-sep">&middot;</span> {{ review_count }}{% if section.settings.reviews_word != blank %} {{ section.settings.reviews_word }}{% endif %}{% endif %} {{ rating_label }}</span>
           {%- if section.settings.google_url != blank -%}</a>{%- else -%}</div>{%- endif -%}
         {%- endif -%}
       </div>
@@ -372,6 +372,7 @@
     { "type": "checkbox", "id": "show_rating", "label": "Show the rating", "default": true },
     { "type": "text", "id": "rating", "label": "Rating", "default": "4.4" },
     { "type": "text", "id": "review_count", "label": "Number of reviews", "default": "28" },
+    { "type": "text", "id": "reviews_word", "label": "Word after the number of reviews", "default": "reviews" },
     { "type": "text", "id": "rating_label", "label": "Rating label", "default": "on Google" },
     { "type": "header", "content": "Single quote (when there are no Review blocks)" },
     { "type": "textarea", "id": "quote", "label": "Quote" },

@@ -1,8 +1,8 @@
 {%- comment -%}
   Description and enquiry - the residence's story beside the form
 
-  Headline, description and key features (Products › the residence)
-  with the enquiry form, buyer questions and the brochure / general
+  Headline, description and key features (typed in this panel, or the
+  words saved on the page when a box is empty) with the enquiry form, buyer questions and the brochure / general
   enquiry buttons beside them. (The sticky Enquire bar on phones lives in
   the Property page section.)
 
@@ -36,6 +36,23 @@
     assign sold = true
   endif
   assign state = mf.state.value | default: 'QLD'
+  # Words typed in this section's panel win (17 Sep 2026, so Tamsin can edit
+  # every word in Customize); an empty box falls back to the page's saved
+  # fields (Content › Pages › the residence).
+  assign r_headline = s.headline_text | default: mf.headline.value
+  assign r_desc = res_desc
+  assign desc_typed = s.description_text | strip_html | strip
+  if desc_typed != blank
+    assign r_desc = s.description_text
+  endif
+  assign r_feats = mf.features.value
+  assign feats_typed = s.features_list | strip
+  if feats_typed != blank
+    assign r_feats = s.features_list | newline_to_br | split: '<br />'
+  endif
+  assign r_enq_heading = s.enquiry_heading | default: mf.enquiry_heading.value | default: 'Enquire Now'
+  assign r_enq_intro = s.enquiry_intro | default: mf.enquiry_text.value
+  assign r_enq_button = s.enquiry_button | default: mf.enquiry_button.value | default: 'Submit Enquiry'
   # The residence's name in its own brochure face (Products › the residence
   # › Metafields › Residence name font …), for headings that carry it.
   capture name_span
@@ -64,15 +81,16 @@
   <div class="prop-layout inner">
     <div class="{% if section.settings.sticky_desc %}prop-desc{% endif %}">
       {%- if section.settings.show_about_label -%}<div class="slabel prop-desc-slabel reveal">{{ section.settings.about_label | replace: name_token, name_span }}</div>{%- endif -%}
-      {%- if section.settings.show_headline and mf.headline.value != blank -%}<h1 class="prop-body-h reveal d1">{{ mf.headline.value }}</h1>{%- endif -%}
-      {%- if section.settings.show_description -%}{{ res_desc | replace: '<p>', '<p class="prop-body-p reveal d2">' }}{%- endif -%}
+      {%- if section.settings.show_headline and r_headline != blank -%}<h1 class="prop-body-h reveal d1">{{ r_headline }}</h1>{%- endif -%}
+      {%- if section.settings.show_description -%}{{ r_desc | replace: '<p>', '<p class="prop-body-p reveal d2">' }}{%- endif -%}
 
-      {%- if mf.features.value.size > 0 and section.settings.show_features -%}
+      {%- if r_feats.size > 0 and section.settings.show_features -%}
         <div class="prop-features reveal d3">
           <div class="prop-features-h">{{ section.settings.features_heading }}</div>
           <div class="prop-feat-grid">
-            {%- for f in mf.features.value -%}
-              <div class="prop-feat">{{ f }}</div>
+            {%- for f in r_feats -%}
+              {%- assign ft = f | strip -%}
+              {%- if ft != blank -%}<div class="prop-feat">{{ ft }}</div>{%- endif -%}
             {%- endfor -%}
           </div>
         </div>
@@ -82,19 +100,19 @@
     {%- if section.settings.show_enquiry -%}
     <div class="reveal d2 prop-side">
       <div class="prop-enquire">
-        <div class="prop-enquire-h">{{ mf.enquiry_heading.value | default: 'Enquire Now' | replace: res.title, name_span }}</div>
-        <p style="font-size:13px;font-weight:300;color:var(--ink3);line-height:1.75;margin-bottom:24px">{{ mf.enquiry_text.value }}</p>
+        <div class="prop-enquire-h">{{ r_enq_heading | replace: name_token, res.title | replace: res.title, name_span }}</div>
+        <p style="font-size:13px;font-weight:300;color:var(--ink3);line-height:1.75;margin-bottom:24px">{{ r_enq_intro | replace: name_token, prop_name }}</p>
         {%- if settings.form_backend == 'vercel' -%}
         <form class="cform" id="cform" name="property-enquiry" method="POST" action="{{ settings.forms_endpoint }}/api/contact">
           <input type="hidden" name="form-name" value="property-enquiry">
           <input type="hidden" name="property" value="{{ res.title | escape }}">
           <p class="hidden" style="display:none" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
           <div class="frow">
-            <div class="fg"><label class="fl" for="pe-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="pe-first" name="first-name" class="fi" placeholder="First name" autocomplete="given-name" required></div>
-            <div class="fg"><label class="fl" for="pe-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="pe-last" name="last-name" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+            <div class="fg"><label class="fl" for="pe-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="pe-first" name="first-name" class="fi" placeholder="{{ s.ph_first | escape }}" autocomplete="given-name" required></div>
+            <div class="fg"><label class="fl" for="pe-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="pe-last" name="last-name" class="fi" placeholder="{{ s.ph_last | escape }}" autocomplete="family-name" required></div>
           </div>
-          <div class="fg"><label class="fl" for="pe-email">{{ section.settings.f_email | default: "Email*" }}</label><input type="email" id="pe-email" name="email" class="fi" placeholder="Email address" autocomplete="email" required></div>
-          <div class="fg"><label class="fl" for="pe-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="pe-phone" name="phone" class="fi" required placeholder="Phone number" autocomplete="tel"></div>
+          <div class="fg"><label class="fl" for="pe-email">{{ section.settings.f_email | default: "Email*" }}</label><input type="email" id="pe-email" name="email" class="fi" placeholder="{{ s.ph_email | escape }}" autocomplete="email" required></div>
+          <div class="fg"><label class="fl" for="pe-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="pe-phone" name="phone" class="fi" required placeholder="{{ s.ph_phone | escape }}" autocomplete="tel"></div>
           {%- unless sold -%}
             <div class="fg">
               <label class="fl" for="pe-type">{{ section.settings.f_interest | default: "Enquiry Type" }}</label>
@@ -113,27 +131,27 @@
             </div>
           {%- endunless -%}
           {% render 'prequal-fields', mode: 'vercel', s: section.settings, residence_suburb: mf.suburb.value %}
-          <div class="fg"><label class="fl" for="pe-message">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" id="pe-message" name="message" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
+          <div class="fg"><label class="fl" for="pe-message">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" id="pe-message" name="message" placeholder="{{ s.ph_message | escape }}"></textarea></div>
           <p class="form-note">{% render 'privacy-link', note: section.settings.privacy_note %}</p>
-          <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
+          <button type="submit" class="fsub" id="fsub">{{ r_enq_button }} &rarr;</button>
           <p class="sr-status" role="status" aria-live="polite" data-form-status></p>
         </form>
         {%- else -%}
         {% form 'contact', id: 'cform', class: 'cform' %}
           <span hidden data-thanks>{{ section.settings.success_text }}</span>
           {%- if form.posted_successfully? -%}
-            {% render 'form-thanks', text: section.settings.success_text %}
+            {% render 'form-thanks', text: section.settings.success_text, heading: section.settings.thanks_heading %}
           {%- else -%}
           {%- if form.errors -%}
             <p class="form-note" role="alert">{{ form.errors | default_errors }}</p>
           {%- endif -%}
           <input type="hidden" name="contact[Property]" value="{{ res.title | escape }}">
           <div class="frow">
-            <div class="fg"><label class="fl" for="pe-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="pe-first" name="contact[First name]" class="fi" placeholder="First name" autocomplete="given-name" required></div>
-            <div class="fg"><label class="fl" for="pe-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="pe-last" name="contact[Last name]" class="fi" placeholder="Last name" autocomplete="family-name" required></div>
+            <div class="fg"><label class="fl" for="pe-first">{{ section.settings.f_first | default: "First Name*" }}</label><input type="text" id="pe-first" name="contact[First name]" class="fi" placeholder="{{ s.ph_first | escape }}" autocomplete="given-name" required></div>
+            <div class="fg"><label class="fl" for="pe-last">{{ section.settings.f_last | default: "Last Name*" }}</label><input type="text" id="pe-last" name="contact[Last name]" class="fi" placeholder="{{ s.ph_last | escape }}" autocomplete="family-name" required></div>
           </div>
-          <div class="fg"><label class="fl" for="pe-email">{{ section.settings.f_email | default: "Email*" }}</label><input type="email" id="pe-email" name="contact[email]" class="fi" placeholder="Email address" autocomplete="email" required></div>
-          <div class="fg"><label class="fl" for="pe-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="pe-phone" name="contact[Phone]" class="fi" required placeholder="Phone number" autocomplete="tel"></div>
+          <div class="fg"><label class="fl" for="pe-email">{{ section.settings.f_email | default: "Email*" }}</label><input type="email" id="pe-email" name="contact[email]" class="fi" placeholder="{{ s.ph_email | escape }}" autocomplete="email" required></div>
+          <div class="fg"><label class="fl" for="pe-phone">{{ section.settings.f_phone | default: "Phone" }}</label><input type="tel" id="pe-phone" name="contact[Phone]" class="fi" required placeholder="{{ s.ph_phone | escape }}" autocomplete="tel"></div>
           {%- unless sold -%}
             <div class="fg">
               <label class="fl" for="pe-type">{{ section.settings.f_interest | default: "Enquiry Type" }}</label>
@@ -152,10 +170,10 @@
             </div>
           {%- endunless -%}
           {% render 'prequal-fields', mode: 'shopify', s: section.settings, residence_suburb: mf.suburb.value %}
-          <div class="fg"><label class="fl" for="pe-message">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" id="pe-message" name="contact[body]" placeholder="Tell us about your requirements or any questions you have…"></textarea></div>
+          <div class="fg"><label class="fl" for="pe-message">{{ section.settings.f_message | default: "Message" }}</label><textarea class="fta" id="pe-message" name="contact[body]" placeholder="{{ s.ph_message | escape }}"></textarea></div>
           <p class="form-note">{% render 'privacy-link', note: section.settings.privacy_note %}</p>
           {% render 'form-optin', label: section.settings.optin_label %}
-          <button type="submit" class="fsub" id="fsub">{{ mf.enquiry_button.value | default: 'Submit Enquiry' }} &rarr;</button>
+          <button type="submit" class="fsub" id="fsub">{{ r_enq_button }} &rarr;</button>
         {%- endif -%}
           {% endform %}
           {%- assign cm_uid = 'cm-' | append: section.id -%}{% render 'customer-mirror', uid: cm_uid, residence: res.handle %}
@@ -187,7 +205,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "About the residence and the enquiry flow: the residence's story beside the enquiry form (Enquire about {name}), the buyer questions and the buttons around it. The headline, description and key features come from Products › the residence; every word around them and the form lives here."
+      "content": "About the residence and the enquiry flow: the residence's story beside the enquiry form (Enquire about {name}), the buyer questions and the buttons around it. Every word here is editable in this panel. The headline, description, key features and form heading start as the words saved on the page (Content › Pages › the residence); an empty box shows the page's words again."
     },
     {
       "type": "header",
@@ -217,10 +235,24 @@
       "default": true
     },
     {
+      "type": "text",
+      "id": "headline_text",
+      "label": "Headline",
+      "info": "Put <em> and </em> around the italic words and <br> where the line breaks. Empty = the headline saved on the page.",
+      "visible_if": "{{ section.settings.show_headline }}"
+    },
+    {
       "type": "checkbox",
       "id": "show_description",
       "label": "Show the description",
       "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "description_text",
+      "label": "Description",
+      "info": "Empty = the page's own text (Content › Pages › the residence). The site chat answers from the page's own text, so when a fact changes, change it there too.",
+      "visible_if": "{{ section.settings.show_description }}"
     },
     {
       "type": "checkbox",
@@ -233,6 +265,13 @@
       "id": "features_heading",
       "label": "Features heading",
       "default": "Key Features",
+      "visible_if": "{{ section.settings.show_features }}"
+    },
+    {
+      "type": "textarea",
+      "id": "features_list",
+      "label": "Key features (one per line)",
+      "info": "They show in two columns, in this order. Empty = the list saved on the page. The For Sale filter (pool, views, lift…) still reads the page's saved list.",
       "visible_if": "{{ section.settings.show_features }}"
     },
     {
@@ -278,6 +317,27 @@
       "id": "show_enquiry",
       "label": "Show the enquiry panel",
       "default": true
+    },
+    {
+      "type": "text",
+      "id": "enquiry_heading",
+      "label": "Form heading",
+      "info": "{name} becomes the residence's name. Empty = the heading saved on the page, or Enquire Now.",
+      "visible_if": "{{ section.settings.show_enquiry }}"
+    },
+    {
+      "type": "textarea",
+      "id": "enquiry_intro",
+      "label": "Form intro",
+      "info": "The line under the heading. Empty = the intro saved on the page.",
+      "visible_if": "{{ section.settings.show_enquiry }}"
+    },
+    {
+      "type": "text",
+      "id": "enquiry_button",
+      "label": "Send button",
+      "info": "Empty = the button saved on the page, or Submit Enquiry.",
+      "visible_if": "{{ section.settings.show_enquiry }}"
     },
     {
       "type": "textarea",
@@ -331,6 +391,41 @@
     },
     {
       "type": "text",
+      "id": "ph_first",
+      "label": "First name placeholder",
+      "default": "First name",
+      "visible_if": "{{ section.settings.show_enquiry }}"
+    },
+    {
+      "type": "text",
+      "id": "ph_last",
+      "label": "Last name placeholder",
+      "default": "Last name",
+      "visible_if": "{{ section.settings.show_enquiry }}"
+    },
+    {
+      "type": "text",
+      "id": "ph_email",
+      "label": "Email placeholder",
+      "default": "Email address",
+      "visible_if": "{{ section.settings.show_enquiry }}"
+    },
+    {
+      "type": "text",
+      "id": "ph_phone",
+      "label": "Phone placeholder",
+      "default": "Phone number",
+      "visible_if": "{{ section.settings.show_enquiry }}"
+    },
+    {
+      "type": "text",
+      "id": "ph_message",
+      "label": "Message placeholder",
+      "default": "Tell us about your requirements or any questions you have…",
+      "visible_if": "{{ section.settings.show_enquiry }}"
+    },
+    {
+      "type": "text",
       "id": "optin_label",
       "label": "Keep-me-updated box",
       "default": "Keep me updated on new Sabdia releases",
@@ -342,6 +437,14 @@
       "id": "privacy_note",
       "label": "Privacy note",
       "default": "By submitting this form you agree to our privacy policy. Your details will not be shared with third parties.",
+      "visible_if": "{{ section.settings.show_enquiry }}"
+    },
+    {
+      "type": "text",
+      "id": "thanks_heading",
+      "label": "Thank-you heading (Shopify mode)",
+      "default": "Thank you",
+      "info": "Shown if the page reloads after sending. Otherwise the thank-you opens with a greeting (Theme settings › Messages).",
       "visible_if": "{{ section.settings.show_enquiry }}"
     },
     {
@@ -403,6 +506,13 @@
     },
     {
       "type": "text",
+      "id": "prequal_select",
+      "label": "Dropdown prompt (budget, timeline, flexibility)",
+      "default": "Select…",
+      "visible_if": "{{ section.settings.show_enquiry }}"
+    },
+    {
+      "type": "text",
       "id": "prequal_budget_label",
       "label": "Budget label",
       "default": "Budget range",
@@ -461,7 +571,14 @@
       "type": "textarea",
       "id": "prequal_locations",
       "label": "Location options (one per line)",
-      "info": "Leave empty to list the suburbs of the residences for sale plus Other inner Brisbane.",
+      "info": "Leave empty to list the suburbs of the residences for sale plus the last choice below.",
+      "visible_if": "{{ section.settings.show_enquiry }}"
+    },
+    {
+      "type": "text",
+      "id": "prequal_loc_other",
+      "label": "Last location choice (when the list above is empty)",
+      "default": "Other inner Brisbane",
       "visible_if": "{{ section.settings.show_enquiry }}"
     },
     {

@@ -1,7 +1,8 @@
 {%- comment -%}
   A "Post" block of The Series rendered as a tile of its own (its link is
   not one of the synced posts). Params: block, section, ig_home,
-  brand_from, brand_to.
+  brand_from, brand_to, title_reel, title_carousel, title_post (the icons'
+  hover words, passed on to series-tile).
 {%- endcomment -%}
 {%- liquid
   assign b_thumb = ''
@@ -33,7 +34,7 @@
   endif
 -%}
 {%- if b_thumb != blank or b_video != blank -%}
-  {%- render 'series-tile', thumb: b_thumb, video: b_video, url: block.settings.url, link: b_link, caption: block.settings.caption, date: block.settings.date, kind: b_kind, alt: block.settings.caption, on_site: on_site, attrs: block.shopify_attributes, synced: false, section: section, brand_from: brand_from, brand_to: brand_to -%}
+  {%- render 'series-tile', thumb: b_thumb, video: b_video, url: block.settings.url, link: b_link, caption: block.settings.caption, date: block.settings.date, kind: b_kind, alt: block.settings.caption, on_site: on_site, attrs: block.shopify_attributes, synced: false, section: section, brand_from: brand_from, brand_to: brand_to, title_reel: title_reel, title_carousel: title_carousel, title_post: title_post -%}
 {%- elsif request.design_mode -%}
   <div class="series-card series-card-empty" {{ block.shopify_attributes }}><div class="series-card-meta"><div class="series-card-cap">Add a photo or a film to this post.</div></div></div>
 {%- endif -%}

@@ -129,19 +129,19 @@
         {%- endif -%}
       {%- endfor -%}
     {%- else -%}
-      <a href="/collections/for-sale">For Sale</a>
-      <a href="/pages/collection">Collection</a>
-      <a href="/pages/services">Process</a>
-      <a href="/pages/about">About</a>
-      {%- if section.settings.show_agent_link and settings.agent_access_enabled -%}<a href="/pages/agent-access">Agent Access</a>{%- endif -%}
+      {%- if section.settings.fallback_for_sale != blank -%}<a href="/collections/for-sale">{{ section.settings.fallback_for_sale }}</a>{%- endif -%}
+      {%- if section.settings.fallback_collection != blank -%}<a href="/pages/collection">{{ section.settings.fallback_collection }}</a>{%- endif -%}
+      {%- if section.settings.fallback_process != blank -%}<a href="/pages/services">{{ section.settings.fallback_process }}</a>{%- endif -%}
+      {%- if section.settings.fallback_about != blank -%}<a href="/pages/about">{{ section.settings.fallback_about }}</a>{%- endif -%}
+      {%- if section.settings.show_agent_link and settings.agent_access_enabled -%}<a href="/pages/agent-access">{{ section.settings.fallback_agent | default: 'Agent Access' }}</a>{%- endif -%}
     {%- endif -%}
     <a href="{{ section.settings.cta_link }}">{{ section.settings.mobile_contact_label }}</a>
   </nav>
   <div class="mob-nav-rule"></div>
   <div class="mob-nav-sub">
-    <a href="{{ settings.instagram_url }}" target="_blank" rel="noopener">Instagram</a>
-    <a href="{{ settings.facebook_url }}" target="_blank" rel="noopener">Facebook</a>
-    <a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener">LinkedIn</a>
+    {%- if section.settings.mobile_instagram_label != blank -%}<a href="{{ settings.instagram_url }}" target="_blank" rel="noopener">{{ section.settings.mobile_instagram_label }}</a>{%- endif -%}
+    {%- if section.settings.mobile_facebook_label != blank -%}<a href="{{ settings.facebook_url }}" target="_blank" rel="noopener">{{ section.settings.mobile_facebook_label }}</a>{%- endif -%}
+    {%- if section.settings.mobile_linkedin_label != blank -%}<a href="{{ settings.linkedin_url }}" target="_blank" rel="noopener">{{ section.settings.mobile_linkedin_label }}</a>{%- endif -%}
   </div>
 </div>
 
@@ -169,11 +169,11 @@
         {%- endif -%}
       {%- endfor -%}
     {%- else -%}
-      <li><a href="/collections/for-sale">For Sale</a></li>
-      <li><a href="/pages/collection">Collection</a></li>
-      <li><a href="/pages/services">Process</a></li>
-      <li><a href="/pages/about">About</a></li>
-      {%- if section.settings.show_agent_link and settings.agent_access_enabled -%}<li><a href="/pages/agent-access">Agent Access</a></li>{%- endif -%}
+      {%- if section.settings.fallback_for_sale != blank -%}<li><a href="/collections/for-sale">{{ section.settings.fallback_for_sale }}</a></li>{%- endif -%}
+      {%- if section.settings.fallback_collection != blank -%}<li><a href="/pages/collection">{{ section.settings.fallback_collection }}</a></li>{%- endif -%}
+      {%- if section.settings.fallback_process != blank -%}<li><a href="/pages/services">{{ section.settings.fallback_process }}</a></li>{%- endif -%}
+      {%- if section.settings.fallback_about != blank -%}<li><a href="/pages/about">{{ section.settings.fallback_about }}</a></li>{%- endif -%}
+      {%- if section.settings.show_agent_link and settings.agent_access_enabled -%}<li><a href="/pages/agent-access">{{ section.settings.fallback_agent | default: 'Agent Access' }}</a></li>{%- endif -%}
     {%- endif -%}
   </ul>
   <div class="nav-right">
@@ -196,6 +196,15 @@
     { "type": "text", "id": "loader_meta", "label": "Homepage loader caption", "default": "Sabdia · Est. 2013" },
     { "type": "range", "id": "loader_hold", "label": "Homepage loader stays for", "min": 0.5, "max": 5, "step": 0.5, "unit": "s", "default": 3, "info": "How long the SABDIA opening screen holds on the first visit of a session (Naomi, 11 Sep 2026: 2.5 to 3 seconds). It shows once per visit, on the home page only." },
     { "type": "text", "id": "light_templates", "label": "Force dark-on-light nav on these templates (optional)", "info": "Normally leave blank: the nav reads each page's opening section by itself and turns dark-on-light over cream or stone, white over a photo, film or dark band. Comma-separated template names (for example: blog, page.contact) force the dark-on-light nav there regardless." },
+    { "type": "header", "content": "Words" },
+    { "type": "text", "id": "mobile_instagram_label", "label": "Mobile menu - Instagram link label", "default": "Instagram" },
+    { "type": "text", "id": "mobile_facebook_label", "label": "Mobile menu - Facebook link label", "default": "Facebook" },
+    { "type": "text", "id": "mobile_linkedin_label", "label": "Mobile menu - LinkedIn link label", "default": "LinkedIn" },
+    { "type": "text", "id": "fallback_for_sale", "label": "Built-in menu - For Sale label", "default": "For Sale", "info": "The built-in menu only shows when no menu is chosen above. Clear a label to drop that link." },
+    { "type": "text", "id": "fallback_collection", "label": "Built-in menu - Collection label", "default": "Collection" },
+    { "type": "text", "id": "fallback_process", "label": "Built-in menu - Process label", "default": "Process" },
+    { "type": "text", "id": "fallback_about", "label": "Built-in menu - About label", "default": "About" },
+    { "type": "text", "id": "fallback_agent", "label": "Built-in menu - Agent Access label", "default": "Agent Access", "visible_if": "{{ section.settings.show_agent_link }}" },
     {"type": "header", "content": "Bar"},
     {"type": "range", "id": "bar_height", "label": "Bar height", "min": 60, "max": 110, "step": 2, "default": 80, "unit": "px", "info": "The scrolled bar is 15% shorter. Every page hero clears this height by itself."},
     {"type": "select", "id": "scrolled_bar", "label": "Bar once scrolled", "options": [{"value": "cream", "label": "Cream (as designed)"}, {"value": "obsidian", "label": "Obsidian"}], "default": "cream"},

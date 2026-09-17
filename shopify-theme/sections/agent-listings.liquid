@@ -26,9 +26,9 @@
         {%- assign odd = al_shown | modulo: 2 -%}
         {%- assign al_shown = al_shown | plus: 1 -%}
         {%- if odd == 1 -%}
-          {% render 'property-card', product: al_res, class: 'reveal d1', style: al_style, img_w: 900, img_h: 560, show_cars: section.settings.show_cars %}
+          {% render 'property-card', product: al_res, class: 'reveal d1', style: al_style, img_w: 900, img_h: 560, show_cars: section.settings.show_cars, word_bed: section.settings.word_bed, word_bath: section.settings.word_bath, word_garage: section.settings.word_garage, unit_area: section.settings.unit_area, word_build: section.settings.word_build, word_land: section.settings.word_land, mark_land_over: section.settings.mark_land_over, tip_build: section.settings.tip_build, tip_land: section.settings.tip_land, loc_state: section.settings.loc_state %}
         {%- else -%}
-          {% render 'property-card', product: al_res, class: 'reveal', style: al_style, img_w: 900, img_h: 560, show_cars: section.settings.show_cars %}
+          {% render 'property-card', product: al_res, class: 'reveal', style: al_style, img_w: 900, img_h: 560, show_cars: section.settings.show_cars, word_bed: section.settings.word_bed, word_bath: section.settings.word_bath, word_garage: section.settings.word_garage, unit_area: section.settings.unit_area, word_build: section.settings.word_build, word_land: section.settings.word_land, mark_land_over: section.settings.mark_land_over, tip_build: section.settings.tip_build, tip_land: section.settings.tip_land, loc_state: section.settings.loc_state %}
         {%- endif -%}
       {%- endfor -%}
     </div>
@@ -55,6 +55,17 @@
     { "type": "collection", "id": "listings_collection", "label": "Collection", "info": "Defaults to for-sale" },
     { "type": "text", "id": "cta_label", "label": "Button label", "default": "View All Properties" },
     { "type": "url", "id": "cta_link", "label": "Button link" },
+    { "type": "header", "content": "Words" },
+    { "type": "text", "id": "word_bed", "label": "Card - bedrooms word", "default": "Bed", "info": "After the number on every card, e.g. 5 Bed." },
+    { "type": "text", "id": "word_bath", "label": "Card - bathrooms word", "default": "Bath" },
+    { "type": "text", "id": "word_garage", "label": "Card - garage word", "default": "Garage", "visible_if": "{{ section.settings.show_cars }}" },
+    { "type": "text", "id": "unit_area", "label": "Card - size unit", "default": "m²", "info": "After the build size and land size numbers." },
+    { "type": "text", "id": "word_build", "label": "Card - build size word", "default": "build", "info": "After the build size. Shows on phones, where the icons are hidden." },
+    { "type": "text", "id": "word_land", "label": "Card - land size word", "default": "land", "info": "After the land size. Shows on phones, where the icons are hidden." },
+    { "type": "text", "id": "mark_land_over", "label": "Card - land size over mark", "default": "+", "info": "After the land size when the residence's land size is marked as over." },
+    { "type": "text", "id": "tip_build", "label": "Card - build size tooltip", "default": "Build size", "info": "Shows when the pointer rests on the house icon." },
+    { "type": "text", "id": "tip_land", "label": "Card - land size tooltip", "default": "Land size", "info": "Shows when the pointer rests on the lot icon." },
+    { "type": "text", "id": "loc_state", "label": "Card - after the suburb", "default": ", QLD", "info": "Follows the suburb on every card, e.g. Camp Hill, QLD." },
     {"type": "header", "content": "Show"},
     {"type": "checkbox", "id": "show_label", "label": "Show the small label", "default": true},
     {"type": "checkbox", "id": "show_heading", "label": "Show the heading", "default": true},

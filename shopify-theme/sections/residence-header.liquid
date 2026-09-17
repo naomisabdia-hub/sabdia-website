@@ -29,7 +29,7 @@
   if pstatus contains 'Sold'
     assign sold = true
   endif
-  assign state = mf.state.value | default: 'QLD'
+  assign state = mf.state.value | default: s.state_fallback
   # The residence's name in its own brochure face (Products › the residence
   # › Metafields › Residence name font …), for headings that carry it.
   capture name_span
@@ -220,7 +220,7 @@
       endif
     -%}
     <div class="prop-name">{{ prop_name }}</div>
-    {%- if section.settings.show_location -%}<div class="prop-loc">{{ mf.suburb.value }}, {{ state }}</div>{%- endif -%}
+    {%- if section.settings.show_location -%}<div class="prop-loc">{{ mf.suburb.value }}{% if state != blank %}, {{ state }}{% endif %}</div>{%- endif -%}
   </div>
 </section>
 
@@ -437,6 +437,14 @@
       "step": 5,
       "unit": "%",
       "default": 100
+    },
+    {
+      "type": "text",
+      "id": "state_fallback",
+      "label": "State after the suburb (when the residence has none)",
+      "default": "QLD",
+      "info": "The residence's own State (on the residence) comes first. Leave empty to show the suburb alone.",
+      "visible_if": "{{ section.settings.show_location }}"
     },
     {
       "type": "header",

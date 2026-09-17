@@ -228,6 +228,10 @@ document.addEventListener('click', (e) => {
 //  • Sabdia API mode: POST to /api/contact as before.
 // In Shopify mode the enquiry is also mirrored to the API (Customers,
 // leads inbox) when Theme settings › Site plumbing has an endpoint.
+/* Theme settings › Messages (17 Sep 2026: every word on the site is editable
+   in Customize). WORD('sending', 'Sending…') is the editor's word, or
+   today's word when the box is empty or the page has no SabdiaForms. */
+const WORD = (key, fallback) => { const w = window.SabdiaForms && window.SabdiaForms.words; return (w && typeof w[key] === 'string' && w[key].trim()) ? w[key] : fallback; };
 const THANKS_HTML = (h, t) => '<div class="form-thanks" id="formThanks" role="status" tabindex="-1"><div class="form-thanks-k" aria-hidden="true">&#10003;</div><h3 class="form-thanks-h">' + h + '</h3><p class="form-thanks-p">' + t + '</p></div>';
 function showThanks(form, heading, text) {
   const cfg = (window.SabdiaForms && window.SabdiaForms.thanks) || {};
@@ -286,7 +290,7 @@ function thanksHeading(form) {
   /* Greeting the way Sabdia's replies open ("Good morning Mark,"); the
      message below carries the thank-you, so the heading never repeats it. */
   const hr = new Date().getHours();
-  const greet = hr < 12 ? 'Good morning' : (hr < 17 ? 'Good afternoon' : 'Good evening');
+  const greet = hr < 12 ? WORD('morning', 'Good morning') : (hr < 17 ? WORD('afternoon', 'Good afternoon') : WORD('evening', 'Good evening'));
   return first ? greet + ', ' + first.charAt(0).toUpperCase() + first.slice(1) : greet;
 }
 function mirrorEnquiry(form) {
@@ -317,7 +321,7 @@ document.addEventListener('submit', async (e) => {
   const status = cform.querySelector('[data-form-status]');
   const announce = (msg) => { if (status) status.textContent = msg; };
   const label = btn.textContent;
-  btn.textContent = 'Sending…';
+  btn.textContent = WORD('sending', 'Sending…');
   btn.disabled = true;
   btn.style.background = '#6B6860';
   announce('Sending your enquiry…');
@@ -338,7 +342,7 @@ document.addEventListener('submit', async (e) => {
   } catch (err) {
     const msg = (err && err.message && !/^Form submit failed|Failed to fetch|NetworkError/.test(err.message))
       ? err.message
-      : 'Something went wrong — please try again.';
+      : WORD('error', 'Something went wrong — please try again.');
     btn.textContent = label;
     btn.disabled = false;
     btn.style.background = '';
@@ -353,13 +357,16 @@ document.addEventListener('submit', async (e) => {
 document.addEventListener('click', async (e) => {
   const btn = e.target.closest('.share-copy');
   if (!btn) return;
+  /* The button's own word is kept before anything changes it, so a second
+     handler (a section's own copy script) can never leave it stuck on Copied. */
+  if (!btn.dataset.label) btn.dataset.label = btn.textContent;
   try {
     await navigator.clipboard.writeText(btn.getAttribute('data-share-url') || location.href);
-    const t = btn.textContent;
-    btn.textContent = 'Copied';
-    setTimeout(() => { btn.textContent = t; }, 1800);
+    btn.textContent = btn.getAttribute('data-copied') || WORD('copied', 'Copied');
+    clearTimeout(btn._copiedTimer);
+    btn._copiedTimer = setTimeout(() => { btn.textContent = btn.dataset.label; }, 1800);
   } catch (err) {
-    window.prompt('Copy this link:', btn.getAttribute('data-share-url') || location.href);
+    window.prompt(WORD('copyPrompt', 'Copy this link:'), btn.getAttribute('data-share-url') || location.href);
   }
 });
 
@@ -398,7 +405,7 @@ document.addEventListener('submit', async (e) => {
       throw new Error((detail && detail.error) || 'subscribe failed: ' + res.status);
     }
     const doneEl = form.querySelector('[data-nl-success]');
-    const done = (doneEl && doneEl.textContent.trim()) || form.getAttribute('data-success') || 'Thank you — you\'re subscribed.';
+    const done = (doneEl && doneEl.textContent.trim()) || form.getAttribute('data-success') || WORD('subscribed', 'Thank you — you\'re subscribed.');
     form.innerHTML = '<p class="nl-done">' + done + '</p>';
     announce(done);
   } catch (err) {
@@ -406,7 +413,7 @@ document.addEventListener('submit', async (e) => {
     btn.disabled = false;
     announce((err && err.message && !/^subscribe failed|Failed to fetch|NetworkError/.test(err.message))
       ? err.message
-      : 'Something went wrong — please try again.');
+      : WORD('error', 'Something went wrong — please try again.'));
   }
 });
 
@@ -518,7 +525,7 @@ function nativeFormInit() {
       pending = true;
       if (silent) return;
       const err = form.querySelector('.form-error'); if (err) err.remove();
-      if (btn) { label = btn.textContent; btn.textContent = isNews ? '…' : 'Sending…'; btn.style.background = '#6B6860'; }
+      if (btn) { label = btn.textContent; btn.textContent = isNews ? '…' : WORD('sending', 'Sending…'); btn.style.background = '#6B6860'; }
       announce('Sending…');
     };
     const fail = (msg) => {
@@ -538,11 +545,11 @@ function nativeFormInit() {
       if (form.dataset.quiet) { form.dispatchEvent(new CustomEvent('sabdia:sent', { bubbles: true })); return; }
       if (isNews) {
         const doneEl = form.querySelector('[data-nl-success]');
-        form.innerHTML = '<p class="nl-done">' + ((doneEl && doneEl.textContent.trim()) || 'Thank you — you\'re subscribed.') + '</p>';
+        form.innerHTML = '<p class="nl-done">' + ((doneEl && doneEl.textContent.trim()) || WORD('subscribed', 'Thank you — you\'re subscribed.')) + '</p>';
       } else {
         mirrorEnquiry(form);
         let tt = thanksText(form);
-        if (form.dataset.cvFailed === '1') tt = (tt || '') + ' Not every document uploaded this time, so please email your CV to sales@sabdia.com.au.';
+        if (form.dataset.cvFailed === '1') tt = (tt || '') + ' ' + WORD('cvUploadFailed', 'Not every document uploaded this time, so please email your CV to sales@sabdia.com.au.');
         showThanks(form, thanksHeading(form), tt);
       }
     };
@@ -594,11 +601,11 @@ function nativeFormInit() {
         const doc = new DOMParser().parseFromString(html, 'text/html');
         const alert = doc.querySelector((isNews ? '#nlForm' : '#cform') + ' [role="alert"], .errors');
         if (alert && alert.textContent.trim()) throw new Error(alert.textContent.trim());
-        if (/CAPTCHA/i.test(doc.title || '')) throw new Error('The spam check did not pass — please press the button again.');
+        if (/CAPTCHA/i.test(doc.title || '')) throw new Error(WORD('spam', 'The spam check did not pass — please press the button again.'));
         if (res.ok && !alert && !/\/contact/.test(res.url)) { done(); return; }
-        throw new Error('Something went wrong — please try again.');
+        throw new Error(WORD('error', 'Something went wrong — please try again.'));
       } catch (err) {
-        fail((err && err.message && !/Failed to fetch|NetworkError/.test(err.message)) ? err.message : 'Something went wrong — please try again.');
+        fail((err && err.message && !/Failed to fetch|NetworkError/.test(err.message)) ? err.message : WORD('error', 'Something went wrong — please try again.'));
       }
     };
     /* Shopify's spam script ends with form.submit(); take it from here. */
@@ -642,8 +649,8 @@ function careersFilesInit() {
         li.append(name, size);
         if (canKeep) {
           const rm = document.createElement('button');
-          rm.type = 'button'; rm.className = 'cv-remove'; rm.textContent = 'Remove';
-          rm.setAttribute('aria-label', 'Remove ' + f.name);
+          rm.type = 'button'; rm.className = 'cv-remove'; rm.textContent = WORD('cvRemove', 'Remove');
+          rm.setAttribute('aria-label', WORD('cvRemove', 'Remove') + ' ' + f.name);
           rm.addEventListener('click', () => { kept.splice(i, 1); render(); input.focus(); });
           li.appendChild(rm);
         }
@@ -658,12 +665,12 @@ function careersFilesInit() {
       const skipped = [];
       picked.forEach((f) => {
         if (kept.some((k) => k.name === f.name && k.size === f.size)) return;
-        if (!/\.(pdf|docx?)$/i.test(f.name)) skipped.push(f.name + ' is not a PDF or Word file');
-        else if (f.size > CV_MAX_BYTES) skipped.push(f.name + ' is over 10 MB');
-        else if (kept.length >= CV_MAX_FILES) skipped.push(f.name + ' (' + CV_MAX_FILES + ' documents at most)');
+        if (!/\.(pdf|docx?)$/i.test(f.name)) skipped.push(f.name + ' ' + WORD('cvNotDoc', 'is not a PDF or Word file'));
+        else if (f.size > CV_MAX_BYTES) skipped.push(f.name + ' ' + WORD('cvTooBig', 'is over 10 MB'));
+        else if (kept.length >= CV_MAX_FILES) skipped.push(f.name + ' (' + CV_MAX_FILES + ' ' + WORD('cvTooMany', 'documents at most') + ')');
         else kept.push(f);
       });
-      render(skipped.length ? 'Left out: ' + skipped.join('; ') + '.' : '');
+      render(skipped.length ? WORD('cvLeftOut', 'Left out:') + ' ' + skipped.join('; ') + '.' : '');
     });
   });
 }
@@ -694,7 +701,7 @@ function prequalInit() {
     };
     const syncLoc = () => {
       if (hiddenLoc) hiddenLoc.value = chips.filter((c) => c.checked).map((c) => c.value).join(', ');
-      if (chips.length) chips[0].setCustomValidity(wrap.dataset.locRequired === '1' && !chips.some((c) => c.checked) ? 'Please choose at least one location' : '');
+      if (chips.length) chips[0].setCustomValidity(wrap.dataset.locRequired === '1' && !chips.some((c) => c.checked) ? WORD('pickLocation', 'Please choose at least one location') : '');
     };
     chips.forEach((c) => c.addEventListener('change', syncLoc));
     const apply = () => {
@@ -1005,7 +1012,7 @@ function initPage() {
     if (!thanks && fyh) {
       thanks = document.createElement('div');
       thanks.className = 'form-thanks'; thanks.id = 'formThanks'; thanks.setAttribute('role', 'status'); thanks.tabIndex = -1;
-      thanks.innerHTML = '<div class="form-thanks-k" aria-hidden="true">&#10003;</div><h3 class="form-thanks-h">Thank you</h3><p class="form-thanks-p">We have your answers and will be in touch within a business day.</p>';
+      thanks.innerHTML = '<div class="form-thanks-k" aria-hidden="true">&#10003;</div><h3 class="form-thanks-h">' + WORD('thanksHeading', 'Thank you') + '</h3><p class="form-thanks-p">' + WORD('thanksFyh', 'We have your answers and will be in touch within a business day.') + '</p>';
       fyh.parentNode.insertBefore(thanks, fyh); fyh.hidden = true;
     }
     try {
@@ -1412,6 +1419,7 @@ function filmInit() {
     var video = frame.querySelector('video');
     var btn = frame.querySelector('[data-sound]');
     var label = frame.querySelector('[data-sound-label]');
+    var soundOn = label ? label.textContent : 'Sound On'; // the section's own Sound button word
     if (!video) return;
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1456,7 +1464,7 @@ function filmInit() {
       btn.addEventListener('click', function () {
         video.muted = !video.muted;
         if (!video.muted && video.paused) video.play().catch(function () {});
-        label.textContent = video.muted ? 'Sound On' : 'Mute';
+        label.textContent = video.muted ? soundOn : WORD('mute', 'Mute');
       });
     }
   });

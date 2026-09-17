@@ -64,11 +64,11 @@
       {%- if line != blank -%}<p class="rr-line">{{ line }}</p>{%- endif -%}
       {%- if section.settings.show_facts -%}
       <ul class="rr-facts">
-        {%- if m.beds.value != blank -%}<li><b>{{ m.beds.value }}</b> Bed</li>{%- endif -%}
-        {%- if m.baths.value != blank -%}<li><b>{{ m.baths.value }}</b> Bath</li>{%- endif -%}
-        {%- if m.cars.value != blank -%}<li><b>{{ m.cars.value }}</b> Garage</li>{%- endif -%}
-        {%- if m.build_size.value != blank -%}<li><b>{{ m.build_size.value }}</b>m&sup2; build</li>{%- endif -%}
-        {%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>m&sup2; land</li>{%- endif -%}
+        {%- if m.beds.value != blank -%}<li><b>{{ m.beds.value }}</b> {{ section.settings.fact_bed | default: 'Bed' }}</li>{%- endif -%}
+        {%- if m.baths.value != blank -%}<li><b>{{ m.baths.value }}</b> {{ section.settings.fact_bath | default: 'Bath' }}</li>{%- endif -%}
+        {%- if m.cars.value != blank -%}<li><b>{{ m.cars.value }}</b> {{ section.settings.fact_garage | default: 'Garage' }}</li>{%- endif -%}
+        {%- if m.build_size.value != blank -%}<li><b>{{ m.build_size.value }}</b>{{ section.settings.fact_build | default: 'm² build' }}</li>{%- endif -%}
+        {%- if m.land.value != blank -%}<li><b>{{ m.land.value }}</b>{{ section.settings.fact_land | default: 'm² land' }}</li>{%- endif -%}
       </ul>
       {%- endif -%}
       {%- if section.settings.card_cta != blank -%}<span class="rr-cta">{{ section.settings.card_cta }}</span>{%- endif -%}

@@ -34,10 +34,10 @@
     {%- if s.show_share -%}
     <div class="share-row cd-share reveal d4" aria-label="Share this page">
       <span class="share-l">{{ s.share_label | default: "Share" }}</span>
-      <a href="https://www.facebook.com/sharer/sharer.php?u={{ eu }}" target="_blank" rel="noopener" class="share-a">Facebook</a>
-      <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ eu }}" target="_blank" rel="noopener" class="share-a">LinkedIn</a>
-      <a href="mailto:?subject={{ et }}&body={{ et }}%0A{{ eu }}" class="share-a">Email</a>
-      <button type="button" class="share-a share-copy" data-share-url="{{ share_url }}">{{ s.copy_link_label | default: "Copy link" }}</button>
+      {%- if s.share_facebook != blank -%}<a href="https://www.facebook.com/sharer/sharer.php?u={{ eu }}" target="_blank" rel="noopener" class="share-a">{{ s.share_facebook }}</a>{%- endif -%}
+      {%- if s.share_linkedin != blank -%}<a href="https://www.linkedin.com/sharing/share-offsite/?url={{ eu }}" target="_blank" rel="noopener" class="share-a">{{ s.share_linkedin }}</a>{%- endif -%}
+      {%- if s.share_email != blank -%}<a href="mailto:?subject={{ et }}&body={{ et }}%0A{{ eu }}" class="share-a">{{ s.share_email }}</a>{%- endif -%}
+      <button type="button" class="share-a share-copy" data-share-url="{{ share_url }}" data-copied="{{ s.copied_label | default: 'Copied' | escape }}">{{ s.copy_link_label | default: "Copy link" }}</button>
     </div>
     {%- endif -%}
   </div>
@@ -61,11 +61,13 @@
 </style>
 <script>
   (function () {
+    var copied = {{ s.copied_label | default: 'Copied' | json }};
     document.querySelectorAll('.cd-share .share-copy').forEach(function (b) {
       if (b.dataset.init) return; b.dataset.init = '1';
       b.addEventListener('click', function () {
-        var u = b.getAttribute('data-share-url'), t = b.textContent;
-        if (navigator.clipboard) navigator.clipboard.writeText(u).then(function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = t; }, 1600); });
+        var u = b.getAttribute('data-share-url');
+        if (!b.dataset.label) b.dataset.label = b.textContent;
+        if (navigator.clipboard) navigator.clipboard.writeText(u).then(function () { b.textContent = copied; setTimeout(function () { b.textContent = b.dataset.label; }, 1600); });
       });
     });
   })();
@@ -86,7 +88,11 @@
     { "type": "header", "content": "Share row" },
     { "type": "checkbox", "id": "show_share", "label": "Show the share row", "default": true },
     { "type": "text", "id": "share_label", "label": "Share row label", "default": "Share" },
+    { "type": "text", "id": "share_facebook", "label": "Facebook link text", "default": "Facebook", "info": "Empty = no Facebook link." },
+    { "type": "text", "id": "share_linkedin", "label": "LinkedIn link text", "default": "LinkedIn", "info": "Empty = no LinkedIn link." },
+    { "type": "text", "id": "share_email", "label": "Email link text", "default": "Email", "info": "Empty = no Email link." },
     { "type": "text", "id": "copy_link_label", "label": "Copy link button", "default": "Copy link" },
+    { "type": "text", "id": "copied_label", "label": "Copy link button, once copied", "default": "Copied", "info": "Shows for a moment after the link is copied." },
     { "type": "header", "content": "Layout" },
     { "type": "select", "id": "close_style", "label": "Band", "options": [{"value": "obsidian", "label": "Obsidian (as designed)"}, {"value": "stone", "label": "Stone"}], "default": "obsidian" },
     { "type": "header", "content": "Look" },

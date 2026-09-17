@@ -9,6 +9,9 @@
   block's overrides (15 Sep 2026): url, focus, name, suburb, status, beds,
   baths, cars, build, land - each replaces the residence's own line when given,
   on the card and in the toolbar's filters.
+  Words (17 Sep 2026), passed on to property-card / sold-card: word_bed,
+  word_bath, word_garage, unit_area, word_build, word_land, mark_land_over,
+  tip_build, tip_land, loc_state.
 {%- endcomment -%}
 {%- liquid
   assign mfp = product.metafields.custom
@@ -47,12 +50,12 @@
   {{ attrs }}
 >
   {%- if pstatus contains 'Sold' -%}
-    {% render 'sold-card', product: product, class: 'reveal-wipe', img_w: 800, img_h: 500, show_suburb: true, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build %}
+    {% render 'sold-card', product: product, class: 'reveal-wipe', img_w: 800, img_h: 500, show_suburb: true, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build, word_bed: word_bed, word_bath: word_bath, word_garage: word_garage, unit_area: unit_area, word_build: word_build, word_land: word_land, mark_land_over: mark_land_over, tip_build: tip_build, tip_land: tip_land, loc_state: loc_state %}
   {%- elsif delay == 1 -%}
-    {% render 'property-card', product: product, class: 'reveal d1', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build %}
+    {% render 'property-card', product: product, class: 'reveal d1', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build, word_bed: word_bed, word_bath: word_bath, word_garage: word_garage, unit_area: unit_area, word_build: word_build, word_land: word_land, mark_land_over: mark_land_over, tip_build: tip_build, tip_land: tip_land, loc_state: loc_state %}
   {%- elsif delay == 2 -%}
-    {% render 'property-card', product: product, class: 'reveal d2', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build %}
+    {% render 'property-card', product: product, class: 'reveal d2', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build, word_bed: word_bed, word_bath: word_bath, word_garage: word_garage, unit_area: unit_area, word_build: word_build, word_land: word_land, mark_land_over: mark_land_over, tip_build: tip_build, tip_land: tip_land, loc_state: loc_state %}
   {%- else -%}
-    {% render 'property-card', product: product, class: 'reveal', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build %}
+    {% render 'property-card', product: product, class: 'reveal', style: style, img_w: 900, img_h: 562, show_cars: show_cars, show_land: show_land, image: image, url: url, focus: focus, name: name, suburb: suburb, status: status, beds: beds, baths: baths, cars: cars, build: build, land: land, show_build: show_build, word_bed: word_bed, word_bath: word_bath, word_garage: word_garage, unit_area: unit_area, word_build: word_build, word_land: word_land, mark_land_over: mark_land_over, tip_build: tip_build, tip_land: tip_land, loc_state: loc_state %}
   {%- endif -%}
 </div>

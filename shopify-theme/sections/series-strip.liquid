@@ -98,7 +98,7 @@
   <div class="series-hdr">
     <div>
       {%- if section.settings.show_label -%}<div class="slabel {% if section.settings.dark %}slabel-dark {% endif %}reveal">{{ section.settings.label }}</div>{%- endif -%}
-      {%- if section.settings.show_heading -%}<h2 class="series-h reveal d1">{{ section.settings.heading_prefix }} <em>{{ series_name_html }}</em>.</h2>{%- endif -%}
+      {%- if section.settings.show_heading -%}<h2 class="series-h reveal d1">{{ section.settings.heading_prefix }} <em>{{ series_name_html }}</em>{{ section.settings.heading_suffix }}</h2>{%- endif -%}
       {%- if section.settings.show_handle -%}
       <a href="{{ ig_home }}" target="_blank" rel="noopener" class="series-handle reveal d2">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
@@ -163,7 +163,7 @@
               {%- if ss_limit > 0 and ss_shown >= ss_limit -%}{%- break -%}{%- endif -%}
               {%- comment -%} Only a block that makes a tile counts toward Most posts shown (15 Sep 2026). {%- endcomment -%}
               {%- if block.settings.image != blank or block.settings.photo_url != blank or block.settings.video != blank or block.settings.video_url != blank -%}{%- assign ss_shown = ss_shown | plus: 1 -%}{%- endif -%}
-              {%- render 'series-tile-block', block: block, section: section, ig_home: ig_home, brand_from: brand_from, brand_to: brand_to -%}
+              {%- render 'series-tile-block', block: block, section: section, ig_home: ig_home, brand_from: brand_from, brand_to: brand_to, title_reel: section.settings.title_reel, title_carousel: section.settings.title_carousel, title_post: section.settings.title_post -%}
             {%- endif -%}
           {%- endfor -%}
         {%- endif -%}
@@ -231,7 +231,7 @@
         {%- if t_thumb == blank and t_video == blank and t_slides.first == blank -%}{%- assign t_hidden = true -%}{%- endif -%}
         {%- unless t_hidden -%}
           {%- assign ss_shown = ss_shown | plus: 1 -%}
-          {%- render 'series-tile', thumb: t_thumb, video: t_video, slides: t_slides, url: item.url, link: t_link, caption: t_caption, date: t_date, kind: t_kind, alt: series_name, on_site: on_site, attrs: t_attrs, synced: true, section: section, brand_from: brand_from, brand_to: brand_to -%}
+          {%- render 'series-tile', thumb: t_thumb, video: t_video, slides: t_slides, url: item.url, link: t_link, caption: t_caption, date: t_date, kind: t_kind, alt: series_name, on_site: on_site, attrs: t_attrs, synced: true, section: section, brand_from: brand_from, brand_to: brand_to, title_reel: section.settings.title_reel, title_carousel: section.settings.title_carousel, title_post: section.settings.title_post -%}
         {%- endunless -%}
         {%- assign prev_num = item_num -%}
       {%- endfor -%}
@@ -272,7 +272,7 @@
           -%}
           {%- if slot -%}
             {%- if block.settings.image != blank or block.settings.photo_url != blank or block.settings.video != blank or block.settings.video_url != blank -%}{%- assign ss_shown = ss_shown | plus: 1 -%}{%- endif -%}
-            {%- render 'series-tile-block', block: block, section: section, ig_home: ig_home, brand_from: brand_from, brand_to: brand_to -%}
+            {%- render 'series-tile-block', block: block, section: section, ig_home: ig_home, brand_from: brand_from, brand_to: brand_to, title_reel: section.settings.title_reel, title_carousel: section.settings.title_carousel, title_post: section.settings.title_post -%}
           {%- endif -%}
         {%- endfor -%}
       {%- endif -%}
@@ -485,6 +485,7 @@
   "settings": [
     { "type": "text", "id": "label", "label": "Small label", "default": "The Series" },
     { "type": "text", "id": "heading_prefix", "label": "Heading before the name", "default": "The story of", "info": "Renders as “The story of <name>.”" },
+    { "type": "text", "id": "heading_suffix", "label": "Heading after the name", "default": ".", "info": "Follows the name straight away, with no space. Empty = nothing after the name." },
     { "type": "text", "id": "handle_line", "label": "Handle line prefix", "default": "As documented on" },
     { "type": "text", "id": "handle", "label": "Instagram handle", "info": "Defaults to the theme's Instagram label" },
     { "type": "url", "id": "instagram_url", "label": "Instagram URL", "info": "Defaults to the theme's Instagram URL" },
@@ -519,6 +520,10 @@
     {"type": "range", "id": "caption_lines", "label": "Caption lines shown", "min": 1, "max": 5, "step": 1, "default": 3},
     {"type": "range", "id": "limit", "label": "Most posts shown", "min": 0, "max": 40, "step": 1, "default": 0, "info": "0 = every post."},
     {"type": "select", "id": "order", "label": "Order", "options": [{"value": "posted", "label": "As posted"}, {"value": "reverse", "label": "Reversed"}], "default": "posted"},
+    {"type": "header", "content": "Words"},
+    {"type": "text", "id": "title_reel", "label": "Reel icon - word on hover", "default": "Reel", "visible_if": "{{ section.settings.show_kind }}"},
+    {"type": "text", "id": "title_carousel", "label": "Carousel icon - word on hover", "default": "Carousel", "visible_if": "{{ section.settings.show_kind }}"},
+    {"type": "text", "id": "title_post", "label": "Post icon - word on hover", "default": "Instagram post", "visible_if": "{{ section.settings.show_kind }}"},
     {"type": "header", "content": "Look"},
     {"type": "paragraph", "content": "The same dials the home hero has, for this section. Leave everything as designed and nothing changes; every dial is undoable."},
     {"type": "select", "id": "look_surface", "label": "Background", "options": [{"value": "design", "label": "As designed"}, {"value": "cream", "label": "Cream (the page colour)"}, {"value": "stone", "label": "Stone (soft panel)"}, {"value": "obsidian", "label": "Obsidian (dark)"}, {"value": "custom", "label": "A colour of your own (below)"}, {"value": "media", "label": "A photo or film behind it (below)"}], "default": "design", "info": "Obsidian turns the words light; cream and stone keep them dark. Buttons, rules, panels and cards follow the surface."},

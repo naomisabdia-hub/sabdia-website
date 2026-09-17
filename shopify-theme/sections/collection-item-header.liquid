@@ -204,7 +204,7 @@
     {%- if mf.land.value != blank -%}
     <div class="prop-spec-item">
       <div class="prop-spec-l">{{ s.spec_land | default: "Land Size" }}</div>
-      <div class="prop-spec-v">{{ mf.land.value }}<em>m&sup2;</em></div>
+      <div class="prop-spec-v">{{ mf.land.value }}{%- if s.unit_land != blank -%}<em>{{ s.unit_land }}</em>{%- endif -%}</div>
     </div>
     {%- endif -%}
   </div>
@@ -261,6 +261,7 @@
     { "type": "text", "id": "spec_baths", "label": "Bathrooms label", "default": "Bathrooms" },
     { "type": "text", "id": "spec_cars", "label": "Garages label", "default": "Garages" },
     { "type": "text", "id": "spec_land", "label": "Land size label", "default": "Land Size" },
+    { "type": "text", "id": "unit_land", "label": "Land size unit", "default": "m²", "info": "Shown after the land size. Empty = no unit." },
     { "type": "header", "content": "Space" },
     { "type": "range", "id": "look_space_top", "label": "Space above", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100, "info": "100 = as designed. Theme settings › Layout › Space above and below sections still scales the whole site; this dial is for this section only." },
     { "type": "range", "id": "look_space_bottom", "label": "Space below", "min": 0, "max": 200, "step": 10, "unit": "%", "default": 100 },

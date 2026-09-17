@@ -90,6 +90,18 @@
   assign ffile_list = ffiles | split: '||' | uniq
   assign mc_featured = section.settings.show_featured
   assign mc_style = 'aspect-ratio:' | append: section.settings.card_shape | default: '16/10'
+  # Card words (17 Sep 2026): the chips on the banner and on every card,
+  # from Card words in this section's panel.
+  assign w_bed = section.settings.word_bed | default: 'Bed'
+  assign w_bath = section.settings.word_bath | default: 'Bath'
+  assign w_garage = section.settings.word_garage | default: 'Garage'
+  assign w_area = section.settings.unit_area | default: 'm²'
+  assign w_build = section.settings.word_build | default: 'build'
+  assign w_land = section.settings.word_land | default: 'land'
+  assign w_over = section.settings.mark_land_over | default: '+'
+  assign w_tip_build = section.settings.tip_build | default: 'Build size'
+  assign w_tip_land = section.settings.tip_land | default: 'Land size'
+  assign w_state = section.settings.loc_state | default: ', QLD'
   # The first Residence block's own words and photo lead the featured
   # banner too (15 Sep 2026): anything typed on the block replaces the
   # residence's line there as on its card.
@@ -150,15 +162,15 @@
     assign f_focus = 'center'
     assign f_suburb = fmf.suburb.value | append: ', ' | append: fmf.state.value | default: 'QLD'
     if fmf.state.value == blank
-      assign f_suburb = fmf.suburb.value | append: ', QLD'
+      assign f_suburb = fmf.suburb.value | append: w_state
     endif
     assign f_beds = fmf.beds.value
     assign f_baths = fmf.baths.value
     assign f_cars = fmf.cars.value
     assign f_build = fmf.build_size.value
-    assign f_land = fmf.land.value | append: 'm²'
+    assign f_land = fmf.land.value | append: w_area
     if fmf.land_over.value
-      assign f_land = f_land | append: '+'
+      assign f_land = f_land | append: w_over
     endif
     if fb
       if fb.image
@@ -184,7 +196,7 @@
         assign f_build = fb.build
       endif
       if fb.land != blank
-        assign f_land = fb.land | append: 'm²'
+        assign f_land = fb.land | append: w_area
       endif
     endif
   -%}
@@ -233,11 +245,11 @@
           {%- if section.settings.featured_specs -%}
           {%- comment -%} The same chips as the cards below, so the featured residence matches (Naomi, 15 Sep 2026). {%- endcomment -%}
           <ul class="pc-specs" style="margin-top:0">
-            {%- if f_beds != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'beds' %}<span>{{ f_beds }} Bed</span></li>{%- endif -%}
-            {%- if f_baths != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'baths' %}<span>{{ f_baths }} Bath</span></li>{%- endif -%}
-            {%- if f_cars != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'cars' %}<span>{{ f_cars }} Garage</span></li>{%- endif -%}
-            {%- if f_build != blank -%}<li class="pc-spec" title="Build size">{% render 'spec-icon', icon: 'house' %}<span>{{ f_build }}m&sup2;<span class="pc-spec-k"> build</span></span></li>{%- endif -%}
-            {%- if f_land != 'm²' -%}<li class="pc-spec" title="Land size">{% render 'spec-icon', icon: 'land' %}<span>{{ f_land }}<span class="pc-spec-k"> land</span></span></li>{%- endif -%}
+            {%- if f_beds != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'beds' %}<span>{{ f_beds }} {{ w_bed }}</span></li>{%- endif -%}
+            {%- if f_baths != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'baths' %}<span>{{ f_baths }} {{ w_bath }}</span></li>{%- endif -%}
+            {%- if f_cars != blank -%}<li class="pc-spec">{% render 'spec-icon', icon: 'cars' %}<span>{{ f_cars }} {{ w_garage }}</span></li>{%- endif -%}
+            {%- if f_build != blank -%}<li class="pc-spec" title="{{ w_tip_build | escape }}">{% render 'spec-icon', icon: 'house' %}<span>{{ f_build }}{{ w_area }}<span class="pc-spec-k"> {{ w_build }}</span></span></li>{%- endif -%}
+            {%- if f_land != w_area -%}<li class="pc-spec" title="{{ w_tip_land | escape }}">{% render 'spec-icon', icon: 'land' %}<span>{{ f_land }}<span class="pc-spec-k"> {{ w_land }}</span></span></li>{%- endif -%}
           </ul>
           {%- endif -%}
         </div>
@@ -258,7 +270,7 @@
           {%- if gb_res == blank -%}{%- continue -%}{%- endif -%}
           {%- assign gi = gi | plus: 1 -%}
           {%- assign lead = false -%}{%- if show_rich and mc_featured -%}{%- assign lead = true -%}{%- endif -%}
-          {% render 'collection-card', product: gb_res, index: gi, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes %}
+          {% render 'collection-card', product: gb_res, index: gi, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build, image: block.settings.image, url: block.settings.link, focus: block.settings.focus, name: block.settings.name, suburb: block.settings.suburb, status: block.settings.status, beds: block.settings.beds, baths: block.settings.baths, cars: block.settings.cars, build: block.settings.build, land: block.settings.land, attrs: block.shopify_attributes, word_bed: w_bed, word_bath: w_bath, word_garage: w_garage, unit_area: w_area, word_build: w_build, word_land: w_land, mark_land_over: w_over, tip_build: w_tip_build, tip_land: w_tip_land, loc_state: w_state %}
         {%- endfor -%}
       {%- else -%}
       {%- for h in handles -%}
@@ -266,7 +278,7 @@
         {%- if gc_res == blank -%}{%- continue -%}{%- endif -%}
         {%- for once in (1..1) -%}
           {%- assign lead = false -%}{%- if show_rich and mc_featured -%}{%- assign lead = true -%}{%- endif -%}
-          {% render 'collection-card', product: gc_res, index: forloop.parentloop.index, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build %}
+          {% render 'collection-card', product: gc_res, index: forloop.parentloop.index, featured: lead, style: mc_style, show_cars: section.settings.show_cars, show_land: section.settings.show_land, show_build: section.settings.show_build, word_bed: w_bed, word_bath: w_bath, word_garage: w_garage, unit_area: w_area, word_build: w_build, word_land: w_land, mark_land_over: w_over, tip_build: w_tip_build, tip_land: w_tip_land, loc_state: w_state %}
         {%- break -%}
         {%- endfor -%}
       {%- endfor -%}
@@ -308,6 +320,10 @@
     var chips = Array.prototype.slice.call(document.querySelectorAll('.ptool-opt input[data-feat]'));
     var featSummary = document.querySelector('[data-feat-summary]');
     var featAnyLabel = featSummary ? featSummary.textContent : '';
+    /* Words the script writes into the toolbar, set beside No-matches text in this section's panel. */
+    var featManyWord = {{ section.settings.features_many | default: 'Features' | json }};
+    var countOneWord = {{ section.settings.count_one | default: 'Residence' | json }};
+    var countManyWord = {{ section.settings.count_many | default: 'Residences' | json }};
     var selects = [suburb, beds, baths, cars, size, status].filter(Boolean);
     var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-prop-card]'));
     if (!selects.length && !chips.length && !sort) return;
@@ -373,7 +389,7 @@
       if (empty) empty.style.display = visible === 0 ? '' : 'none';
       if (count) count.textContent = isDefault
         ? ''
-        : visible + (visible === 1 ? ' Residence' : ' Residences');
+        : visible + ' ' + (visible === 1 ? countOneWord : countManyWord);
     }
 
     selects.concat(sort ? [sort] : []).forEach(function (el) {
@@ -383,7 +399,7 @@
       if (!featSummary) return;
       var on = chips.filter(function (c) { return c.checked; });
       featSummary.textContent = on.length === 0 ? featAnyLabel
-        : (on.length === 1 ? on[0].parentNode.textContent.trim() : on.length + ' Features');
+        : (on.length === 1 ? on[0].parentNode.textContent.trim() : on.length + ' ' + featManyWord);
     }
     chips.forEach(function (chip) {
       chip.addEventListener('change', function () { featLabel(); apply(); });
@@ -533,10 +549,41 @@
       "label": "No-matches text",
       "default": "Nothing matches those filters. Try widening them."
     },
+    {
+      "type": "text",
+      "id": "count_one",
+      "label": "Toolbar count - one residence",
+      "default": "Residence",
+      "info": "Shows in the Refine toolbar while a filter is on, after the number: 1 Residence."
+    },
+    {
+      "type": "text",
+      "id": "count_many",
+      "label": "Toolbar count - several residences",
+      "default": "Residences",
+      "info": "After the number: 3 Residences."
+    },
+    {
+      "type": "text",
+      "id": "features_many",
+      "label": "Toolbar Features - several ticked",
+      "default": "Features",
+      "info": "The Features dropdown in the Refine toolbar reads 2 Features when more than one is ticked."
+    },
     {"type": "header", "content": "Card words"},
     {"type": "range", "id": "card_status_size", "label": "Status chip size", "min": 60, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "The For Sale / Sold chip. 100% = as designed."},
     {"type": "range", "id": "card_name_size", "label": "Name size", "min": 60, "max": 180, "step": 5, "unit": "%", "default": 100, "info": "The residence name on every card (brochure faces follow it)."},
     {"type": "range", "id": "card_chip_size", "label": "Spec chip size", "min": 60, "max": 160, "step": 5, "unit": "%", "default": 100, "info": "The bed, bath, garage and size chips."},
+    {"type": "text", "id": "word_bed", "label": "Bedrooms word", "default": "Bed", "info": "After the number on the banner and every card, e.g. 5 Bed."},
+    {"type": "text", "id": "word_bath", "label": "Bathrooms word", "default": "Bath"},
+    {"type": "text", "id": "word_garage", "label": "Garage word", "default": "Garage"},
+    {"type": "text", "id": "unit_area", "label": "Size unit", "default": "m²", "info": "After the build size and land size numbers."},
+    {"type": "text", "id": "word_build", "label": "Build size word", "default": "build", "info": "After the build size. Shows on phones, where the icons are hidden."},
+    {"type": "text", "id": "word_land", "label": "Land size word", "default": "land", "info": "After the land size. Shows on phones, where the icons are hidden."},
+    {"type": "text", "id": "mark_land_over", "label": "Land size - over mark", "default": "+", "info": "After the land size when the residence's land size is marked as over."},
+    {"type": "text", "id": "tip_build", "label": "Build size tooltip", "default": "Build size", "info": "Shows when the pointer rests on the house icon."},
+    {"type": "text", "id": "tip_land", "label": "Land size tooltip", "default": "Land size", "info": "Shows when the pointer rests on the lot icon."},
+    {"type": "text", "id": "loc_state", "label": "After the suburb", "default": ", QLD", "info": "Follows the suburb on the banner and every card, e.g. Camp Hill, QLD. A card whose block has its own Location line prints that line as typed."},
     {
       "type": "header",
       "content": "Look"

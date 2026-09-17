@@ -169,8 +169,16 @@
       "label": "Success message (Shopify mode)",
       "default": "Thank you. We have received your enquiry and will be in touch within one business day."
     },
+    {
+      "type": "text",
+      "id": "thanks_heading",
+      "label": "Thank-you heading (Shopify mode)",
+      "default": "Thank you",
+      "info": "Shown above the success message when the page reloads after a send."
+    },
     { "type": "header", "content": "Pre-qualification (budget, timeline, flexibility)" },
     { "type": "paragraph", "content": "Three optional dropdowns on the form. Answers arrive in the enquiry email, and budget and timeline become tags on the person in Customers (budget-5m-6m, timeline-ready-now) for segments. If they skip them, the thank-you asks for budget and timeline in your words." },
+    { "type": "text", "id": "prequal_select", "label": "Dropdown prompt (budget, timeline, flexibility)", "default": "Select…" },
     { "type": "text", "id": "prequal_budget_label", "label": "Budget label", "default": "Budget range" },
     { "type": "textarea", "id": "prequal_budget", "label": "Budget options (one per line)", "default": "Under $4m\n$4m - $5m\n$5m - $6m\n$6m - $8m\n$8m+\nPrefer not to say" },
     { "type": "text", "id": "prequal_timeline_label", "label": "Timeline label", "default": "Timeline to purchase" },
@@ -179,7 +187,8 @@
     { "type": "textarea", "id": "prequal_flex", "label": "Flexibility options (one per line)", "default": "Only this residence\nOpen to other Sabdia residences\nOpen to upcoming releases" },
     { "type": "text", "id": "prequal_loc_label", "label": "Locations label (For Sale enquiry)", "default": "Preferred locations" },
     { "type": "text", "id": "prequal_loc_label_other", "label": "Locations label (residence enquiry)", "default": "Other locations you would also consider (optional)" },
-    { "type": "textarea", "id": "prequal_locations", "label": "Location options (one per line)", "info": "Leave empty to list the suburbs of the residences for sale plus Other inner Brisbane." },
+    { "type": "textarea", "id": "prequal_locations", "label": "Location options (one per line)", "info": "Leave empty to list the suburbs of the residences for sale plus the last choice below." },
+    { "type": "text", "id": "prequal_loc_other", "label": "Last location choice (when the list above is empty)", "default": "Other inner Brisbane" },
     { "type": "text", "id": "optin_label", "label": "Keep-me-updated box", "default": "Keep me updated on new Sabdia releases", "info": "Ticked by default. Ticked = tagged newsletter in Customers (the mailing list). Every enquirer is filed under Customers regardless, tagged enquiry and the residence." },
     {
       "type": "header",
@@ -219,7 +228,7 @@
       "type": "text",
       "id": "f_email_ph",
       "label": "Email placeholder",
-      "default": "Email address"
+      "default": "your@email.com"
     },
     {
       "type": "text",
@@ -231,7 +240,7 @@
       "type": "text",
       "id": "f_phone_ph",
       "label": "Phone placeholder",
-      "default": "Phone number"
+      "default": "+61 4xx xxx xxx"
     },
     {
       "type": "text",
@@ -249,13 +258,22 @@
       "type": "text",
       "id": "f_message_ph",
       "label": "Message placeholder",
-      "default": "Tell us about your interest..."
+      "default": "Tell us about your interest, timeline, or any questions you have…"
     },
     {
       "type": "text",
       "id": "f_submit",
-      "label": "Button",
-      "default": "Submit"
+      "label": "Button (not used on this page)",
+      "default": "Submit",
+      "info": "This page's button is Submit button, above.",
+      "visible_if": "{{ section.settings.f_submit == 'hidden' and section.settings.f_submit != 'hidden' }}"
+    },
+    {
+      "type": "text",
+      "id": "f_regarding",
+      "label": "Message opening when a link names a residence",
+      "default": "Regarding {name}:",
+      "info": "{name} becomes the residence's name, e.g. a link ending ?property=SOLACE."
     },
     {
       "type": "header",
