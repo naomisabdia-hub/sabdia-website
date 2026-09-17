@@ -307,6 +307,13 @@
         "info": "Shown when pages are shared - 1200×630 works best."
       },
       {
+        "type": "text",
+        "id": "seo_home_title",
+        "label": "Homepage title in search results",
+        "default": "Sabdia Constructions | Luxury Home Builders and Developers, Brisbane",
+        "info": "The headline Google shows for the homepage, and the browser tab name. Google shortens anything much past 60 characters. Empty = the store's name on its own."
+      },
+      {
         "type": "textarea",
         "id": "seo_home_description",
         "label": "Homepage meta description",

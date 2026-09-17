@@ -25,6 +25,13 @@
     when 'list-collections'
       assign title_text = 'Residences'
   endcase
+  # The homepage's own title for search results, editable in Customize
+  # (Search & sharing). The store's name on its own is "Sabdia", which
+  # leaves the words people actually search for - Constructions, builder,
+  # Brisbane - out of the one line Google weighs most.
+  if template.name == 'index' and settings.seo_home_title != blank
+    assign title_text = settings.seo_home_title
+  endif
 -%}
 <title>{{ title_text }}{% unless title_text contains 'Sabdia' or title_text == blank or settings.title_suffix == blank %} | {{ settings.title_suffix }}{% endunless %}</title>
 {%- liquid
@@ -151,6 +158,19 @@ try {
 <meta name="robots" content="noindex,nofollow">
 <style>html,body{background:var(--dark)}body.pw-page{min-height:100svh;display:flex;flex-direction:column}body.pw-page main{flex:1;display:flex;flex-direction:column}body.pw-page .pw-band{flex:1}</style>
 {%- endif -%}
+{%- comment -%}
+  Pages the site chat reads, not pages for visitors (Naomi, 18 Sep 2026:
+  Open homes & availability is "items that Claude can pull", not a page).
+  The Inbox agent only answers from PUBLISHED pages, so it has to stay
+  live - noindex keeps it out of Google and out of anyone's search results
+  without taking the chat's answers away. Nothing on the site links to it
+  and /search shows no results, so this is the last way in. Add a handle
+  to the list for any future page that only exists for the chat.
+{%- endcomment -%}
+{%- assign chat_only_pages = 'inspections' | split: ',' -%}
+{%- if template.name == 'page' and chat_only_pages contains page.handle -%}
+<meta name="robots" content="noindex,nofollow">
+{%- endif -%}
 {{ content_for_header }}
 </head>
 {%- comment -%}
@@ -228,6 +248,8 @@ try {
 {%- unless locked %}
 
 {% sections 'footer-group' %}
+{%- comment -%} Chat sign-up before Shopify Inbox's chat (Naomi, 17 Sep 2026). {%- endcomment -%}
+{% section 'chat-gate' %}
 {% endunless -%}
 {%- comment -%}
   Ask Sabdia (sections/concierge.liquid) is ARCHIVED (Naomi, 15 Sep 2026):
