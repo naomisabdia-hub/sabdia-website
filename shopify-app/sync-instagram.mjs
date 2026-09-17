@@ -42,6 +42,7 @@
  * alone. Add `"hidden": true` to any entry in the metafield to keep it out
  * of the strip without it coming back on the next sync.
  */
+import { redact } from './address-privacy.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -253,6 +254,8 @@ const tidyCaption = (raw = '') => {
   // drop a trailing block that is nothing but hashtags / mentions
   c = c.replace(/(\s*[#@][\w.]+)+\s*$/g, '').trim();
   c = c.replace(/\n{2,}/g, '\n').replace(/\n/g, ' ').replace(/\s{2,}/g, ' ');
+  // Never a street address on the site (Naomi, 17 Sep 2026); Instagram keeps its own.
+  c = redact(c).replace(/\s{2,}/g, ' ').trim();
   if (c.length > MAX_CAPTION) c = c.slice(0, MAX_CAPTION - 1).replace(/\s+\S*$/, '') + '…';
   return c;
 };

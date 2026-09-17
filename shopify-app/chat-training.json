@@ -1,0 +1,84 @@
+{
+  "_about": "Hand-written answers for the site chat (Shopify Inbox agent). train-chat.py adds the per-residence answers from the live pages and the Open homes & availability page, then writes the whole set to the end of /pages/inspections on --write. Sabdia voice: residence not property, no exclamation marks, no long dashes, no prices. {for_sale} and {for_sale_suburbs} are filled in from the live residence pages.",
+  "groups": [
+    {
+      "group": "About Sabdia",
+      "qa": [
+        ["What is Sabdia?", "Sabdia is a boutique Brisbane developer. Since 2013 the studio has designed, developed and built more than 100 homes, one team from the first sketch to handover, and it releases a few residences a year."],
+        ["Is Sabdia a builder or a real estate agent?", "Sabdia designs, develops and builds its own residences. Each residence for sale is offered through a selling agent, and our team can put you in touch."],
+        ["Who designs and builds the homes?", "The one team. Architecture, interiors, development management and construction all happen inside Sabdia, so each residence is drawn and built by the same people."],
+        ["How long has Sabdia been building?", "Sabdia began in 2013. More than 100 homes later, the studio still takes on only a few residences a year."],
+        ["Where are you based?", "Brisbane. Our residences for sale today are in {for_sale_suburbs}."],
+        ["Which suburbs do you build in?", "Brisbane's inner suburbs. Our residences for sale today are in {for_sale_suburbs}, and The Collection shows where our completed homes stand."],
+        ["What are Sabdia homes like?", "Each residence is drawn and built by one team, so the palette carries from the facade to the last room: natural stone, warm timber, Venetian plaster and brushed metals. The residence pages show each home as it stands."],
+        ["Are you on Instagram?", "Yes. Sabdia posts each residence as it takes shape at @_sabdia, and The Series on every residence page collects those posts."],
+        ["Do you have a newsletter?", "Yes, The Sabdia Journal, with new releases and finished homes a few times a year. The sign-up is at the bottom of every page, or leave your email here and we will add you."],
+        ["How do I contact Sabdia?", "Send an enquiry at sabdia.com.au/pages/contact or email sales@sabdia.com.au, and a member of our team will be in touch."],
+        ["Do you have a phone number?", "Leave your name and phone number here, or email sales@sabdia.com.au, and a member of our team will call you."],
+        ["Can I talk to a person?", "Of course. A member of our team will reply here as soon as possible, or you can send an enquiry at sabdia.com.au/pages/contact."],
+        ["Am I talking to a real person?", "I'm Sabdia's AI assistant. Our team will confirm any details with you, and you can ask for a person at any time."]
+      ]
+    },
+    {
+      "group": "Sold residences and The Collection",
+      "qa": [
+        ["What does Sold mean?", "A sold residence has been bought and is no longer available."],
+        ["What is The Collection?", "The Collection shows completed Sabdia residences that have been sold and are now privately owned. They show our work. They are not for sale and cannot be inspected."],
+        ["Will a sold residence come back on the market?", "No. A sold residence belongs to its owner and is not offered by Sabdia again. If you would like a home like one in The Collection, leave your email and we will tell you first about our next releases."],
+        ["Can I see inside a Collection home?", "No. Collection residences are privately owned, so they cannot be inspected. Each one has its photographs and film on its page."],
+        ["Why are sold residences still on the website?", "They stay on the website as a record of our work. They are not available to buy."],
+        ["Can I buy a home like one in The Collection?", "Our new releases are designed and built by the same team. Ask about the residences for sale today, {for_sale}, or leave your email and we will tell you first about our next releases."],
+        ["Do you sell homes off market?", "Some residences are secured before they reach the market. Leave your email and budget range and we will let you know first about upcoming releases."]
+      ]
+    },
+    {
+      "group": "Buying",
+      "qa": [
+        ["Which residences can I buy?", "The residences for sale today are {for_sale}. Ask me about any of them by name."],
+        ["Is a residence still available?", "The residences for sale today are {for_sale}. Anything else has sold, and our team can confirm the latest."],
+        ["How much are your residences?", "We don't disclose pricing unless it has been discussed with our Director. Leave your name and phone number and our team will be in touch."],
+        ["Is there a price guide?", "We don't disclose pricing unless it has been discussed with our Director. Tell us which residence and leave your phone number, and our team will be in touch."],
+        ["What is your price range?", "We don't disclose pricing unless it has been discussed with our Director. Share your budget range and the residence you have in mind, and our team will be in touch."],
+        ["Can I make an offer?", "Offers and terms are discussed directly with our team. Leave your name, phone number and the residence you have in mind, and a member of our team will be in touch."],
+        ["How does buying a Sabdia residence work?", "It begins with an open home or a private inspection. From there the selling agent and our team take you through the contract and settlement. Leave your name and phone number and we will begin."],
+        ["Can I buy before completion?", "Yes. Residences are often secured before completion, and CAPRI in Holland Park West sold prior to completion. Leave your details and our team will talk you through how that works."],
+        ["Can you help with finance, deposits or stamp duty?", "Deposits, finance, stamp duty and buying from overseas are talked through directly with our team and your own advisers. Leave your name and phone number and a member of our team will be in touch."],
+        ["Can I buy from overseas?", "Buying from overseas is talked through directly with our team and your own advisers. Leave your name, email and phone number and a member of our team will be in touch."],
+        ["Can I rent or lease a residence?", "Sabdia residences are offered for sale rather than for lease. If you are considering one as an investment, leave your details and our team will talk you through it."],
+        ["Can I register my interest?", "Yes. Leave your name, email and the residence you are interested in, or register at sabdia.com.au/pages/contact, and we will keep you posted."],
+        ["When is your next release?", "Sabdia releases a small number of residences each year. Leave your email and we will let you know first."],
+        ["Can I see the floor plans?", "Leave your name, email and the residence, and a member of our team will send the floor plans and details through."],
+        ["What is included in a residence?", "What each residence includes is confirmed directly by our team. Tell us which one and we will walk you through it."],
+        ["Is the furniture included?", "What each residence includes is confirmed directly by our team. Tell us which one and we will walk you through it."],
+        ["Can I change the design or finishes?", "Each residence is resolved as a whole, from the facade to the last drawer pull. Whether any choices remain depends on the residence and its stage, and our team can tell you where it stands."],
+        ["Is the home finished or still being built?", "Each residence is at its own stage, from under construction to complete. Its page shows where it stands, and our team can confirm the timing."],
+        ["Is there a warranty?", "Our team will talk you through the warranty and handover for each residence directly."],
+        ["Can I arrange a building and pest inspection?", "Our team will talk you through that directly. Leave your name, phone number and the residence."]
+      ]
+    },
+    {
+      "group": "Open homes and inspections",
+      "qa": [
+        ["How do I inspect a residence?", "Open homes and auctions for each residence are listed on our Open homes & availability page. If none of the times suit, leave your name, phone number and the residence, and we will arrange a private inspection."],
+        ["Can I book a private inspection?", "Yes. Tell us the residence, your phone number and the days that suit you, and a member of our team will arrange a time."],
+        ["Can I visit without an appointment?", "Outside the open homes, residences are shown by private appointment. Tell us which residence and a member of our team will arrange a time."],
+        ["Do I need to register for an open home?", "It helps, so the selling agent can let you know of any changes. Leave your name and phone number and we will pass them on."],
+        ["Is there a display home?", "There is no display home. Residences for sale are shown at open homes or by private appointment."],
+        ["Do you have films or a walkthrough?", "Yes. Each residence page carries its film, and some homes have a scroll-through walkthrough of the real rooms. To see the home itself, come to an open home or book a private inspection."]
+      ]
+    },
+    {
+      "group": "Builds, agents and trades",
+      "qa": [
+        ["Can Sabdia build my home?", "Thank you so much for thinking of us for your project. At the moment we aren't taking on client builds or renovations, as our focus is solely on designing and building our own residences."],
+        ["Do you do renovations or knockdown rebuilds?", "Thank you for thinking of us. At the moment we aren't taking on client builds or renovations, as our focus is solely on designing and building our own residences."],
+        ["Can I engage you for design only?", "Design, development and construction happen together at Sabdia, one team on its own residences, so design and interiors are not offered as a separate service."],
+        ["I am a buyer's agent", "Leave your details, your agency and the residence, and a member of our team will be in touch directly."],
+        ["I am a real estate agent", "Agents can apply for access at sabdia.com.au/pages/agent-access, and our team will be in touch."],
+        ["I am a tradesperson or supplier", "Sabdia manages its own construction, so trades and suppliers work with our team directly. Leave your details, your trade and where you work, and the construction team will be in touch when there is a fit."],
+        ["Are you hiring?", "Send your details and the role you are interested in through sabdia.com.au/pages/contact, and it will reach the right person."],
+        ["I am from the media", "Send your details and your story through sabdia.com.au/pages/contact, and a member of our team will be in touch."]
+      ]
+    }
+  ]
+}

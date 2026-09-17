@@ -20,6 +20,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { redactJson } from './address-privacy.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DRY = process.argv.includes('--dry-run');
@@ -43,7 +44,8 @@ async function gql(query, variables = {}) {
   return out.data;
 }
 
-const lists = JSON.parse(fs.readFileSync(path.join(ROOT, 'shopify-app', 'series-posts.json'), 'utf8'));
+// Captions go on the site without street addresses (Naomi, 17 Sep 2026).
+const lists = redactJson(JSON.parse(fs.readFileSync(path.join(ROOT, 'shopify-app', 'series-posts.json'), 'utf8')));
 const d = await gql(`{ products(first: 50) { nodes { id handle title } }
   pages(first: 100) { nodes { id handle title templateSuffix } } }`);
 const owners = new Map();

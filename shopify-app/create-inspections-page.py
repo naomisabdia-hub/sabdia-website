@@ -27,8 +27,9 @@ TITLE = 'Open homes & availability'
 
 COLLECTION = ['ALHAMBRA', 'AMMOS', 'ARROL', 'AURA', 'BLANC', 'BRIS AV', 'CALLE', 'CASA PALMERA', 'EDEN', 'ENCANTO', 'FRASER', 'HAVEN', 'HERMOSA', 'JUDGE', 'KEMPSIE', 'KIRRA', 'LAUREL', 'LISLE', 'MILOS', 'NERO', 'PETRA', 'PLATEAU', 'SPECTRE', 'WHITE']
 
-def home(name, address, open_homes, auction, agents):
-    s = f'<h2>{name} - {address}</h2>\n<h3>Open homes</h3>\n'
+def home(name, suburb, open_homes, auction, agents):
+    # Suburb only, never the street (Naomi, 17 Sep 2026).
+    s = f'<h2>{name} - {suburb}</h2>\n<h3>Open homes</h3>\n'
     if open_homes:
         s += '<ul>\n' + ''.join(f'<li>{t}</li>\n' for t in open_homes) + '</ul>\n'
     else:
@@ -44,19 +45,19 @@ BODY = (
     '<h2>Available to buy</h2>\n'
     '<p>These residences are for sale: QASR in Coorparoo, SOLACE in Camp Hill, SIERRA in Holland Park West, CASPIAN in Ascot and AETHER in Hendra.</p>\n'
     '<h2>Not available</h2>\n<ul>\n'
-    '<li>CAPRI, 8 Dagmar Street, Holland Park West - sold prior to completion.</li>\n'
+    '<li>CAPRI, Holland Park West - sold prior to completion.</li>\n'
     f'<li>The Collection: {", ".join(COLLECTION)}. These are completed homes that have been sold and are privately owned. They are not for sale and cannot be inspected.</li>\n'
     '</ul>\n'
     '<p>A residence sold off market, sold prior to completion or shown in The Collection cannot be bought. We can let you know first about our upcoming releases instead.</p>\n'
-    + home('AETHER', '30 Matong Street, Hendra', [
+    + home('AETHER', 'Hendra', [
         'Thursday 17 September 2026, 5:00 to 5:30pm',
         'Saturday 19 September 2026, 9:00 to 9:30am',
         'Saturday 19 September 2026, 12:00 to 12:30pm',
     ], 'Saturday 10 October 2026, starting at 9:00am.', 'Matt Lancashire and Nick Kouparitsas')
-    + home('SIERRA', '6 Dagmar Street, Holland Park West', [], None, 'Michael Bacon')
-    + home('SOLACE', '96 Newman Avenue, Camp Hill', [], None, 'Will Torres, Torres Property')
-    + home('CASPIAN', '79 Lapraik Street, Ascot', [], None, None)
-    + home('QASR', '119 Buena Vista Avenue, Coorparoo', [], None, None)
+    + home('SIERRA', 'Holland Park West', [], None, 'Michael Bacon')
+    + home('SOLACE', 'Camp Hill', [], None, 'Will Torres, Torres Property')
+    + home('CASPIAN', 'Ascot', [], None, None)
+    + home('QASR', 'Coorparoo', [], None, None)
 )
 
 # Straight answers for the questions the agent was guessing at (17 Sep 2026: it

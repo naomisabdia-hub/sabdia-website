@@ -1,0 +1,19 @@
+{
+  "_about": "STANDING (Naomi, 17 Sep 2026): the website and the site chat never show a street address for any Sabdia house, for sale or in The Collection. Suburb only. Instagram may keep its addresses; captions copied onto the site are cleaned. address_privacy.py (Python) and address-privacy.mjs (Node) both read this list. Add a street here when a new house joins.",
+  "types": ["Street", "St", "Avenue", "Ave", "Road", "Rd", "Court", "Ct", "Crescent", "Cres", "Parade", "Pde", "Terrace", "Tce", "Drive", "Dr", "Lane", "Ln", "Place", "Pl", "Close", "Way", "Boulevard", "Blvd", "Grove", "Esplanade"],
+  "streets": [
+    {"name": "Newman", "suburb": "Camp Hill", "houses": {"96": "SOLACE", "94": "CALLE"}},
+    {"name": "Dagmar", "suburb": "Holland Park West", "houses": {"6": "SIERRA", "8": "CAPRI"}},
+    {"name": "Lapraik", "suburb": "Ascot", "houses": {"79": "CASPIAN"}},
+    {"name": "Matong", "suburb": "Hendra", "houses": {"30": "AETHER"}},
+    {"name": "Buena Vista", "suburb": "Coorparoo", "houses": {"119": "QASR"}},
+    {"name": "Akala", "suburb": "Camp Hill", "houses": {"26": "MILOS"}},
+    {"name": "Todd", "suburb": "Taringa", "houses": {"29": "AMMOS", "29A": "AURA"}},
+    {"name": "Murton", "suburb": "Holland Park", "houses": {"66": "KIRRA"}},
+    {"name": "Arnold", "suburb": "Holland Park", "houses": {"49": "CASA PALMERA"}},
+    {"name": "Sydney", "suburb": "Camp Hill", "houses": {"10": "HAVEN"}},
+    {"name": "Lisle", "suburb": "Tarragindi", "houses": {"20": "LISLE"}},
+    {"name": "White", "suburb": "Graceville", "houses": {"34": "WHITE"}},
+    {"name": "Balcha", "suburb": "Holland Park", "houses": {"14": "ELYSIUM"}}
+  ]
+}

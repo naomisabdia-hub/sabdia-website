@@ -25,6 +25,8 @@ its blocks; assign-collection-templates.py then moves the page onto it
   python3 shopify-app/add-series-blocks.py 150783361126 --dry-run   # report only
 """
 import json, os, re, shutil, subprocess, sys, tempfile
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from address_privacy import redact
 
 STORE = "b91p0j-f4.myshopify.com"
 LIVE = "150554902630"
@@ -54,7 +56,7 @@ def load(path):
 def stored(e):
     """The block settings that keep one post on the site."""
     s = {"url": e["url"], "photo_url": e.get("thumb") or "", "video_url": e.get("video") or "",
-         "caption": e.get("caption") or "", "date": e.get("date") or "",
+         "caption": redact(e.get("caption") or ""),  # never a street address on the site "date": e.get("date") or "",
          "kind": e["type"] if e.get("type") in KINDS else "auto"}
     return {k: v for k, v in s.items() if v}
 
