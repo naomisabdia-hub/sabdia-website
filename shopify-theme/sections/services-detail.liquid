@@ -1,27 +1,66 @@
 {%- comment -%}
   Services - the alternating image/copy service spreads. One block per
   service; paragraphs and bullet lists are written one per line.
+  Bands (17 Sep 2026, Naomi): each stage sits on its own full-width band,
+  white then warm grey in turn (the heading shares the first, white band),
+  and the colour edge replaces the hairlines between stages.
 {%- endcomment -%}
 {% render 'section-look', section: section %}
 {%- liquid
   assign sdt_side = section.settings.image_side | default: 'alternate'
   assign sdt_b = section.settings.bullet_style | default: 'dots'
   assign sdt_pad = section.settings.spread_space | default: 100 | divided_by: 100.0
+  assign sdt_bands = true
+  if section.settings.alternate_bands == false
+    assign sdt_bands = false
+  endif
+  assign sdt_has_hdr = false
+  if section.settings.label != blank or section.settings.heading_html != blank
+    assign sdt_has_hdr = true
+  endif
 -%}
-<section class="sp sdt sdt-{{ sdt_side }} sdt-b-{{ sdt_b }}{% if section.settings.dividers %} sdt-div{% endif %}{% if section.settings.hover_zoom == false %} sdt-nozoom{% endif %}" style="--sdt-ar:{{ section.settings.image_shape | default: '4/3' }};--sdt-gap:{{ section.settings.gap | default: 96 }}px;--sdt-pad:{{ sdt_pad }}">
+{%- capture sdt_hdr -%}
+  {%- if sdt_has_hdr -%}
+    <div class="sdt-hdr">
+      {%- if section.settings.label != blank -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
+      {%- if section.settings.heading_html != blank -%}<h2 class="about-h reveal d1" style="margin-bottom:0">{{ section.settings.heading_html }}</h2>{%- endif -%}
+    </div>
+  {%- endif -%}
+{%- endcapture -%}
+<section class="sp sdt sdt-{{ sdt_side }} sdt-b-{{ sdt_b }}{% if sdt_bands %} sdt-bands{% elsif section.settings.dividers %} sdt-div{% endif %}{% if section.settings.hover_zoom == false %} sdt-nozoom{% endif %}" style="--sdt-ar:{{ section.settings.image_shape | default: '4/3' }};--sdt-gap:{{ section.settings.gap | default: 96 }}px;--sdt-pad:{{ sdt_pad }}">
+  {%- if sdt_bands -%}
+    {%- if section.blocks.size == 0 and sdt_has_hdr -%}<div class="sdt-band sdt-band-first sdt-band-last"><div class="inner">{{ sdt_hdr }}</div></div>{%- endif -%}
+  {%- else -%}
   <div class="inner">
-    {%- if section.settings.label != blank or section.settings.heading_html != blank -%}
-      <div class="sdt-hdr">
-        {%- if section.settings.label != blank -%}<div class="slabel reveal">{{ section.settings.label }}</div>{%- endif -%}
-        {%- if section.settings.heading_html != blank -%}<h2 class="about-h reveal d1" style="margin-bottom:0">{{ section.settings.heading_html }}</h2>{%- endif -%}
-      </div>
-    {%- endif -%}
+    {{ sdt_hdr }}
+  {%- endif -%}
     {%- for block in section.blocks -%}
       {%- capture sdt_reveal -%}{% cycle 'reveal-x', 'reveal-r' %}{%- endcapture -%}
       {%- comment -%} A stage whose photo is removed drops the empty frame and its words take the row (15 Sep 2026). {%- endcomment -%}
       {%- assign sdt_has_img = false -%}
       {%- if block.settings.image or block.settings.image_ext != blank -%}{%- assign sdt_has_img = true -%}{%- endif -%}
-      <div class="svc-detail-grid{% unless sdt_has_img %} sdt-noimg{% endunless %}" {{ block.shopify_attributes }}>
+      {%- comment -%} Which side the photo takes. Counted as the stages always were (the heading counted first), so 01 keeps its photo on the right. {%- endcomment -%}
+      {%- liquid
+        assign sdt_n = forloop.index
+        if sdt_has_hdr
+          assign sdt_n = sdt_n | plus: 1
+        endif
+        assign sdt_flip = false
+        if sdt_side == 'right'
+          assign sdt_flip = true
+        elsif sdt_side == 'alternate'
+          assign sdt_odd = sdt_n | modulo: 2
+          if sdt_odd == 0
+            assign sdt_flip = true
+          endif
+        endif
+        assign sdt_alt = forloop.index | modulo: 2
+      -%}
+      {%- if sdt_bands -%}
+      <div class="sdt-band{% if sdt_alt == 0 %} sdt-band-alt{% endif %}{% if forloop.first %} sdt-band-first{% endif %}{% if forloop.last %} sdt-band-last{% endif %}"><div class="inner">
+        {%- if forloop.first -%}{{ sdt_hdr }}{%- endif -%}
+      {%- endif -%}
+      <div class="svc-detail-grid{% if sdt_flip %} sdt-flip{% endif %}{% unless sdt_has_img %} sdt-noimg{% endunless %}" {{ block.shopify_attributes }}>
         {%- if sdt_has_img -%}
         <div class="svc-detail-img {{ sdt_reveal }}">
           {%- if block.settings.image -%}
@@ -51,16 +90,27 @@
           {%- endif -%}
         </div>
       </div>
+      {%- if sdt_bands -%}</div></div>{%- endif -%}
     {%- endfor -%}
+  {%- unless sdt_bands -%}
   </div>
+  {%- endunless -%}
 </section>
 
 <style>
-  .svc-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sdt-gap,96px);align-items:center;padding:calc(clamp(72px,10vw,140px) * var(--sdt-pad,1)) 0}
+  .svc-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sdt-gap,96px);align-items:center;padding:calc(clamp(44px,5vw,72px) * var(--sdt-pad,1)) 0}
   .sdt-hdr{margin-bottom:8px}
-  .sdt-alternate .svc-detail-grid:nth-child(even),.sdt-right .svc-detail-grid{direction:rtl}
+  .svc-detail-grid.sdt-flip{direction:rtl}
   .svc-detail-grid>*{direction:ltr}
   .sdt-div .svc-detail-grid+.svc-detail-grid{border-top:1px solid var(--border)}
+  /* Bands: the section hands its padding to each stage's band. */
+  .sp.sdt.sdt-bands{padding:0}
+  .sdt-band{background:var(--bg);padding:calc(clamp(44px,5vw,72px) * var(--sdt-pad,1) * var(--sp-scale,1)) var(--page-pad)}
+  .sdt-band-alt{background:var(--bg2)}
+  .sdt-band-first{padding-top:calc(clamp(44px,5vw,72px) * var(--sdt-pad,1) * var(--sp-scale,1) * var(--sp-top,1))}
+  .sdt-band-last{padding-bottom:calc(clamp(44px,5vw,72px) * var(--sdt-pad,1) * var(--sp-scale,1) * var(--sp-bot,1))}
+  .sdt-bands .svc-detail-grid{padding:0}
+  .sdt-bands .sdt-hdr{margin-bottom:clamp(28px,3.5vw,48px)}
   .sdt-b-lines .svc-detail-list li::before{display:none}
   .sdt-b-plain .svc-detail-list li::before{display:none}.sdt-b-plain .svc-detail-list li{border-bottom:0;padding:4px 0}.sdt-b-plain .svc-detail-list{border-top:0;padding-top:0}
   .sdt-nozoom .svc-detail-grid:hover .svc-detail-img img{transform:none}
@@ -75,7 +125,8 @@
   .svc-detail-list{list-style:none;margin-top:24px;border-top:1px solid var(--border);padding-top:24px}
   .svc-detail-list li{font-size:13px;font-weight:300;color:var(--ink3);padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
   .svc-detail-list li::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);flex-shrink:0}
-  @media(max-width:900px){.svc-detail-grid{grid-template-columns:1fr;gap:36px}.sdt-alternate .svc-detail-grid:nth-child(even),.sdt-right .svc-detail-grid{direction:ltr}}
+  @media(max-width:900px){.svc-detail-grid{grid-template-columns:1fr;gap:36px}.svc-detail-grid.sdt-flip{direction:ltr}}
+  @media(max-width:768px){.sdt-band{padding-left:20px;padding-right:20px}}
 </style>
 
 {% schema %}
@@ -86,12 +137,13 @@
     {"type": "checkbox", "id": "show_numbers", "label": "Show the large numbers", "default": true},
     {"type": "checkbox", "id": "show_labels", "label": "Show the small labels", "default": true},
     {"type": "checkbox", "id": "show_bullets", "label": "Show the bullet lists", "default": true},
-    {"type": "checkbox", "id": "dividers", "label": "Hairlines between the stages", "default": true},
+    {"type": "checkbox", "id": "dividers", "label": "Hairlines between the stages", "default": true, "info": "Used only when the stages don't alternate backgrounds (Layout)."},
     {"type": "checkbox", "id": "hover_zoom", "label": "Photos zoom gently on hover", "default": true},
     {"type": "header", "content": "Words (optional)"},
     {"type": "text", "id": "label", "label": "Small label above the stages"},
     {"type": "html", "id": "heading_html", "label": "Heading above the stages", "info": "Wrap a word in <em> for the italic accent."},
     {"type": "header", "content": "Layout"},
+    {"type": "checkbox", "id": "alternate_bands", "label": "Stages alternate white and warm grey", "default": true, "info": "Each stage on its own full-width band: the heading and 01 white, 02 warm grey, and so on. Off = one background with hairlines between the stages."},
     {"type": "select", "id": "image_side", "label": "Photos sit", "options": [{"value": "alternate", "label": "Alternating sides (as designed)"}, {"value": "left", "label": "Always left"}, {"value": "right", "label": "Always right"}], "default": "alternate"},
     {"type": "select", "id": "image_shape", "label": "Photo shape", "options": [{"value": "16/10", "label": "Landscape 16:10"}, {"value": "4/3", "label": "Landscape 4:3"}, {"value": "3/2", "label": "Landscape 3:2"}, {"value": "16/9", "label": "Wide 16:9"}, {"value": "1/1", "label": "Square"}, {"value": "4/5", "label": "Portrait 4:5"}], "default": "4/3"},
     {"type": "select", "id": "bullet_style", "label": "Bullet style", "options": [{"value": "dots", "label": "Gold dots with hairlines (as designed)"}, {"value": "lines", "label": "Hairlines only"}, {"value": "plain", "label": "Plain list"}], "default": "dots"},
