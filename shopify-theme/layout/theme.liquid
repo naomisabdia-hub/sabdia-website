@@ -57,6 +57,16 @@
 -%}
 {%- if meta_description -%}<meta name="description" content="{{ meta_description | escape }}">{%- endif -%}
 <link rel="canonical" href="{{ canonical_url }}">
+{%- comment -%}
+  Google Search Console ownership (Naomi, 18 Sep 2026). This one line is
+  what proves the site is ours, so Google will take our sitemap and our
+  requests to index a page. DO NOT REMOVE IT: the property un-verifies the
+  moment it goes, and everything submitted under it stops.
+  Property: https://www.sabdia.com.au (URL prefix). A second Domain
+  property goes in by DNS once the domain moves to GoDaddy; this tag stays
+  either way - it survives a nameserver change, a DNS record would not.
+{%- endcomment -%}
+<meta name="google-site-verification" content="_Bern7SBiX7zMazF0UclO60-pJp0LvFFE1X8zVSJ4ik">
 <link rel="icon" type="image/png" sizes="32x32" href="{{ 'favicon-32.png' | asset_url }}">
 <link rel="icon" type="image/png" sizes="16x16" href="{{ 'favicon-16.png' | asset_url }}">
 <link rel="apple-touch-icon" href="{{ 'apple-touch-icon.png' | asset_url }}">
