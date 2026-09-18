@@ -1,0 +1,19 @@
+{
+  "_about": "What real visitors actually typed at the site chat, read off Apps > Knowledge Base > Query log on 18 Sep 2026. Every one was logged Unanswered. Each is mapped to the question in the trained bank that answers it, so export-knowledge-base.py can put those first: answer these and every question a buyer has actually asked is covered. Re-read the log in Shopify and update this list; the answers are never typed here, they come from train-chat.py.",
+  "read_on": "2026-09-18",
+  "queries": [
+    {"asked": "off market residences buying privately", "when": "18 Sep 7:36am", "answer_to": "Do you sell homes off market?"},
+    {"asked": "residence pricing and sale prices", "when": "18 Sep 7:33am", "answer_to": "How much are your residences?"},
+    {"asked": "SOLACE price", "when": "17 Sep 7:11pm", "answer_to": "How much is SOLACE?"},
+    {"asked": "residences for sale Paddington", "when": "17 Sep 7:10pm", "answer_to": "Do you have anything for sale in another suburb?"},
+    {"asked": "rent or lease QASR", "when": "17 Sep 7:10pm", "answer_to": "Can I rent or lease a residence?"},
+    {"asked": "CASPIAN completion date when finished", "when": "17 Sep 7:09pm", "answer_to": "Is CASPIAN finished?"},
+    {"asked": "AETHER auction price guide", "when": "17 Sep 7:09pm", "answer_to": "Is there a price guide for AETHER?"},
+    {"asked": "CAPRI sale price", "when": "17 Sep 7:09pm", "answer_to": "How much did CAPRI sell for?"},
+    {"asked": "next open home", "when": "17 Sep 6:35pm", "answer_to": "When is the next open home?"},
+    {"asked": "AETHER price rough price range", "when": "17 Sep 6:35pm", "answer_to": "How much is AETHER?"},
+    {"asked": "AETHER availability and inspections", "when": "17 Sep 2:56pm", "answer_to": "Is AETHER still available?"},
+    {"asked": "AETHER next open home inspection open home viewing date", "when": "17 Sep 2:25pm", "answer_to": "When is the open home for AETHER?"},
+    {"asked": "How can I find pricing for a home or request a price quote?", "when": "11 Sep 2026", "answer_to": "How does a pricing enquiry work?"}
+  ]
+}

@@ -25,6 +25,7 @@ import json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BANK = os.path.join(ROOT, 'shopify-app', 'applied', 'chat-training-bank.json')
+LOG = os.path.join(ROOT, 'shopify-app', 'query-log.json')
 OUT = os.path.join(ROOT, 'docs', 'KNOWLEDGE-BASE.md')
 LONG = 250
 if not os.path.exists(BANK): sys.exit('No answer bank - run train-chat.py first.')
@@ -57,10 +58,24 @@ def collection_faqs():
          f"{who} They aren't for sale and have no price guide from our end. Our Director discusses pricing on the residences we do have for sale - tell me which one interests you and our team will come back to you."),
     ]]
 
+# Part 0: the questions real visitors actually typed (Apps > Knowledge Base >
+# Query log), each logged Unanswered. Answer these and every question a buyer
+# has really asked is covered - so they go in before anything else.
+zero = []
+if os.path.exists(LOG):
+    log = json.load(open(LOG))
+    byq = {q: a for g in d['groups'] for q, a in g['qa']}
+    for x in log['queries']:
+        a = byq.get(x['answer_to'])
+        if not a: sys.exit(f"query-log.json points at a question the bank no longer has: {x['answer_to']}")
+        zero.append((f"asked {x['when']}: \u201c{x['asked']}\u201d", x['answer_to'], a))
+ZERO_Q = {q for _, q, _ in zero}
+
 first, rest = [], []
 for g in d['groups']:
     if COLLECTION and g['group'] == COLLECTION['group']: continue
     for q, a in g['qa']:
+        if q in ZERO_Q: continue          # already in Part 0
         (first if g['group'] in FIRST_GROUPS or FIRST_Q.match(q) else rest).append((g['group'], q, a))
 first += collection_faqs()
 
@@ -73,6 +88,7 @@ def fold(rows):
         out.append(seen[a])
     return out
 
+zero_f = [[g, q, a, []] for g, q, a in zero]
 first_f, rest_f = fold(first), fold(rest)
 
 def render(rows, n0, heading, blurb):
@@ -84,7 +100,7 @@ def render(rows, n0, heading, blurb):
         n += 1
     return lines, n
 
-total_faqs = len(first_f) + len(rest_f)
+total_faqs = len(zero_f) + len(first_f) + len(rest_f)
 head = [
     '# Site chat - the answers to enter in the Knowledge Base', '',
     'Shopify admin > **Apps > Knowledge Base > Add FAQ**: the bold line goes in Question, the text under it in Answer.',
@@ -96,11 +112,14 @@ head = [
     '**Part 1 first** - those are the ones the website pages cannot answer, and the ones the agent was making up.',
     'A few answers are marked `long`: Shopify suggests one or two sentences but does not enforce it, so trim if you want to.', '',
 ]
-b1, n = render(first_f, 1, f'Part 1 - enter these first ({len(first_f)})',
+b0, n = render(zero_f, 1, f'Part 0 - the questions buyers have actually asked ({len(zero_f)})',
+               'Read off Apps > Knowledge Base > Query log on 18 Sep 2026. Every one was logged **Unanswered**. '
+               'Enter these first: they are real questions from real visitors, and the answers already exist.')
+b1, n = render(first_f, n, f'Part 1 - enter these next ({len(first_f)})',
                'Open homes, the auction, the selling agent, what Sold and The Collection mean, pricing, and reaching a person.')
 b2, _ = render(rest_f, n, f'Part 2 - the rest ({len(rest_f)})',
                'Worth having, but the published residence pages, For Sale, The Collection, Process and About already cover most of it.')
-open(OUT, 'w').write('\n'.join(head + b1 + b2) + '\n')
+open(OUT, 'w').write('\n'.join(head + b0 + b1 + b2) + '\n')
 print(f"{sum(len(g['qa']) for g in d['groups'])} answers -> {total_faqs} FAQs "
-      f"(Part 1: {len(first_f)}, Part 2: {len(rest_f)}) -> docs/KNOWLEDGE-BASE.md")
-print(f"  {sum(1 for r in first_f + rest_f if len(r[2]) > LONG)} run longer than Shopify's suggested 1-2 sentences.")
+      f"(Part 0: {len(zero_f)}, Part 1: {len(first_f)}, Part 2: {len(rest_f)}) -> docs/KNOWLEDGE-BASE.md")
+print(f"  {sum(1 for r in zero_f + first_f + rest_f if len(r[2]) > LONG)} run longer than Shopify's suggested 1-2 sentences.")
