@@ -181,6 +181,20 @@ try {
 {%- if template.name == 'page' and chat_only_pages contains page.handle -%}
 <meta name="robots" content="noindex,nofollow">
 {%- endif -%}
+{%- comment -%}
+  Two pages Shopify makes that we never made (18 Sep 2026, getting the site
+  into Google): /collections/frontpage is the leftover "Home page" collection,
+  linked from nothing and named nothing we'd choose; and a blog with no
+  articles in it is an empty page. Neither should be the thing someone finds.
+  The blog rule undoes itself: the day The Journal has its first article, it
+  goes back in the index on its own.
+{%- endcomment -%}
+{%- if template.name == 'collection' and collection.handle == 'frontpage' -%}
+<meta name="robots" content="noindex,follow">
+{%- endif -%}
+{%- if template.name == 'blog' and blog.articles_count == 0 -%}
+<meta name="robots" content="noindex,follow">
+{%- endif -%}
 {{ content_for_header }}
 </head>
 {%- comment -%}
